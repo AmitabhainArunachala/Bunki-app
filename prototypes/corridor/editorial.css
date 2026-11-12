@@ -220,7 +220,6 @@ body.v-depth-layered main > .eyebrow::before,
 body.v-depth-layered .eyebrow.shelf-section::before { content: none; }
 body.v-depth-layered main > .eyebrow { padding-top: 0; }
 .note { font-size: var(--type-chrome); line-height: 1.75; border-left-width: 1px; }
-.gesture-hint { font-size: var(--type-label); line-height: 1.65; color: var(--ed-muted); }
 .pool-tag { font-size: var(--type-caption); line-height: 1.7; letter-spacing: 0.01em; color: var(--ed-muted); }
 body .sheet button.pool-tag.cat-chip { min-width: 44px; min-height: 44px; }
 .level-chip { font-size: var(--type-caption); letter-spacing: 0.025em; border-radius: var(--radius-seal); padding: 4px 9px; }
@@ -425,20 +424,6 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
 }
 /* A source you quote from stays selectable: a drag across its words picks an excerpt to keep. */
 .publisher-body .japanese-lookup-word { -webkit-user-select: text; user-select: text; }
-.vocabulary-list-dialog {
-  width: min(520px, calc(100vw - 32px));
-  max-height: calc(100dvh - 48px);
-  padding: 28px;
-  border: 0;
-  border-top: 4px solid var(--red);
-  border-radius: 0;
-  background: var(--ed-paper);
-  color: var(--ed-ink);
-  box-shadow: 0 18px 64px rgb(7 15 23 / 35%);
-}
-.vocabulary-list-dialog::backdrop { background: rgb(9 18 27 / 58%); }
-.vocabulary-list-dialog h2 { margin: 0 0 12px; font: 800 var(--type-title)/1.5 var(--display); overflow-wrap: anywhere; }
-.vocabulary-list-dialog > p { font: var(--type-body)/1.75 var(--sans); color: var(--ed-muted); }
 .vocabulary-list-choices { display: grid; margin: 22px 0; border-top: 2px solid var(--ed-ink); }
 .vocabulary-list-choices .chip {
   width: 100%;
@@ -461,8 +446,6 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
 .vocabulary-list-choices .chip[aria-pressed='true'] { background: var(--ed-ink); color: var(--ed-paper); }
 .vocabulary-list-form { display: grid; gap: 12px; }
 .vocabulary-list-form .search-field { width: 100%; min-width: 0; min-height: 50px; margin: 0; padding: 12px; border: 1px solid var(--ed-rule); border-radius: var(--radius-seal); font: var(--type-body)/1.5 var(--sans); color: var(--ed-ink); background: var(--ed-paper); }
-.vocabulary-list-dialog > .chip { display: block; margin-left: auto; background: var(--ed-ink); color: var(--ed-paper); }
-.vocabulary-list-dialog .vocabulary-list-status { min-height: 1.7em; font-size: var(--type-control); color: var(--ai); }
 
 /* Reference work: navigation, collection information, then an index table. */
 .reference-library { padding-top: 0; }
@@ -2738,48 +2721,6 @@ html[data-register='attempt'] .mock-nav .chip { min-height: 48px; padding: 0 var
    words. The focused word wears the focus token; the pill shows its keys. */
 #reader .tok:focus-visible { outline: none; background: transparent; }
 #reader .tok:focus-visible > .tok-word { background: var(--focus-wash); box-shadow: var(--focus-ring); border-radius: var(--radius-seal) var(--radius-seal) 0 0; }
-.token-actions .tok-kbd {
-  margin-left: 6px;
-  padding: 1px 5px;
-  border: 1px solid var(--raised-edge-strong);
-  border-radius: var(--radius-card);
-  font: 600 var(--type-caption)/1.2 var(--sans);
-  color: var(--text-2);
-}
-@media (hover: none) { .token-actions .tok-kbd { display: none; } }
-
-/* the list chooser's Done: an outlined secondary that reads on its paper */
-body .vocabulary-list-dialog > .chip {
-  border: 1px solid var(--ink);
-  background: var(--raised);
-  color: var(--ink);
-  font-weight: 600;
-}
-body .vocabulary-list-dialog > .chip:hover { background: var(--ai-wash); }
-body .token-actions {
-  max-width: calc(100vw - 16px);
-  width: max-content;
-  gap: 2px;
-  padding: 4px;
-  border: 1px solid var(--raised-edge);
-  border-radius: var(--radius-overlay);
-  background: var(--raised);
-  box-shadow: var(--float-shadow);
-}
-body .token-actions button {
-  display: inline-flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 6px;
-  min-height: 44px;
-  padding: 0 12px;
-  border-radius: var(--radius-control);
-  color: var(--ai);
-  font: 700 var(--type-chrome)/1 var(--sans);
-  white-space: nowrap;
-}
-body .token-actions button .en-sub { display: inline; font-size: var(--type-caption); font-weight: 500; letter-spacing: 0.01em; text-transform: none; color: var(--text-2); }
-body .token-actions button:hover { background: var(--ai-wash); }
 
 /* reference pages: the pager wraps rather than pushing past a 320px screen */
 .reference-library .reference-page-controls { flex-wrap: wrap; row-gap: var(--s1); min-width: 0; }

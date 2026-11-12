@@ -57,7 +57,7 @@
   .gs-button:not(.primary), .cd-btn:not(.cd-primary), .stroke-btn, .stroke-controls button,
   #bunki-reports-root .br-actions button, #bunki-reports-root .br-context-summary button,
   .skip-more, .skip-retry, .skip-search-opener, .skip-code-door, .reference-button,
-  .vocabulary-list-create, .vocabulary-list-form .chip, .vocabulary-list-dialog > .chip,
+  .vocabulary-list-create, .vocabulary-list-form .chip,
   .shelf-tools-toggle
 ) {
   min-height: var(--tc-h);
