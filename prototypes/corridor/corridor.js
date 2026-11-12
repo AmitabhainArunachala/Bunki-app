@@ -20749,7 +20749,6 @@ function renderTextSourceContextSelection(main, saved, body, personal) {
   refresh();
 }
 /** Whether this sentence already stands on the tutor page (a kept sentence): read-only, from the record's entries. */
-/** A tutor door's item and the encounter it was met in: every drawing of one page's door agrees on it. */
 // quoted: false on the sentence's own page, where the sentence already stands above its keep (tighten pass, 2026-11-10)
 function renderTeacherDoor(container, getNode, { quoted = true } = {}) {
   const node = typeof getNode === 'function' ? getNode() : getNode;
@@ -21556,7 +21555,6 @@ function currentJoyoKunNote(id, tag = 'p', className = 'fine') {
   note.dataset.currentJoyoKun = id;
   return note;
 }
-/** Explicit table status for the readings actually shown, including preserved saved answers. */
 /** Every kanji the finder lists, including official forms absent from the lesson source. */
 
 /** Display-only enrichment. Canonical facts and scheduling records are never
@@ -21811,7 +21809,6 @@ function renderSkipLookup(host, options = {}) {
   });
 }
 
-/** What a capped grid shows: its first `cap` hits, or every hit once its "show all" is open (K05). */
 /** Hfix-2e (KT-3) · a grid glyph's name says the kanji itself, then its meaning (「稿 — draft」), with the reading its
  * grid found it by where it has one (「食 たべる — eat」): the gloss alone hid the glyph from VoiceOver. A kanji the
  * lessons lack keeps its reference meaning. */
@@ -22044,7 +22041,6 @@ function ensureKanjiFrequency() {
   }
   return kanjiFreqPromise;
 }
-/** The kanji one newspaper-frequency band lists, commonest first, over the finder's universe (K05). */
 /** The honest line for a lookup table that could not load, with the one retry: the retry answers the query the
  * learner already has (S.kdx keeps it), without a reload (K06). */
 const FREQ_BANDS = [
@@ -22612,11 +22608,6 @@ const wwShort = (s) => String(s || '').replace(/\s*\([^)]*\)/g, '').split(/[;,]/
 /* The shelf is indexed once per fetched article (content bases + text), so a
  * re-centre asks ~130 Set lookups instead of re-walking every token. */
 const wwTokenIndex = new WeakMap();
-/** The sentences of one article whose tokens pass test, as findExamples shapes them. */
-/** The shelf sentences (then fetched bank lines) that hold a word. */
-/** A shelf sentence that holds a kanji, from the articles already fetched. */
-/** A grammar point linked to the word: its pattern, else one of its examples. */
-/** '…学の推進に道…' — a few characters either side of the word. */
 /** Walk back into the article at the sentence, or open the bank line on its own page. */
 
 const WW_REL = { syn: ['類義', 'near'], ant: ['対義', 'opposite'], reg: ['語感', 'register'], fam: ['同族', 'family'], col: ['共起', 'goes with'], thm: ['主題', 'theme'] };
@@ -23985,7 +23976,6 @@ function nodeTitle(node) {
  * Operator (2026-08-10): a level or count on an entry should be a door — tap
  * 漢検 3級 / JLPT N1 / 12 画 and see EVERY kanji in that group, exhaustively.
  * The same node opens the same way everywhere the chip appears. */
-/** Every kanji in a category, ordered common-first (by 漢検 rank) then simpler. */
 /** A tappable chip that opens the catalog for its category. */
 
 function chipsFor(items, onTap, sub, kind) {
@@ -24611,7 +24601,6 @@ function readerTapEncounter(key, articleId) {
   const node = readerTokenNode(token);
   return node && node.id === take.id ? node : null;
 }
-/** A reader token as its door stands for it: a katakana run the reader joined into one word is that word (readerRenderedTokens). */
 /** The slip, in every room: what it stands for (the dot on its headword) and the look-up itself. A card drawn again on the
  * same word counts only what its arrival could not: the entry the full dictionary has just named for a reading the quick
  * one lacked (a reading still being asked about is never counted under a guess; one the dictionary has answered with no
@@ -24793,8 +24782,6 @@ function renderDepthBasis(sheet, node, reading = '') {
  * capture's entry and reading — never the spelling alone, which would open 年 read とし for a card saved as ねん. */
 /** A kept word's own record for a node that names its entry: the card's saved answer (savedAnswerFor), when it stands for
  * exactly that entry. null for anything else; never the first row of the spelling. */
-/** The door to a word he keeps: the capture's own node (learningItemNode — its entry and reading); any other key as it was. */
-/** A mirror row for a word he keeps names the reading he kept it as, and wears its dot. */
 /** The tutor's and the examples' archive key for a word page: the core record keeps the spelling's own key (its replies were
  * written for that record); an entry, and a reading nothing at hand settles, each key by spelling + reading (+ entry), so
  * 訳's archived わけ reply never answers 訳 read やく. Old rows are read, never rewritten. */
@@ -29057,7 +29044,6 @@ function speakBack() {
   if (S.view === 'reader') returnScroll(); else window.scrollTo(0, 0);
   return true;
 }
-/** The article's foot: one quiet chip beside 読み終えた. */
 /** The JLPT room's own door to the guided session, beside the level and length chooser. */
 
 /** 稽古の間 — the study hall (operator, 2026-09-18: "we should have a whole
@@ -29229,7 +29215,6 @@ function learnStageFace(order) {
   return { item, label: item.label || item.id };
 }
 
-/** The stage (concept C): a lacquer proscenium holding one lit washi card. */
 /** The stage's primary for a deck with a sitting ready: begin its due cards, or its new ones. */
 
 /** The five numbered blocks under the stage, inside #study-hall. */
@@ -29389,7 +29374,6 @@ function renderTests(main) {
   main.append(hall);
 }
 
-/** The dojo lobby: choose a length and what to drill. */
 /* 集中道場 › デッキ — the SRS decks the learner can sit. Each deck keeps its
  * own schedule (its own localStorage ledger); 覚えるの札 is the corridor's
  * own word queue, opened as a plain review. */
@@ -30248,7 +30232,6 @@ function renderCardVariant(container, target) {
  * the index has its entry, that entry's spellings (引き返す for 引きかえす; a word with no kanji, its kana forms). Never
  * a kana another entry shares. A page that names its sense (an entry number or a reading) also asks an uninflected
  * token to be read one of that entry's ways, so 一日 read ついたち is not an example of いちにち. */
-/** The kanji a spelling is written with, in order (押さえる and 押える: 押). */
 /** A gloss as the sense test compares it: the dictionary's own normalisation, its ellipses and spacing set aside ("a certain
  * ..." and "a certain..." are one sense). */
 /** The word's own entry: of the entries at hand that write `key`, the one read the core word's way (that reading allowed
@@ -34542,7 +34525,6 @@ function pageCutAllowed() {
   return typeof Element.prototype.animate === 'function' && !document.hidden &&
     !(typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 }
-/** The page's headword: a word's h2, a kanji's glyph, else the page's first heading. */
 /** End a word still travelling: it lands at once. */
 function finishPageTransition() {
   const running = pageTransition;
@@ -36208,7 +36190,6 @@ function typedSearchLens(lens, query) {
   return { lens: 'words' };
 }
 
-/** Build the whole 銀河 chrome (symbol, and when open the bar + bubbles). */
 /* The front door's invitations are written by the frozen drift layer in Japanese. The
  * EN/JA law holds for them too: in EN the layer's own plaque speaks English. Only the
  * invitations are mapped; the layer's record and recovery notices stay exactly as written. */
@@ -37014,7 +36995,6 @@ const ME_FIELDS = [
   { id: 'ai', ja: '半導体・AI・投資', en: 'Semiconductors, AI and investing',
     noteJa: 'ホフスタッター・再帰・計算機科学・テクノロジー', noteEn: 'Hofstadter, recursion, computer science and tech' },
 ];
-/** The July sitting: the first Sunday of July in the goal year, local midnight. */
 /** Whole days from today to the sitting: 0 on the day, negative once it has passed. */
 const ME_MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 /** session only: how many months back the seal calendar is turned */
@@ -37030,8 +37010,6 @@ const meNum = (n) => Number(n).toLocaleString('en-US');
 /** 継いだ言葉: a word that lapsed in review and was later recalled again. The corridor's review log
  * names the state before each grade; a deck's log does not, so a deck card counts only when it
  * has lapsed (its own lapse count), stands in review again, and was recalled on a later day. */
-/** the newest line the learner wrote by hand in sentence practice, else the newest line they kept */
-/** a gold seam along the word's own crack: the same word always breaks the same way */
 /** A Japanese name breaks only after its 中黒 (・) and 、, never inside a word (ヒン|ドゥー) and never
  * before its 中黒 (|・テクノロジー): each phrase, with the mark that ends it, is one unbreakable piece. */
 /** Where an unbegun goal's deck lives: Learn in the current layout, Review in the layout under test. Q · in the house voice
@@ -37040,7 +37018,6 @@ function fieldsDeckHome(ja = '専門デッキ', en = 'The fields deck is') {
   const [roomJa, roomEn] = placesLayout() ? ['復習', 'Review'] : ['学ぶ', 'Learn'];
   return tx(`まだ始めていない。${ja}は「${roomJa}」にある。`, `Not started yet. ${en} in ${roomEn}.`);
 }
-/** One horizon: its name (a field also carries his own gloss), the figure held, the ruled scale. */
 /** The lead horizon: N1 in July 2027, the days to the July sitting from today, then N1 vocabulary. */
 function meSealsPart(days, first) {
   const now = new Date();
@@ -37162,7 +37139,6 @@ function meBackPart() {
   sec.append(row('表示言語', 'Interface language', language), row('明かり', 'Light', light), doors);
   return sec;
 }
-/** Opening Settings at the record: the backup row in view and Export ready for a key press. */
 /** Settings → Layout: the current layout, or the one under test. Two visible states, the active one
  * lit, and one plain line of what changes and what does not. The choice re-renders where it stands. */
 /** Settings → 筆 and 声 (G4): when a word he brings closer writes itself (first meeting · always · never) and whether a
