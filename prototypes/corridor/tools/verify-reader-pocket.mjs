@@ -893,7 +893,10 @@ const CASES = {
       if (!(on.lit > lost.lit)) { problems.push(`${label}: play did not take the read up: bar ${on.bar} (${on.silent}), lit word ${on.litFirst}`); return on; }
       if (on.litFirst <= lost.heard) problems.push(`${label}: play went back to word ${on.litFirst} (heard to word ${lost.heard})`);
       const order = [...new Set((await recordOf(s.page)).asked.map((a) => letters(a.text)))];
-      const expected = order[order.indexOf(letters(lost.played.at(-1))) + 1];
+      // the sentence it could not get is the one after the last played; a clip that could not play (WebKit under the
+      // offline switch, below) is itself the sentence play takes up
+      const last = letters(lost.played.at(-1));
+      const expected = lost.end.silent === 'decode' ? last : order[order.indexOf(last) + 1];
       const first = (await playedTexts())[lost.played.length];
       if (!expected || letters(first) !== expected) problems.push(`${label}: the first sentence played after play ("${String(first).slice(0, 12)}") is not the one after the last heard ("${String(lost.played.at(-1)).slice(0, 12)}")`);
       return on;
@@ -909,7 +912,10 @@ const CASES = {
       await wait(400);
       let lost = await lostAt();
       let end = lost.end;
-      if (end.bar !== 'idle' || !['offline', 'network-failed'].includes(end.silent)) problems.push(`hidden and offline: the bar says ${end.bar} (${end.silent || 'no reason'}: "${end.note}")`);
+      // Playwright's WebKit offline switch also stops blob clips from playing: there the read ends on a clip it had and
+      // could not play ("could not play"), not at the first sentence it could not get; a real network loss does not do that
+      const lostReasons = ENGINE === 'webkit' ? ['offline', 'network-failed', 'decode'] : ['offline', 'network-failed'];
+      if (end.bar !== 'idle' || !lostReasons.includes(end.silent)) problems.push(`hidden and offline: the bar says ${end.bar} (${end.silent || 'no reason'}: "${end.note}")`);
       if (end.audio && !end.audio.paused) problems.push(`hidden and offline: the read ended and the element still plays (${JSON.stringify(end.audio)})`);
       if (end.media?.title !== title || end.media?.state !== 'paused' || !end.media?.handlers.includes('play')) problems.push(`hidden and offline: the lock screen does not keep the article paused with its play: ${JSON.stringify(end.media)}`);
       await wait(1500);
