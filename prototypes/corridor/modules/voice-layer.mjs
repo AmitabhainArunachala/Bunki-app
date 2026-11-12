@@ -125,7 +125,9 @@ export function installVoiceLayer(host) {
   const pocket = createPocketPlayer({ player: speechPlayer, audio, silence: () => (heldSilence ||= silenceUrl(doc.defaultView)),
     // a clip the browser will not let start (a locked phone may refuse) pauses the article's read at its sentence, so
     // the lock screen's play takes it up; any other read fails as before
-    refusalIsPause: () => readerActive() && seam.active() === reader.session });
+    refusalIsPause: () => readerActive() && seam.active() === reader.session,
+    // his read is paused: the element started by nobody in this app is paused again at once (fix round 1)
+    heldPaused: () => readerActive() && seam.active() === reader.session && reader.session.state === 'paused' });
   const player = pocket.player;
   /** The play bar and the lock screen say what the article reader is doing: every change of the read repaints both. */
   const barChanged = () => { host.refreshListenRow?.(); syncMedia(); };

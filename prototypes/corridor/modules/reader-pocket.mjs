@@ -57,8 +57,10 @@ export function pageTimer({ doc, ticks = null, view = doc.defaultView, now = () 
 /** `player` is the speech team's player on `audio` (speech-player.mjs, unchanged); `silence()` gives the address of a
  * short silent clip. `refusalIsPause()` says whether the read now playing takes a clip the browser will not let sound
  * (a locked phone may refuse a new start) as a pause from outside, held at its sentence; otherwise that clip fails as
- * before. Returns { player, hold, letGo, holding, onOutsidePause }: `player` is what the seam drives. */
-export function createPocketPlayer({ player, audio, silence, refusalIsPause = () => false }) {
+ * before. `heldPaused()` says whether his read is paused now: the element started by nobody in this app meanwhile (an
+ * interruption that ends, a headset button) is paused again at once, so the sound never disagrees with the bar and the
+ * lock screen (fix round 1). Returns { player, hold, letGo, holding, onOutsidePause }: `player` is what the seam drives. */
+export function createPocketPlayer({ player, audio, silence, refusalIsPause = () => false, heldPaused = () => false }) {
   // what this app last asked of the element: a clip to play, silence to hold, or nothing sounding
   let intent = 'still';
   let serial = 0;
@@ -73,6 +75,12 @@ export function createPocketPlayer({ player, audio, silence, refusalIsPause = ()
     intent = 'still';
     unkeep();
     tell();
+  });
+  // a start this app did not ask for while his read is paused: his pause wins, and the element is paused again at once
+  // (its own pause is then not told: nothing in this app asked it to play)
+  audio?.addEventListener?.('play', () => {
+    if (intent !== 'still' || audio.paused || !heldPaused()) return;
+    try { audio.pause(); } catch { /* already still */ }
   });
   const settled = (mine) => () => { if (serial === mine && intent === 'play') intent = 'still'; };
   return {
