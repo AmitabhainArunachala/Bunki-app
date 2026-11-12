@@ -87,6 +87,9 @@ async function open(device, address, { wait = null, places = false } = {}) {
 async function goto(page, address, wait = null) {
   await page.goto(base + address, { waitUntil: 'load' });
   await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 45000 });
+  // the voice layer is loaded beside the app and may arrive after the app says ready: a bar is read with the ear in
+  // (its mark is one of the bar's controls); the ear is in once it has painted
+  await page.waitForFunction(() => 'ear' in document.documentElement.dataset, null, { timeout: 45000 });
   if (wait) await page.locator(wait).waitFor();
   await page.evaluate(() => document.fonts?.ready);
   await page.waitForTimeout(500);
