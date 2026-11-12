@@ -2,7 +2,8 @@
 // neighbour (the 耳 like the gate button beside it)"). At rest, the 耳's plate and ink are measured on their pixels next to
 // the gate's: the colour covering most of each button's inner square is its plate, the pixel of its glyph square furthest
 // from that plate its ink (the builder's own measure, tools/verify-voice-legibility.mjs). The two plates must be alike
-// and the two inks must be alike (contrast between them under 1.5:1 each). The first screen (the sky, drawn on the graphics
+// and the two inks must be alike (plates under 1.5:1 apart; inks under 2.5:1 apart, since the gate's torii is drawn in thin
+// SVG strokes that a browser lightens more than the 耳's type). The first screen (the sky, drawn on the graphics
 // card: Chromium with --use-angle=metal, or headless WebKit) and, as the control, a reading page's bar.
 //   node mark-like-gate.mjs --engine chromium|webkit [--width 1728|390] [--looks hokusai,sumi,yoru] [--where sky,bar]
 import { createRequire } from 'node:module';
@@ -51,7 +52,7 @@ async function compare(where, look) {
   const plates = ratio(gate.plate, ear.plate), inks = ratio(gate.ink, ear.ink);
   const problems = [];
   if (plates >= 1.5) problems.push(`the plates differ ${plates.toFixed(2)}:1`);
-  if (inks >= 1.5) problems.push(`the inks differ ${inks.toFixed(2)}:1`);
+  if (inks >= 2.5) problems.push(`the inks differ ${inks.toFixed(2)}:1`);
   record(`${where}, ${look}: at rest the 耳 looks like the gate beside it`, problems, `gate ${show(gate)}; 耳 ${show(ear)}; ear ${await page.evaluate(() => document.documentElement.dataset.ear)}`);
 }
 try {
