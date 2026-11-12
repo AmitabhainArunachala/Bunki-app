@@ -81,6 +81,9 @@ function fixture({ language = 'en', preference = null, results = [], quotes = 1,
     after(button) { this.nextElementSibling = button; },
   }));
   const context = {
+    // the voice layer (corridor.js `let voiceLayer`, set once it installs) is not installed in these fixtures: the
+    // lifted functions take their recorded-clip paths, as before the voice seam (4f324b65e) began to name it
+    voiceLayer: null,
     S: { view: 'reader' }, sessionVoicePref: null,
     articleNarration: { v: 2, lock: lockBlock, articles: library },
     tx: (ja, en) => language === 'ja' ? ja : en,
@@ -233,6 +236,9 @@ test('Replaying a card word leaves no false failure; a real failure still says s
       classList: { add() {}, remove() {} },
     };
   const context = {
+    // the voice layer (corridor.js `let voiceLayer`, set once it installs) is not installed in these fixtures: the
+    // lifted functions take their recorded-clip paths, as before the voice seam (4f324b65e) began to name it
+    voiceLayer: null,
     S: { view: "review" },
     readAloud: { on: false },
     Audio: media.Audio,
@@ -366,6 +372,9 @@ function listeningFixture({ loadAudio = null, retainedOwner = false } = {}) {
       recordingStopped: context.recAudioEl === null });
   };
   const context = {
+    // the voice layer (corridor.js `let voiceLayer`, set once it installs) is not installed in these fixtures: the
+    // lifted functions take their recorded-clip paths, as before the voice seam (4f324b65e) began to name it
+    voiceLayer: null,
     AbortController, clearTimeout,
     recordEpoch: 1, recordReady: epoch => epoch === 1, recordWritable: () => true,
     S: { view: 'sentence-practice', sentencePracticeView: state },
