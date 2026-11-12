@@ -19,7 +19,6 @@ const AUDIO_DB = 'kairo-speak-audio';
 const AUDIO_DB_MAX_BYTES = 50 * 1024 * 1024;
 const AUTO_LISTEN_MS = 60_000;
 const TURN_BUDGET_MS = 30_000;
-const VOICE_BUDGET_MS = 30_000;
 const SLOW_RATE = 0.85;
 const VISIBLE_MARKS = 2;
 
@@ -262,25 +261,6 @@ export function createSpeakRoom(host) {
     line.voice = [];
     return typeof host.lineSentences === 'function' ? host.lineSentences(String(line?.text || '')) : [];
   }
-  function splitLine(line) {
-    const tokens = Array.isArray(line.tokens) ? line.tokens : null;
-    if (!tokens) return core.splitSentences(line.text).map((text) => ({ text, tokens: null }));
-    const out = [];
-    let current = [];
-    for (const token of tokens) {
-      current.push(token);
-      if (/[。！？!?]$/u.test(token.s)) { out.push(current); current = []; }
-    }
-    if (current.length) out.push(current);
-    return out.map((tokens) => ({ text: tokens.map((token) => token.s).join(''), tokens }));
-  }
-  /** A reading the dictionary would read otherwise is given to the voice in kana: what is shown is what is said. */
-  function readingTrap(token) {
-    if (!token?.r || token.b !== token.s) return false;
-    const usual = host.defaultReading?.(token.b);
-    return !!usual && core.kana(usual) !== core.kana(token.r);
-  }
-
   /* ---------------------------------------------------------------- playback: one element, one owner */
   function ensureAudio() {
     if (audio) return audio;
