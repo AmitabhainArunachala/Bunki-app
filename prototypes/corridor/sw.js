@@ -128,6 +128,9 @@ const SHELL = [
   // 宙's mount, a boot script of index.html; the engine and its data load only where the sky shows, and offline
   // without them the mount gives the old first screen back
   'sky/mount.mjs',
+  // the print look's reader (an article's pigments, the old first screen's word inks), a boot script of index.html;
+  // its plates (print/) are verified and cached on first use like any release asset
+  'print-look.mjs',
   'manifest.webmanifest',
   'apple-touch-icon.png',
   'icon-192.png',

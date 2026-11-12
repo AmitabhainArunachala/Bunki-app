@@ -146,6 +146,7 @@ try {
     'review-caller.mjs',
     'help-relevance.mjs',
     'journey-lifecycle.mjs',
+    'print-look.mjs',
     'decks/context-dense/engine.js',
     'decks/context-dense/mount.js',
     'decks/player/engine.js',
