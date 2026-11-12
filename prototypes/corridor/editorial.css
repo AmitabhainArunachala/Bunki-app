@@ -1804,22 +1804,6 @@ body[data-view='reader'] main > blockquote {
   white-space: nowrap;
 }
 .reader-actions .teacher-actions .en-sub { font-size: var(--type-caption); letter-spacing: 0.02em; text-transform: none; opacity: 0.9; }
-.reader-tip {
-  /* a note in the page, above the article's text: it never floats over the words (glance pass) */
-  display: flex;
-  align-items: center;
-  gap: var(--s1);
-  max-width: 40em;
-  margin: 0 0 var(--s3);
-  padding: 4px 2px 4px var(--s2);
-  border: 1px solid var(--raised-edge);
-  border-left: 3px solid var(--ai);
-  border-radius: var(--radius-card);
-  color: var(--text);
-  background: color-mix(in srgb, var(--ai) 6%, var(--raised));
-}
-.reader-tip-text { flex: 1 1 auto; margin: 0; font: 500 var(--type-chrome)/1.55 var(--sans); }
-.reader-tip .icon-button { flex: 0 0 auto; color: var(--text-2); }
 
 /* the article's foot: finish, then everything about the text */
 .article-footer { margin: var(--s5) 0 0; padding: var(--s3) 0 0; border-top: 2px solid var(--rule-strong); }
@@ -1854,11 +1838,6 @@ body .article-about .note .inline-link { color: var(--text-2); text-decoration-c
 body .article-about .note .inline-link:hover { color: var(--ai); text-decoration-color: currentColor; }
 .article-about .details-toggle { margin: var(--s1) 0 0; }
 
-/* a fixed bar never hides the page's last lines */
-/* the room the sentence bar needs at the page's foot is reserved from the first visit's tip on, so
-   the page does not grow under the reader when the first word is chosen (the tip itself is inline) */
-body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip) #app { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
-:root body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip):not(.zen):not([data-view='entry']) #app > main { padding-bottom: 176px; }
 /* pending (no recording in the locked voice): the same mark, dimmed; its reason is its description, out of sight.
    The reader's bar only: sentence practice has no mark, so there its reason is the one visible sign that the
    recording is missing (V, 2026-10-17 — unscoped, this hid it too and left the listening section blank) */
@@ -2008,8 +1987,6 @@ body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip) #app { 
   .reader-actions .teacher-actions { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .reader-actions .teacher-actions .chip { padding: 4px 6px; font-size: var(--type-chrome); }
   .reader-actions-close { grid-column: 2; grid-row: 1; }
-  .reader-tip { margin-bottom: var(--s2); padding-left: 12px; }
-  :root body[data-view='reader']:has(.reader-actions:not([hidden]), #reader-tip):not(.zen):not([data-view='entry']) #app > main { padding-bottom: 210px; }
   .article-about { padding: var(--s2); }
   .article-facts { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   .article-facts dd { margin-bottom: var(--s1); }
@@ -2259,14 +2236,12 @@ body .sheet .rad-door {
   margin: 0 0 var(--s2);
   padding: 12px var(--s2);
 }
-@media (hover: hover) { }
 body .sheet .rad-glyph { font-size: var(--type-hero); color: var(--text); }
 body .sheet .rad-name { font: 600 var(--type-lead)/1.4 var(--sans); color: var(--text); }
 body .sheet .rad-sub { font: var(--type-label)/1.5 var(--sans); color: var(--text-2); }
 body .sheet .stroke-door {
   padding: 10px;
 }
-@media (hover: hover) { }
 
 /* the writing room */
 #stroke-page .ink-sheet {
@@ -3157,10 +3132,6 @@ body .token-actions button:hover { background: var(--ai-wash); }
 .vocabulary-list-popover .vocabulary-list-status:empty { display: none; }
 .vocabulary-list-popover :is(.vocabulary-list-form, .vocabulary-list-new)[hidden] { display: none; }
 
-/* The one-time hint keeps its space after the first word opens. */
-.reader-tip.is-done { opacity: 0; pointer-events: none; transition: opacity 200ms ease; }
-.reader-tip.is-done[data-faded] { visibility: hidden; }
-
 /* 原文 / やさしい版: a two-sided switch that says what each side is and its level, and one line on what the
    simplified version is */
 .version-block { margin: 0 0 var(--s3); }
@@ -3723,7 +3694,6 @@ body.zen .probe-row .grade.g-again { border-color: var(--color-zen-signal); }
     font-size: var(--type-chrome);
     font-variant-numeric: tabular-nums;
   }
-  body.has-primary-tabs[data-view='reader'] #reader-tip { margin-bottom: 4px; }
   body.has-primary-tabs[data-view='reader'] #app > main > .view-title-en { margin-bottom: 4px; }
   body.has-primary-tabs[data-view='reader'] .reader-head { margin-bottom: 8px; }
   body.has-primary-tabs[data-view='reader'] #app::after { height: calc(44px + env(safe-area-inset-bottom)); }
