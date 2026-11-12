@@ -162,7 +162,7 @@ await run('bare', async () => {
   const s = await sky();
   try {
     let words = [];
-    for (let k = 0; k < 10 && !words.length; k += 1) { words = await clearWords(s.page, "W.rd[i] === ''"); if (!words.length) { await s.page.mouse.wheel(0, 400); await s.sleep(1500); } }
+    for (let k = 0; k < 10 && !words.length; k += 1) { words = await clearWords(s.page, "W.rd[i] === ''"); if (!words.length) { if (s.phone) { for (let q = 0; q < 3; q += 1) await s.page.keyboard.press('ArrowRight'); } else await s.page.mouse.wheel(0, 400); await s.sleep(1500); } }   // a phone's WebKit has no wheel: the sky's own arrow key turns the ring there
     const w = words[0];
     if (!w) throw new Error('no clear sky word without a reading in view');
     await arm(s);
