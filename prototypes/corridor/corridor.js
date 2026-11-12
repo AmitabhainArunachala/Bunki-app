@@ -18566,16 +18566,6 @@ async function loadAssessmentForm(entry) {
   const { form, delivery } = await store.prepare(entry, assessmentV2Module.parseFormVersion);
   assessmentForms.set(key, form); assessmentDeliveries.set(key, delivery); assessmentFormStores.set(key, store); return form;
 }
-// A finished or reopened attempt may need its delivery for per-question provenance only.
-const assessmentDeliveryLoads = new Map();
-function ensureAssessmentDelivery(selected) {
-  const key = selected?.form?.sha256;
-  if (!key || assessmentDeliveries.has(key) || assessmentDeliveryLoads.has(key)) return;
-  assessmentDeliveryLoads.set(key, loadAssessmentCatalog().then(catalog => {
-    const entry = assessmentCatalogVersions(catalog).find(row => row.id === selected.form.id && row.formSha256 === key && assessmentAdmitted(row));
-    return entry ? loadAssessmentForm(entry) : null;
-  }).catch(() => null).finally(() => { if (S.view === 'mock') render(); }));
-}
 async function assessmentMediaBlob(selected, assetId) {
   if (!assessmentDeliveries.has(selected.form.sha256)) {
     const catalog = await loadAssessmentCatalog();
@@ -18809,14 +18799,12 @@ function createAssessmentRoom() {
     // 検収前 class: the label for an attempt started on a machine-checked form, and each question's checks
     machineCheckLabel: selected => assessmentDeliveryModule?.machineCheckedEditorial(selected?.attempt?.editorialAtStart)
       ? assessmentDeliveryModule.MACHINE_CHECK_LABEL : null,
-    itemCheck: (selected, itemId) => assessmentDeliveries.get(selected.form.sha256)?.itemChecks?.find(row => row.itemId === itemId) || null,
     officialFacts: level => assessmentV2Module?.jlptOfficialFacts?.(level) || null,
     // 本物 class: a real paper from this device's private store (never mixed with AI forms)
     officialEntry: officialAssessmentEntry,
     officialPages: officialAssessmentPages,
     importPrivatePack: importPrivateAssessmentPack,
     removePrivatePack: removePrivateAssessmentPack,
-    ensureDelivery: ensureAssessmentDelivery,
     remaining: selected => {
       if (!selected.block || selected.remainingMs === null) return 0;
       const monotonicDelta = selected.attempt.clock.sessionId === assessmentClockSession && selected.attempt.clock.lastMonotonicMs !== null
