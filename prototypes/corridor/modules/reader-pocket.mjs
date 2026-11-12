@@ -90,7 +90,12 @@ export function createPocketPlayer({ player, audio, silence, refusalIsPause = ()
         intent = 'play';
         const mine = ++serial;
         const pending = Promise.resolve(player.play(clip, rate)).catch((error) => {
-          if (error?.name !== 'NotAllowedError' || serial !== mine || !refusalIsPause()) throw error;
+          if (error?.name !== 'NotAllowedError' || serial !== mine || !refusalIsPause()) {
+            // a clip that could not play: a browser leaves the element not paused after a source it cannot play; it is
+            // made still, so it never reads as playing once the read has ended (fix round 1). Not told: this app did it.
+            if (serial === mine) { intent = 'still'; try { audio?.pause(); } catch { /* already still */ } }
+            throw error;
+          }
           // told first, so the read is paused while this clip is still its own; the clip ends as stopped, and play says
           // its sentence again
           intent = 'still';
