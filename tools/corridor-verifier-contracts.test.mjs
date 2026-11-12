@@ -35,3 +35,6 @@ test('pending save held-request contract executes without skips', () => {
 test('gate on every bar contracts execute every case without skips', () => {
   requireContracts('prototypes/corridor/tools/gate-everywhere.test.mjs', 12, 420000);
 }, 450000);
+test('ear mark beside its gate in every frame contracts execute every case without skips', () => {
+  requireContracts('prototypes/corridor/tools/ear-place.test.mjs', 8, 420000);
+}, 450000);

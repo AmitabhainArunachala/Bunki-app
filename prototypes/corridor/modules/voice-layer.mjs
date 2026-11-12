@@ -1059,9 +1059,9 @@ export function installVoiceLayer(host) {
     if (changes.every(earsOnly)) return;
     // a bar the app has just drawn takes the ear's mark in the same turn, before the screen is painted: the mark is not
     // missing from a bar between its drawing and the next look at the page (on a slow machine that was many frames,
-    // and the line's check on GitHub read the Learn bar inside them)
-    ear.place();
-    rescan();
+    // and the line's check on GitHub read the Learn bar inside them). A mark that cannot be placed must not cost the
+    // page its look at what changed: the look is asked for whatever the placement does, and the failure is still thrown
+    try { ear.place(); } finally { rescan(); }
   }).observe(doc.body, { childList: true, subtree: true });
   ear.place();
   rescan();
