@@ -1932,3 +1932,175 @@ describe('words of running text that open a lookup are text for the ear (K2)', (
     expect(appControlAt(textIn(word, '経済'))).toBe(null);
   });
 });
+
+/* ------------------------------------------------------------------ where the marks stand */
+describe('where the ear’s marks stand: beside every gate, and a bar drawn again wears its old mark', () => {
+  // A page of bars. Each bar is a row of nodes; a node knows its row, its next neighbour and whether its row is on the page.
+  function stage() {
+    const rows = new Set();
+    const made = [];
+    const node = (fields) => {
+      const attrs = new Map();
+      const self = {
+        row: null,
+        ...fields,
+        getAttribute: (name) => (attrs.has(name) ? attrs.get(name) : null),
+        setAttribute: (name, value) => attrs.set(name, String(value)),
+        get isConnected() {
+          return !!self.row && rows.has(self.row);
+        },
+        get parentElement() {
+          return self.row;
+        },
+        get nextElementSibling() {
+          const at = self.row ? self.row.kids.indexOf(self) : -1;
+          return at >= 0 ? (self.row.kids[at + 1] ?? null) : null;
+        },
+        after(other) {
+          if (other.row) other.row.kids.splice(other.row.kids.indexOf(other), 1);
+          self.row.kids.splice(self.row.kids.indexOf(self) + 1, 0, other);
+          other.row = self.row;
+        },
+      };
+      return self;
+    };
+    const plain = { contains: () => false };
+    const make = () => {
+      const spot = node({ classList: { contains: (name) => name === 'ear-spot' } });
+      made.push(spot);
+      return spot;
+    };
+    /** A bar of a kind (sky, bar or sheet) on the page: its gate, then one more control. */
+    const bar = (kind) => {
+      const row = {
+        kids: [],
+        matches: (selector) => selector === '.sheet-bar' && kind === 'sheet',
+      };
+      const gate = node({ id: kind === 'sky' ? 'ginga-symbol' : '', classList: plain });
+      const search = node({ id: 'search', classList: plain });
+      for (const kid of [gate, search]) {
+        kid.row = row;
+        row.kids.push(kid);
+      }
+      rows.add(row);
+      return { row, gate, search, mark: () => gate.nextElementSibling };
+    };
+    return { bar, drop: (b) => rows.delete(b.row), make, made };
+  }
+  const home = (spot) => spot.getAttribute('data-ear-home');
+
+  it('a gate with no mark takes a new one, right after the gate, named for where it stands', () => {
+    const { bar, make, made } = stage();
+    const marks = new Set();
+    const sky = bar('sky');
+    const room = bar('bar');
+    const sheet = bar('sheet');
+    ear.placeMarks([sky.gate, room.gate, sheet.gate], marks, make);
+    expect(made).toHaveLength(3);
+    expect(marks.size).toBe(3);
+    expect([sky, room, sheet].map((b) => home(b.mark()))).toEqual(['sky', 'bar', 'sheet']);
+    for (const b of [sky, room, sheet]) expect(b.row.kids).toEqual([b.gate, b.mark(), b.search]);
+    expect(ear.gateHome(sky.gate)).toBe('sky');
+    expect(ear.gateHome(room.gate)).toBe('bar');
+    expect(ear.gateHome(sheet.gate)).toBe('sheet');
+  });
+
+  it('a gate that has its mark is left as it is', () => {
+    const { bar, make, made } = stage();
+    const marks = new Set();
+    const room = bar('bar');
+    ear.placeMarks([room.gate], marks, make);
+    const first = room.mark();
+    ear.placeMarks([room.gate], marks, make);
+    ear.placeMarks([room.gate], marks, make);
+    expect(room.mark()).toBe(first);
+    expect(made).toHaveLength(1);
+    expect(room.row.kids).toHaveLength(3);
+  });
+
+  it('a bar drawn again wears the mark its old bar had; eight redraws make no second mark', () => {
+    const { bar, drop, make, made } = stage();
+    const marks = new Set();
+    let room = bar('bar');
+    ear.placeMarks([room.gate], marks, make);
+    const first = room.mark();
+    for (let redraw = 0; redraw < 8; redraw += 1) {
+      drop(room);
+      room = bar('bar');
+      expect(room.mark()).toBe(room.search);
+      ear.placeMarks([room.gate], marks, make);
+      expect(room.mark()).toBe(first);
+      expect(first.isConnected).toBe(true);
+    }
+    expect(made).toHaveLength(1);
+    expect(marks.size).toBe(1);
+  });
+
+  it('two bars at once keep one mark each: each bar drawn again takes back its own', () => {
+    const { bar, drop, make, made } = stage();
+    const marks = new Set();
+    let room = bar('bar');
+    let sheet = bar('sheet');
+    ear.placeMarks([room.gate, sheet.gate], marks, make);
+    const ofRoom = room.mark();
+    const ofSheet = sheet.mark();
+    expect(ofRoom).not.toBe(ofSheet);
+    // the page's bar is drawn again under the sheet
+    drop(room);
+    room = bar('bar');
+    ear.placeMarks([room.gate, sheet.gate], marks, make);
+    expect(room.mark()).toBe(ofRoom);
+    expect(sheet.mark()).toBe(ofSheet);
+    // both at once
+    drop(room);
+    drop(sheet);
+    room = bar('bar');
+    sheet = bar('sheet');
+    ear.placeMarks([sheet.gate, room.gate], marks, make);
+    expect(room.mark()).toBe(ofRoom);
+    expect(sheet.mark()).toBe(ofSheet);
+    expect(made).toHaveLength(2);
+    expect([home(ofRoom), home(ofSheet)]).toEqual(['bar', 'sheet']);
+  });
+
+  it('a mark never moves to a bar of another kind: the sheet’s spare is not given to a room’s bar', () => {
+    const { bar, drop, make, made } = stage();
+    const marks = new Set();
+    const sheet = bar('sheet');
+    ear.placeMarks([sheet.gate], marks, make);
+    const ofSheet = sheet.mark();
+    drop(sheet);
+    const room = bar('bar');
+    ear.placeMarks([room.gate], marks, make);
+    expect(room.mark()).not.toBe(ofSheet);
+    expect(home(room.mark())).toBe('bar');
+    expect(home(ofSheet)).toBe('sheet');
+    expect(made).toHaveLength(2);
+    // and the sheet's mark, which no gate took, is no longer held
+    expect(marks.has(ofSheet)).toBe(false);
+    expect(marks.size).toBe(1);
+  });
+
+  it('a mark no gate takes is let go, and the next bar gets a new one', () => {
+    const { bar, drop, make, made } = stage();
+    const marks = new Set();
+    const room = bar('bar');
+    ear.placeMarks([room.gate], marks, make);
+    const first = room.mark();
+    // a screen with no bar (the review card)
+    drop(room);
+    ear.placeMarks([], marks, make);
+    expect(marks.size).toBe(0);
+    const next = bar('bar');
+    ear.placeMarks([next.gate], marks, make);
+    expect(next.mark()).not.toBe(first);
+    expect(made).toHaveLength(2);
+    expect(marks.size).toBe(1);
+  });
+
+  it('the gates it looks for are the first screen’s and each bar’s', () => {
+    expect(ear.EAR_GATES).toBe(
+      '#ginga-symbol, :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate',
+    );
+  });
+});

@@ -1013,6 +1013,29 @@ html[data-ear='novoice'] .ear-mark::after { content: ''; position: absolute; lef
 }
 `;
 
+/* ------------------------------------------------------------------ where the marks stand */
+/** The gates a mark stands beside: the first screen's, and the gate of the room's bar and of a page's bar. */
+export const EAR_GATES = '#ginga-symbol, :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate';
+/** Where a gate stands: the first screen (sky), a page's bar (sheet) or the room's bar (bar). */
+export const gateHome = (gate) => (gate.id === 'ginga-symbol' ? 'sky' : gate.parentElement?.matches?.('.sheet-bar') ? 'sheet' : 'bar');
+/** The one rule for where the marks stand. `gates` are the gates now in the page; `marks` is the set of marks the ear
+ * holds; `make()` makes a new one. A gate that has its mark is left as it is. A mark that left the page with its old bar
+ * is given to a new gate of the same home, so a bar drawn again wears the mark its old bar had and two bars at once (a
+ * room's bar under a page's) never trade marks. A mark no gate takes is let go. Plain inputs: tools/ear.test.mjs. */
+export function placeMarks(gates, marks, make) {
+  const spare = [];
+  for (const spot of [...marks]) if (!spot.isConnected) { marks.delete(spot); spare.push(spot); }
+  for (const gate of gates) {
+    if (gate.nextElementSibling?.classList?.contains('ear-spot')) continue;
+    const home = gateHome(gate);
+    const at = spare.findIndex((spot) => spot.getAttribute('data-ear-home') === home);
+    const spot = at >= 0 ? spare.splice(at, 1)[0] : make();
+    spot.setAttribute('data-ear-home', home);
+    marks.add(spot);
+    gate.after(spot);
+  }
+}
+
 /* ------------------------------------------------------------------ the wiring */
 /** Install the ear in `doc`. `speak(unit, done)` reads a unit through the voice seam and returns its handle;
  * `cannot(unit)` names why there is no voice right now; `context()` gives { view, articleOf, keyFor } for voice keys.
@@ -1178,20 +1201,8 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
   /** A mark beside the first screen's gate and beside the gate of every bar, put there in the same turn as the gate.
    * The app draws a room's bar again several times while the room loads; the new bar takes the mark its old bar had,
    * with the colours and the state it wore, so the mark never leaves a bar that is on screen (the voice layer calls
-   * this at each change to the page; the painting waits for mount). */
-  function place() {
-    const spare = [];
-    for (const spot of [...marks]) if (!spot.isConnected) { marks.delete(spot); spare.push(spot); }
-    for (const gate of doc.querySelectorAll('#ginga-symbol, :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate')) {
-      if (gate.nextElementSibling?.classList?.contains('ear-spot')) continue;
-      const home = gate.id === 'ginga-symbol' ? 'sky' : gate.parentElement?.matches?.('.sheet-bar') ? 'sheet' : 'bar';
-      const at = spare.findIndex((spot) => spot.getAttribute('data-ear-home') === home);
-      const spot = at >= 0 ? spare.splice(at, 1)[0] : makeMark();
-      spot.setAttribute('data-ear-home', home);
-      marks.add(spot);
-      gate.after(spot);
-    }
-  }
+   * this at each change to the page; the painting waits for mount). The rule itself is placeMarks, above. */
+  function place() { placeMarks(doc.querySelectorAll(EAR_GATES), marks, makeMark); }
   /** The marks in their places, and each one that shows painted for where it now stands. */
   function mount() {
     place();
