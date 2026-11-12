@@ -28725,7 +28725,6 @@ function guidedHost() {
       }
       : null,
     openReport: maintenanceReports ? () => maintenanceReports.openReport() : null,
-    openEntry: (node) => go(node, { invoker: document.activeElement }),
     // a word in the session's teaching text opens the app's one slip beside it (contract §1); Save goes through
     // the session's own path (host), so its ledger and its crane keep their word
     openSlip: (node, options = {}) => openSlip(node, { ...options, from: 'guided' }),
