@@ -467,16 +467,6 @@ body.v-depth-layered .sheet .sem-group { border: 0; border-radius: 0; background
 .reference-level:hover { background: var(--ai-wash); }
 .reference-level-name { font-family: var(--display); font-size: var(--type-display); color: var(--ed-ink); }
 .reference-level-count { font-size: var(--type-body); line-height: 1.6; margin-top: 8px; }
-.reference-level-saved { font-size: var(--type-label); line-height: 1.6; color: var(--ed-muted); }
-.reference-guide { margin: 24px 0 30px; border-block: 1px solid var(--ed-rule); }
-.reference-guide > summary { padding: 15px 0; cursor: pointer; font-size: var(--type-body); font-weight: 600; color: var(--ai); }
-.reference-guide[open] > summary { border-bottom: 1px solid var(--ed-rule-light); }
-.reference-guide-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; padding: 22px 0; }
-.reference-guide-grid > * { min-width: 0; padding: 0; }
-.reference-guide-grid :is(h2, h3) { font-family: var(--display); font-size: var(--type-reading); margin: 0 0 12px; }
-.reference-guide-grid p { font-size: var(--type-control); line-height: 1.8; color: var(--ed-muted); margin: 0 0 12px; }
-.reference-guide-grid a { color: var(--ai); font-size: var(--type-chrome); }
-.reference-guide-note { margin: 0 0 18px; font-size: var(--type-chrome); line-height: 1.75; color: var(--ed-muted); }
 .reference-provenance { border-color: var(--ed-rule); font-size: var(--type-chrome); line-height: 1.8; }
 .reference-toolbar {
   padding: 22px;
@@ -687,7 +677,6 @@ html[data-register='tutor'] main button.japanese-lookup-word { border: 0; backgr
 @media (max-width: 760px) {
   body:not(.zen) #app > .chrome { gap: 0; padding-inline: 8px; }
   body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main { width: calc(100% - 24px); margin-top: 16px; padding: 26px 24px 64px; }
-  .reference-guide-grid { grid-template-columns: minmax(0, 1fr); gap: 22px; }
 }
 @media (max-width: 520px) {
   /* a phone's bar keeps every door on one row: the English words stay in each door's name for a
@@ -720,7 +709,6 @@ html[data-register='tutor'] main button.japanese-lookup-word { border: 0; backgr
   .reference-toolbar { padding: 14px 12px; }
   .reference-results-header { align-items: flex-start; }
   .reference-library .reference-level { padding: 16px; min-height: 135px; }
-  .reference-guide-grid { padding: 18px 0; }
   .reference-other-rooms { gap: 4px 14px; }
   .assessment-room .exam-paper { padding-top: 22px; }
   .assessment-room .exam-task-heading { font-size: var(--type-reading); }
@@ -1296,15 +1284,6 @@ body #shelf-body .story-card:focus-within { outline: 2px solid var(--tint); outl
   transition: transform 600ms var(--ease-standard);
 }
 /* (the calm topic-coloured placeholder block is gone: a picture-less story wears its key-kanji sheet, Material II) */
-.story-picture-word {
-  padding: 0 12px;
-  font: 600 var(--type-label)/1.2 var(--sans);
-  font-variant: small-caps;
-  letter-spacing: 0.16em;
-  text-transform: lowercase;
-  color: color-mix(in srgb, var(--topic, var(--tint)) 82%, #000);
-  opacity: 0.82;
-}
 /* N · a picture-less story's key kanji (heroKanji), one 書 sheet: the world's ink on the world's paper, set large and
    centred in the picture's own 3:2 box, so nothing moves; no category word, no block. The glyph scales with its box. */
 .story-picture.is-kanji,
@@ -1428,7 +1407,6 @@ html[data-room='shelf'] #shelf-body .story-lead .story-picture.is-kanji {
 #shelf-body .story-teaser .story-foot { padding-top: 6px; gap: 6px; }
 #shelf-body .story-teaser .level-badge { top: 8px; right: 8px; min-height: 20px; padding: 0 7px; font-size: var(--type-caption); }
 #shelf-body .story-teaser .story-date { font-size: var(--type-caption); }
-#shelf-body .story-teaser .story-picture-word { font-size: var(--type-caption); letter-spacing: 0.12em; }
 
 /* the short word definitions: compact text cards in their own band, no picture */
 #shelf-body .shelf-definition-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
@@ -1810,7 +1788,6 @@ body .article-about .note .inline-link:hover { color: var(--ai); text-decoration
   #shelf-reading-results > .story-grid .story-picture { grid-column: 2; grid-row: 1; margin: 16px 16px 16px 0; border-radius: var(--radius-card); }
   #shelf-reading-results > .story-grid .shelf-head { grid-column: 1; grid-row: 1; padding: 14px 12px 16px 16px; }
   #shelf-reading-results > .story-grid .level-badge { top: 6px; right: 6px; min-height: 20px; padding: 0 7px; font-size: var(--type-caption); }
-  #shelf-reading-results > .story-grid .story-picture-word { font-size: var(--type-caption); letter-spacing: 0.1em; }
   #shelf-body .shelf-definition-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .shelf-encounter-choices { grid-template-columns: minmax(0, 1fr); }
 }
@@ -2831,12 +2808,9 @@ html[data-register='attempt'] .mock-nav .chip { min-height: 48px; padding: 0 var
 .seal-strip-lists > .seal-strip-status { display: inline-flex; align-items: center; min-height: 44px; margin: 0 6px 0 4px; }
 .seal-strip-lists > .seal-act[data-strip-action='remove'] { margin-inline: -4px 6px; }
 .seal-strip-lists > .seal-strip-status:empty { display: none; }
-.seal-strip-more { display: contents; }
-.seal-strip-more[hidden], .seal-strip-form[hidden], .seal-strip [hidden] { display: none; }
+.seal-strip [hidden] { display: none; }
 .seal-strip .seal-list { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .seal-strip .seal-list[aria-pressed='true']::after { content: ' ✓'; }
-.seal-strip-form { display: flex; flex: 1 1 100%; gap: 6px; }
-.seal-strip-form .vocabulary-list-field { flex: 1 1 auto; min-width: 0; }
 .seal-strip-acts { display: flex; flex-wrap: wrap; gap: 0 2px; margin: 8px -6px 0; padding-top: 4px; border-top: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent); }
 /* two verbs to a line even on a 320 phone (全項目 · Full entry | Save the sentence), so the acts take two lines, not three */
 .seal-strip .seal-strip-acts > button.seal-act { padding-inline: 6px; }
@@ -2991,7 +2965,6 @@ html[data-register='attempt'] .mock-nav .chip { min-height: 48px; padding: 0 var
 .vocabulary-list-action { min-height: 44px; padding: 0 8px; border: 0; border-radius: var(--radius-control); background: none; color: inherit; font: var(--type-control)/1.3 var(--sans); text-align: start; cursor: pointer; }
 .vocabulary-list-action:hover { background: var(--ai-wash); }
 .vocabulary-list-action:focus-visible { outline: none; box-shadow: var(--focus-ring); }
-.vocabulary-list-action#mini-unsave { color: var(--text-2); }
 .vocabulary-list-title { margin: 0 0 4px; font: 700 var(--type-control)/1.4 var(--sans); overflow-wrap: anywhere; }
 .vocabulary-list-popover .vocabulary-list-choices { display: grid; max-height: 40vh; margin: 0 0 8px; overflow: auto; border: 0; }
 /* G5 · Save ▾'s menu, his lists and all, stays under 40 % of the screen: its title, Review, New list… and Copy take about
@@ -3025,7 +2998,6 @@ html[data-register='attempt'] .mock-nav .chip { min-height: 48px; padding: 0 var
    simplified version is */
 .version-block { margin: 0 0 var(--s3); }
 .version-block .version-toggle { margin: 0; }
-.version-toggle .version-choice .version-name { font-weight: 500; }
 .version-toggle .version-choice .version-level { font: 600 var(--type-label)/1 var(--sans); letter-spacing: 0.02em; color: var(--text-2); }
 .version-toggle .version-choice[aria-pressed='true'] .version-level { color: var(--accent); }
 .version-toggle .version-choice:focus-visible { outline: 2px solid var(--ai); outline-offset: 2px; }
@@ -4019,7 +3991,6 @@ html:not([data-register='attempt']) :is(body:not([data-view='drift']), body[data
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) :is(.kdx-lens:where(.on), .focus-chip:where(.on)) :where(.l-ja, .en-sub) { color: inherit; }
 /* a graph's node kinds keep a quiet tint of their own, never a coloured or dashed edge */
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) .chip:where(.t-kanji) { border: 0; background: color-mix(in srgb, var(--color-seal) 10%, transparent); color: color-mix(in srgb, var(--color-seal) 88%, var(--color-ink)); }
-:is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) .chip:where(.t-radical) { border: 0; background: var(--color-fill); color: var(--color-ink); }
 :is(body:not([data-view='drift']), body[data-view='drift'] :where(#sheet)) .chip:where(.t-idiom) { border: 0; background: color-mix(in srgb, #6a4a7a 11%, transparent); color: #5a3c69; }
 
 /* ---- C · Quiet: a word, no box ---- */

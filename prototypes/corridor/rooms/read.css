@@ -1326,8 +1326,6 @@ body:not(.ui-bi) #mini .mini-band-label { letter-spacing: 0.08em; }
   text-align: start;
   cursor: pointer;
 }
-#mini .mini-sentence-keep-name { font: 600 var(--type-control)/1.25 var(--font-ui); color: var(--color-accent); }
-#mini .mini-sentence-keep-hint { font: 400 var(--type-label)/1.3 var(--font-ui); color: var(--color-ink-2); }
 #mini .mini-sentence-keep:disabled { opacity: 0.55; cursor: default; }
 #mini .mini-status { margin: 0; padding: 0 18px; font: var(--type-label)/1.5 var(--font-ui); color: var(--color-ink); }
 #mini .mini-status:empty { display: none; }
@@ -1407,8 +1405,7 @@ body:not(.ui-bi) #mini .mini-band-label { letter-spacing: 0.08em; }
 #mini .mini-head :is(button):focus-visible { outline-color: var(--mini-gold); }
 @media (hover: hover) {
   #mini .mini-kanji-row:hover .mini-kanji-glyph { border-color: var(--color-accent); }
-  #mini :is(.mini-web-open, .mini-sentence-back):hover,
-  #mini .mini-sentence-keep:hover .mini-sentence-keep-name { text-decoration: underline; text-underline-offset: 0.2em; }
+  #mini :is(.mini-web-open, .mini-sentence-back):hover { text-decoration: underline; text-underline-offset: 0.2em; }
   #mini :is(.mini-sentence-open, .mini-sentence-action):hover { background-color: color-mix(in srgb, var(--color-accent) 6%, var(--mini-paper)); }
 }
 

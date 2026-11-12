@@ -2343,10 +2343,6 @@ body.v-depth-layered .chip.t-word {
   border-top: 2px solid color-mix(in srgb, var(--ai) 60%, var(--line));
 }
 
-body.v-depth-layered .chip.t-radical {
-  border-style: dashed;
-}
-
 body.v-depth-layered .chip.t-idiom {
   border-top: 3px double color-mix(in srgb, var(--ink-2) 70%, var(--line));
 }
@@ -2795,10 +2791,6 @@ svg.strokes text {
   display: flex;
   align-items: baseline;
   gap: 5px;
-}
-.rad-glyph .rad-var {
-  font-size: var(--type-lead);
-  color: var(--ink-2, var(--faint));
 }
 .rad-text {
   flex: 1;
@@ -4325,7 +4317,6 @@ body.v-depth-layered .stroke-page[data-minimal='on'] {
   margin: 2px 0 18px;
 }
 
-.mock-pending,
 .mock-score {
   font-size: var(--type-caption);
   color: var(--ink-2);
@@ -6574,10 +6565,6 @@ body.zen .grade-row .grade:nth-child(4) {
   white-space: nowrap;
   max-width: 55%;
 }
-.fold-head .fold-arrow {
-  flex: none;
-  opacity: 0.86;
-}
 .fold-head.open {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
@@ -7145,8 +7132,7 @@ body.zen .review-face .assessment-review-assisted { color: var(--card-ink-2, #4a
 .exam-passage-label { margin: 0 0 .3rem; font-weight: 700; }
 .assessment-room .mock-opts.exam-opts-row { grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: .4rem; }
 .assessment-room .exam-opts-row .mock-opt { border-top: 0; }
-.exam-form-timing, .exam-paper-note, .exam-practice-note, .exam-next-paper { font-size: var(--type-chrome); line-height: 1.7; }
-.exam-practice-note { border-inline-start: 3px solid var(--line, #76808066); padding-inline-start: .75rem; }
+.exam-form-timing, .exam-paper-note, .exam-next-paper { font-size: var(--type-chrome); line-height: 1.7; }
 .exam-paper-list { margin: .4rem 0; padding-inline-start: 1.4rem; line-height: 1.8; }
 .exam-paper-name { font-family: var(--serif, "Noto Serif JP", serif); font-weight: 600; }
 .exam-official-results { margin: 0 0 14px; }

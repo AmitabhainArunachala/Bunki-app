@@ -1093,9 +1093,6 @@ legend.gs-instruction {
 .gs-card[data-deck='held'] span {
   color: var(--red);
 }
-.gs-deck-line {
-  margin-top: 10px !important;
-}
 .gs-deck-summary {
   border-top: 1px solid var(--line);
   padding-top: 14px;
