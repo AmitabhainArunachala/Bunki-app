@@ -38,7 +38,7 @@ const clearWords = (page, filter = 'true') => page.evaluate((filter) => {
   const sky = window.__SKY__, W = sky.W, r = sky.wrap.getBoundingClientRect(), host = document.getElementById('bunki-sky');
   const keep = new Function('W', 'i', `return ${filter};`);
   return W.hits.map((i) => ({ i, word: W.D.words[i][0], rd: W.rd[i], x: r.left + W.vis[i * 5], y: r.top + W.vis[i * 5 + 1], h: W.vis[i * 5 + 2] }))
-    .filter((w) => w.y > 170 && w.y < innerHeight - 200 && w.x > Math.min(160, innerWidth * 0.12) && w.x < innerWidth - Math.min(160, innerWidth * 0.12) && w.h > 12 && /\p{Script=Han}/u.test(w.word) && keep(W, w.i))
+    .filter((w) => w.y > Math.min(170, innerHeight * 0.2) && w.y < innerHeight - Math.min(200, innerHeight * 0.25) && w.x > Math.min(160, innerWidth * 0.12) && w.x < innerWidth - Math.min(160, innerWidth * 0.12) && w.h > 12 && /\p{Script=Han}/u.test(w.word) && keep(W, w.i))
     .filter((w) => host.earWordAt(w.x, w.y, { pointer: innerWidth < 700 ? 'touch' : 'mouse' })?.text === w.word)
     .sort((a, b) => b.h - a.h);
 }, filter);
@@ -162,7 +162,7 @@ await run('bare', async () => {
   const s = await sky();
   try {
     let words = [];
-    for (let k = 0; k < 10 && !words.length; k += 1) { words = await clearWords(s.page, "W.rd[i] === ''"); if (!words.length) { if (s.phone) { for (let q = 0; q < 3; q += 1) await s.page.keyboard.press('ArrowRight'); } else await s.page.mouse.wheel(0, 400); await s.sleep(1500); } }   // a phone's WebKit has no wheel: the sky's own arrow key turns the ring there
+    for (let k = 0; k < 10 && !words.length; k += 1) { words = await clearWords(s.page, "W.rd[i] === ''"); if (!words.length) { if (s.phone) { for (let q = 0; q < 3; q += 1) await s.page.keyboard.press('ArrowUp'); } else await s.page.mouse.wheel(0, 400); await s.sleep(1500); } }   // a phone's WebKit has no wheel: the sky's own arrow key flies forward there, as the wheel does
     const w = words[0];
     if (!w) throw new Error('no clear sky word without a reading in view');
     await arm(s);
