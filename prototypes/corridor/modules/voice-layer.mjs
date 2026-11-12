@@ -468,6 +468,10 @@ export function installVoiceLayer(host) {
   const readerBusy = () => readerActive() || !!reader.yielding;
   let readSessions = 0;
   function startReader(p, from = 0) {
+    // his play on a read that ended on a sentence it could not get: should it fail again before it sounds (the server's
+    // wait after a slow answer or a lost connection, the network still gone), the lock screen keeps the article, paused,
+    // as the bar keeps its play (fix round 2, the re-check's F3)
+    const takenUp = reader.halted && reader.pid === p.id;
     reader.pid = p.id;
     reader.title = String(p.title || '');
     // which read this is, on the page: a read that goes on keeps its number (the checks read it)
@@ -508,7 +512,7 @@ export function installVoiceLayer(host) {
           reader.failed = { pid: p.id, code: code || 'failed' };
           // the sentence it could not get (or play) is where play takes it up, not the one heard before it (fix round 1)
           if (Number.isInteger(reader.session?.index)) reader.index = reader.session.index;
-          reader.halted = voiced;
+          reader.halted = voiced || takenUp;
         }
         if (['done', 'stopped', 'error'].includes(state)) clearSpeaking();
         // waiting for the next clip on a hidden page, the element holds silence so the page goes on sounding (L1); a clip
