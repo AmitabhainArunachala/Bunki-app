@@ -21,7 +21,7 @@ import { EAR_SLOW, installEar } from './ear.mjs';
 import { baseBoxes, createBands } from './voice-bands.mjs';
 import { createClipStore, createIndexedDbClipStorage } from './voice-clip-store.mjs';
 import { createDeviceTokenStore, createVoiceClient } from './voice-client.mjs';
-import { createPocketPlayer, createReaderMediaSession, gapSleep } from './reader-pocket.mjs';
+import { createPocketPlayer, createReaderMediaSession, gapSleep, pageTimer } from './reader-pocket.mjs';
 import { SPEEDS, createVoiceSeam, sentencesOf, voiceKeyOf } from './voice-seam.mjs';
 
 export const READER_RATES = Object.freeze([1, 1.25, 0.75]);
@@ -111,12 +111,16 @@ export function limitLine(reason, limits, at) {
 export function installVoiceLayer(host) {
   const { tx, el, uiIcon } = host;
   const doc = host.document || document;
-  // the client knows no server until a pairing line brings its address (voice-client.mjs)
-  const client = createVoiceClient({ store: createDeviceTokenStore(globalThis) });
   // the one audio element, as an article read in his pocket needs it (L1, modules/reader-pocket.mjs): a pause nobody in
   // this app asked for is told, and a read that waits for its next clip on a hidden page holds the element with silence
   const speechPlayer = createAudioPlayer(doc);
   const audio = doc.querySelector('audio[data-speak-audio]');
+  // the clock of every deadline in the path to the next sentence (the client's 20 s, the device store's 1.5 s): a timer,
+  // and the wall clock read at every tick of this element and every change of visibility, so a hidden page's held timers
+  // never leave a read waiting without end (L1 fix round 1)
+  const clock = pageTimer({ doc, ticks: audio });
+  // the client knows no server until a pairing line brings its address (voice-client.mjs)
+  const client = createVoiceClient({ store: createDeviceTokenStore(globalThis), after: clock });
   let heldSilence = null;
   const pocket = createPocketPlayer({ player: speechPlayer, audio, silence: () => (heldSilence ||= silenceUrl(doc.defaultView)),
     // a clip the browser will not let start (a locked phone may refuse) pauses the article's read at its sentence, so
@@ -139,8 +143,10 @@ export function installVoiceLayer(host) {
   void clips.ready();
   const seam = createVoiceSeam({
     client, player, store: clips,
-    // between two sentences nothing waits on a timer while the page is hidden (L1): a hidden page's timers stop
+    // between two sentences nothing waits on a timer while the page is hidden (L1): a hidden page's timers stop; the
+    // retry after a 503 waits on the same gap, and the device store's wait is the page's clock (fix round 1)
     gapSleep: gapSleep(doc),
+    after: clock,
     recorded: (src, rate) => host.playRecorded(src, rate),
     quiet: () => host.quiet(),
     onStatus: (status) => {

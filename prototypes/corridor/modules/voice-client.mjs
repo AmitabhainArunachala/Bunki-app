@@ -146,7 +146,10 @@ export function createDeviceTokenStore(env = globalThis) {
   };
 }
 
-export function createVoiceClient({ fetch: fetchFn = globalThis.fetch?.bind(globalThis), store = createMemoryTokenStore(), timeoutMs = 20000 } = {}) {
+/** `after(ms, run)` is the clock of the request's deadline (timeoutMs) and returns a cancel; the reader's page gives one
+ * that a hidden page's held timers cannot hold (reader-pocket.mjs, pageTimer; L1 fix round 1). */
+export function createVoiceClient({ fetch: fetchFn = globalThis.fetch?.bind(globalThis), store = createMemoryTokenStore(), timeoutMs = 20000,
+  after = (ms, run) => { const timer = setTimeout(run, ms); return () => clearTimeout(timer); } } = {}) {
   let server = '';  // the voice server's origin, once a pairing line has brought it
   let pairing;      // undefined = not read yet · null = unpaired · { token, scope }
   let reading = null;
@@ -174,14 +177,14 @@ export function createVoiceClient({ fetch: fetchFn = globalThis.fetch?.bind(glob
     if (signal?.aborted) controller.abort();
     else signal?.addEventListener('abort', stop, { once: true });
     let late = false;
-    const timer = setTimeout(() => { late = true; controller.abort(); }, timeoutMs);
+    const cancel = after(timeoutMs, () => { late = true; controller.abort(); });
     try {
       return await fetchFn(`${origin}${path}`, { ...init, signal: controller.signal, credentials: 'omit', cache: 'no-store', referrerPolicy: 'no-referrer' });
     } catch (error) {
       if (signal?.aborted && !late) { const aborted = new Error('aborted'); aborted.name = 'AbortError'; throw aborted; }
       throw new VoiceError(late ? 'voice-timeout' : 'network-failed');
     } finally {
-      clearTimeout(timer);
+      cancel();
       signal?.removeEventListener('abort', stop);
     }
   }

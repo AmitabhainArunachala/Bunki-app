@@ -29,6 +29,31 @@ export function gapSleep(doc, view = doc.defaultView) {
   });
 }
 
+/** The page's clock for a deadline in the path to the next sentence (the client's 20 s, the device store's 1.5 s):
+ * `after(ms, run)` runs `run` once `ms` have passed by the wall clock and returns a cancel. A timer stands as before; and
+ * because a hidden page's timers may be held (L1-2), the clock is also read at every tick of the element that is sounding
+ * (`timeupdate`: a clip, or the silence a waiting read holds) and at every change of visibility, so a held timer cannot
+ * leave a read waiting without end (fix round 1, the review's F2). */
+export function pageTimer({ doc, ticks = null, view = doc.defaultView, now = () => Date.now() }) {
+  return (ms, run) => {
+    const until = now() + ms;
+    let over = false;
+    let timer = 0;
+    const off = () => {
+      over = true;
+      view.clearTimeout(timer);
+      ticks?.removeEventListener?.('timeupdate', check);
+      doc.removeEventListener('visibilitychange', check);
+    };
+    const fire = () => { if (over) return; off(); run(); };
+    function check() { if (!over && now() >= until) fire(); }
+    ticks?.addEventListener?.('timeupdate', check);
+    doc.addEventListener('visibilitychange', check);
+    timer = view.setTimeout(fire, ms);
+    return off;
+  };
+}
+
 /** `player` is the speech team's player on `audio` (speech-player.mjs, unchanged); `silence()` gives the address of a
  * short silent clip. `refusalIsPause()` says whether the read now playing takes a clip the browser will not let sound
  * (a locked phone may refuse a new start) as a pause from outside, held at its sentence; otherwise that clip fails as

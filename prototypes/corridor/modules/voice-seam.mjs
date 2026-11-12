@@ -19,7 +19,7 @@
  *   413 speech-input-too-large    the sentence is split further and its parts are asked for in order
  *   429 day-budget                the server is not asked again until 00:00 UTC
  *   429 request-rate-limit        no request for 60 s
- *   503 voice-unavailable         once more after 2 s
+ *   503 voice-unavailable         once more after 2 s (at once while the page is hidden: L1, fix round 1)
  *   400 (client bug), 500         that sentence is not asked twice in the read
  * In every one of these the read ends with the code as its reason.
  *
@@ -48,10 +48,13 @@ export function sentencesOf(text) {
 }
 
 /** `gapSleep` is the pause between two sentences of a read (the queue's `sleep`); the page gives one that does not wait
- * while it is hidden (modules/reader-pocket.mjs, L1). Without it the seam's own `sleep` is the gap, as before; the seam's
- * other waits (the 2 s after a 503) stay its own `sleep`. */
+ * while it is hidden (modules/reader-pocket.mjs, L1). The one retry after a 503 waits on it too (fix round 1, the
+ * review's F2: hidden, the retry goes at once; shown, after 2 s as before). Without it the seam's own `sleep` is both.
+ * `after(ms, run)` is the clock of the device store's wait (storeWaitMs); the page gives one that a hidden page's held
+ * timers cannot hold (reader-pocket.mjs, pageTimer); it returns a cancel. */
 export function createVoiceSeam({ client, player, recorded = null, store = null, storeWaitMs = 1500, quiet = () => {},
   sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)), gapSleep = null, now = () => Date.now(),
+  after = (ms, run) => { const timer = setTimeout(run, ms); return () => clearTimeout(timer); },
   online = () => globalThis.navigator?.onLine !== false, onStatus = () => {} } = {}) {
   if (!client || !player) throw new TypeError('the seam needs a client and a player');
   const cache = new Map();   // `${voiceKey}|${text}` → clip, most recent last (this page's own; the device store is below)
@@ -131,14 +134,14 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     const near = cache.get(key);
     if (near) { remember(key, near); if (storeOn()) quietly(() => store.touch?.(key)); return near; }
     if (!storeOn()) return null;
-    let timer = null;
+    let cancel = null;
     let clip = null;
     try {
       clip = await Promise.race([
         Promise.resolve().then(() => store.get(key)),
-        new Promise((resolve) => { timer = setTimeout(() => { storeOff = true; resolve(null); }, storeWaitMs); }),
+        new Promise((resolve) => { cancel = after(storeWaitMs, () => { storeOff = true; resolve(null); }); }),
       ]);
-    } catch { clip = null; } finally { clearTimeout(timer); }
+    } catch { clip = null; } finally { cancel?.(); }
     aborted(signal);
     if (!(clip?.bytes instanceof Uint8Array) || !clip.bytes.length) return null;
     const kept = { bytes: clip.bytes, contentType: clip.contentType || 'audio/mpeg', voiceId: clip.voiceId ?? null, inputKey: null, source: 'server', kept: true, key };
@@ -155,7 +158,8 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
       clip = await client.speak({ text, voiceKey, signal });
     } catch (error) {
       if (error?.code !== 'voice-unavailable') throw error;
-      await sleep(2000);
+      // once more, after 2 s; on the page's gap, so a hidden page asks again at once instead of waiting on a held timer
+      await (gapSleep || sleep)(2000);
       aborted(signal);
       clip = await client.speak({ text, voiceKey, signal });
     }
