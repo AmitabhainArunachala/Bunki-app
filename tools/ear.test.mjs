@@ -1524,14 +1524,15 @@ describe('the sky draws its words: the ear asks the sky which word stands under 
 function skyMount() {
   const sandbox = { window: {} };
   vm.runInNewContext(
-    `${corridorDeclarations('sky/mount.mjs', ['sayable', 'said', 'wordAt', 'earTakes', 'askEarFirst'])}
+    `${corridorDeclarations('sky/mount.mjs', ['sayable', 'OPTIONAL_AFTER_KANJI', 'KANA_SAID', 'formSaid', 'patternSaid', 'said', 'enginePick', 'lifted', 'wordAt', 'earTakes', 'askEarFirst'])}
      this.sayable = sayable; this.wordAt = wordAt; this.askEarFirst = askEarFirst;`,
     sandbox,
   );
   return sandbox;
 }
-/** An engine surface (sky-world.js, sky-web.js) with two words drawn: 読み near, 希望 deep, overlapping at x 100. */
-function engine({ open = false, item = null } = {}) {
+/** An engine surface (sky-world.js, sky-web.js, version 3) with three words drawn: 読み large, 希望 smaller behind it,
+ * overlapping at x 100, and 行く apart; one grammar sign overhead (〜ため（に）) and a band name (i -1) beside it. */
+function engine({ open = false, item = null, over = 0 } = {}) {
   const W = {
     ready: true,
     D: {
@@ -1547,7 +1548,12 @@ function engine({ open = false, item = null } = {}) {
     hits: [1, 0, 2],
     // x, y, size, alpha, width per word, as drawn in the latest frame (CSS px inside the sky)
     vis: new Float32Array([100, 100, 30, 1, 60, 104, 98, 20, 1, 40, 300, 200, 20, 1, 40]),
-    hz: [400, 900, 500],
+    // grammar signs drawn in the latest frame: { i, x, y, w, s }; a band's name has i -1
+    gHits: [
+      { i: 7, x: 400, y: 300, w: 80, s: 19 },
+      { i: -1, x: 600, y: 300, w: 80, s: 14 },
+    ],
+    gramById: new Map([[7, { i: 7, p: '〜ため（に）' }]]),
     web: {
       isOpen: () => open,
       pick: (x, y) =>
@@ -1556,11 +1562,16 @@ function engine({ open = false, item = null } = {}) {
     },
   };
   const calls = [];
-  return { W, wrap: { getBoundingClientRect: () => ({ left: 10, top: 20 }) }, calls };
+  return {
+    W,
+    S: { view: { over } },
+    wrap: { getBoundingClientRect: () => ({ left: 10, top: 20 }) },
+    calls,
+  };
 }
 
 describe('the sky’s mount says which word it drew under a point, as its own tap would pick it (N1)', () => {
-  it('the nearest word under the point, in page coordinates; its reading made sayable', () => {
+  it('the largest drawn word under the point (version 3: no W.hz), in page coordinates; its reading made sayable', () => {
     const m = skyMount();
     const sky = engine();
     expect(m.wordAt(sky, 110, 120, 'mouse')).toEqual({ text: '読み', reading: 'よみ', id: 'w0' });
@@ -1591,6 +1602,57 @@ describe('the sky’s mount says which word it drew under a point, as its own ta
       reading: 'ごんべん',
       id: 'p0',
     });
+  });
+  it('version 3: a grammar sign overhead is picked before a word and said as its pattern; a band’s name is not', () => {
+    const m = skyMount();
+    const sky = engine();
+    expect(m.wordAt(sky, 10 + 400, 20 + 300, 'mouse')).toEqual({
+      text: 'ために',
+      reading: 'ために',
+      id: 'g7',
+    });
+    // a word drawn under the sign: the sign still comes first, as in the engine
+    sky.W.vis.set([400, 300, 40, 1, 60], 5);
+    expect(m.wordAt(sky, 10 + 400, 20 + 300, 'mouse')?.id).toBe('g7');
+    expect(m.wordAt(sky, 10 + 600, 20 + 300, 'mouse')).toBe(null);
+  });
+  it('version 3: from above (the view over the ring past 0.3) nothing is picked; an opened family still is', () => {
+    const m = skyMount();
+    expect(m.wordAt(engine({ over: 0.31 }), 110, 120, 'mouse')).toBe(null);
+    expect(m.wordAt(engine({ over: 0.31 }), 10 + 400, 20 + 300, 'mouse')).toBe(null);
+    expect(m.wordAt(engine({ over: 0.3 }), 110, 120, 'mouse')?.text).toBe('読み');
+    const family = engine({ over: 0.9, open: true, item: { kind: 'w', id: 2, text: '行く' } });
+    expect(m.wordAt(family, 10 + 500, 20 + 50, 'mouse')?.text).toBe('行く');
+  });
+  it('the engine’s own pick is asked when the engine hands one out (W.pick)', () => {
+    const m = skyMount();
+    const sky = engine();
+    const asked = [];
+    sky.W.pick = (px, py, slop) => (asked.push([px, py, slop]), { t: 'w', i: 2 });
+    expect(m.wordAt(sky, 110, 120, 'touch')?.text).toBe('行く');
+    expect(asked).toEqual([[100, 100, 14]]);
+  });
+  it('on a lift, the ear is told the engine’s own pick for that event, not a second pick', () => {
+    const m = skyMount();
+    const sky = engine();
+    const host = { earWordAt: (x, y, o) => m.wordAt(sky, x, y, o && o.pointer) };
+    m.askEarFirst(sky);
+    const seen = [];
+    m.window.__BUNKI_EAR = {
+      takes: (event) => (
+        seen.push(host.earWordAt(event.clientX, event.clientY, { pointer: 'touch' })),
+        false
+      ),
+    };
+    // the engine picked 行く for this lift; at the same point the field shows 読み
+    const up = { type: 'pointerup', clientX: 110, clientY: 120 };
+    sky.W.web.tap({ t: 'w', i: 2 }, up);
+    // and it picked nothing for this one, where 読み stands
+    sky.W.web.tap(null, { type: 'pointerup', clientX: 110, clientY: 120 });
+    expect(seen.map((one) => one && one.text)).toEqual(['行く', null]);
+    // outside the ear's question the mount answers by the engine's rule again
+    expect(host.earWordAt(110, 120, { pointer: 'touch' })?.text).toBe('読み');
+    expect(sky.calls).toHaveLength(2);
   });
   it('the sky asks the ear before it acts on a lifted finger or a cancelled one; ear off, it acts on the same event as before', () => {
     const m = skyMount();
