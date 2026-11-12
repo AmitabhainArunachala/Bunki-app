@@ -3827,6 +3827,15 @@ function dictionaryReadingSummaries(row) {
 
 
 
+function resetDictionaryCaches() {
+  D.dictionaryBySeq = new Map();
+  D.dictionaryByForm = new Map();
+  D.dictionaryCompleteForms = new Set();
+  D.dictionarySearchCache = new Map();
+  D.dictionarySearchPending = new Map();
+  D.dictionarySearchErrors = new Map();
+}
+
 function installDictionaryIndex(index, { mode = 'main', performanceRecord = null } = {}) {
   const mainEntries = Array.isArray(index?.entries) ? index.entries : null;
   if (
@@ -3855,12 +3864,7 @@ function installDictionaryIndex(index, { mode = 'main', performanceRecord = null
   // In the served build these maps contain only rows returned for a complete
   // search/form/seq request. The 70k entry array never crosses the worker
   // boundary; the standalone fallback uses the embedded entries directly.
-  D.dictionaryBySeq = new Map();
-  D.dictionaryByForm = new Map();
-  D.dictionaryCompleteForms = new Set();
-  D.dictionarySearchCache = new Map();
-  D.dictionarySearchPending = new Map();
-  D.dictionarySearchErrors = new Map();
+  resetDictionaryCaches();
   D.dictionaryState = 'ready';
   D.dictionaryError = null;
   if (performanceRecord) recordDictionaryPerformance(performanceRecord);
@@ -4528,12 +4532,7 @@ async function boot() {
   D.dictionaryMode = 'core';
   D.dictionaryShards = new Map();
   D.dictionaryDetails = new Map();
-  D.dictionaryBySeq = new Map();
-  D.dictionaryByForm = new Map();
-  D.dictionaryCompleteForms = new Set();
-  D.dictionarySearchCache = new Map();
-  D.dictionarySearchPending = new Map();
-  D.dictionarySearchErrors = new Map();
+  resetDictionaryCaches();
   D.strokes = strokes.strokes;
   D.kmeta = strokes.meta;
   // Optional reference data settles independently of the core rooms.
