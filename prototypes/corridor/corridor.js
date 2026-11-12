@@ -13594,7 +13594,13 @@ function playRecClip(src, btn, { rate = 1, onTime = null, pausable = false } = {
       if (btn) btn.classList.remove('is-speaking');
       if (recAudioEl === a) recAudioEl = null;
     };
-    a.onplay = () => btn && btn.classList.add('is-speaking');
+    // the article reader's recording this app has let go of (paused from outside, stopped, at its end, replaced), started
+    // by anyone else (an interruption that ends, a headset's button): paused again at once, so it never sounds while the
+    // bar and the lock screen say paused; his play says the sentence again (L1 fix round 2, the re-check's F4)
+    a.onplay = () => {
+      if (pausable && recAudioEl !== a) { try { a.pause(); } catch { /* already still */ } return; }
+      if (btn) btn.classList.add('is-speaking');
+    };
     a.onended = () => { off(); done(true); };
     // the app's own stop (stopRecAudio) lets go of the element before its pause is told; anyone else's pause finds it held
     a.onpause = () => { const outside = pausable && !a.ended && recAudioEl === a; off(); done(a.ended ? true : outside ? 'paused' : null); };
