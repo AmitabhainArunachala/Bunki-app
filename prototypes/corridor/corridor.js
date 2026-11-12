@@ -3357,10 +3357,6 @@ function noteIgnoredSrsParams(reason) {
 // waits for the same async record transaction to confirm both roots before
 // publishing a judgment. Drift grades words, kanji glyphs, and
 // particle satellites; each keeps its own modality-true target type.
-/** G6 projection: a seal is membership in Review or a learner list, never a
- * Drift grade. Read one committed snapshot; preserve its saved lexical identity.
- * This function never mutates the record or invents a second persisted shape. */
-
 /** A kept star opens the saved answer it names. Broken snapshots stay visible
  * without silently borrowing today's dictionary answer for a different entry. */
 function renderKeptWordNode(sheet, node) {
@@ -3526,12 +3522,6 @@ document.addEventListener('visibilitychange', () => {
 addEventListener('focus', () => {
   if (document.visibilityState === 'visible') void refreshCommittedRecordNotes();
 });
-
-/** Local calendar day for the review trace — the learner's day, not UTC's. */
-
-/** Month bucket label for an epoch ms — the automatic Renzo-style list. */
-
-/** Localised display only: automatic list identities remain the original month keys. */
 
 /** Full dictionary record for a written form: kotobako (all senses, most
  * common first) with the original 6,687-word layer as fallback. */
@@ -3816,10 +3806,6 @@ function dictionaryReadingSummaries(row) {
     Array.isArray(summary) && summary[1] ? summary[1] : row[3] || '',
   ]);
 }
-
-/** Decode the restriction-compatible cue for one flattened English gloss.
- * Cell 10 is aligned 1:1 with cells 6/7; its kana index selects the exact
- * JMdict reading permitted by the source sense. */
 
 /** Whether a source reading may be printed with this exact spelling. Cell 11
  * is aligned with kana forms: 0 means every written form, 1 means no written
@@ -4939,9 +4925,6 @@ addEventListener(
   },
   { passive: true },
 );
-
-/** A sheet is rebuilt on each recursive step. Remember the actual door,
- * not a DOM reference (nor a row number that async dictionary senses shift). */
 
 /* G6 · a scale is a projection of the room and canonical page stack. The one
  * retained visit records where this journey began; it is neither a second
@@ -6069,17 +6052,6 @@ function rubyNode(pairs, { furigana, revealed }) {
   return frag;
 }
 
-/** The token's word content as exactly ONE row.
- *
- * `.tok.content` is an inline-flex COLUMN (it keeps the glyph box identical
- * before and after English mounts — see corridor.css). rubyNode returns a
- * FRAGMENT, so a token whose ruby covers only the stem — 含め becomes
- * <ruby>含<rt>ふく</rt></ruby> plus a bare "め" text node — would drop the ruby
- * and its okurigana into that column as SIBLING flex items, and the word would
- * tear into stacked rows (含 over め). Wrapping the word in this single child
- * keeps the column at exactly [word row, optional .tok-en gloss row].
- */
-
 /** Kanji dial: 0 as written · 1 above-常用 replaced by its reading · 2 all kana. */
 
 
@@ -6251,11 +6223,6 @@ function renderSignals(grading, { compact = false } = {}) {
 
 /* The shelf's one count. A story is a reading on the shelf; an N3 rewrite whose original stands
  * beside it is that story's やさしい版, not a second story. Glossary entries are counted apart. */
-/** One number for the shelf: every card counts, and the line says what it includes. */
-
-
-/** The default opens on three different recent stories each day. An explicit sort or filter
- * keeps its own order; the source collection and every story's identity stay untouched. */
 
 /* ---------------------------------------------------------------- views */
 /** Context-dense deck. Its schedule is its own ledger, loaded on demand. */
@@ -8341,8 +8308,6 @@ function gatherSeries(list) {
   return out;
 }
 
-/** Days since a calendar day, counted on the reader's own calendar. */
-
 
 
 /* ------------------------------------------- the learner's labels (design pass 2026-09-30)
@@ -8386,8 +8351,6 @@ const TOPIC_BLOCKS = {
 /** The picture band, or null: a story with no picture shows its key kanji set large in the world's ink on the world's
  * paper — one 書 sheet, no category word — and a story with neither has no band at all, never a placeholder block
  * (N, the lead 2026-10-17: the first screen had a plain "CULTURE" block where a print stood). */
-/** An original and its N3 rewrite are one story with two versions (adaptation.basedOn). */
-
 // This is a device demonstration, never a learner observation or review event.
 const WORD_LADDER_DEMO_KEY = 'kairo-word-ladder-demo-v1';
 let wordLadderDemoSeen = false;
@@ -8548,12 +8511,6 @@ function shelfCard(p, rank = 'grid') {
 
 /** How many of the learner's saved words an article holds: the saved word ids met in the article's
  * own word forms (readingFacets.forms, from the index). Real data only; 0 when the record has none. */
-/** A story's instrument line: level · topic · characters · your words. Every figure is the record's
- * own (chars from the index, words from the learner's saved cards); there is no time estimate,
- * because no real reading timings exist to make one honest. */
-
-/** The lead's teaser: the story's own first sentence, from the snippet the record carries. */
-
 /** A card's date: the day with how long ago while it is fresh; a teaser keeps the day alone. */
 
 function dialRow(labelJa, labelEn, key, options) {
@@ -8916,8 +8873,6 @@ function removeMini({ keep = null } = {}) {
 /** Hfix-1A (19) · a standing slip made ready to be drawn again in place: what it says goes (its content, its attributes but
  * its id, what the slip maps hold for it), and it is drawn from nothing as a new slip is; its element, its arrival still
  * running, its listeners and observers stay. */
-/** The standing slip's headword: where the word leaves from when the slip is the door into the page. */
-
 /* One tap grammar for every Japanese word (John, 2026-10-14: "I should be able to tap ANY word … and it
  * should be able to cycle through the layers to full entry"; "there is NO WAY to return to the
  * original word without the furigana"). A word cycles: the original text → its reading above it → the stage (meaning, Save) → the full entry.
@@ -9132,13 +9087,6 @@ function diveFromSlip(anchor) {
 /** Endings and helper words are named only by an entry whose headword is exactly their text. */
 const LOOKUP_HELPER_POS = new Set(['助動詞', '助詞', '接尾辞', '接頭辞']);
 
-/** The entry a looked-up spelling names, or null. A reading the text supplies chooses among
- * entries of that spelling and is never replaced by another entry's reading. A kana spelling
- * (an ending, a helper word, a segmenter fragment) never borrows a kanji entry through its
- * kana form: ます is not 升. */
-
-/** japaneseLookupRecord's entry before its sense (R, R2). */
-
 /* Prose remains prose in the accessibility tree. Only its paragraph is in the Tab order;
  * an explicitly selected word temporarily becomes a named group while it has keyboard focus. */
 const proseWordRovers = new WeakMap();
@@ -9242,9 +9190,6 @@ function setLookupStop(word) {
   if (!proseWordRovers.has(block)) installProseWordRoving(block);
   proseWordRovers.get(block).word = word;
 }
-
-/** The keyboard help every lookup word shares. It lives outside the prose so that no question
- * text, excerpt or narration source ever contains it. */
 
 /** Where a question's word sits — which of that question's blocks, which word in it — so a
  * re-render that commits assistance returns to this occurrence, never an earlier repeat. */
@@ -9883,13 +9828,6 @@ function openPlainSaveMenu(invoker, { more = [], place = null, home = null, keep
 }
 /** A card that has grown to all the room it has scrolls itself, never the page, until its unfolded menu stands whole in
  * it: the menu's foot comes into view without its head leaving the card's top. */
-/** Where the one Save's menu stands: inside its card or row (the card grows; nothing is covered), as a drawer under its bar,
- * or (the lists popover of a surface with neither) beside its invoker. */
-
-/** What a word's Save stands for: the entry it would capture, and whether it is held (D11: a reader
- * word the core dictionary lacks; D23: another entry's card holds the spelling). The popup and the
- * word menu read the same facts, so they can never disagree about what Save does. */
-
 /** After a save or an undo: the open popup's Save, the reader's learning marks and the chrome seal repaint
  * in place, so nothing under the finger moves. */
 function refreshWordSaveControls(node, label) {
@@ -11258,14 +11196,6 @@ function showMini(span, token, onEntry, { focusEntry = false, from = null, reade
   return mini;
 }
 
-/** Whether a slip may stand beside this element: always, unless a layer stands over the room (the writing room, else a
- * page) and the element is not on that top layer. */
-
-/** The quick look's kanji line (Read lane, redesign): each kanji of the word with its parts, the saved
- * words that share one of them, and one door into the web of the word. Every part comes from the
- * kanji data (D.kanji[c].parts through mainParts, named from D.radicals), never chosen by hand; the
- * cards line comes from the learner's own saved words. Nothing is drawn when the word has no kanji. */
-
 /** Q · a word's box with its reading (Q/DESIGN.md §3): a card set 10 px from the word's own box stood on its reading
  * (Grok's walk: そうり under the card's edge), because the reading is drawn outside that box: the reader's label over a
  * word (ruby::before, attr(data-r): shown while its <rt> is not hidden), the deck's (ruby[data-rt]::after), or true
@@ -11303,8 +11233,6 @@ function frameFoot(onPage, fixedEdge) {
   const thread = fixedEdge(onPage ? '#sheet > .scale-thread' : '#app > .scale-thread', 'bottom');
   return bar == null && thread == null ? null : Math.max(bar ?? 0, thread ?? 0);
 }
-/** Place a popup beside its word, and again whenever its own size settles (a late font, a held reason). */
-
 /** A card beside its word: short cards fit above or below the fixed chrome; a tall sentence on a
  * phone becomes a full document card below its word, with the page carrying the text and actions. */
 /** The 層 mark's top, when a box spanning [left, left + width] would stand over it; null otherwise (or when it is hidden). */
@@ -12028,21 +11956,6 @@ async function writeListMembership(node, label, listName, on) {
  * 全項目 · Full entry, Save the sentence, Copy, Ask the tutor about the sentence — and Remove, the one way a kept word goes
  * out. A second hold is the same strip: nothing written twice, nothing un-kept. The strip stays under 40 % of the screen,
  * beside the word, and covers no button. The old word menu became it. */
-/** His lists in the strip's order: the ones he used this session first, newest first, then the record's own order. */
-
-/* The ring under the finger: it begins at RING_MS and is whole at the commit (MENU_MS); a hold that moves, a second
- * finger, a cancel or a lift before the commit takes it away. It fills clockwise from twelve by transform alone (the
- * motion law: transform and opacity): two half rings, each clipped to its half of the disc, turn into view one after the
- * other. Decorative (aria-hidden, no pointer events): the strip and its status line answer the hold in words. Reduced
- * motion draws it whole at once. */
-
-/* The seal flies: on a keep's durable success a vermilion 印 presses onto the word at its shoulder, rests a beat, and
- * travels — the X and the Y on two nested layers, each on its own house curve, so the path bows — to the top bar's
- * bookmark (#tray, the kept-words count), which takes it with one small press. The count is the record's: #tray's name
- * and data-count already say it; the digit the eye reads turns as the seal lands. Transform and opacity only. Reduced
- * motion, a hidden page or no Web Animations: the seal shows where it pressed and leaves; nothing travels. Decorative
- * throughout (aria-hidden, no pointer events): the strip's status line says it in words. */
-
 /* The strip. role=dialog (it holds a name field), labelled by its word; ↑↓←→ walk its controls, Home/End, Tab stays
  * inside, Escape closes and gives focus back to the word. A press anywhere else closes it (the document's pointerdown).
  * It is laid out in the word's own scroller (the page's, or the document's), so it scrolls with its word and never
@@ -12514,69 +12427,12 @@ function wireReaderWordMenu(span, door) {
   span.addEventListener('keydown', (event) => readerWordKey(event, span, door));
 }
 
-/** The inline gloss under a word must NEVER truncate (operator, morning
- * round). JMdict first senses are wordy; the most compact sense makes the
- * best hint — the full numbered senses are one hold away. Parentheticals
- * drop; if everything is long, the clause before the first comma wins. */
-
-/* D11 · the reader's quick look at ONE content token: its tap-2 line, its
- * mini and its label. A core hit is lookup() itself, so it renders exactly as
- * before. A spelling the core lacks answers only from records keyed by that
- * spelling, in lookup()'s own order when no index row is in play: the
- * learner's kept deep word, then the original word layer. It never takes the
- * deep index's first row for the form, which lookup() returns once that form's
- * rows are cached: that row is a guess about this token (いう → 結う "to do up
- * (hair)"). With nothing to show, the reader says so instead of staying
- * silent. lookup() is unchanged for every other caller. */
-
-/** N · an article's own note on one of its words: its index row's `wordNotes` ([{ surface, note: { ja, en } }], from the
- * editorial word list), matched on the token's surface; null everywhere else. */
-
-
-/* R · reading truth (2026-10-16). A word door that carries a token shows the reading the text gives that token and
- * stands for the entry read that way: 年 is ねん in 令和8年 though the quick dictionary's 年 is とし, 月 is がつ in 9月
- * though its 月 is つき. The reader, a sentence's words and a deck card's back are such doors. A door with no reading
- * of its own (the sky, Words, a word in prose), or with the quick dictionary's own reading, answers from the quick
- * dictionary exactly as before (lookup's guarantee). lookup and the slip's own functions spell tokenReading's rule
- * inline, so each stays whole by itself. */
-
-/** The reading a token carries for its dictionary form: its own when the token is that form (uninflected). R2: an
- * inflected token's is its dictionary form's reading, derived from its own (lemmaReading), or '' when it cannot be. */
-
-/* R2 · reading truth for inflected words (2026-10-17). An inflected token's door stands for its dictionary form read
- * the way the text reads it: おい (base おく) is おく, 云っ read いっ is 云う read いう, 開か read ひらか is 開く read ひらく,
- * 解せ read げせ is 解する read げする — never the reading of a row made from another inflected surface (the original
- * word layer's おく read おけ, 云う read いい, 解する read かいする). A token whose dictionary form cannot be shown to be read
- * so is the word as the text writes and reads it. readingToken then names the entry as R and N do for any word. */
 
 /** The euphonic stems of a godan ending: 書い 泳い 言っ 待っ 取っ 死ん 呼ん 読ん 出し. */
 const LEMMA_ONBIN = { う: ['っ', 'う'], つ: ['っ'], る: ['っ'], ぬ: ['ん'], ぶ: ['ん'], む: ['ん'], く: ['い'], ぐ: ['い'], す: ['し'] };
 /** 文語 二段: the う-row kana an ichidan stem's last kana takes in its old forms (教える → 教うる, 起きる → 起くる). */
 const LEMMA_NIDAN = Object.fromEntries([...'えけげせぜてでねへべぺめれいきぎしじちぢにひびぴみり']
   .map((kana, at) => [kana, 'うくぐすずつづぬふぶぷむる'[at % 13]]));
-
-/** Whether a word whose dictionary form reads `lemma` can read `reading` in a text: its own reading, or one of the forms
- * its class takes before an ending — godan (書か 書き 書く 書け 書こ 書こう 書い), ichidan (食べ 食べれ 食べろ 食べよう),
- * サ変 (愛し 愛さ 愛せ; 信じ), カ変 (来 read こ き く), the i-adjective (高 高く 高かっ 高けれ) and the 文語 forms (教うる, 高き,
- * しかれ). A word that does not inflect reads only its own reading. */
-
-/** The reading of an inflected token's dictionary form, from the token's own: a kana dictionary form is its own
- * reading; otherwise the reading of the stem the surface and the dictionary form share (the token's reading less its
- * written kana ending) plus the dictionary form's own kana ending, if that form can read the token's reading
- * (lemmaTakesForm). Where the stem itself reads otherwise as the word inflects (来 read き or こ is 来る, read くる), or the
- * ruby hides the ending (生 read うま is 生む, read うむ), a reading the dictionary lists for the form, one that can read
- * the token's, stands instead; an adjective's bare stem (古 read こ) needs the dictionary to confirm it. '' when nothing
- * can be shown: the token is then read as the text writes it (readingForm). */
-
-/** N2 (the lead, 2026-10-18, on Grok 0036) · the quick dictionary's kana いる is 要る, "to be needed": a word a text
- * writes 要る, and means in kana only in a few phrases (お金がいる). A verb the text writes いる in kana, in any form, is the
- * verb of being, 居る, the entry JMdict heads いる: the quick dictionary's word never answers for it. Like its bare stem
- * (R2), its door is marked unfit and its entry is chosen among the verbs read いる (readingToken, narrowLemmaEntries).
- * 要る stays one tap away: the full entry lists every entry of the form. */
-
-/** R2 · a token as its dictionary form, read the way the text reads it: an inflected token with a derived reading is
- * that form read so (おい → おく; the surface it came from rides as `inflected`); one without is the word as the text
- * writes and reads it, so its door never shows a reading the text does not use. An uninflected token is itself. */
 
 /* N2 · the te-form's auxiliaries (Grok 0036; the lead, 2026-10-18). A verb the text writes in kana right after the
  * te-form (the particle て or で after a verb or an auxiliary verb: 残って いる, 済んで い ます, 書いて おく, 降って き た) is
@@ -12600,22 +12456,6 @@ function markTeFormAuxiliaries(tokens) {
       && (verb?.p === '動詞' || verb?.p === '助動詞')) TE_FORM_AUXILIARY.add(token);
   }
 }
-
-/** The glosses of the senses JMdict lists for an entry's use after the te-form (its detail entry), sense by sense. */
-
-/** A te-form auxiliary's answer: { door } names the entry and carries its te-form senses (`te`, glosses by sense);
- * { none: true } when JMdict lists no such sense for the word; { need: { forms, shards } } while the rows or detail
- * shards the answer depends on are still to come; null for any other token. The entries asked, in order: those read as
- * the dictionary form that fit the token (narrowLemmaEntries: いる → 居る, くる → 来る), then the quick dictionary's own
- * entry for the text's form (ください → 下さい). The first with such a sense is the answer. */
-
-/** Ask for what a te-form auxiliary's answer needs until it is answered: the dictionary form's rows, its entries'
- * senses, then the text's own form's rows and senses. */
-
-/** A te-form auxiliary's record leads with JMdict's senses for its use after the te-form: each sense's first gloss, then
- * the rest of those senses' glosses, then the entry's other meanings — every one a gloss of the entry, in JMdict's words.
- * Its card shows the first, and a second such sense on a line of its own (居る: "to be ...-ing", "to have ...-ed").
- * Any other record is returned as it is. */
 
 /* R3 · sense truth (Grok 0315; the lead's R3 brief, 2026-10-18). An entry has senses, and the slip showed its first
  * gloss whatever the sentence meant: ない "nonexistent" for the auxiliary "not", 一つ's つ "indicates two contrasting
@@ -12672,11 +12512,6 @@ function markSenseContext(tokens, passage = null) {
   });
 }
 
-/** A return mark is focused once on return, so the exact saved span is announced. It must never take a press: with
- * tabindex a mouse or finger press on the highlight focused the mark instead of starting a text selection, so a drag
- * that began on the saved words selected nothing. The tabindex goes at the mark's first blur, or at the first press on
- * it, before the press's default action; the highlight looks the same. */
-
 /** The shelf's sense sidecar (data/articles/senses.json, R3 part 2), asked for once. The single file carries it with
  * the articles (articles/senses), as it carries their bodies; it has no sibling file to fetch. */
 let senseSidecarPromise = null;
@@ -12689,8 +12524,6 @@ function ensureSenseSidecar() {
       () => { D.senseSidecar = {}; return D.senseSidecar; });
   return senseSidecarPromise;
 }
-
-/** A word's neighbours in its text, with its article and index; null for a word no text was marked for. */
 
 /** The sidecar's sense for this token in its article: { seq, k, source, lead }, a name ({ name: true }), a reading the
  * text talks about ({ reading: true }), or null. lead,
@@ -12707,9 +12540,6 @@ const senseCounting = (token) => token?.p === '接尾辞' && senseNumberBefore(s
 const senseWeekdayBracket = (token, near) => /^[日月火水木金土]$/u.test(String(token.s || '')) && /^[（(]$/u.test(String(near?.prev?.s || ''))
   && /^[）)]$/u.test(String(near?.next?.s || ''));
 
-/** Whether a kana word stands inside brackets that spell the reading of the word before them (悉曇（しったん）: しっ, た
- * and ん spell しったん): the bracket holds kana alone, and the one to four words before it read exactly that. */
-
 /** The must family, read whole (Grok 2029; the lead): なくてはいけない, なくてはならない, なければならない (なければいけない,
  * なければなりません, ねばならない), なくちゃ. After a verb's, an adjective's or the copula's stem the run is "have to do";
  * after anything else its ない is the existence ない and the run "cannot do without; indispensable" (、なくてはならない資源).
@@ -12719,35 +12549,8 @@ const senseWeekdayBracket = (token, near) => /^[日月火水木金土]$/u.test(S
 const SENSE_MUST_NOT = new Set(['ない', 'ず', 'ぬ', 'ん', 'ませ', 'なかっ', 'なく', 'なけれ', 'ね']);
 const SENSE_MUST_END = /^(?:[」』）)。、！？!?…]|よ|ね|な|わ|ぞ)$/u;
 
-/** The expressions read whole: { s, b, r, seq, k } for the expression's door, or null. */
-
 /** The glosses of one sense of a detail entry, as JMdict lists them. */
 const senseGlosses = (sense) => (sense?.[10] || []).map((gloss) => String(gloss?.[0] || '')).filter(Boolean);
-
-/** The sense a word in its text uses (the section's rules): { seq, k, glosses, why, left, entry } — entry true when it is
- * another entry than the door's own — or { door } for an expression read whole or a name, { need: { forms, shards } }
- * while rows or senses are still to come, null when there is nothing to choose. */
-
-/** A door with the sense its text uses (senseChoice): an expression read whole or a name is its own door; another
- * entry, when the word's own has no sense left, is named by its entry number; a door that named several entries names
- * one only when one entry is left. Any other door is unchanged. */
-
-/** Whether an entry is the one the quick dictionary answers for this door: the entry read alike whose glosses hold the
- * meaning the quick dictionary gives for its spelling. */
-
-/** A record shaped by its door's sense: the chosen sense's glosses first, then the rest (every one the entry's own);
- * its glosses ride as senseGlosses for the slip's second line. A name has no dictionary meaning. */
-
-/** R3's special cards (the lead's ruling, 2026-10-19; V-07): a token the card says is a name in this text, or a reading
- * the text quotes, is not a word to review. Its Save is held, and says why in one quiet line, wherever a held Save explains
- * itself (the slip, the hold's strip, the bar). */
-
-/** The quiet second line itself: one line, never more (a long gloss ends in "…"; the page lists it whole), so the slip
- * grows by one line at most and Save ▾'s menu still unfolds inside it on a phone. */
-
-/** The second line of a sense on the slip: its next glosses, at most two more, while the line stays short. */
-
-/** Ask for what a word's sense needs (its rows, its entries' senses, the sidecar) until it is answered. */
 
 /** A slip drawn before its word's sense was at hand: marked pending, then drawn again with it if it is still the open
  * slip and nobody has touched it (a press or a key inside it: a menu opened, Save pressed, a pane open stay as they are;
@@ -12893,18 +12696,6 @@ function senseLaterDraw(anchor) {
   }
 }
 
-/** R2 · among several entries that write a dictionary form and read it the derived way, the one that fits the token:
- * its class (a verb's English glosses begin "to …"; an adjective by the quick dictionary's part of speech), then the
- * entry whose own first reading this is, then the entry headed by the spelling itself, then — a form the text writes
- * in kana, read alike by several words — the one the quick dictionary teaches earliest (its JLPT level). Each step
- * keeps at least one (おく: 奥, 億, 置く → 置く; いう: 結う, 言う → 言う; くる: 繰る, 来る → 来る); a tie stays the full
- * entry's explicit choice (きる: 切る and 着る, both N5). */
-
-/** The entries (at hand) that write `form` and read it `reading`, by that reading's own restriction (readerReadingFits). */
-
-/** R2 · a lemma door read so by no entry: a サ変 dictionary form's other spelling (解する read げする is 解す read げす,
- * 応ずる read おうずる is 応じる read おうじる), when the quick dictionary or one entry at hand reads it so. */
-
 /** R2 (addendum 1) · the readings a sound change in a compound comes from, those keeping the text's voicing first: a
  * final っ undone (いっ → いち, はっ → はち, じゅっ → じゅう), then a voiced or ぱ-row first kana made plain (ぽん, ぼん →
  * ほん; がねもち → かねもち), alone or with the っ undone. Given the readings the kanji data lists for a lone kanji, no
@@ -12912,33 +12703,6 @@ function senseLaterDraw(anchor) {
  * never ふつ, France: Codex's f2e3015e review). */
 const SOUND_VOICED = 'がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ';
 const SOUND_PLAIN = 'かきくけこさしすせそたちつてとはひふへほはひふへほ';
-
-/** The readings the kanji data lists for one kanji, in hiragana (on and kun; a kun reading's okurigana mark dropped). */
-
-/** R2 (addendum 1, 2) · a word no entry is read the text's way for, once the full dictionary has answered: a sound change
- * of an entry's reading names that entry, by the entry's own reading, and its card still shows the text's (一 read いっ
- * is 一 いち; 本 read ぽん is 本 ほん) — never when the text's reading is one the kanji data itself lists for a lone kanji
- * (仏 read ぶつ is not 仏 ふつ, France), nor by a voicing change once undoing the っ alone gives one (仏 read ぶっ); a lone
- * kanji read by one of its on'yomi, or a sound change of one (寺 じ, 国 こく, 所 じょ, 仏 ぶっ), is that kanji (kanjiOnly:
- * its meaning from the kanji data, its page, its Save). null when neither holds. */
-
-/** R2 (addendum 1, 2) · the same answer for a reader word the lookup door opens (a counter, a suffix, an ending): with no
- * entry read the text's way, { reading, shown } names the entry a sound change comes from, or { kanjiOnly } the lone
- * kanji; {} otherwise. The form's rows must be at hand (openJapaneseLookup asks for them first). */
-
-/** Whether a reading needs the full dictionary: the quick one lacks the spelling, or reads it otherwise. */
-
-/** Ask the full dictionary for a token's spelling when its own reading needs it and the form's rows are not at
- * hand: a promise that settles once they are, or once the index cannot answer; null when nothing needs asking. */
-
-/** The token a word door stands for. One whose own reading the quick dictionary does not carry stands, by entry
- * number (seq), for the entry read that way: on a spelling the quick dictionary has, the full dictionary's first
- * entry so read (lookup's choice) or, with none, no entry at all (N, 2026-10-17: an entry read otherwise counts as
- * missing; it was the form's first row, whose meaning belonged to another reading); on a spelling it lacks, only the
- * one entry so read and so permitted (several stay the full entry's explicit choice, D11). Until the form's rows are
- * at hand, and for every other token, it is the token as it was. */
-
-/** readingToken's door before its sense: the entry the token's reading names (R, R2, N2). */
 
 /** A word slip for a token whose own reading needs the full dictionary. With the dictionary open, its answer is a
  * moment away and the slip waits for it (READING_WAIT_MS at most); with the dictionary still to open, the slip comes
@@ -13011,24 +12775,6 @@ function openReadingSlip(anchor, token, draw) {
   return drawn;
 }
 
-/** Source indices remain those of the original article. A displayed name can cover several
- * segmenter pieces, so an old bookmark on any of them still finds that same visible word. */
-
-/** A foreign name such as ジャラマナ must not borrow マナ's unrelated dictionary sense.
- * Join only contiguous noun pieces of at least two Katakana characters where the grader
- * excluded a piece. Ordinary content compounds and short classical kana stay as authored.
- * This is a display plan: no original token, paragraph index or source digest is rewritten. */
-
-/** N · the quick record as the text reads the word: an entry read otherwise counts as missing (the lead, 2026-10-17),
- * so no line or spoken state lends another reading's meaning (訳 read やく never says わけ's "reason"). An inflected
- * word answers by its dictionary form, as before. */
-
-/** N · the miss said for a word whose entries at hand are all read otherwise: once the full dictionary has answered for
- * the spelling and names none read the text's way, "No dictionary entry for this reading."; until then, the quick
- * dictionary's own miss. */
-
-/** N · the full dictionary has answered for this spelling: its index is in, and the spelling's rows are complete. */
-
 /** The line under a content word on the ladder's English rung: its gloss, or nothing where it has none (Ladder R2: never the
  * dash). N · a word whose entry at hand is read otherwise shows nothing until the full dictionary answers, then that
  * answer's gloss if it has one read so. */
@@ -13038,8 +12784,6 @@ const readerTokenGloss = (token) => readerDoorGloss(readingToken(token));
 /** Ladder R4 · the English row's gloss for a reader door: the box's lead (boxLeadGloss) where readerDoorGloss gave its
  * shortest candidate; a lone kanji's meaning as before. */
 const readerTokenLead = (token) => readerDoorLead(readingToken(token));
-
-/** How the reader's words work, in plain words: the text settings say it whole (John, 2026-10-02 #8). */
 
 /* R4 (2026-09-30) — a reader word is named by the word itself. How to work it and what it shows now
  * ride as its description: the kind and the keyboard help are shared by the whole reader
@@ -13084,8 +12828,6 @@ function paintNamedTok(span, token, index) {
   span.classList.toggle('lit', shown);
   nameReaderToken(span, token, index, 'named');
 }
-/** Apply one token's reveal state straight to its DOM — no re-render. */
-
 /* ふりがな 触れて (on touch): the word you touched shows its reading, and touching another moves it
  * there. つねに shows every reading, なし none. Taps never cycle the text: the popup carries the reading and
  * the meaning. Each rendered reader word registers how it repaints itself. */
@@ -13532,8 +13274,6 @@ function speakPassage(p, onDone) {
     }
   });
 }
-
-/** The play bar's progress: clips done plus the fraction of the one playing, painted in place. */
 
 
 /* ------------------------------------------------ 収録の声 the recorded voice
@@ -14605,11 +14345,6 @@ function renderReader(main) {
   main.append(footer);
   if (S.scaleVisit?.returnRequest) settleScaleReturn(reader);
 }
-
-/* The Drift entry (Phase 2): the real 墨流し universe fills the viewport on
- * its own layer beneath the chrome; the corridor contributes exactly one
- * thing here — the door into the shelf. 藍 indigo, per the palette law:
- * "you can go here". */
 
 /* ------------------------------------------- the Drift card's study door
  * The drift universe is generated from its own source and knows nothing about
@@ -15762,22 +15497,6 @@ const TODAY_SKY_CAP = 10;
 /** How far back a miss still counts for the sky. */
 const TODAY_SKY_MISS_DAYS = 14;
 /** When a moment was, in words a learner says: today · yesterday · 3 days ago (by calendar day). */
-/** The one plain line a star says about why it is in the sky. */
-
-/** Hfix-2b · X-9 — every word standing under his own "Not yet", read where the WORD PAGE writes
- * it: `met.entries[<encounterKey>].said = { value:'not-yet', at, cursor }`.
- *
- * Today's sky used to read one mark only — the review room's obslog 'reveal' row — and nothing
- * writes that row any more, so a word he marked on its own page never reached the sky. Both marks
- * are read now; this is the newer of the two, and the one he actually presses.
- *
- * A mark stands unless a later recall released it, which is the exact rule `wordDepth` applies at
- * the word's own ring (match === 'same' && notYetReleased). The sky and the ring therefore cannot
- * disagree. The identity comes from the key itself rather than being re-derived, so a word whose
- * dictionary entry has since moved is still counted as the word he marked.
- *
- * Pure: reads the record, writes nothing, adds no field, and touches no SRS ledger or schedule. */
-
 /** Hfix-2b · X-1 — why one 宙 star is there, in the same words and from the same recorded sources
  * as Today's sky (MASTER_SPEC §7 line 39: "each star says why it is there").
  *
@@ -17310,11 +17029,6 @@ async function commitLearningEnrollment(owner, nodes, isCurrent, { listName = nu
     if (recordReady(epoch) && isCurrent()) render();
   }
 }
-/** Why an enrollment row holds its word (D23): the one-line held text when the spelling's
- * card or history stands for an identity this spelling-only door does not, or the answer
- * cannot be confirmed; otherwise null. The lesson and older-set rows show it before any
- * commit; commitLearningEnrollment's skip stays the producer's guard for a later change. */
-
 /** The held enroll row's route (D23): a spelling held by a card, or kept history, this door does
  * not stand for opens that card or entry from the row too, as the mini's and the full note's route
  * do, so the held line's "open that card" has its control. Opening only navigates. */
