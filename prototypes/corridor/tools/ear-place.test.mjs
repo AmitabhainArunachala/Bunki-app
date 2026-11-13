@@ -27,6 +27,9 @@ import { createRequire } from 'node:module';
 import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
+// the gates and where each stands are the module's own (placeMarks reads the same two): the page gets them as arguments,
+// so this test cannot drift from the rule it checks
+import { EAR_GATES, gateHome } from '../modules/ear.mjs';
 
 const CORRIDOR = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const { chromium } = createRequire(join(CORRIDOR, '../../package.json'))('playwright-core');
@@ -71,16 +74,17 @@ after(async () => {
   await new Promise((done) => server?.close(done) ?? done());
 });
 
-/** In the page, from its first script on: one look per drawn frame at every gate that is shown. */
-function watchFrames() {
+/** In the page, from its first script on: one look per drawn frame at every gate that is shown. `rule`: the module's
+ * gates' selector and its home rule's source (modules/ear.mjs EAR_GATES, gateHome). */
+function watchFrames(rule) {
   if (globalThis.speechSynthesis) Object.getPrototypeOf(globalThis.speechSynthesis).speak = function () {};
   try { localStorage.setItem('bunki-prototype:intro-dismissed:v1', '1'); } catch { /* storage may be blocked */ }
   const seen = (globalThis.__earPlace = {
     frames: 0, bare: 0, bareByHome: {}, shownByHome: {}, worst: 0, run: 0, firstMark: null, ready: null,
     hidden: 0, jumps: 0, wrongHome: 0, lastChange: performance.now(), rest: false, changedAtRest: 0, addedAtRest: 0,
   });
-  const GATES = '#ginga-symbol, :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate';
-  const homeOf = (gate) => (gate.id === 'ginga-symbol' ? 'sky' : gate.parentElement?.matches?.('.sheet-bar') ? 'sheet' : 'bar');
+  const GATES = rule.gates;
+  const homeOf = new Function(`return (${rule.home});`)();
   const stoodAt = new WeakMap();
   const frame = () => {
     const now = Math.round(performance.now());
@@ -127,7 +131,7 @@ async function open(device, address, { wait = null } = {}) {
   const context = await browser.newContext({ ...device, locale: 'en-US', timezoneId: 'Asia/Tokyo' });
   contexts.push(context);
   await silenceBrowserAudio(context);
-  await context.addInitScript(watchFrames);
+  await context.addInitScript(watchFrames, { gates: EAR_GATES, home: String(gateHome) });
   const page = await context.newPage();
   page.setDefaultTimeout(30000);
   const errors = [];
