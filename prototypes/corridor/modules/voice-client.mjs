@@ -29,7 +29,10 @@ export const isVoiceServer = (value) => typeof value === 'string' && value.lengt
 const PAIR_CODES = new Set(['invalid-pairing', 'authentication-required', 'installation-exists', 'authentication-rate-limit', 'pairing-unavailable']);
 const SPEAK_CODES = new Set(['speech-input-invalid', 'speech-input-not-normal', 'japanese-only', 'profile-not-approved',
   'authentication-required', 'budget-exhausted', 'not-in-release', 'speech-input-too-large', 'day-budget', 'request-rate-limit',
-  'voice-unavailable', 'server-failed']);
+  'voice-unavailable', 'server-failed', 'upgrade-required']);
+/** The code an answer carries when its body names none the contract knows: a 401 ends the pairing, a 426 asks for a newer
+ * app (its line says to update, not to tap again), anything else is the server's failure. */
+const STATUS_CODES = new Map([[401, 'authentication-required'], [426, 'upgrade-required']]);
 
 export class VoiceError extends Error {
   constructor(code, status = 0) {
@@ -250,7 +253,7 @@ export function createVoiceClient({ fetch: fetchFn = globalThis.fetch?.bind(glob
         headers: { Authorization: `Bearer ${pairing.token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ format: input.format, version: input.version, inputKey: input.inputKey, segments: input.segments, profile: input.profile, voiceKey }) }, signal);
       if (response.status !== 200) {
-        const { code, figures } = await refusal(response, SPEAK_CODES, response.status === 401 ? 'authentication-required' : 'speak-failed');
+        const { code, figures } = await refusal(response, SPEAK_CODES, STATUS_CODES.get(response.status) || 'speak-failed');
         if (response.status === 401) await endedByServer();
         throw Object.assign(new VoiceError(code, response.status), { figures });
       }
