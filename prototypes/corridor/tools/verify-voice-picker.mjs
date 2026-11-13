@@ -38,6 +38,7 @@ import { resolve } from 'node:path';
 import { chromium } from 'playwright-core';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
+import { voiceShortOf } from '../modules/voice-lines.mjs';
 
 const require = createRequire(import.meta.url);
 const { startStaticHost } = require('../../bunki-desktop/lib/static-host.cjs');
@@ -166,7 +167,8 @@ try {
     const page = await context.newPage();
     const state = await openRecordedReader(page);
     if (!state.disabled) await page.locator('#listen-toggle').click();
-    const stopped = await page.waitForFunction(() => /could not play|再生できません/u.test(document.querySelector('#listen-note')?.textContent || ''), null, { timeout: 10_000 })
+    // the bar's few words for a clip that could not play (C10's short form, in either language)
+    const stopped = await page.waitForFunction((words) => words.some((w) => (document.querySelector('#listen-note')?.textContent || '').includes(w)), voiceShortOf('decode'), { timeout: 10_000 })
       .then(() => true, () => false);
     check('V4 a failed recording stops with a visible reason', stopped, await page.evaluate(() => document.querySelector('#listen-note')?.textContent || ''));
     check('V4 no fallback voice: zero device speech', (await deviceSpoken(page)) === 0);

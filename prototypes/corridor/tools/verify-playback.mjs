@@ -34,6 +34,7 @@ import { chromium, webkit } from 'playwright-core';
 let CORRIDOR_DIR = null, startCorridorServer;
 import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
 import { runtimeLock } from './voice-lock.mjs';
+import { voiceShortOf } from '../modules/voice-lines.mjs';
 import { englishExpectation, englishSourcePins, assertEnglishSource, observeReaderEnglishRung } from './reader-english-rung.mjs';
 import { runPureEnglishControls, runBrowserEnglishControls } from './reader-english-rung-controls.mjs';
 const readerEnglishRung = { schemaVersion: 1, sources: englishSourcePins(), observations: [], pureControls: [], browserControls: null };
@@ -292,7 +293,8 @@ const barShut = (page) => page.evaluate(() => !document.querySelector('#listen-o
   && !!document.querySelector('.listen-row.is-pending[hidden]') && document.querySelector('.listen-row.is-pending')?.dataset.open === 'false');
 const PENDING = /^No recording for this article$/u;
 const PENDING_VOICES = 'Approved voices: Kore (main), Charon (second).';
-const FAILED = /could not play|再生できませんでした/u;
+// the bar's few words for a clip that could not play (C10's short form, in either language)
+const FAILED = new RegExp(voiceShortOf('decode').join('|'), 'u');
 async function counts(page) {
   return page.evaluate(() => ({
     utterances: window.__playbackFixture.utterances.map((u) => u.text),

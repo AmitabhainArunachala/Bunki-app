@@ -29,6 +29,8 @@
 import { createReadStream, mkdirSync, statSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { extname, join, normalize } from 'node:path';
+// the voice's one vocabulary (2026-11-13): the lines these cases read are the module's
+import { voiceLineOf } from '../modules/voice-lines.mjs';
 
 const argOf = (name, fallback) => { const i = process.argv.indexOf(name); return i > 0 && process.argv[i + 1] ? process.argv[i + 1] : fallback; };
 const SITE = argOf('--site', process.env.KAIRO_SITE_DIR || '');
@@ -441,7 +443,7 @@ const cases = {
       if (!keptBefore.some((k) => k.endsWith(`|${text}`))) problems.push('the clip was not kept online (nothing to check)');
       if (sent(s, a0).length - again.length > 0) problems.push('offline, the ear asked the server');
       if (!struck) problems.push('the media error did not strike the mark');
-      if (/voice server could not say|音声サーバーがこの文を読めません/u.test(why) || !/Could not play|再生できません/u.test(why)) problems.push(`the line says ${JSON.stringify(why)}, not that the clip could not play`);
+      if (!voiceLineOf('decode').includes(why) || voiceLineOf('server-failed').includes(why)) problems.push(`the line says ${JSON.stringify(why)}, not that the clip could not play`);
       if (keptAfter.some((k) => k.endsWith(`|${text}`))) problems.push('the clip that would not play is still kept on the device');
       if (again.length !== 1 || again[0] !== text) problems.push(`the next tap sent ${JSON.stringify(again)}, not ${JSON.stringify(text)} again`);
       record('a kept clip that will not play (a media error): one true line, the clip leaves the device, and the next tap asks again', problems,
@@ -478,8 +480,9 @@ const cases = {
       await page.locator('#me-settings').scrollIntoViewIfNeeded(); await press('#me-settings'); await s.sleep(900);
       const settings = await page.evaluate(() => document.getElementById('settings-voice-server')?.textContent || '');
       const problems = [];
-      if (/not paired|つないでいません/u.test(line) || !/pair again|つなぎ直/u.test(line)) problems.push(`the next tap says ${JSON.stringify(line)}`);
-      if (!/ended this pairing|接続を終了/u.test(settings)) problems.push(`Settings says ${JSON.stringify(settings.slice(0, 160))}`);
+      // a pairing the server ended reads C2 under the ear and in Settings, never C1 (not paired)
+      if (voiceLineOf('not-paired').includes(line) || !voiceLineOf('authentication-required').includes(line)) problems.push(`the next tap says ${JSON.stringify(line)}`);
+      if (!voiceLineOf('authentication-required').some((words) => settings.includes(words))) problems.push(`Settings says ${JSON.stringify(settings.slice(0, 160))}`);
       record('I13 a 401 on a request nobody waits for: the next tap and Settings say the pairing was ended', problems, JSON.stringify({ line, settings: settings.slice(0, 160) }));
     } finally { await s.close(); }
   },

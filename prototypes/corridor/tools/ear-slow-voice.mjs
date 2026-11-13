@@ -17,6 +17,7 @@
  *        [--width 390|1728] [--ui bi|ja] [--voice-port 19482] [--out DIR]
  */
 import { arg, earMark, open, openArticle, reporter } from './review-ear/lib.mjs';
+import { voiceLineOf } from '../modules/voice-lines.mjs';
 
 const ENGINE = arg('--engine', 'chromium');
 const WIDTH = Number(arg('--width', '390'));
@@ -25,7 +26,8 @@ const OUT = arg('--out', process.env.REVIEW_OUT || '.');
 const tag = `${ENGINE}-${WIDTH}-${UI}`;
 const { rows, record } = reporter(tag);
 const SLOW_MS = 9000;
-const LINES = ['No voice: the voice took too long', '声が届くまでに時間がかかりすぎました'];
+// the voice took too long (C5), in the one vocabulary's words: [ja, en]
+const LINES = voiceLineOf('ear-too-slow');
 const s = await open({ engine: ENGINE, width: WIDTH, ui: UI, clipSeconds: () => 1.2, voicePort: Number(arg('--voice-port', '19532')) });
 const { page, fake } = s;
 const sent = [];
