@@ -135,7 +135,7 @@ const CAUSES = [
   { key: '426', code: 'upgrade-required', script: [{ status: 426, error: 'upgrade-required' }], then: 'none' },
   { key: 'no-new', code: 'not-in-release', script: [{ status: 404, error: 'not-in-release' }], then: 'same' },
   { key: 'else-500', code: 'server-failed', script: [{ status: 500, error: 'server-failed' }], then: 'speaks' },
-  { key: 'else-400', code: 'japanese-only', script: [{ status: 400, error: 'japanese-only' }, { status: 400, error: 'japanese-only' }], then: 'same' },
+  { key: 'else-400', code: 'japanese-only', script: [{ status: 400, error: 'japanese-only' }, { status: 400, error: 'japanese-only' }], then: 'again' },
   { key: 'nothing', code: 'nothing-to-say', setup: 'latin', then: 'same' },
 ];
 const ONLY_CAUSES = new Set(arg('--causes', CAUSES.map((c) => c.key).join(',')).split(','));
@@ -184,6 +184,14 @@ const WORD = 'read=wikinews:1403&word=開催';
 const HEAD_MARK = '#sheet .voice-say[data-voice-say="entry-headword"]';
 const EXAMPLE_MARK = '#sheet .voice-say[data-voice-say="example"]';
 
+/** A fresh reader may open the first-use demonstration's word box over the bar's mark: it is closed first, as the pocket's
+ * own checks close it (Escape). */
+async function closeBox(p) {
+  for (let i = 0; i < 4 && (await p.page.locator('#mini').isVisible().catch(() => false)); i += 1) {
+    await p.page.keyboard.press('Escape');
+    await p.page.waitForFunction(() => !document.getElementById('mini')?.getClientRects().length, null, { timeout: 3000 }).catch(() => {});
+  }
+}
 /** A lost connection: every speak request of this page fails at the network until the line has been seen (`p.cutOn` is
  * cleared then). The stand-in's own dropped socket is not used for it: the browser asks again on a reset connection. */
 async function cut(p, cause) {
@@ -219,7 +227,7 @@ async function nextPress(p, cause, mark, readLine) {
   }
   const asked = speaksNow();
   await p.press(mark);
-  if (['same', 'none'].includes(cause.then) || cause.then === undefined) {
+  if (['same', 'again', 'none'].includes(cause.then) || cause.then === undefined) {
     if (cause.then === 'none') { await page.waitForTimeout(1500); return 'pressed'; }
     const again = await until(page, readLine.fn, readLine.arg, 25000);
     return again && matches(again, cause.code) ? `same line${speaksNow() > asked ? `, asked ${speaksNow() - asked}` : ', not asked'}` : `no line (${again})`;
@@ -260,7 +268,7 @@ async function markCase(cause) {
     line: matches(seen, cause.code) || `${JSON.stringify(seen)} ≠ ${JSON.stringify(lineOf(cause.code))}`,
     title: matches(title, cause.code) || JSON.stringify(title),
     'goes after about 4 s': (gone !== null && gone >= 3000 && gone <= 6500) || `gone after ${gone} ms`,
-    'next press': (thenOk ? then === thenOk : then.startsWith('same line') && then.endsWith('not asked')) || then,
+    'next press': (thenOk ? then === thenOk : cause.then === 'again' ? then.startsWith('same line') : then.startsWith('same line') && then.endsWith('not asked')) || then,
   }, { seen, shownAtMs: shownAt, goneAfterMs: gone, then, moved: { during: moved(before, during), after: moved(before, after) }, errors: p.errors.slice(0, 3) });
   await p.context.close();
 }
@@ -270,6 +278,7 @@ async function barCase(cause) {
   const p = await freshPage({ paired: cause.setup !== 'unpaired' });
   const { page } = p;
   await prepare(p, cause, 'read=wikinews:1403', '#listen-open');
+  await closeBox(p);
   if ((await page.locator('#listen-toggle').count()) === 0 || !(await page.locator('#listen-toggle').isVisible())) await p.press('#listen-open');
   await page.locator('#listen-toggle').waitFor();
   const near = { toggle: '#listen-toggle', rate: '#listen-rate', note: '#listen-note', text: '#reader p.reader-prose' };
@@ -325,23 +334,28 @@ async function settingsCase(cause) {
   const p = await freshPage({ paired: cause.setup !== 'unpaired' });
   const { page } = p;
   await prepare(p, cause, WORD, HEAD_MARK);
-  fake.failNext(cause.script || []);
-  await cut(p, cause);
-  if (cause.key !== 'not-paired') {
-    await p.press(HEAD_MARK);
-    await until(page, (sel) => !!document.querySelector(sel)?.nextElementSibling?.textContent, HEAD_MARK, 20000);
-  }
-  // Settings, in the same page: the app's own block, drawn now (corridor.js voiceSettingsBlock), as Settings draws it
-  const near = { status: '#vl-settings #voice-status', last: '#vl-settings #voice-last', budget: '#vl-settings #voice-budget' };
+  // Settings, open in the same page: the app's own block (corridor.js voiceSettingsBlock), as Settings draws it; it
+  // paints itself again at every change of the voice's state
+  const near = { status: '#vl-settings #voice-status', last: '#vl-settings #voice-last', budget: '#vl-settings #voice-budget', how: '#vl-settings #voice-pair-how, #vl-settings #voice-budget-refresh' };
   await page.evaluate(async () => {
     const m = await import('/corridor.js');
     const host = document.createElement('div'); host.id = 'vl-settings';
     host.append(m.voiceSettingsBlock());
     document.querySelector('#sheet')?.prepend(host);
   });
-  const seen = await until(page, () => { const s = document.querySelector('#vl-settings #voice-status')?.textContent; const l = document.querySelector('#vl-settings #voice-last')?.textContent; const b = document.querySelector('#vl-settings #voice-budget')?.textContent; return s && !/…$/u.test(b || '') ? [s, l, b] : null; }, null, 15000);
+  const read = () => { const s = document.querySelector('#vl-settings #voice-status')?.textContent; const l = document.querySelector('#vl-settings #voice-last')?.textContent; const b = document.querySelector('#vl-settings #voice-budget')?.textContent; return s && !/…$/u.test(b || '') ? [s, l, b] : null; };
+  const first = await until(page, read, null, 15000);
   const before = await where(page, near);
-  await page.waitForTimeout(1500);
+  fake.failNext(cause.script || []);
+  await cut(p, cause);
+  if (cause.key !== 'not-paired') {
+    await p.press(HEAD_MARK);
+    // the press's own line (not the headword after the mark): the answer has come
+    await until(page, (sel) => { const n = document.querySelector(sel)?.nextElementSibling; return !!(n?.classList.contains('voice-note') && n.textContent); }, HEAD_MARK, 20000);
+  }
+  // Settings shows the lasting cause while it is open (a status that has changed since the press)
+  const seen = cause.key === 'not-paired' ? first
+    : await until(page, ([fn, was]) => { const now = new Function(`return (${fn})`)()(); return now && now[0] !== was ? now : null; }, [read.toString(), first?.[0]], 15000);
   const after = await where(page, near);
   await shot(p, `settings-${cause.key}`);
   // the whole limit with the figure the stand-in's budget answer gave beside it; today's limit with the time it resets
@@ -414,9 +428,12 @@ async function controlsCase() {
       if (prepare) await prepare(p);
       const control = p.page.locator(sel).first();
       if (!(await control.count())) { row('controls', name, { 'the control stands here': 'not reached' }); return; }
-      await control.scrollIntoViewIfNeeded().catch(() => {});
+      // the 読む chip goes when the page scrolls, and Playwright's touch tap brings no click on it in headless WebKit (the
+      // lane's own ear check presses it the same way): its click, as a tap's
+      const chip = sel === '.ear-chip';
+      if (!chip) await control.scrollIntoViewIfNeeded().catch(() => {});
       busy();
-      await p.press(control);
+      if (chip && phone) await control.dispatchEvent('click', { detail: 1 }); else await p.press(control);
       const seen = await until(p.page, lineNear, sel, 20000);
       await shot(p, `control-${name}`);
       row('controls', name, { 'a line, exactly as ruled': (seen && seen.text === want) || JSON.stringify(seen) }, { seen });
@@ -453,6 +470,7 @@ async function controlsCase() {
   await press(p, '読む on a selection (reader)', '.ear-chip', (q) => select(q, '#reader p.reader-prose'));
   // the play bar
   await p.open('read=wikinews:1403', '#listen-open');
+  await closeBox(p);
   if (!(await p.page.locator('#listen-toggle').isVisible().catch(() => false))) await p.press('#listen-open');
   busy();
   await p.press('#listen-toggle');
