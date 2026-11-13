@@ -85,8 +85,9 @@ test('the actual saved-answer controls run and every declared child is killed', 
       JSON.stringify(report.verdicts.filter((verdict) => verdict.verdict !== 'killed')),
     );
     assert.deepEqual(report.pins.after, report.pins.before);
-    // 20 since SAVE (2026-11-11): corridor.js reads modules/save-places.mjs, one more authored source in the closure
-    assert.equal(Object.keys(report.pins.before).length, 20);
+    // 20 since SAVE (2026-11-11): corridor.js reads modules/save-places.mjs, one more authored source in the closure;
+    // 21 since the voice's one vocabulary (2026-11-13): corridor.js reads modules/voice-lines.mjs
+    assert.equal(Object.keys(report.pins.before).length, 21);
     assert.equal(report.pins.stable, true);
     assert.equal(report.pass, true);
     const admission = retainedReportContracts['word-saved-answer-mutation-controls'].validate(
