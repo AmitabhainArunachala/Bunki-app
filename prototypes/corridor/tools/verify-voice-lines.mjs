@@ -14,6 +14,8 @@
  *            after about four seconds
  *  settings  the lasting causes, as Settings shows them while it is open (the dollar figure beside the limits)
  *  clears    a line goes at the next press, at once, and a success leaves none
+ *  controls  every voice control pressed while the voice is busy: what appears, and where (a silent press is a fault)
+ *  several   a kanji with several readings in review: its answer's row says it is not read aloud, with no control
  *  For each surface the nearest text and the nearest control are measured before the line, while it shows and after it
  *  goes (does anything he reads or is about to tap move?).
  *
@@ -122,7 +124,7 @@ const shot = (p, name) => (SHOTS ? p.page.screenshot({ path: join(SHOTS, `${tag}
 const CAUSES = [
   { key: 'not-paired', code: 'not-paired', setup: 'unpaired', then: 'pair' },
   { key: '401', code: 'authentication-required', script: [{ status: 401, error: 'authentication-required' }], then: 'pair' },
-  { key: 'lost-connection', code: 'network-failed', script: [{ drop: true }], then: 'wait-16s' },
+  { key: 'lost-connection', code: 'network-failed', cut: true, then: 'wait-16s' },
   { key: 'offline', code: 'offline', setup: 'offline', then: 'same' },
   { key: 'timeout', code: 'voice-timeout', script: [{ holdMs: 23000 }], then: 'wait-16s', slow: true },
   { key: '503', code: 'voice-unavailable', script: [{ status: 503, error: 'voice-unavailable' }, { status: 503, error: 'voice-unavailable' }], then: 'speaks' },
@@ -137,7 +139,6 @@ const CAUSES = [
   { key: 'nothing', code: 'nothing-to-say', setup: 'latin', then: 'same' },
 ];
 const ONLY_CAUSES = new Set(arg('--causes', CAUSES.map((c) => c.key).join(',')).split(','));
-const newDay = () => new Date((Math.floor(Date.now() / 86400000) + 1) * 86400000).toLocaleTimeString(LANG === 'ja' ? 'ja-JP' : 'en-US', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit' });
 const lineOf = (code) => T(L.voiceLineOf(code, { time: '{time}' }));
 /** The line as the page should show it; C8's time is read off the page (the device's own clock and format). */
 const matches = (seen, code) => {
@@ -183,6 +184,13 @@ const WORD = 'read=wikinews:1403&word=開催';
 const HEAD_MARK = '#sheet .voice-say[data-voice-say="entry-headword"]';
 const EXAMPLE_MARK = '#sheet .voice-say[data-voice-say="example"]';
 
+/** A lost connection: every speak request of this page fails at the network until the line has been seen (`p.cutOn` is
+ * cleared then). The stand-in's own dropped socket is not used for it: the browser asks again on a reset connection. */
+async function cut(p, cause) {
+  if (!cause.cut) return;
+  p.cutOn = true;
+  await p.page.route('**/v1/audio/speak', (route) => (p.cutOn ? route.abort('internetdisconnected') : route.fallback()));
+}
 async function prepare(p, cause, query, wait) {
   await p.open(query, wait);
   if (cause.setup === 'offline') await p.context.setOffline(true);
@@ -234,10 +242,12 @@ async function markCase(cause) {
   const near = { headword: '#sheet > h2.headword', reading: '#sheet > p.reading', mark: HEAD_MARK, next: '#sheet > h2.headword + *' };
   const before = await where(page, near);
   fake.failNext(cause.script || []);
+  await cut(p, cause);
   const t0 = Date.now();
   await p.press(HEAD_MARK);
   const note = (sel) => { const m = document.querySelector(sel); const n = m?.nextElementSibling; return n?.classList.contains('voice-note') && n.textContent ? n.textContent : null; };
   const seen = await until(page, note, HEAD_MARK, cause.slow ? 40000 : 20000);
+  p.cutOn = false;
   const shownAt = Date.now() - t0;
   const title = await page.locator(HEAD_MARK).getAttribute('title');
   const during = await where(page, near);
@@ -266,9 +276,11 @@ async function barCase(cause) {
   const before = await where(page, near);
   // the read asks two sentences ahead: each of the first few asks meets the cause
   fake.failNext(...Array.from({ length: 4 }, () => cause.script || []));
+  await cut(p, cause);
   await p.press('#listen-toggle');
   const read = () => { const n = document.getElementById('listen-note'); return n?.title ? [n.textContent, n.title] : null; };
   const seen = await until(page, read, null, cause.slow ? 40000 : 20000);
+  p.cutOn = false;
   const during = await where(page, near);
   await shot(p, `bar-${cause.key}`);
   row('play bar', cause.key, {
@@ -288,9 +300,11 @@ async function earCase(cause) {
   await p.press(`${spot} .ear-mark`);
   await until(page, () => document.documentElement.dataset.ear === 'armed', null, 5000);
   fake.failNext(cause.script || []);
+  await cut(p, cause);
   await p.press('#sheet > h2.headword');
   const read = (sel) => { const why = document.querySelector(`${sel} .ear-why`); return why && !why.hidden && why.textContent ? [why.textContent, document.querySelector(`${sel} .ear-mark`).getAttribute('aria-label')] : null; };
   const seen = await until(page, read, spot, cause.slow ? 40000 : 20000);
+  p.cutOn = false;
   const during = await where(page, near);
   await shot(p, `ear-${cause.key}`);
   const gone = seen ? await goneAfter(page, read, spot, 9000) : null;
@@ -312,6 +326,7 @@ async function settingsCase(cause) {
   const { page } = p;
   await prepare(p, cause, WORD, HEAD_MARK);
   fake.failNext(cause.script || []);
+  await cut(p, cause);
   if (cause.key !== 'not-paired') {
     await p.press(HEAD_MARK);
     await until(page, (sel) => !!document.querySelector(sel)?.nextElementSibling?.textContent, HEAD_MARK, 20000);
@@ -329,11 +344,12 @@ async function settingsCase(cause) {
   await page.waitForTimeout(1500);
   const after = await where(page, near);
   await shot(p, `settings-${cause.key}`);
-  const time = newDay();
-  const want = cause.key === 'whole' ? T(L.voiceSettingsLine(cause.code, { capCents: 100000 })) : T(L.voiceSettingsLine(cause.code, { time }));
+  // the whole limit with the figure the stand-in's budget answer gave beside it; today's limit with the time it resets
+  // (the stand-in sends no day figure, so none stands beside it)
+  const want = cause.key === 'whole' ? T(L.voiceSettingsLine(cause.code, { capCents: 100000 })) : T(L.voiceLineOf(cause.code));
   const status = seen?.[0] || '';
-  const checks = { 'the lasting cause in its ruled words': status.includes(want.replace(/\d{1,2}:\d{2}/u, '')) || status === want || `${JSON.stringify(status)} lacks ${JSON.stringify(want)}` };
-  if (cause.key === 'day') checks['the line with its time'] = matches(status.replace(/^.*?(?=今日の音声|Today's voice)/u, ''), cause.code) || JSON.stringify(status);
+  const checks = { 'the lasting cause in its ruled words': (cause.key === 'day'
+    ? matches(status.slice(status.indexOf(want)), cause.code) : status.includes(want)) || `${JSON.stringify(status)} lacks ${JSON.stringify(want)}` };
   if (cause.key !== 'not-paired') {
     const last = seen?.[1] || '';
     checks['last tap, short form'] = last.includes(`(${shortOf(cause.code)}`) || last.includes(`（${shortOf(cause.code)}`) || JSON.stringify(last);
@@ -455,7 +471,30 @@ async function controlsCase() {
   await p.context.close();
 }
 
+/** A kanji with several readings (C14b), saved from its own page and met in review: the answer's row says it is not read
+ * aloud, in the ruled words, and holds no control. */
+async function severalCase() {
+  const p = await freshPage();
+  const { page } = p;
+  await page.goto(`${ORIGIN}/?ui=${UI}&kanji=${encodeURIComponent('生')}`, { waitUntil: 'load' });
+  await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 90000 });
+  await page.locator('#sheet-take').waitFor();
+  await settled(page);
+  await p.press('#sheet-take'); await page.locator('#mini-review').waitFor(); await p.press('#mini-review');
+  await settled(page);
+  await p.open('room=tray', '#review-start');
+  await p.press('#review-start');
+  await page.locator('.review-face').first().waitFor();
+  await settled(page);
+  await p.press('#reveal');
+  const seen = await until(page, () => { const n = document.getElementById('card-say-note'); return n?.textContent ? [n.textContent, !!document.getElementById('card-say')] : null; }, null, 20000);
+  await shot(p, 'review-several-readings');
+  row('review card answer', 'several readings', { line: (seen && seen[0] === lineOf('several-readings')) || JSON.stringify(seen), 'no control': (seen && !seen[1]) || JSON.stringify(seen) }, { seen });
+  await p.context.close();
+}
+
 try {
+  if (ONLY.has('several')) await severalCase().catch((e) => row('review card answer', 'several readings', { ran: String(e.message || e).slice(0, 200) }));
   if (ONLY.has('controls')) await controlsCase().catch((e) => row('controls', 'all', { ran: String(e.message || e).slice(0, 200) }));
   for (const cause of CAUSES.filter((c) => ONLY_CAUSES.has(c.key))) {
     if (ONLY.has('mark')) await markCase(cause).catch((e) => row('control line', cause.key, { ran: String(e.message || e).slice(0, 200) }));
