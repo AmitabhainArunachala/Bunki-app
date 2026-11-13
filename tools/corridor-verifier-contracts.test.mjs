@@ -38,3 +38,6 @@ test('gate on every bar contracts execute every case without skips', () => {
 test('ear mark beside its gate in every frame contracts execute every case without skips', () => {
   requireContracts('prototypes/corridor/tools/ear-place.test.mjs', 8, 420000);
 }, 450000);
+test('the voice says the true cause in the ruled words contracts execute every case without skips', () => {
+  requireContracts('prototypes/corridor/tools/voice-lines-page.test.mjs', 3, 240000);
+}, 270000);
