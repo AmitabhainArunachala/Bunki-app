@@ -9,7 +9,8 @@
  *   const fake = await startFakeVoiceServer({ origins: ['http://127.0.0.1:19471'] });
  *   const code = fake.issue({ learner: 'test-learner' });      // a pairing code, as release would hand over
  *   fake.failNext({ status: 503, error: 'voice-unavailable' }); // script the next speak answer
- *   fake.log                                                    // every request, without its token
+ *   fake.failNext({ drop: true }, { holdMs: 23000 }, { bytes: 'x' }); // a lost connection, a late answer, bad audio
+ *   fake.log                                                   // every request, without its token
  */
 import { createHash, randomBytes } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -121,7 +122,16 @@ export async function startFakeVoiceServer({ origins = [], port = 0, capCents = 
       row.text = body?.segments?.[0]?.text ?? null;
       row.nth = ++speakCount;
       if (!bearer(req)) return done(401, { error: 'authentication-required' });
-      if (scripted.length) { const next = scripted.shift(); return done(next.status, { error: next.error }, next.headers); }
+      if (scripted.length) {
+        // a scripted answer: held back first (`holdMs`: past the client's deadline it is a timeout); the connection
+        // dropped with no answer (`drop`); bytes sent as audio that will not play (`bytes`); or the status and error.
+        // A held answer with nothing else scripted goes on as the normal answer.
+        const next = scripted.shift();
+        if (next.holdMs > 0) { row.heldMs = next.holdMs; await new Promise((resolve) => setTimeout(resolve, next.holdMs)); }
+        if (next.drop) { row.status = 'dropped'; req.socket.destroy(); return undefined; }
+        if (next.bytes !== undefined) return done(next.status || 200, Buffer.from(next.bytes), next.headers);
+        if (next.status) return done(next.status, { error: next.error }, next.headers);
+      }
       if (!body || Object.keys(body).sort().join('|') !== 'format|inputKey|profile|segments|version|voiceKey') return done(400, { error: 'speech-input-invalid' });
       let input;
       try { input = createSpeechInput({ segments: body.segments, profile: body.profile }); } catch { return done(400, { error: 'speech-input-invalid' }); }
@@ -170,6 +180,8 @@ export async function startFakeVoiceServer({ origins = [], port = 0, capCents = 
     },
     allow(origin) { allowed.add(origin); },
     failNext(...answers) { scripted.push(...answers.flat()); },
+    /** Drops the scripted answers nobody asked for yet. */
+    clearNext() { scripted.length = 0; },
     revokeAll() { tokens.clear(); },
     set({ pairingOff: off, pairLimited: limited, spentCents: spent, daySpent: day, dayFields: fields } = {}) {
       if (fields !== undefined) dayFields = fields;
