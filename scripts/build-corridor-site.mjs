@@ -95,6 +95,7 @@ try {
     'modules/voice-bands.mjs',
     'modules/card-audio.mjs',
     'modules/save-places.mjs',
+    'modules/voice-lines.mjs',
     'modules/voice-seam.mjs',
     'modules/voice-client.mjs',
     'modules/voice-clip-store.mjs',

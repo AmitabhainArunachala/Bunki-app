@@ -68,6 +68,8 @@ const SHELL = [
   'modules/drift.mjs',
   'modules/library.mjs',
   'modules/teacher.mjs',
+  // the one vocabulary of the voice: corridor.js imports it at boot too (its lines show with no voice layer as well)
+  'modules/voice-lines.mjs',
   'maintenance/report-client.js',
   'maintenance/report-client.css',
   'register.css',
