@@ -16,6 +16,7 @@ import {
   createVoiceClient,
 } from '../prototypes/corridor/modules/voice-client.mjs';
 import * as layer from '../prototypes/corridor/modules/voice-layer.mjs';
+import { voiceLineOf } from '../prototypes/corridor/modules/voice-lines.mjs';
 import { createVoiceSeam } from '../prototypes/corridor/modules/voice-seam.mjs';
 import { startFakeVoiceServer } from '../prototypes/corridor/tools/fake-voice-server.mjs';
 
@@ -69,44 +70,42 @@ describe('the day-limit line follows the server’s own figure', () => {
   });
 });
 
+// Settings says a limit reached in the one vocabulary's words (modules/voice-lines.mjs, held to the ruling by
+// tools/voice-lines.test.mjs) with the server's own figure beside it (the owner's rule 7); a control says the line alone.
 describe('the no-voice lines name only the server’s own amounts', () => {
   const line = (reason, limits, english = true) => {
     expect(typeof layer.limitLine).toBe('function');
     const words = layer.limitLine(reason, limits, at);
     return english ? words.en : words.ja;
   };
+  const ruled = (reason, english = true) => voiceLineOf(reason, { time: at })[english ? 1 : 0];
 
   it('the day line names the day ceiling the server gave: 1,000 or 3,000 cents, as it said', () => {
-    expect(line('day-budget', { dayCapCents: 1000 })).toBe(
-      'No voice: today’s $10 is used. The voice comes back at 09:00.',
-    );
-    expect(line('day-budget', { dayCapCents: 3000 })).toBe(
-      'No voice: today’s $30 is used. The voice comes back at 09:00.',
-    );
+    expect(line('day-budget', { dayCapCents: 1000 })).toBe(`${ruled('day-budget')} ($10 a day)`);
+    expect(line('day-budget', { dayCapCents: 3000 })).toBe(`${ruled('day-budget')} ($30 a day)`);
     expect(line('day-budget', { dayCapCents: 1000 }, false)).toBe(
-      '声を出せません。今日の10ドル分を使いました。声は09:00に戻ります。',
+      `${ruled('day-budget', false)}（1日10ドル）`,
     );
+    expect(line('day-budget', { dayCapCents: 1000 })).toContain('09:00');
   });
 
   it('the total line names the total the server gave: 10,000 or 30,000 cents', () => {
-    expect(line('budget-exhausted', { capCents: 10000 })).toBe('No voice: the $100 total is used.');
-    expect(line('budget-exhausted', { capCents: 30000 })).toBe('No voice: the $300 total is used.');
+    expect(line('budget-exhausted', { capCents: 10000 })).toBe(
+      `${ruled('budget-exhausted')} ($100 in all)`,
+    );
+    expect(line('budget-exhausted', { capCents: 30000 })).toBe(
+      `${ruled('budget-exhausted')} ($300 in all)`,
+    );
     expect(line('budget-exhausted', { capCents: 10000 }, false)).toBe(
-      '声を出せません。合計100ドルを使い切りました。',
+      `${ruled('budget-exhausted', false)}（合計100ドル）`,
     );
   });
 
   it('with no amount from the server, the lines name none', () => {
-    expect(line('day-budget', {})).toBe(
-      'No voice: today’s voice limit is used. The voice comes back at 09:00.',
-    );
-    expect(line('day-budget', {}, false)).toBe(
-      '声を出せません。今日の音声の上限を使いました。声は09:00に戻ります。',
-    );
-    expect(line('budget-exhausted', {})).toBe('No voice: the voice budget’s total is used.');
-    expect(line('budget-exhausted', {}, false)).toBe(
-      '声を出せません。音声の予算の合計を使い切りました。',
-    );
+    expect(line('day-budget', {})).toBe(ruled('day-budget'));
+    expect(line('day-budget', {}, false)).toBe(ruled('day-budget', false));
+    expect(line('budget-exhausted', {})).toBe(ruled('budget-exhausted'));
+    expect(line('budget-exhausted', {}, false)).toBe(ruled('budget-exhausted', false));
     for (const text of [
       line('day-budget', {}),
       line('budget-exhausted', {}),

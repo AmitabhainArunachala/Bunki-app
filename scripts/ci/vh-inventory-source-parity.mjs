@@ -38,7 +38,10 @@ const PRODUCER_PINS = Object.freeze({
   // 2026-11-11 (SAVE): the pin above was already stale on the line (the file read 7c0de19a… there); the builder now folds
   // twelve seams (modules/save-places.mjs is the twelfth); the recordImports map is unchanged (9 rows). Re-pin of the
   // producer bytes only, by the builder that made the change: not yet read by a second reviewer.
-  [`${P}build-standalone.mjs`]: '85b64c800336098ca9c48c42937419d6158c97a08203b9e55458d8896831246a',
+  // 2026-11-13 (the voice's one vocabulary): thirteen seams (modules/voice-lines.mjs is the thirteenth: it imports
+  // nothing); the recordImports map is unchanged (9 rows). Re-pin of the producer bytes only, by the builder that made
+  // the change: not yet read by a second reviewer.
+  [`${P}build-standalone.mjs`]: '24be1f8a5a7830d13febf418091365aee00df4e15042247c1799e992868e35e5',
   [`${P}verify-sense-truth.mjs`]:
     '315786beb7763d8d847d5eb04a8e399df769aa1a07ece364a15795181c6854f6',
   [`${P}sense-grok-case.mjs`]: 'f968617684b38ece18d40cde2d645ae3f8c2de0eb0e59d5b7f7f0e5e3eaab367',

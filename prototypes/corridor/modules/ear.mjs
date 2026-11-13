@@ -21,11 +21,13 @@
  * lead's (design/ear/ear-states.html, 2026-11-11 00:30): colours from the look's own variables. */
 import { isJapaneseEnough } from './nihongo-speech/audio/speech-text.mjs';
 import { createBands, rangeBoxes } from './voice-bands.mjs';
+import { VOICE_EAR_HELP, VOICE_LINE_STANDS_MS, VOICE_WORDS, voiceEarLabel, voiceLineOf } from './voice-lines.mjs';
 import { sentencesOf, voiceKeyOf } from './voice-seam.mjs';
 import { splitSentences } from './nihongo-speech/audio/speech-text.mjs';
 
 export const REST_MS = 400;
-export const NOVOICE_MS = 4000;
+/** The struck ear's line stands as long as a control's (modules/voice-lines.mjs). */
+export const NOVOICE_MS = VOICE_LINE_STANDS_MS;
 /** A press this long is a hold (the reader's hold saves a word at 500 ms): never the ear's tap. */
 export const TAP_MAX_MS = 450;
 export const LONG_PRESS_MS = 500;
@@ -159,37 +161,17 @@ export function createEarMachine({ speak, cannot = () => null, schedule = (fn, m
 }
 
 /* ------------------------------------------------------------------ the words it shows */
-/** `plain`: the voice seam's own words for a reason ({ line(reason), words(reason) }, the listen marks' lines): used for
- * every reason the ear's short list does not name (the per-minute limit, a sentence too long, a server not taking new
- * sentences), so a struck ear says why as the listen marks do. */
-export function earLabel(state, reason, tx, plain = null) {
-  switch (state) {
-    case 'armed': return tx('耳：次のタップを読む', 'ear: armed for the next tap');
-    case 'held': return tx('耳：オン', 'ear: on');
-    case 'speaking': return tx('耳：読んでいます', 'ear: speaking');
-    case 'novoice': return tx(`耳：声なし、${reasonShort(reason, tx, plain)}`, `ear: no voice, ${reasonShort(reason, tx, plain)}`);
-    default: return tx('耳：オフ', 'ear: off');
-  }
+/** The ear's label for its state, in the interface language: the one vocabulary's words (modules/voice-lines.mjs); with no
+ * voice, the short form of the cause, the same as the bar's (a pairing the server ended is "pair again" here as in the
+ * line). */
+export function earLabel(state, reason, tx) {
+  return tx(...voiceEarLabel(state, reason));
 }
-function reasonShort(reason, tx, plain = null) {
-  if (['not-paired', 'not-configured', 'authentication-required'].includes(reason)) return tx('未接続', 'not paired');
-  if (['offline', 'network-failed'].includes(reason)) return tx('接続なし', 'no connection');
-  if (reason === 'day-budget') return tx('今日の予算切れ', 'today’s budget used up');
-  if (reason === 'budget-exhausted') return tx('予算切れ', 'budget used up');
-  if (reason === EAR_SLOW) return tx('時間がかかりすぎ', 'took too long');
-  const own = reason && plain?.words ? plain.words(reason) : '';
-  return own || tx('サーバーが答えない', 'the voice server is not answering');
-}
-/** The one plain line beside the struck mark, in the interface language. */
+/** The one plain line beside the struck mark, in the interface language: the cause's line, as a control says it.
+ * `plain.line(reason)`: the voice layer's own (it knows when today's limit resets); without it the module's. */
 export function noVoiceLine(reason, tx, plain = null) {
-  if (reason === 'authentication-required') return tx('声の接続が切れました。設定でつなぎ直してください', 'No voice: pair again in Settings');
-  if (['not-paired', 'not-configured'].includes(reason)) return tx('声はまだつないでいません', 'No voice yet: not paired');
-  if (['offline', 'network-failed'].includes(reason)) return tx('声が届きません。接続がありません', 'No voice: no connection');
-  if (reason === 'day-budget') return tx('今日の声の予算を使い切りました', 'No voice: today’s budget is used up');
-  if (reason === 'budget-exhausted') return tx('声の予算を使い切りました', 'No voice: the voice budget is used up');
-  if (reason === EAR_SLOW) return tx('声が届くまでに時間がかかりすぎました', 'No voice: the voice took too long');
   const own = reason && plain?.line ? plain.line(reason) : '';
-  return own || tx('いま声を出せません', 'No voice right now');
+  return own || tx(...voiceLineOf(reason));
 }
 
 /* ------------------------------------------------------------------ the unit that speaks */
@@ -1096,12 +1078,16 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
   const find = (x, y, through = true, pointer = 'mouse') => { try { return unitAt(doc, x, y, { through, pointer, context: ctx() }); } catch { return null; } };
   let speakingUnit = null;
   let hoverUnit = null;
+  let askedLast = null;
+  let chipEl = null; // the 読む chip (made below)
   const machine = createEarMachine({
     speak: (unit, done) => {
       speakingUnit = unit;
       return speak(unit, (outcome, reason) => { if (speakingUnit === unit) speakingUnit = null; done(outcome, reason); });
     },
-    cannot: (unit) => cannot(unit),
+    // every read starts here: the unit last asked for is where a line that names no voice belongs, when it is not under
+    // a mark (asked by 読む, or where no mark is shown: a study card)
+    cannot: (unit) => { askedLast = unit; return cannot(unit); },
     schedule: (fn, ms) => view.setTimeout(fn, ms),
     cancel: (timer) => view.clearTimeout(timer),
     onChange: () => paint(),
@@ -1156,12 +1142,13 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
   function paintMark(spot) {
     const state = machine.display();
     const mark = spot.firstElementChild, why = spot.lastElementChild;
-    const label = earLabel(state, machine.reason(), tx, plain);
+    const label = earLabel(state, machine.reason(), tx);
     // only what differs is written: a mark painted again with nothing changed touches no node, attribute or text (each
     // write under body is a reason for the voice layer to look at the page again)
     setAttr(mark, 'aria-label', label);
-    setAttr(mark, 'title', state === 'off' ? tx('耳 — タップで次のタップを読む。長押しでずっと読む', 'Ear — tap: read what you tap next. Hold: keep reading') : label);
-    const struck = state === 'novoice', line = struck ? noVoiceLine(machine.reason(), tx, plain) : '';
+    setAttr(mark, 'title', state === 'off' ? tx(...VOICE_EAR_HELP) : label);
+    // struck by a read 読む asked for, the line stands by the chip instead (lineElsewhere); the mark still shows it is struck
+    const struck = state === 'novoice' && !lineElsewhere(), line = struck ? noVoiceLine(machine.reason(), tx, plain) : '';
     if (why.textContent !== line) why.textContent = line;
     if (why.hidden === struck) why.hidden = !struck;
     // its colours, from the gate beside it and the ground it stands on (toneFor), each time it is drawn
@@ -1212,12 +1199,40 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
     // a mark on a screen that has just come up takes the colours of where it now stands
     for (const spot of marks) if (spot.isConnected && spot.getClientRects().length) paintMark(spot);
   }
+  /** A read that found no voice says why where it was asked for (rule 6): under its mark, or, for 読む, beside the chip;
+   * and where no mark is shown (a study card), beside the text it was asked for. */
+  const markShown = () => [...marks].some((spot) => spot.isConnected && spot.getClientRects().length);
+  const lineElsewhere = () => machine.display() === 'novoice' && (askedLast?.kind === 'selection' || !markShown());
+  let loneWhy = null;
+  function paintLoneLine(state) {
+    const anchor = askedLast?.kind === 'selection' && chipEl && !chipEl.hidden && chipEl.isConnected ? chipEl
+      : askedLast?.element?.isConnected ? askedLast.element : null;
+    const line = state === 'novoice' && lineElsewhere() && anchor ? noVoiceLine(machine.reason(), tx, plain) : '';
+    if (!line && !loneWhy) return;
+    if (!loneWhy) {
+      loneWhy = doc.createElement('span');
+      loneWhy.className = 'ear-why';
+      loneWhy.setAttribute('role', 'status');
+      loneWhy.setAttribute('data-ear-own', '');
+    }
+    if (line && !loneWhy.isConnected) doc.body.append(loneWhy);
+    if (loneWhy.textContent !== line) loneWhy.textContent = line;
+    if (loneWhy.hidden === !!line) loneWhy.hidden = !line;
+    if (!line) return;
+    // under what was asked for, inside the screen with 16 px on each side, as the mark's own line stands
+    const r = anchor.getBoundingClientRect(), side = 16;
+    const width = Math.min(view.innerWidth - 2 * side, loneWhy.getBoundingClientRect().width || view.innerWidth);
+    const below = r.bottom + 6 + 40 <= view.innerHeight ? r.bottom + 6 : Math.max(side, r.top - 46);
+    setVar(loneWhy, '--ear-why-top', `${Math.round(below)}px`);
+    setVar(loneWhy, '--ear-why-left', `${Math.round(Math.max(side, Math.min(r.left, view.innerWidth - side - width)))}px`);
+  }
   function paint() {
     const state = machine.display();
     if (root.dataset.ear !== state) root.dataset.ear = state;
     const voiced = !!machine.voice();
     if (voiced !== ('earVoice' in root.dataset)) { if (voiced) root.dataset.earVoice = ''; else delete root.dataset.earVoice; }
     for (const spot of marks) if (spot.isConnected) paintMark(spot);
+    paintLoneLine(state);
     // the unit: the one being read carries the wash; otherwise the one under the Mac's pointer shows what a tap would read
     if (speakingUnit && machine.voice()) showUnit(speakingUnit, 'speaking');
     else if (hoverUnit && (state === 'armed' || state === 'held')) showUnit(hoverUnit, state);
@@ -1285,6 +1300,7 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
 
   /* select-then-読む */
   const chip = doc.createElement('button');
+  chipEl = chip;
   chip.type = 'button';
   chip.className = 'ear-chip';
   chip.setAttribute('data-ear-own', '');
@@ -1325,7 +1341,8 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
       const box = boxes[boxes.length - 1] || range.getBoundingClientRect();
       if (!chip.isConnected) doc.body.append(chip);
       picked = { text, node, range };
-      chip.setAttribute('aria-label', tx('選んだ日本語を読む', 'Read the selected Japanese'));
+      chip.setAttribute('aria-label', tx(...VOICE_WORDS.selection));
+      chip.title = tx(...VOICE_WORDS.selection);
       chip.hidden = false;
       const width = chip.offsetWidth || 48, height = chip.offsetHeight || 32;
       const left = Math.max(8, Math.min(view.innerWidth - width - 8, box.right + 6));

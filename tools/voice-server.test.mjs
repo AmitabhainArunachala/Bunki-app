@@ -36,6 +36,7 @@ import {
   japaneseSentences,
   shownText,
 } from '../prototypes/corridor/modules/voice-layer.mjs';
+import { voiceLineOf } from '../prototypes/corridor/modules/voice-lines.mjs';
 import { createVoiceSeam, voiceKeyOf } from '../prototypes/corridor/modules/voice-seam.mjs';
 import { startFakeVoiceServer } from '../prototypes/corridor/tools/fake-voice-server.mjs';
 
@@ -1346,11 +1347,7 @@ describe('only the Japanese is read', () => {
       element('RUBY', [], text('本'), element('RT', [], text('ほん'))),
       text('を読む。'),
       element('BUTTON', ['voice-say'], text('聞く')),
-      element(
-        'SPAN',
-        ['say-note', 'voice-note'],
-        text('声を出せません。設定の「筆と声」で音声サーバーとつなぐ。'),
-      ),
+      element('SPAN', ['say-note', 'voice-note'], text(voiceLineOf('not-paired')[0])),
     );
     expect(shownText(sentence)).toBe('雨の日は本を読む。');
   });

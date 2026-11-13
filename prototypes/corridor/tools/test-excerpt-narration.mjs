@@ -19,6 +19,8 @@ import {fileURLToPath} from 'node:url';
 import {createDeviceVoice,REASONS as DEVICE_VOICE_REASONS} from '../device-voice.mjs';
 import {fixtureSource,fixtureDefinitions} from './corridor-fixture-source.mjs';
 import { runtimeLock } from './voice-lock.mjs';
+// the voice's one vocabulary, which corridor.js imports (its lines and words reach the lifted functions from here)
+import { VOICE_NOTES, VOICE_WORDS, voiceLineOf, voiceShortOf } from '../modules/voice-lines.mjs';
 
 /** The source under test. KAIRO_CORRIDOR_SOURCE lets the mutant adjudicator point this
  * suite at a one-line mutation of corridor.js and prove each control actually goes red;
@@ -87,6 +89,9 @@ function fixture({ language = 'en', preference = null, results = [], quotes = 1,
     S: { view: 'reader' }, sessionVoicePref: null,
     articleNarration: { v: 2, lock: lockBlock, articles: library },
     tx: (ja, en) => language === 'ja' ? ja : en,
+    VOICE_NOTES, VOICE_WORDS, voiceLineOf, voiceShortOf,
+    // no voice layer here, as in the single-file build, whose bundle is on the page
+    __CORRIDOR_BUNDLE__: {},
     localStorage: {
       getItem: key => preferences.get(key) ?? null,
       setItem: (key, value) => { writes.push([key, value]); preferences.set(key, value); },
@@ -162,7 +167,8 @@ test('A failed clip stops the excerpt with an enabled retry control; retry can c
   const f = fixture({ results: [true, false] });
   await f.context.playNarratedExcerpt(quoteText, f.button);
   assert.deepEqual(f.requests, clips.slice(1, 3).map(clip => clip.src));
-  assert.equal(f.button.textContent, 'Playback failed · try again');
+  // with no voice layer the chip itself says the clip could not play, in the one vocabulary's short form (C10)
+  assert.equal(f.button.textContent, voiceShortOf('decode')[1]);
   assert.equal(f.button.classList.contains('is-speaking'), false);
   assert.equal(f.button.disabled, false);
   await f.context.playNarratedExcerpt(quoteText, f.button);
@@ -176,7 +182,7 @@ test('A failed clip stops the excerpt with an enabled retry control; retry can c
 test('Rejected playback is a visible retryable failure instead of an unhandled rejection', async () => {
   const f = fixture({ language: 'ja', results: [new Error('media unavailable')] });
   await assert.doesNotReject(f.context.playNarratedExcerpt(quoteText, f.button));
-  assert.equal(f.button.textContent, '再生できませんでした · もう一度');
+  assert.equal(f.button.textContent, voiceShortOf('decode')[0]);
   assert.equal(f.button.disabled, false);
   assert.equal(f.button.classList.contains('is-speaking'), false);
   assert.deepEqual(f.writes, []);
@@ -244,6 +250,8 @@ test('Replaying a card word leaves no false failure; a real failure still says s
     Audio: media.Audio,
     setImmediate,
     tx: (ja, en) => en,
+    VOICE_NOTES, VOICE_WORDS, voiceLineOf, voiceShortOf,
+    __CORRIDOR_BUNDLE__: {},
     localStorage: { getItem: () => MAIN },
     document: { hidden: false, getElementById: () => null },
     createDeviceVoice,
@@ -265,7 +273,7 @@ test('Replaying a card word leaves no false failure; a real failure still says s
   await settle();
   assert.equal(media.created.length, 0);
   assert.equal(btn.dataset.voiceUnavailable, "current-source-required");
-  assert.equal(note.textContent, "Current audio source required");
+  assert.equal(note.textContent, voiceLineOf('current-source-required')[1]);
 });
 
 test('An excerpt resolves inside its OWN article, and refuses when it cannot tell which', async () => {
@@ -319,7 +327,8 @@ test('A quote that names its own article plays nothing when that article is unre
   const f = fixture({ articles, sourceId: 'article:mine' });
   await f.context.playNarratedExcerpt(quoteText, f.button, 'article:mine');
   assert.deepEqual(f.requests, [], 'another article\u2019s recording is never borrowed');
-  assert.equal(f.button.textContent, 'No recording for this excerpt');
+  // no voice layer and no recording of its own: no voice in this version of the app (C18)
+  assert.equal(f.button.textContent, voiceLineOf('current-source-required')[1]);
   // the control built by the page passes the quote's own id on the click as well
   const page = fixture({ articles, sourceId: 'article:mine' });
   await page.button.handlers.click();

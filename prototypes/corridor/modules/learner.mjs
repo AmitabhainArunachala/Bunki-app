@@ -2,6 +2,7 @@
 import { $, voiceSettingsBlock, AI_EVIDENCE_ROLES, D, DRAFT_KEY, GRAMMAR, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, PLACES_TABS, PRIMARY_TABS, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, ROOM_IDS, ROOM_NAMES, S, SVG_NS, THEME_STORE, THEME_UI, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, bi, biLabel, contrastOf, el, fieldsDeckHome, finiteNumber, flowText, foundationDoor, logicalArchiveRows, meBackPart, meDeckIndex, meNum, meSealsPart, nonEmptyString, openPersonalCollection, optional, owns, passage, paintKeptCount, placesLayout, plainRecord, render, roomTransition, safeJsonValue, savedAnswerFor, setLayout, setWordPref, srsKey, tx, validStoreEnvelope, wordBrush, setReadHighlight, wordHighlight, wordVoice } from '../corridor.js';
 import { dayKey, helpByMonth } from './drift.mjs';
 import { articleReadChars } from './library.mjs';
+import { VOICE_WORDS } from './voice-lines.mjs';
 
 function mergeGrammar(harvested) {
   const norm = (p) => p.replace(/[〜～\s（）()]/g, '');
@@ -690,9 +691,9 @@ function renderWritingChoice() {
     row('settings-brush', '筆 — 語が自分で書かれる', '筆 — a word writes itself',
       [['first', '初めての語', 'First meeting'], ['always', 'いつも', 'Always'], ['never', '書かない', 'Never']],
       wordBrush(), (value) => setWordPref(WORD_BRUSH_KEY, 'wordBrush', WORD_BRUSH, value)),
-    // on unless he turns it off (John, 2026-11-10: "on reveal"): said by themselves, an answer and an opened word
-    // are paid for from the voice budget, and the row says so (corridor.js, WORD_VOICE)
-    row('settings-voice', '声 — カードの答えと開いた語を一度、自動で読む（音声の予算を使います）', '声 — say a card’s answer and an opened word once, by themselves (uses the voice budget)',
+    // on unless he turns it off (John, 2026-11-10: "on reveal"): an answer shown and an opened word say themselves once
+    // (corridor.js, WORD_VOICE); the row is named in the one vocabulary's words, as in Nihongo Study
+    row('settings-voice', ...VOICE_WORDS.speakOnReveal,
       [['on', 'オン', 'On'], ['off', 'オフ', 'Off']],
       wordVoice(), (value) => setWordPref(WORD_VOICE_KEY, 'wordVoice', WORD_VOICE, value)),
     // on unless he turns it off (John, 2026-11-11: "the option to have no highlighting at all"): nothing is drawn over a

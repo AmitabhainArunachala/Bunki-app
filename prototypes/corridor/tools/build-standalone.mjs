@@ -163,13 +163,14 @@ for (const [hook, [specifier, name]] of controllerImports) {
 assert.equal(appScript.split("import('./corridor-ink.js')").length - 1, 1, 'Standalone writing import changed');
 appScript = appScript.replace("import('./corridor-ink.js')", 'import(window.__KAIRO_INK_URL__)');
 
-// G3: corridor.js imports its twelve seams as sibling modules (SAVE, 2026-11-11: modules/save-places.mjs is the twelfth). A single file cannot
+// G3: corridor.js imports its thirteen seams as sibling modules (SAVE, 2026-11-11: modules/save-places.mjs is the twelfth;
+// the voice's one vocabulary, 2026-11-13: modules/voice-lines.mjs the thirteenth, imports nothing). A single file cannot
 // fetch siblings (a file:// document blocks cross-origin module fetches), so fold each
 // static seam import back into one module scope. The moved declarations are unchanged;
 // only the module boundary the split added is removed for the standalone document.
 const seamImports = [...appScript.matchAll(/^import\s*\{[^}]*\}\s*from\s*'\.\/modules\/([^']+)\.mjs';$/gmu)]
   .map((match) => match[1]);
-assert.equal(seamImports.length, 12, 'Standalone must fold exactly the twelve corridor seams');
+assert.equal(seamImports.length, 13, 'Standalone must fold exactly the thirteen corridor seams');
 let seamScript = '';
 for (const seam of seamImports) {
   const seamSource = read(`modules/${seam}.mjs`)

@@ -15,6 +15,7 @@ import { describe, expect, it } from 'vitest';
 
 // one namespace, so that a name a base lacks fails its own tests and not the whole file
 import * as ear from '../prototypes/corridor/modules/ear.mjs';
+import { voiceEarLabel, voiceLineOf } from '../prototypes/corridor/modules/voice-lines.mjs';
 import { corridorDeclarations } from './corridor-declarations.mjs';
 
 const {
@@ -1395,31 +1396,37 @@ describe('Escape stops the ear’s voice, and does nothing else then', () => {
 describe('the mark’s words and look', () => {
   const ja = (j) => j;
   const en = (_j, e) => e;
+  // the words are the one vocabulary's (modules/voice-lines.mjs; tools/voice-lines.test.mjs holds them to the ruling)
   it('a name for assistive tools that says the state, in the interface language', () => {
-    expect(earLabel('off', null, en)).toBe('ear: off');
-    expect(earLabel('armed', null, en)).toBe('ear: armed for the next tap');
-    expect(earLabel('held', null, en)).toBe('ear: on');
-    expect(earLabel('speaking', null, en)).toBe('ear: speaking');
-    expect(earLabel('novoice', 'not-paired', en)).toBe('ear: no voice, not paired');
+    for (const state of ['off', 'armed', 'held', 'speaking']) {
+      expect(earLabel(state, null, en)).toBe(voiceEarLabel(state)[1]);
+      expect(earLabel(state, null, ja)).toBe(voiceEarLabel(state)[0]);
+    }
+    expect(earLabel('novoice', 'not-paired', en)).toBe(voiceEarLabel('novoice', 'not-paired')[1]);
     expect(earLabel('off', null, ja)).toMatch(/^耳/);
   });
-  it('the no-voice line names the three reasons in plain words, in both languages', () => {
-    expect(noVoiceLine('not-paired', ja)).toBe('声はまだつないでいません');
-    expect(noVoiceLine('not-paired', en)).toMatch(/not paired/i);
-    expect(noVoiceLine('offline', en)).toMatch(/no connection/i);
-    expect(noVoiceLine('network-failed', en)).toMatch(/no connection/i);
-    expect(noVoiceLine('day-budget', en)).toMatch(/today’s .*budget.* used up/i);
-    expect(noVoiceLine('budget-exhausted', en)).toMatch(/budget.* used up/i);
+  it('the no-voice line is the cause’s own line, in both languages', () => {
+    for (const reason of [
+      'not-paired',
+      'offline',
+      'network-failed',
+      'day-budget',
+      'budget-exhausted',
+    ]) {
+      expect(noVoiceLine(reason, en)).toBe(voiceLineOf(reason)[1]);
+      expect(noVoiceLine(reason, ja)).toBe(voiceLineOf(reason)[0]);
+    }
+    expect(noVoiceLine('offline', en)).not.toBe(noVoiceLine('network-failed', en));
   });
-  it('a reason the ear’s own list does not name says the voice seam’s plain line (the per-minute limit)', () => {
+  it('the voice layer’s own line stands for every reason (it knows when today’s limit resets); the label is the short form', () => {
     const en = (ja, english) => english;
-    const plain = { line: (r) => `seam line for ${r}`, words: (r) => `seam words for ${r}` };
+    const plain = { line: (r) => `seam line for ${r}` };
     expect(noVoiceLine('request-rate-limit', en, plain)).toBe('seam line for request-rate-limit');
-    expect(earLabel('novoice', 'request-rate-limit', en, plain)).toMatch(
-      /seam words for request-rate-limit/,
+    expect(earLabel('novoice', 'request-rate-limit', en, plain)).toBe(
+      voiceEarLabel('novoice', 'request-rate-limit')[1],
     );
-    expect(noVoiceLine('day-budget', en, plain)).toMatch(/today’s budget/i);
-    expect(noVoiceLine('request-rate-limit', en)).toMatch(/no voice right now/i);
+    expect(noVoiceLine('day-budget', en, plain)).toBe('seam line for day-budget');
+    expect(noVoiceLine('request-rate-limit', en)).toBe(voiceLineOf('request-rate-limit')[1]);
   });
   it('colours come from the look; the text marks never move the layout', () => {
     expect(EAR_CSS).toMatch(/\.ear-mark/);
@@ -1903,15 +1910,18 @@ describe('the choice of colours (chooseTone): from what is there, the look’s o
 describe('the ear’s own time limit says the voice took too long, not that the server is busy (K3)', () => {
   const ja = (j) => j;
   const en = (_j, e) => e;
-  const plain = { line: (r) => `seam line for ${r}`, words: (r) => `seam words for ${r}` };
   it('its own reason, its own plain line, in both languages', () => {
     expect(ear.EAR_SLOW).toBeTruthy();
-    expect(noVoiceLine(ear.EAR_SLOW, en, plain)).toBe('No voice: the voice took too long');
-    expect(noVoiceLine(ear.EAR_SLOW, ja, plain)).toBe('声が届くまでに時間がかかりすぎました');
-    expect(earLabel('novoice', ear.EAR_SLOW, en, plain)).toBe('ear: no voice, took too long');
-    expect(noVoiceLine(ear.EAR_SLOW, en, plain)).not.toMatch(/busy/i);
-    // "busy" stays the server's own word
-    expect(noVoiceLine('voice-unavailable', en, plain)).toBe('seam line for voice-unavailable');
+    // the ear's limit is "too slow" (C5), the same cause as the client's own time limit, in the line and the label
+    expect(noVoiceLine(ear.EAR_SLOW, en)).toBe(voiceLineOf('voice-timeout')[1]);
+    expect(noVoiceLine(ear.EAR_SLOW, ja)).toBe(voiceLineOf('voice-timeout')[0]);
+    expect(earLabel('novoice', ear.EAR_SLOW, en)).toBe(
+      voiceEarLabel('novoice', 'voice-timeout')[1],
+    );
+    expect(noVoiceLine(ear.EAR_SLOW, en)).not.toMatch(/busy/i);
+    // "busy" stays the server's own word (a 503)
+    expect(noVoiceLine('voice-unavailable', en)).toMatch(/busy/i);
+    expect(noVoiceLine('voice-unavailable', en)).not.toBe(noVoiceLine(ear.EAR_SLOW, en));
   });
 });
 

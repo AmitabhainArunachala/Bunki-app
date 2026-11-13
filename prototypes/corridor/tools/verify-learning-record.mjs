@@ -17,6 +17,8 @@ import { verifyBundledArtifact } from '../../bunki-desktop/lib/artifact.cjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import * as fsrsApi from '../vendor/ts-fsrs.mjs';
 import * as srsCore from '../srs-core.mjs';
+// the review face's audio row says its words in the voice's one vocabulary (corridor.js imports it)
+import { VOICE_WORDS, voiceLineOf } from '../modules/voice-lines.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const browserMode = process.argv.includes('--browser');
@@ -161,7 +163,7 @@ function fixture(overrides = {}, options = {}) {
     render: () => { paints += 1; },
     window: { scrollY: 0, scrollTo: () => { scrolls += 1; }, __CORRIDOR_STANDALONE__: true },
     // the review face's audio marks are drawn by the actual renderReview: a plain element for the glyph, and no voice layer (no control)
-    uiIcon: () => new Element('svg'), voiceLayer: null,
+    uiIcon: () => new Element('svg'), voiceLayer: null, VOICE_WORDS, voiceLineOf,
     document: { createTextNode: (text) => new Element('text', '', text) },
     el: (tag, cls, text) => new Element(tag, cls, text),
     biLabel: (tag, cls, ja, en) => new Element(tag, cls, en),

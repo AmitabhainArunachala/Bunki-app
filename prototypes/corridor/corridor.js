@@ -1,5 +1,6 @@
 import { createDeviceVoice, REASONS as DEVICE_VOICE_REASONS } from './device-voice.mjs';
 import { listsByRecency, moveLists, placeOf, savedBetween, validSaveMemory, withBoxOpened, withListDropped, withListRenamed, withListUsed } from './modules/save-places.mjs';
+import { VOICE_NOTES, VOICE_WORDS, voiceLineOf, voiceShortOf } from './modules/voice-lines.mjs';
 import { activeDictionaryQuery, appendJapaneseLookup, joyoDialChanges, conjugations, dictionaryAnsweredForm, dictionaryDetailsFor, dictionaryGlossSummary, dictionaryLoneDoor, dictionaryQueryError, dictionaryQueryKey, dictionaryReadingSupportsForm, dictionaryRowsForForm, dictionarySearchContext, dictionaryShardNumber, displayPairs, ensureDictionaryRowsForForm, ensureSense, exampleFnv, exampleOrder, fetchExampleJson, findExamples, glossaryCrossRefPlan, hasEmbeddedDictionaryIndex, inlineTokenGloss, inlineWordGloss, inlineWordReading, japaneseLookupEntryRecord, japaneseLookupHelpId, japaneseLookupRecord, kanjiReadingsInWord, loadDictionaryJson, lookup, lookupBlockWords, lookupItemBlocks, lookupOccurrence, nameReaderToken, normalizeGloss, phoneticAnnotationCandidates, phoneticAnnotationIndices, phoneticAnnotationRanges, posLine, readerDoorGloss, readerDoorLead, readerGlossLine, readerGlossMissText, readerHelp, readerLayerParagraph, readerLayerReading, readerLookupAnswer, readerRenderedTokens, readerTokenAt, readerTokenAtIndex, readerTokenNode, readerWordNote, readingAsksIndex, readingExpected, readingForm, readingPlaceFailure, readingTargets, readingToken, readingTokenEntry, readyTokenReading, renderConjugation, renderDictionaryDetails, renderDictionaryHomographs, renderThesaurus, requestDictionaryDetails, senseChoice, senseFillInPlace, senseMoreElement, senseMoreLine, senseNeighbours, senseRefine, senseWithin, tapLadderHint, tokenReading, validDictionaryRow, yomiReadingType } from './modules/dictionary.mjs';
 import { blankSlip, keepMenuInCard, drawSheetActionLine, entryCueReading, findSheetDoor, flySeal, foldEntryForms, holdRing, keepFloatingBeside, keptState, keptWordProjection, listToMarkdown, listeningField, markStripMore, miniKanjiWeb, note, noteSlipDepth, openSlip, openWordWebLadder, paintWordSave, placeSaveMenu, rememberSheet, renderWordCaptureNote, reopenSaveMenu, saveAiDeviceConfig, saveOne, saveReaderPosition, saveReportRelay, saveReportRelayLink, savedNodeRecord, savedRecordNoteDraft, sealHostedWord, setSaveDrawerPush, sheetActionVisitHolds, sheetTakeLabel, slipAllowed, slipHeadword, slipScroller, standingSlip, takenContext, toggleTaken, travelSlip, unsaveEverywhere, wordCaptureBasis, wordCaptureHeldText, wordCaptureOpenLabel, wordCaptureState, wordDepth, wordPresentationKey, wordRow, wordSaveFacts } from './modules/word-entry.mjs';
 import { clearTouchReadingSeat, encounterIdentity, encounterPatch, fileIntakeFailure, filePageLabel, finishTouchReadingFade, holdReaderCapture, readerCaptureReasonText, readerTakeCurrent, readerTakeNode, reconcileSourceInboxEntries, rememberFileDraft, renderEncounterTrail, seatInlineGloss, seatTouchReading, setTouchReadingShown, sourceInboxEntries, sourceLadderAction, sourceProcessingScope, stopTouchReadingFade, syncReaderTakeSeal, touchReading } from './modules/capture.mjs';
@@ -9653,7 +9654,7 @@ function enhanceJapaneseProse(root) {
     // a quote from an article with no recording is said by the voice layer (the voice server, or silence and the
     // reason beside the chip): its chip is a plain "Listen", never the recorded voice's name
     const seam = !!voiceLayer && !!owner && !articleNarration.articles?.[owner];
-    const listen = el('button', 'chip excerpt-listen', seam ? tx('聞く', 'Listen') : excerptListenLabel()); listen.type = 'button';
+    const listen = el('button', 'chip excerpt-listen', seam ? tx(...VOICE_WORDS.listen) : excerptListenLabel()); listen.type = 'button';
     listen.addEventListener('click', () => {
       if (seam) { cancelExcerptPlayback(); voiceLayer.sayExcerpt({ text, sourceId: owner, button: listen }); return; }
       void playNarratedExcerpt(text, listen, owner);
@@ -13204,11 +13205,12 @@ async function playNarratedExcerpt(text, button, sourceId = null) {
   if (!clips?.length) {
     // no recording of this quote: the voice layer says it (the voice server, or silence and the reason beside the chip)
     if (voiceLayer) { button.textContent = original; voiceLayer.sayExcerpt({ text, sourceId, button }); return; }
-    button.textContent = tx('この引用の収録音声はありません', 'No recording for this excerpt'); return;
+    // no voice layer: the single-file build has no voice (C18); a page whose layer has not arrived yet has one a moment later
+    button.textContent = tx(...voiceLineOf(globalThis.__CORRIDOR_BUNDLE__ ? 'current-source-required' : 'failed')); return;
   }
   stopPassageRead();   // the reader's read yields to the quote; the excerpt lane is already clear
   excerptControl = button;
-  button.classList.add('is-speaking'); button.textContent = tx(`止める · ${narrationVoiceName()}`, `Stop · ${narrationVoiceName()}`);
+  button.classList.add('is-speaking'); button.textContent = `${tx(...VOICE_WORDS.stop)} · ${narrationVoiceName()}`;
   let failed = false;
   try {
     for (const clip of clips) {
@@ -13223,9 +13225,10 @@ async function playNarratedExcerpt(text, button, sourceId = null) {
   if (generation === excerptPlayback && button.isConnected) {
     if (excerptControl === button) excerptControl = null;
     button.classList.remove('is-speaking');
-    button.textContent = failed
-      ? tx('再生できませんでした · もう一度', 'Playback failed · try again')
-      : original;
+    // a recording that would not play: the chip says Listen again and its line stands beside it, as for every press (C10);
+    // without the voice layer the chip itself says it in a few words
+    button.textContent = failed && !voiceLayer ? tx(...voiceShortOf('decode')) : original;
+    if (failed && voiceLayer) voiceLayer.lineBeside(button, 'decode');
   }
 }
 
@@ -13423,7 +13426,8 @@ function retireCardAudioOnFaceChange() {
 
 function cardVoiceStatus(btn, reason, flag) {
   if (!btn) return;
-  btn.title = reason;
+  // the line is the control's title while it stands; then the word box's 音 is called by its name again
+  btn.title = reason || (btn.id === 'mini-voice' ? btn.getAttribute('aria-label') || '' : '');
   if (flag) btn.dataset.voiceUnavailable = flag;
   else delete btn.dataset.voiceUnavailable;
   const note = btn.parentElement?.querySelector('.say-note');
@@ -13462,11 +13466,13 @@ function speakCardReading(text, btn, word = '', { automatic = false, withSentenc
   // The current source is the voice seam (modules/voice-seam.mjs): a recorded clip, then the voice server, and
   // otherwise silence ("real voices or silence"). Nothing sounds from here itself: no manifest, fetch, or utterance
   // starts in this function, and without the seam the reading stays retired.
-  if (!voiceLayer) { cardVoiceStatus(btn, tx('現在の音源が必要です', 'Current audio source required'), 'current-source-required'); return; }
+  // no voice layer: the single-file build has no voice (C18); a page whose layer has not arrived yet has one a moment later
+  if (!voiceLayer) { cardVoiceStatus(btn, tx(...voiceLineOf(globalThis.__CORRIDOR_BUNDLE__ ? 'current-source-required' : 'failed')), 'current-source-required'); return; }
   cardVoiceStatus(btn, '', null);
-  // a voice needs no note; a tap that finds no voice gets the reason in one plain line beside the control
+  // a voice needs no note; a tap that finds no voice gets the reason in one plain line beside the control, for about four
+  // seconds (the voice layer takes it away then): the control as it stands then, if the card or the box was drawn again
   voiceLayer.sayWord({ text, word, button: btn, automatic, withSentence,
-    onNote: (line, flag) => cardVoiceStatus(btn, line, flag || null) });
+    onNote: (line, flag) => cardVoiceStatus(btn?.isConnected || !btn?.id ? btn : document.getElementById(btn.id) || btn, line, flag || null) });
 }
 
 /** Use only the answer on this face; never infer one of a kanji's several readings. */
@@ -13515,11 +13521,11 @@ function appendReviewVoice(row, target) {
   const note = el('span', 'say-note');
   note.id = 'card-say-note'; note.setAttribute('role', 'status'); note.setAttribute('aria-live', 'polite');
   if (!target?.text) {
-    note.textContent = tx('読みを一つに決められないため、読み上げません', 'Audio unavailable: no single reading for this answer');
+    note.textContent = tx(...voiceLineOf('several-readings'));
     row.append(note); return;
   }
   const say = reviewVoiceMark('card-say');
-  say.setAttribute('aria-label', tx('答えと文を読み上げる', 'Speak the answer and its sentence'));
+  say.setAttribute('aria-label', tx(...VOICE_WORDS.listen));
   say.setAttribute('aria-describedby', note.id);
   say.dataset.voiceText = target.text; say.dataset.voiceWord = target.word;
   if (target.entrySeq) say.dataset.voiceEntrySeq = target.entrySeq;
@@ -13546,7 +13552,7 @@ function appendReviewFrontVoice(face, item, { printed, blanked }) {
   const note = el('span', 'say-note');
   note.id = 'card-say-front-note'; note.setAttribute('role', 'status'); note.setAttribute('aria-live', 'polite');
   const say = reviewVoiceMark('card-say-front');
-  say.setAttribute('aria-label', tx('この語を読み上げる', 'Speak this word'));
+  say.setAttribute('aria-label', tx(...VOICE_WORDS.listen));
   say.setAttribute('aria-describedby', note.id);
   say.dataset.voiceText = target.text; say.dataset.voiceWord = target.word;
   say.addEventListener('click', () => speakCardReading(target.text, say, target.word));
@@ -13605,7 +13611,7 @@ function autoSpeakReviewFace() {
   if (reviewVoiceFace.target && reviewVoiceFace.target !== target) {
     retireCardSpeech(); reviewVoiceFace.status = null;
     if (reviewVoiceFace.attempted)
-      cardVoiceStatus(button, tx('答えが更新されました · 音で再生', 'Answer updated · tap audio to play'), null);
+      cardVoiceStatus(button, tx(...VOICE_NOTES.answerUpdated), null);
   }
   reviewVoiceFace.target = target;
   const status = reviewVoiceFace.status;
@@ -13688,7 +13694,7 @@ function buildListenRow(p) {
   listenRow.dataset.open = String(open);
   if (live) listenRow.dataset.voiceState = live.playing ? (live.loading ? 'loading' : 'playing') : live.paused ? 'paused' : 'idle';
   mark.setAttribute('aria-expanded', String(open));
-  mark.setAttribute('aria-label', open ? tx('音声の操作をとじる', 'Close the player') : tx('聞く', 'Listen'));
+  mark.setAttribute('aria-label', open ? tx('音声の操作をとじる', 'Close the player') : tx(...VOICE_WORDS.listen));
   mark.addEventListener('click', () => {
     readAloud.barOpen = !open;
     refreshListenRow();
@@ -13697,7 +13703,7 @@ function buildListenRow(p) {
   listen.type = 'button';
   listen.id = 'listen-toggle';
   listen.setAttribute('aria-pressed', String(readAloud.on));
-  listen.setAttribute('aria-label', readAloud.on ? tx('止める', 'pause') : live?.paused ? tx('続きを聞く', 'resume') : tx('聞く', 'listen'));
+  listen.setAttribute('aria-label', tx(...(readAloud.on ? VOICE_WORDS.pause : live?.paused ? VOICE_WORDS.resume : VOICE_WORDS.listen)));
   listen.append(uiIcon(readAloud.on ? 'pause' : 'play'));
   const track = el('div', 'play-track');
   track.id = 'listen-progress';
@@ -13709,14 +13715,15 @@ function buildListenRow(p) {
   track.setAttribute('aria-valuenow', String(Math.round((readAloud.clip / total) * 100)));
   const failedHere = readAloud.failed?.pid === p.id;
   const listenNote = el('span', 'play-voice', live ? live.note : failedHere
-    ? tx('再生できませんでした', 'could not play')
+    ? tx(...voiceShortOf('decode'))
     : narrationVoiceName());
   listenNote.id = 'listen-note';
   if (live?.silent) { listenNote.title = live.line; listenRow.dataset.voiceSilent = live.silent; }
   const rate = el('button', 'play-rate', `${readAloud.rate}×`);
   rate.type = 'button';
   rate.id = 'listen-rate';
-  rate.setAttribute('aria-label', tx(`速さ ${readAloud.rate}倍`, `speed ${readAloud.rate}×`));
+  const rateLabel = () => `${tx(...VOICE_WORDS.speed)} ${tx(`${readAloud.rate}倍`, `${readAloud.rate}×`)}`;
+  rate.setAttribute('aria-label', rateLabel());
   rate.addEventListener('click', () => {
     // 1 · 1.25 · 0.75, the pitch kept (the voice layer's three speeds); without the layer the bar's older three
     if (live) readAloud.rate = voiceLayer.reader.nextRate();
@@ -13725,7 +13732,7 @@ function buildListenRow(p) {
       if (recAudioEl) recAudioEl.playbackRate = readAloud.rate;
     }
     rate.textContent = `${readAloud.rate}×`;
-    rate.setAttribute('aria-label', tx(`速さ ${readAloud.rate}倍`, `speed ${readAloud.rate}×`));
+    rate.setAttribute('aria-label', rateLabel());
   });
   listen.addEventListener('click', () => {
     if (live) {
@@ -25607,8 +25614,7 @@ function renderSentenceListening(main, entry, state) {
       };
       audio.onerror = () => {
         if (!active()) return;
-        owner.failed = true; audioStatus.textContent = tx('この端末で音声を再生できなかった。もう一度試せる。',
-          'This device could not play the recording. You can try again.'); stopSentenceListening();
+        owner.failed = true; audioStatus.textContent = tx(...voiceLineOf('decode')); stopSentenceListening();
       };
       await audio.play();
       if (active()) audioStatus.textContent = tx(`${voice}の合成音声で再生中`, `Playing ${voice}’s synthetic voice`);
@@ -34070,7 +34076,7 @@ function dressStage(visit, stage, { word, label, token, kind, nodeFor, reading, 
     voice.type = 'button';
     voice.id = 'mini-voice';
     voice.lang = 'ja';
-    voice.title = tx('読み上げる', 'Hear it');
+    voice.title = tx(...VOICE_WORDS.listen);
     voice.setAttribute('aria-label', voice.title);
     // what the voice door said in this visit stays said: the stage drawn again (a return from the page, a redraw) shows it
     if (plan.voiceSaid) {

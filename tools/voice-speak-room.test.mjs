@@ -17,6 +17,10 @@ import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 
 import { japaneseSentences } from '../prototypes/corridor/modules/voice-layer.mjs';
+import { voiceLineOf } from '../prototypes/corridor/modules/voice-lines.mjs';
+
+// the plain line a refused voice hands the room: the one vocabulary's (not paired, C1)
+const NOT_PAIRED = voiceLineOf('not-paired')[1];
 
 /** The Speak room's own functions, lifted from speak.js and run with a stand-in host. */
 function room({
@@ -178,7 +182,7 @@ describe('B4: the Speak room says her line before it listens', () => {
   });
 
   it('(j) with the voice refused the room carries on without sound, and shows the plain line once', async () => {
-    const plain = 'No voice here. Pair the voice server in Settings, Writing and voice.';
+    const plain = NOT_PAIRED;
     const { sandbox, events, painted } = room({
       sayLine: async () => ({ state: 'error', code: 'not-paired', line: plain }),
     });
@@ -242,9 +246,9 @@ describe('B4: the Speak room says her line before it listens', () => {
     vm.createContext(sandbox);
     vm.runInContext(source.slice(found.getStart(ast), found.end), sandbox);
     const note = sandbox.silentNote({
-      silent: 'No voice here. Pair the voice server in Settings, Writing and voice.',
+      silent: NOT_PAIRED,
     });
-    expect(note.textContent).toMatch(/^No voice here/u);
+    expect(note.textContent).toBe(NOT_PAIRED);
     expect(note.attrs.role).toBe('status');
     // every rule that hides a note in the room's line, in the stylesheets the app loads after the room's own
     const sheets = ['tighten.css', 'depth.css', 'rooms/speak.css'].map((name) =>

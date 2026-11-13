@@ -23,6 +23,8 @@ import vm from 'node:vm';
 import ts from 'typescript';
 import { runtimeLock } from './voice-lock.mjs';
 import { createDeviceVoice, REASONS as DEVICE_VOICE_REASONS } from '../device-voice.mjs';
+// the voice's one vocabulary, which corridor.js imports (its lines and words reach the lifted functions from here)
+import { VOICE_NOTES, VOICE_WORDS, voiceLineOf, voiceShortOf } from '../modules/voice-lines.mjs';
 
 /** The source under test. KAIRO_CORRIDOR_SOURCE lets the mutant adjudicator point this
  * suite at a one-line mutation of corridor.js and prove each control actually goes red;
@@ -138,6 +140,9 @@ async function fixture({ narration = null, words = { v: 1, words: {} },
     S: { view: 'reader', stack: [], review: { ix: 0, revealed: true, history: [], queue: [{ t: 'word', id: '電車' }] } },
     ...dom, Audio: media.Audio, clearTimeout,
     tx: (ja, en) => language === 'ja' ? ja : en, bi: () => language !== 'ja',
+    VOICE_NOTES, VOICE_WORDS, voiceLineOf, voiceShortOf,
+    // no voice layer here, as in the single-file build, whose bundle is on the page
+    __CORRIDOR_BUNDLE__: {},
     uiIcon: () => dom.el('svg'),
     refreshListenRow: () => { refreshes += 1; },
     stopSentenceListening() {}, wordVoice: () => voiceSetting,
@@ -208,11 +213,10 @@ async function assertUnboundDisabled(options = {}) {
   assert.equal(f.created.length, 0);
   assert.equal(f.deviceVoiceCalls.length, 0);
   assert.equal(button.dataset.voiceUnavailable, "current-source-required");
+  // no voice in this version of the app (C18), in the one vocabulary's words
   assert.equal(
     note.textContent,
-    options.language === "ja"
-      ? "現在の音源が必要です"
-      : "Current audio source required",
+    voiceLineOf("current-source-required")[options.language === "ja" ? 0 : 1],
   );
   assert.deepEqual(f.writes, []);
   assert.equal(

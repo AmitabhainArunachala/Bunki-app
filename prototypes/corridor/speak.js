@@ -12,6 +12,7 @@
  * (archive rows and gated evidence in one atomic write; a card only on his tap); a month's spend has his cap.
  */
 import * as core from './speak-core.mjs';
+import { VOICE_FAILED_NO_ACTION } from './modules/voice-lines.mjs';
 
 const DEVICE_KEY = 'kairo-speak-device-v1';
 const SPEND_KEY = 'kairo-speak-spend-v1';
@@ -1120,10 +1121,11 @@ export function createSpeakRoom(host) {
     node.append(silentNote(line));
   }
   /** Under a line that found no voice: the voice layer's plain line saying why (its own class: tighten.css hides the old
-   * generic .speak-silent note once the line has its listen mark, and this line must be seen). */
+   * generic .speak-silent note once the line has its listen mark, and this line must be seen). A line with no reason of
+   * its own (kept from an earlier visit) says only that it could not be read aloud: no press waits on it. */
   function silentNote(line) {
     const why = typeof line.silent === 'string';
-    const note = el('p', why ? 'speak-note speak-no-voice' : 'speak-note speak-silent', why ? line.silent : t('声を出せませんでした', 'No voice for this line'));
+    const note = el('p', why ? 'speak-note speak-no-voice' : 'speak-note speak-silent', why ? line.silent : t(...VOICE_FAILED_NO_ACTION));
     note.setAttribute('role', 'status');
     return note;
   }

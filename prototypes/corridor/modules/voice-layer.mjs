@@ -22,6 +22,7 @@ import { baseBoxes, createBands } from './voice-bands.mjs';
 import { createClipStore, createIndexedDbClipStorage } from './voice-clip-store.mjs';
 import { createDeviceTokenStore, createVoiceClient } from './voice-client.mjs';
 import { createPocketPlayer, createReaderMediaSession, gapSleep, pageTimer } from './reader-pocket.mjs';
+import { VOICE_LINE_STANDS_MS, VOICE_PAIRING, VOICE_SETTINGS, VOICE_SOURCES, VOICE_WORDS, voiceLineOf, voicePairingLine, voiceSettingsLine, voiceShortOf } from './voice-lines.mjs';
 import { SPEEDS, createVoiceSeam, sentencesOf, voiceKeyOf } from './voice-seam.mjs';
 
 export const READER_RATES = Object.freeze([1, 1.25, 0.75]);
@@ -93,19 +94,12 @@ export function voiceLimits(status) {
     capCents: cents(status?.budget?.capCents) ?? cents(status?.limits?.capCents),
   };
 }
-const amount = (cents) => { const n = cents % 100 ? (cents / 100).toFixed(2) : String(cents / 100); return { ja: `${n}ドル`, en: `$${n}` }; };
-/** The no-voice line for a limit reached, { ja, en }: the amount the server said, or no amount at all when it said none.
- * `at` is when the voice comes back (the server's new day, in this device's own time). */
+/** A limit reached, as Settings says it, { ja, en }: the ruled line (modules/voice-lines.mjs) and beside it the amount the
+ * server said, or no amount at all when it said none (the owner's rule 7). `at` is when the day's limit resets (the
+ * server's new day, in this device's own time). A control's line is the ruled line alone. */
 export function limitLine(reason, limits, at) {
-  const day = limits?.dayCapCents ?? null, total = limits?.capCents ?? null;
-  if (reason === 'day-budget') {
-    return day === null
-      ? { ja: `声を出せません。今日の音声の上限を使いました。声は${at}に戻ります。`, en: `No voice: today’s voice limit is used. The voice comes back at ${at}.` }
-      : { ja: `声を出せません。今日の${amount(day).ja}分を使いました。声は${at}に戻ります。`, en: `No voice: today’s ${amount(day).en} is used. The voice comes back at ${at}.` };
-  }
-  return total === null
-    ? { ja: '声を出せません。音声の予算の合計を使い切りました。', en: 'No voice: the voice budget’s total is used.' }
-    : { ja: `声を出せません。合計${amount(total).ja}を使い切りました。`, en: `No voice: the ${amount(total).en} total is used.` };
+  const [ja, en] = voiceSettingsLine(reason, { time: at, dayCapCents: limits?.dayCapCents ?? null, capCents: limits?.capCents ?? null });
+  return { ja, en };
 }
 
 export function installVoiceLayer(host) {
@@ -177,55 +171,41 @@ export function installVoiceLayer(host) {
 
   /* ------------------------------------------------------------------ one read from one control */
   let spoken = null; // { button, session }
-  const sourceLine = (source) => source === 'server' ? tx('音声サーバー', 'Voice server') : source === 'recorded' ? tx('収録音声', 'Recorded clip') : '';
+  const sourceLine = (source) => (VOICE_SOURCES[source] ? tx(...VOICE_SOURCES[source]) : '');
   // the voice server's day is the UTC day: its new start, in this device's own time
   const newDay = () => new Date((Math.floor(Date.now() / 86400000) + 1) * 86400000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  // the two limits are the speech team's (one budget for both apps): only the server's own figures, never a guess
-  const limitWords = (reason) => { const words = limitLine(reason, voiceLimits(seam.status()), newDay()); return tx(words.ja, words.en); };
-  /** Why there is no voice, in one plain line: what a listen control says when it makes no sound. */
   /** "Not paired" after the server ended the pairing (a 401) is that 401's reason, whoever saw it (the combine's I13). */
   const told = (reason) => (reason === 'not-paired' && seam.status().pairAgain ? 'authentication-required' : reason);
-  const silenceLine = (reason) => {
-    switch (told(reason)) {
-      case 'not-paired': case 'not-configured':
-        return tx('声を出せません。設定の「筆と声」で音声サーバーとつなぐ。', 'No voice here. Pair the voice server in Settings, Writing and voice.');
-      case 'authentication-required':
-        return tx('声を出せません。音声サーバーがこの接続を終了しました。設定の「筆と声」でもう一度つなぐ。',
-          'No voice: the voice server ended this pairing. Pair again in Settings, Writing and voice.');
-      case 'offline': case 'network-failed':
-        return tx('声を出せません。音声サーバーに届きません。接続を確かめて、もう一度。', 'No voice: the voice server is out of reach. Check the connection, then tap again.');
-      case 'day-budget': case 'budget-exhausted':
-        return limitWords(reason);
-      case 'not-in-release':
-        return tx('声を出せません。音声サーバーはいま新しい文を受け付けていません。', 'No voice: the voice server is not taking new sentences right now.');
-      case 'request-rate-limit':
-        return tx('声を出せません。1分あたりの新しい文が多すぎました。1分ほど待って、もう一度。', 'No voice: too many new sentences in one minute. Wait about a minute, then tap again.');
-      case 'voice-unavailable': case 'voice-timeout':
-        return tx('声を出せません。音声サーバーが混んでいます。もう一度。', 'No voice: the voice server is busy. Tap to try again.');
-      case 'nothing-to-say': case 'not-japanese':
-        return tx('ここには読み上げられる日本語がありません。', 'Nothing here can be read aloud.');
-      // a clip that would not play (the speech queue names every failed play 'decode'): the clip is not kept any more, and
-      // the next tap asks again (voice-seam.mjs). It is not the server refusing (the combine's review). A start the
-      // browser does not allow (NotAllowedError) during the article's read is a pause instead (reader-pocket.mjs, L1)
-      case 'audio-error': case 'decode':
-        return tx('再生できませんでした。もう一度。', 'Could not play. Tap to try again.');
-      default:
-        return tx('声を出せません。音声サーバーがこの文を読めませんでした。もう一度。', 'No voice: the voice server could not say this. Tap to try again.');
-    }
-  };
-  /** The same reasons in a few words: the status line in Settings and the reader's bar. */
-  const reasonWords = (reason) => ({
-    'not-configured': tx('未接続', 'not paired'), 'not-paired': tx('未接続', 'not paired'), 'authentication-required': tx('再接続が必要', 'pair again'),
-    offline: tx('接続なし', 'no connection'), 'network-failed': tx('接続なし', 'no connection'),
-    'day-budget': tx('今日の上限', 'today’s limit reached'), 'budget-exhausted': tx('予算切れ', 'budget used up'),
-    'not-in-release': tx('サーバー停止中', 'voice server not taking sentences'), 'request-rate-limit': tx('混雑、1分待つ', 'too many requests, wait a minute'),
-    'voice-unavailable': tx('サーバー混雑', 'voice server busy'), 'voice-timeout': tx('サーバー混雑', 'voice server busy'),
-    'nothing-to-say': tx('読む文なし', 'nothing to read'), 'not-japanese': tx('読む文なし', 'nothing to read'), 'audio-error': tx('再生エラー', 'could not play'),
-    decode: tx('再生エラー', 'could not play'),
-  }[reason] || tx('サーバーエラー', 'voice server error'));
+  /** Why there is no voice, in one plain line: what a listen control says when it makes no sound, in the one vocabulary's
+   * words (modules/voice-lines.mjs). A timeout is "took too long" and a 503 "busy". A clip that would not play (the speech
+   * queue names every failed play 'decode') is not kept any more, so its "tap to try again" is true (voice-seam.mjs); a
+   * start the browser does not allow during the article's read is a pause instead (reader-pocket.mjs, L1). Today's
+   * limit says when it resets: the server's new day. */
+  const silenceLine = (reason) => tx(...voiceLineOf(told(reason), { time: newDay() }));
+  /** The same reasons in a few words (the short form): the reader's bar, the ear's label and Settings' last tap. */
+  const reasonWords = (reason) => tx(...voiceShortOf(reason));
   // reasons that pass by themselves or by his pairing: what is true now is what a control says
   const PASSING = new Set(['not-paired', 'not-configured', 'authentication-required', 'offline', 'network-failed', 'day-budget', 'budget-exhausted',
     'not-in-release', 'request-rate-limit']);
+  /** The one line that stands after a press that found no voice: it goes after about four seconds, at the next press of a
+   * voice control, or when a voice answers (rule 6). `onNote` is the surface's own way to show the line and take it away.
+   * Only a timer of the page's own: nothing listens on the document for it. */
+  let standing = null; // { onNote, timer }
+  function dropLine() {
+    const was = standing;
+    standing = null;
+    if (!was) return;
+    doc.defaultView.clearTimeout(was.timer);
+    try { was.onNote?.('', null); } catch { /* the surface went */ }
+  }
+  function standLine(onNote, line, why) {
+    dropLine();
+    onNote?.(line, why);
+    if (!line) return;
+    const mine = { onNote, timer: 0 };
+    mine.timer = doc.defaultView.setTimeout(() => { if (standing === mine) dropLine(); }, VOICE_LINE_STANDS_MS);
+    standing = mine;
+  }
   /** The one plain line beside a control the layer made (.say-note is the app's own small note): empty takes it away. */
   function noteBeside(control, text) {
     if (!control?.isConnected) return;
@@ -277,8 +257,12 @@ export function installVoiceLayer(host) {
     // his second tap on a control that is speaking its own turn stops it. A read by itself (the answer's word said as it
     // is shown) is nobody's tap: a tap then ends it and starts the control's own turn from the top (lead's ruling, 11-11).
     // A read the app starts that is not a tap (`toggle` false: the Speak room's line) never stops itself this way.
+    // a press takes away the line an earlier press left (the line stands until the next press)
+    if (!automatic && toggle) dropLine();
     if (!automatic && toggle && tapSpeaking(button)) { seam.stop(); return null; }
-    if (!sentences.length) { if (!automatic) onNote?.(silenceLine('nothing-to-say'), 'nothing-to-say'); return null; }
+    // a press's line stands for its four seconds; a read the app starts (the Speak room's line) hands it on as it was
+    const tell = (line, why) => (toggle ? standLine(onNote, line, why) : onNote?.(line, why));
+    if (!sentences.length) { if (!automatic) tell(silenceLine('nothing-to-say'), 'nothing-to-say'); return null; }
     if (automatic) {
       // a read of the article is under way (or yields to a word): nothing says itself over it (John, 2026-11-11)
       if (readerBusy()) return null;
@@ -314,7 +298,7 @@ export function installVoiceLayer(host) {
     mine.session = seam.read({
       sentences, voiceKey, prefetch: single ? 0 : 2, gapMs: single ? 0 : 260, rate: rate ?? reader.rate,
       // a voice answered: the line an earlier silence left beside the control goes
-      onSource: () => { if (mine.over) return; mine.voiced = true; onNote?.('', null); },
+      onSource: () => { if (mine.over) return; mine.voiced = true; if (standing?.onNote === onNote) dropLine(); else onNote?.('', null); },
       onState: (state, code) => {
         if (mine.over) return;
         if (state === 'loading' || state === 'playing') { paint(true); mine.button?.setAttribute('aria-busy', String(state === 'loading')); }
@@ -325,7 +309,7 @@ export function installVoiceLayer(host) {
           if (spoken === mine) spoken = null;
           // no sound was made: his tap is told why, in words; a read by itself says nothing
           const why = state === 'error' ? code || 'speak-failed' : state === 'done' && !mine.voiced ? 'nothing-to-say' : null;
-          if (why && !automatic) onNote?.(silenceLine(why), why);
+          if (why && !automatic) tell(silenceLine(why), why);
           onDone?.(state, code);
           yieldEnded(mine);
         }
@@ -542,12 +526,11 @@ export function installVoiceLayer(host) {
       // read that is under way names its voice until it ends
       let silent = failed && !PASSING.has(failed) ? failed : active ? null : now;
       if (silent === 'not-paired' && seam.status().pairAgain) silent = 'authentication-required';
-      const brief = (reason) => reason === 'not-paired' || reason === 'not-configured' ? tx('設定でつなぐと聞けます', 'pair in Settings to hear this')
-        : reason === 'authentication-required' ? tx('設定でもう一度つなぐ', 'pair again in Settings') : reasonWords(reason);
+      // the note is the cause's short form; its title (below) the whole line
       let note;
-      if (silent) note = brief(silent);
-      else if (narrated) note = host.narrationVoiceName?.() || tx('収録音声', 'Recorded clip');
-      else note = tx('音声サーバー', 'Voice server');
+      if (silent) note = reasonWords(silent);
+      else if (narrated) note = host.narrationVoiceName?.() || tx(...VOICE_SOURCES.recorded);
+      else note = tx(...VOICE_SOURCES.server);
       return {
         available: true, narrated, active, playing: active && (state === 'loading' || state === 'playing'), paused: active && state === 'paused',
         loading: active && state === 'loading', index: here ? reader.index : 0,
@@ -557,6 +540,8 @@ export function installVoiceLayer(host) {
     },
     /** Play, pause or resume. A read that was stopped starts again at the sentence it had reached. */
     toggle(p) {
+      // his press on the bar takes away a line a control's press left (it stands until the next press)
+      dropLine();
       // while the read yields to a word: pause holds it where it is; play again takes it up now
       const y = reader.yielding && reader.yielding.pid === p.id ? reader.yielding : null;
       if (y) {
@@ -734,8 +719,8 @@ export function installVoiceLayer(host) {
     mark.type = 'button';
     mark.dataset.voiceSay = rule.id;
     mark.dataset.japaneseLookup = 'off';
-    mark.setAttribute('aria-label', tx('聞く', 'Listen'));
-    mark.title = tx('聞く', 'Listen');
+    mark.setAttribute('aria-label', tx(...VOICE_WORDS.listen));
+    mark.title = tx(...VOICE_WORDS.listen);
     mark.append(uiIcon('speaker'));
     return mark;
   }
@@ -768,8 +753,8 @@ export function installVoiceLayer(host) {
           event.stopPropagation();
           let now = null;
           try { now = rule.read(node); } catch { /* the surface went */ }
-          if (!now?.sentences?.length) return;
-          speakFrom(mark, { ...now, onNote: (line) => { mark.title = line || tx('聞く', 'Listen'); noteBeside(mark, line); } });
+          // a press that finds nothing to say now (its text changed under it) is told so, as any press is (rule 6)
+          speakFrom(mark, { sentences: [], ...now, onNote: (line) => { mark.title = line || tx(...VOICE_WORDS.listen); noteBeside(mark, line); } });
         });
         if (rule.at === 'before') node.before(mark);
         else if (rule.at === 'after') node.after(mark);
@@ -881,7 +866,7 @@ export function installVoiceLayer(host) {
         if (at) at.textContent = line || '';
       };
       const say = cardMark('kp-listen-word');
-      say.setAttribute('aria-label', tx('語と文を聞く', 'Listen to the word and its sentence'));
+      say.setAttribute('aria-label', tx(...VOICE_WORDS.listen));
       say.addEventListener('click', (event) => {
         event.stopPropagation();
         const reads = answerReads(reading, japaneseSentences(shownText(sentence())), japaneseSentences(shownText(answer.querySelector('.kp-def'))),
@@ -922,7 +907,7 @@ export function installVoiceLayer(host) {
       // dictionary form, else the card's id), never by the form the passage prints (an inflected 憧れた is 憧れる's)
       const word = host.deckWordTerm ? term || id : shownText(card.querySelector('.kp-sentence .kp-target')) || id;
       const control = cardMark('kp-listen-front');
-      control.setAttribute('aria-label', tx('語を聞く', 'Listen to the word'));
+      control.setAttribute('aria-label', tx(...VOICE_WORDS.listen));
       // what it says, the ear says on the marked word (one clip: the same text under the same voice key)
       const says = { text: plan.text, voiceKey: voiceKeyOf('word', word) };
       frontSays.set(control, says);
@@ -977,7 +962,8 @@ export function installVoiceLayer(host) {
       }
       return session;
     },
-    plain: { line: (reason) => silenceLine(reason), words: (reason) => reasonWords(reason) },
+    // the ear's line is a control's line (the ear's own label takes the short form from the same vocabulary)
+    plain: { line: (reason) => silenceLine(reason) },
     // the card audio's switch (Settings, 筆と声): off, the ear draws nothing on text either
     highlight: () => highlighting(),
     cannot: (unit) => {
@@ -1083,37 +1069,27 @@ export function installVoiceLayer(host) {
   /* ------------------------------------------------------------------ Settings: pairing and the status line */
   const dollars = (cents) => `$${(cents / 100).toFixed(2)}`;
   const DAY_KEY = 'kairo-voice-day'; // the total as this device first saw it today: two numbers and a time, no secret
-  const PAIR_LINES = {
-    'invalid-pairing': ['コードか学習者IDの形が違います。確かめてもう一度。', 'That does not look like a pairing code and learner id. Check them and try again.'],
-    'authentication-required': ['コードが違うか、使用済みか、期限切れです。デスクトップの「Bunki Voice」をもう一度実行してください。', 'That code is wrong, already used or expired. Run “Bunki Voice” on the Desktop again for a new one.'],
-    'installation-exists': ['このコードの端末はすでに接続済みです。デスクトップの「Bunki Voice」をもう一度実行してください。', 'That code belongs to an install that is already paired. Run “Bunki Voice” on the Desktop again for a new one.'],
-    'authentication-rate-limit': ['試行が多すぎます。1分待ってください。', 'Too many tries. Wait one minute.'],
-    'pairing-unavailable': ['いま音声サーバーはつなげません。数分後にもう一度。', 'The voice server can’t pair right now. Try again in a few minutes.'],
-    'network-failed': ['音声サーバーに届きませんでした。接続を確かめてください。', 'Could not reach the voice server. Check the connection.'],
-    'voice-timeout': ['音声サーバーの返事が遅すぎました。もう一度。', 'The voice server took too long. Try again.'],
-    'server-missing': ['この端末はまだ音声サーバーの住所を知りません。「Bunki voice code:」で始まる1行をそのまま貼ってください。',
-      'This device does not know the voice server’s address yet. Paste the whole line that starts “Bunki voice code:”.'],
-  };
-  const pairLine = (code) => tx(...(PAIR_LINES[code] || ['接続できませんでした。もう一度。', 'Pairing did not work. Try again.']));
+  const pairLine = (code) => tx(...voicePairingLine(code));
   function statusLines(status) {
+    // the pairing as it stands: paired, or the cause's own line (not paired, C1; a pairing the server ended, C2)
     let state;
-    if (status.paired) state = tx(`音声サーバーに接続済み（端末 …${status.installation.slice(-4)}）。`, `Paired with the voice server (install …${status.installation.slice(-4)}).`) +
-      (status.durable ? '' : tx(' このブラウザは保存できないため、今回の利用だけ有効。', ' This browser could not keep it, so it lasts for this visit only.'));
-    else if (status.pairAgain) state = tx('音声サーバーがこの接続を終了しました。新しいコードでもう一度つないでください。', 'The voice server ended this pairing. Pair Bunki again with a new code.');
-    else state = tx('未接続。つなぐまで声は出ません（記事の収録音声を除く）。', 'Not paired. Nothing is spoken until you pair, except an article’s own recording.');
-    // paired, and the server is not answering for a reason that lasts: the same plain line a control gives
-    const blocked = ['day-budget', 'budget-exhausted', 'not-in-release', 'request-rate-limit'].includes(status.blocked) ? silenceLine(status.blocked) : '';
+    if (status.paired) state = tx(...VOICE_SETTINGS.paired(status.installation.slice(-4))) + (status.durable ? '' : ` ${tx(...VOICE_SETTINGS.notKept)}`);
+    else state = silenceLine(status.pairAgain ? 'authentication-required' : 'not-paired');
+    // paired, and the server is not answering for a reason that lasts: the cause's line, the server's figure beside a limit
+    const lasting = ['day-budget', 'budget-exhausted', 'not-in-release', 'request-rate-limit'].includes(status.blocked) ? status.blocked : null;
+    const blocked = !lasting ? '' : ['day-budget', 'budget-exhausted'].includes(lasting)
+      ? (({ ja, en }) => tx(ja, en))(limitLine(lasting, voiceLimits(status), newDay())) : silenceLine(lasting);
     const clock = (at) => new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const said = status.last.source === 'none' ? remembered() : status.last;
     // the newest thing that happened: a sentence spoken, or a tap that found no voice, and why
     const last = status.silent && (!said || status.silent.at >= said.at)
-      ? tx(`最後のタップ：声なし（${reasonWords(status.silent.reason)}、${clock(status.silent.at)}）`, `Last tap: no voice (${reasonWords(status.silent.reason)}), at ${clock(status.silent.at)}.`)
-      : !said ? tx('最後に読んだ文：まだありません。', 'Last sentence: nothing spoken yet.')
-        : tx(`最後に読んだ文：${sourceLine(said.source)}（${clock(said.at)}）`, `Last sentence: ${sourceLine(said.source).replace(/^./, (c) => c.toLowerCase())}, at ${clock(said.at)}.`);
+      ? tx(...VOICE_SETTINGS.lastTap(voiceShortOf(status.silent.reason), clock(status.silent.at)))
+      : !said ? tx(...VOICE_SETTINGS.nothingYet)
+        : tx(...VOICE_SETTINGS.lastSentence(VOICE_SOURCES[said.source] || VOICE_SOURCES.server, clock(said.at)));
     const budget = status.budget
       ? tx(`音声の予算：${dollars(status.budget.capCents)} のうち ${dollars(status.budget.spentCents)} 使用、残り ${dollars(status.budget.remainingCents)}（Nihongo Study と共通）。`,
         `Voice budget: ${dollars(status.budget.spentCents)} of ${dollars(status.budget.capCents)} used, ${dollars(status.budget.remainingCents)} left (shared with Nihongo Study).`)
-      : status.paired ? tx('音声の予算：確認中…', 'Voice budget: checking…') : tx('音声の予算：接続すると表示されます。', 'Voice budget: shown once paired.');
+      : status.paired ? tx('音声の予算：確認中…', 'Voice budget: checking…') : tx('音声の予算：ペアリングすると表示されます。', 'Voice budget: shown once paired.');
     // today's spend beside the budget, so a session's cost can be read off
     let today = '';
     if (status.budget) {
@@ -1143,32 +1119,31 @@ export function installVoiceLayer(host) {
   function settingsBlock() {
     const block = el('div', 'settings-voice-server');
     block.id = 'settings-voice-server';
-    const name = el('p', 'settings-writing-name', tx('音声サーバー — 収録音声、次に音声サーバー。ほかの声は使いません', 'Voice server — a recorded clip first, then the voice server. No other voice is used'));
+    const name = el('p', 'settings-writing-name', tx(...VOICE_SETTINGS.heading));
     const state = el('p', 'teacher-note'); state.id = 'voice-status'; state.setAttribute('role', 'status');
     const last = el('p', 'teacher-note'); last.id = 'voice-last';
     const budget = el('p', 'teacher-note'); budget.id = 'voice-budget';
     const today = el('p', 'teacher-note'); today.id = 'voice-today';
     const form = el('form', 'listening-form settings-report-form'); form.id = 'voice-pair-form'; form.noValidate = true;
-    const field = (id, ja, en, attrs) => {
+    const field = (id, words, attrs) => {
       const wrap = el('div');
-      const label = el('label', '', tx(ja, en)); label.htmlFor = id;
+      const label = el('label', '', tx(...words)); label.htmlFor = id;
       const input = el('input', 'chat-field'); input.id = id; input.type = 'text';
       input.autocomplete = 'off'; input.spellcheck = false; input.setAttribute('autocapitalize', 'off'); input.setAttribute('autocorrect', 'off');
       Object.assign(input, attrs);
       wrap.append(label, input);
       return { wrap, input };
     };
-    const learner = field('voice-pair-learner', '学習者ID（または表示された1行）', 'Learner id (or the whole pairing line)', { maxLength: 400 });
-    const code = field('voice-pair-code', '接続コード（12文字）', 'Pairing code (12 characters)', { maxLength: 24 });
-    const submit = el('button', 'chip', tx('つなぐ', 'Pair')); submit.type = 'submit'; submit.id = 'voice-pair-submit';
+    const learner = field('voice-pair-learner', VOICE_PAIRING.learner, { maxLength: 400 });
+    const code = field('voice-pair-code', VOICE_PAIRING.code, { maxLength: 24 });
+    const submit = el('button', 'chip', tx(...VOICE_PAIRING.submit)); submit.type = 'submit'; submit.id = 'voice-pair-submit';
     const note = el('p', 'teacher-note'); note.id = 'voice-pair-note'; note.setAttribute('role', 'status');
     // the speech team's launcher on John's Desktop is "Bunki Voice"; its pairing step prints the one line (release, 22:25)
-    const how = el('p', 'teacher-note', tx('デスクトップの「Bunki Voice」を実行すると「Bunki voice code:」で始まる1行が出ます。その1行をそのまま最初の欄に貼って「つなぐ」。コードは10分で切れます。',
-      'Run “Bunki Voice” on the Desktop. It prints one line that starts “Bunki voice code:”. Paste that whole line into the first box and press Pair. The code lasts 10 minutes.'));
+    const how = el('p', 'teacher-note', tx(...VOICE_PAIRING.how));
     how.id = 'voice-pair-how';
     form.append(how, learner.wrap, code.wrap, submit, note);
-    const forget = el('button', 'btn-tertiary', tx('この端末の接続を消す', 'Forget the pairing on this device')); forget.type = 'button'; forget.id = 'voice-unpair';
-    const refresh = el('button', 'btn-tertiary', tx('予算を更新', 'Refresh the budget')); refresh.type = 'button'; refresh.id = 'voice-budget-refresh';
+    const forget = el('button', 'btn-tertiary', tx(...VOICE_PAIRING.forget)); forget.type = 'button'; forget.id = 'voice-unpair';
+    const refresh = el('button', 'btn-tertiary', tx(...VOICE_PAIRING.refresh)); refresh.type = 'button'; refresh.id = 'voice-budget-refresh';
     let busy = false;
     const paint = (status = seam.status()) => {
       if (!block.isConnected && block.dataset.mounted) { listeners.delete(paint); return; }
@@ -1186,7 +1161,7 @@ export function installVoiceLayer(host) {
       event.preventDefault();
       if (busy) return;
       busy = true; paint();
-      note.textContent = tx('つないでいます…', 'Pairing…');
+      note.textContent = tx(...VOICE_PAIRING.pairing);
       const answer = await client.pair({ learner: learner.input.value, code: code.input.value });
       busy = false;
       if (answer.ok) {
@@ -1241,6 +1216,9 @@ export function installVoiceLayer(host) {
     sayExcerpt({ text, sourceId, button, onNote = (line) => noteBeside(button, line) }) {
       return speakFrom(button, { sentences: japaneseSentences(text), voiceKey: sourceId ? voiceKeyOf('article', sourceId) : voiceKeyOf('word', 'sentence'), onNote });
     },
+    /** A control of the app's own that found no voice by itself (the quote chip's recording would not play): the line for
+     * `code` beside it, standing as every press's line stands. */
+    lineBeside(button, code) { standLine((line) => noteBeside(button, line), silenceLine(code), code); },
     /** Whether a word could be voiced right now. A read that would start by itself asks first (corridor.js), so that
      * with no voice to be had it stops no other sound. Given the word's text, a clip kept on this device counts. While an
      * article is being read (or yields to a word) nothing says itself over it. */

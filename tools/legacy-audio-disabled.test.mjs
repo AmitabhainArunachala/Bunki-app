@@ -8,6 +8,7 @@ const { test } = await import(
 );
 import { createDeviceVoice, REASONS } from '../prototypes/corridor/device-voice.mjs';
 import { japaneseSentences } from '../prototypes/corridor/modules/voice-layer.mjs';
+import { VOICE_WORDS, voiceLineOf } from '../prototypes/corridor/modules/voice-lines.mjs';
 import { runtimeLock } from '../prototypes/corridor/tools/voice-lock.mjs';
 test('unbound legacy speech and recording entry points fail closed', async () => {
   let speaks = 0,
@@ -97,6 +98,10 @@ test('unbound legacy speech and recording entry points fail closed', async () =>
     stopSentenceListening: () => {},
     cardVoiceStatus: (...args) => status.push(args),
     tx: (ja, en) => en,
+    // the one vocabulary's lines (modules/voice-lines.mjs), which corridor.js imports
+    voiceLineOf,
+    // the single-file build: its bundle is on the page and no voice layer ever arrives
+    __CORRIDOR_BUNDLE__: {},
     wordVoice: () => bySelf,
     wordClipFor: () => ({ src: 'retained-synthetic.m4a' }),
     approvedWordManifest: (x) => x,
@@ -128,6 +133,8 @@ test('unbound legacy speech and recording entry points fail closed', async () =>
   assert(retired > 0 || cancels > 4);
   assert(stopped > 0);
   assert(status.some((row) => row[2] === 'current-source-required'));
+  // and it says so in the one vocabulary's words: no voice in this version of the app (C18)
+  assert(status.some((row) => row[1] === voiceLineOf('current-source-required')[1]));
   // With the voice layer the reading has ONE way out, the seam (a recorded clip, then the voice server, otherwise
   // silence): this function still starts no fetch, no Audio and no utterance of its own.
   const said = [];
@@ -147,15 +154,8 @@ test('unbound legacy speech and recording entry points fail closed', async () =>
   // "Real voices or silence" (John, 2026-11-10): when his tap finds no voice, the seam's one plain line and its reason
   // reach the note beside the control as they are; when a voice answers, the line is cleared.
   status.length = 0;
-  said[0].onNote(
-    'No voice here. Pair the voice server in Settings, Writing and voice.',
-    'not-paired',
-  );
-  assert.deepEqual(status.at(-1), [
-    null,
-    'No voice here. Pair the voice server in Settings, Writing and voice.',
-    'not-paired',
-  ]);
+  said[0].onNote(voiceLineOf('not-paired')[1], 'not-paired');
+  assert.deepEqual(status.at(-1), [null, voiceLineOf('not-paired')[1], 'not-paired']);
   said[0].onNote('', null);
   assert.deepEqual(status.at(-1), [null, '', null]);
   // Said by itself (a card's answer shown, a word opened) is not his tap. With the switch off nothing happens at
@@ -428,13 +428,14 @@ test('speak on reveal is on unless he turned it off, and an Off stored tonight s
   fresh.sandbox.write('on');
   assert.equal(fresh.kept.get(KEY), 'on');
   assert.equal(fresh.sandbox.read(), 'on');
-  // the row in Settings says what it does and that it spends the voice budget
+  // the row in Settings is named in the one vocabulary's words, as in Nihongo Study
   const settings = readFileSync(
     new URL('../prototypes/corridor/modules/learner.mjs', import.meta.url),
     'utf8',
   );
-  assert.match(
-    settings,
-    /row\('settings-voice', '[^']+', '声 — say a card’s answer and an opened word once, by themselves \(uses the voice budget\)'/u,
+  assert.match(settings, /row\('settings-voice', \.\.\.VOICE_WORDS\.speakOnReveal,/u);
+  assert.deepEqual(
+    [...VOICE_WORDS.speakOnReveal],
+    ['答えを表示したら読み上げる', 'Say answers aloud when shown'],
   );
 });
