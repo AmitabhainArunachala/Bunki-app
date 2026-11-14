@@ -444,3 +444,245 @@ describe('fix round 2: the wait after a slow server or a lost connection is name
     expect(r.asked).toHaveLength(2);
   });
 });
+
+describe('play on a read he had paused is his press (the re-review’s F1; rule 8)', () => {
+  const S4 = [
+    { text: '雨の日は本を読む。' },
+    { text: '猫が窓の外を見ている。' },
+    { text: '駅の前で友達を待った。' },
+    { text: '新しい靴を買いました。' },
+  ];
+  /** A read of four sentences on a clock the test moves. The client answers in order with the codes in `next` (none: a
+   * clip); the first sentence plays until the test lets it end, so the read can be paused while its window is fetched. */
+  const rig = () => {
+    const r = {
+      at: Date.parse('2026-11-12T02:00:00Z'),
+      asked: [],
+      next: [],
+      played: [],
+      states: [],
+    };
+    let release = null;
+    r.endFirst = () => release?.('ended');
+    const client = {
+      configured: () => true,
+      ready: async () => {},
+      paired: () => true,
+      scope: () => ({ installation: 'bunki-' + 'b'.repeat(32) }),
+      async speak({ text }) {
+        r.asked.push(text);
+        const code = r.next.shift();
+        if (code) throw new VoiceError(code, 0);
+        return {
+          bytes: new Uint8Array([1]),
+          contentType: 'audio/wav',
+          voiceId: 'v',
+          inputKey: text,
+        };
+      },
+    };
+    const player = {
+      play: (clip) => {
+        r.played.push(clip.inputKey);
+        return r.played.length === 1
+          ? new Promise((done) => (release = done))
+          : Promise.resolve('ended');
+      },
+      pause() {},
+      resume() {},
+      stop() {},
+      setRate() {},
+    };
+    r.seam = createVoiceSeam({
+      client,
+      player,
+      sleep: async () => {},
+      gapSleep: async () => {},
+      now: () => r.at,
+    });
+    r.end = new Promise((done) => {
+      r.session = r.seam.read({
+        voiceKey: 'article:a1',
+        sentences: S4,
+        press: true,
+        onState: (state, code) => {
+          r.states.push(code ? `${state}:${code}` : state);
+          if (['done', 'stopped', 'error'].includes(state)) done(code ? `${state}:${code}` : state);
+        },
+      });
+    });
+    return r;
+  };
+  /** The read is on its first sentence and its window has been asked; the later sentence `code` stands for met it. */
+  const pausedAfter = async (code) => {
+    const r = rig();
+    r.next.push(undefined, undefined, code);
+    await tick(10);
+    expect(r.asked).toEqual(S4.slice(0, 3).map((s) => s.text));
+    expect(r.session.state).toBe('playing');
+    r.session.pause();
+    expect(r.session.state).toBe('paused');
+    r.at += 1000;
+    return r;
+  };
+  it('a later sentence lost its connection; paused; play at +1 s asks for it again and the read speaks on to the end', async () => {
+    const r = await pausedAfter('network-failed');
+    r.session.resume({ press: true });
+    r.endFirst();
+    expect(await Promise.race([r.end, tick(500).then(() => 'still going')])).toBe('done');
+    // the lost sentence asked again, then the last one: every sentence spoken, in order
+    expect(r.asked).toEqual([S4[0], S4[1], S4[2], S4[2], S4[3]].map((s) => s.text));
+    expect(r.played).toEqual(S4.map((s) => s.text));
+  });
+  it('the same after a slow answer (voice-timeout): play at +1 s asks again and speaks on', async () => {
+    const r = await pausedAfter('voice-timeout');
+    r.session.resume({ press: true });
+    r.endFirst();
+    expect(await Promise.race([r.end, tick(500).then(() => 'still going')])).toBe('done');
+    expect(r.played).toEqual(S4.map((s) => s.text));
+  });
+  it('a resume nobody pressed: as before, the read ends at the lost sentence and asks nothing more', async () => {
+    const r = await pausedAfter('network-failed');
+    r.session.resume();
+    r.endFirst();
+    expect(await Promise.race([r.end, tick(500).then(() => 'still going')])).toBe(
+      'error:network-failed',
+    );
+    expect(r.asked).toEqual(S4.slice(0, 3).map((s) => s.text));
+    expect(r.played).toEqual(S4.slice(0, 2).map((s) => s.text));
+  });
+  it('a press inside the per-minute wait sends nothing: the read ends at that sentence with the minute’s line', async () => {
+    const r = await pausedAfter('request-rate-limit');
+    r.session.resume({ press: true });
+    r.endFirst();
+    expect(await Promise.race([r.end, tick(500).then(() => 'still going')])).toBe(
+      'error:request-rate-limit',
+    );
+    expect(r.asked).toEqual(S4.slice(0, 3).map((s) => s.text));
+    expect(r.played).toEqual(S4.slice(0, 2).map((s) => s.text));
+  });
+  it('his play with the connection still gone asks once and ends there; the wait starts again from that failure', async () => {
+    const r = await pausedAfter('network-failed');
+    r.next.push('network-failed');
+    r.session.resume({ press: true });
+    r.endFirst();
+    expect(await Promise.race([r.end, tick(500).then(() => 'still going')])).toBe(
+      'error:network-failed',
+    );
+    expect(r.asked).toEqual(
+      [S4[0], S4[1], S4[2], S4[2], S4[3]].map((s) => s.text).slice(0, r.asked.length),
+    );
+    expect(r.asked.filter((t) => t === S4[2].text)).toHaveLength(2);
+    expect(r.played).toEqual(S4.slice(0, 2).map((s) => s.text));
+    r.at += 14_000;
+    expect(r.seam.cannot('article:a1')).toBe('network-failed');
+  });
+});
+
+describe('a wait Settings shows tells its listeners once when it ends (the first review’s C2)', () => {
+  const S2 = [{ text: '雨の日は本を読む。' }, { text: '猫が窓の外を見ている。' }];
+  /** A seam on a clock and an `after` the test moves; the client's answers are held until the test settles them. */
+  const rig = () => {
+    const r = { at: Date.parse('2026-11-12T02:00:00Z'), timers: [], told: [], pending: [] };
+    const client = {
+      configured: () => true,
+      ready: async () => {},
+      paired: () => true,
+      scope: () => ({ installation: 'bunki-' + 'b'.repeat(32) }),
+      budget: async () => {
+        throw new VoiceError('budget-unavailable', 500);
+      },
+      speak: ({ text }) =>
+        new Promise((resolve, reject) => r.pending.push({ text, resolve, reject })),
+    };
+    r.refuse = (index, code) => r.pending[index].reject(new VoiceError(code, 429));
+    r.seam = createVoiceSeam({
+      client,
+      player: { play: async () => 'ended', pause() {}, resume() {}, stop() {}, setRate() {} },
+      sleep: async () => {},
+      gapSleep: async () => {},
+      now: () => r.at,
+      after: (ms, run) => {
+        const timer = { ms, due: r.at + ms, run, live: true };
+        r.timers.push(timer);
+        return () => {
+          timer.live = false;
+        };
+      },
+      onStatus: (status) => r.told.push(status),
+    });
+    r.live = () => r.timers.filter((t) => t.live);
+    r.read = () =>
+      new Promise((done) =>
+        r.seam.read({
+          voiceKey: 'article:a1',
+          sentences: S2,
+          press: true,
+          onState: (state, code) =>
+            ['done', 'stopped', 'error'].includes(state) && done(code ? `${state}:${code}` : state),
+        }),
+      );
+    /** The clock moves to the live timer's time and it runs, as the page's clock would run it. */
+    r.fire = (timer) => {
+      r.at = timer.due;
+      timer.live = false;
+      timer.run();
+    };
+    return r;
+  };
+  it('after a per-minute refusal the listener is told at the minute’s end, and nothing is blocked then', async () => {
+    const r = rig();
+    const ended = r.read();
+    await tick(5);
+    r.refuse(0, 'request-rate-limit');
+    expect(await ended).toBe('error:request-rate-limit');
+    expect(r.seam.status().blocked).toBe('request-rate-limit');
+    expect(r.live()).toHaveLength(1);
+    expect(r.live()[0].ms).toBe(60_000);
+    const before = r.told.length;
+    r.fire(r.live()[0]);
+    expect(r.told.length).toBe(before + 1);
+    expect(r.told.at(-1).blocked).toBe(null);
+    expect(r.seam.status().blocked).toBe(null);
+  });
+  it('a second refusal inside the minute moves the timer; it does not add one', async () => {
+    const r = rig();
+    const ended = r.read();
+    await tick(5);
+    expect(r.pending.map((p) => p.text)).toEqual(S2.map((s) => s.text));
+    const t0 = r.at;
+    r.refuse(1, 'request-rate-limit'); // the second sentence, fetched ahead, is refused first
+    await tick(5);
+    expect(r.live()).toHaveLength(1);
+    r.at = t0 + 20_000;
+    r.refuse(0, 'request-rate-limit'); // twenty seconds later the first one is refused too
+    expect(await ended).toBe('error:request-rate-limit');
+    expect(r.live()).toHaveLength(1);
+    expect(r.live()[0].due).toBe(t0 + 80_000);
+    const before = r.told.length;
+    r.fire(r.live()[0]);
+    expect(r.told.length).toBe(before + 1);
+    expect(r.told.at(-1).blocked).toBe(null);
+  });
+  it('today’s limit: the listener is told at the server’s new day (00:00 UTC)', async () => {
+    const r = rig();
+    const ended = r.read();
+    await tick(5);
+    r.refuse(0, 'day-budget');
+    expect(await ended).toBe('error:day-budget');
+    expect(r.live()).toHaveLength(1);
+    expect(r.live()[0].due).toBe(Date.parse('2026-11-13T00:00:00Z'));
+    r.fire(r.live()[0]);
+    expect(r.told.at(-1).blocked).toBe(null);
+  });
+  it('repaired() (the pairing changed) clears it: no timer is left', async () => {
+    const r = rig();
+    const ended = r.read();
+    await tick(5);
+    r.refuse(0, 'request-rate-limit');
+    await ended;
+    expect(r.live()).toHaveLength(1);
+    r.seam.repaired();
+    expect(r.live()).toHaveLength(0);
+  });
+});

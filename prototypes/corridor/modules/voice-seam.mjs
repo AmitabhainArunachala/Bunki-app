@@ -94,6 +94,21 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     limits: limits ? { ...limits } : null,
   });
   const tell = () => { try { onStatus(status()); } catch { /* a listener's own fault */ } };
+  // A wait Settings shows (the minute's, the day's) tells the listeners once when it ends, so a Settings left open shows
+  // the state as it is (the first review's C2). One timer per wait on the page's clock (`after`), moved when the wait is
+  // replaced and cleared when the pairing changes; no polling.
+  const waitTimers = {};
+  function endsLater(code) {
+    waitTimers[code]?.();
+    const fire = () => {
+      const left = blockedUntil[code] - now();
+      if (left > 0) { waitTimers[code] = after(left, fire); return; }
+      waitTimers[code] = null;
+      tell();
+    };
+    waitTimers[code] = after(Math.max(0, blockedUntil[code] - now()), fire);
+  }
+  const clearWaitTimers = () => { for (const code of Object.keys(waitTimers)) { waitTimers[code]?.(); waitTimers[code] = null; } };
 
   /** Why the server is not asked right now, or null when it may be. `press`: his press, which the short wait does not hold. */
   function serverSkips(voiceKey, press = false) {
@@ -112,10 +127,11 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     else if (code === 'budget-exhausted' || code === 'not-in-release') off = code;
     else if (code === 'day-budget') {
       blockedUntil['day-budget'] = (Math.floor(at / DAY) + 1) * DAY;
+      endsLater(code);
       // the line that says so names the server's own day ceiling: its figures are read (free) when it refuses
       void refreshBudget();
     }
-    else if (code === 'request-rate-limit') blockedUntil['request-rate-limit'] = at + 60000;
+    else if (code === 'request-rate-limit') { blockedUntil['request-rate-limit'] = at + 60000; endsLater(code); }
     else if (WAITS.has(code)) {
       // the last cause names the wait
       for (const wait of WAITS) blockedUntil[wait] = 0;
@@ -348,12 +364,45 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     try { quiet(); } catch { /* another lane's fault */ }
     // the queue gives up a sentence still on its way when the read ends (`keep`: after cut(), see join above)
     const owner = { queue: null, stopRecorded, rateRecorded, onSource, ended: false, recordedStops: 0, keep: false };
+    /* A sentence of this read that met the short wait (its own request lost the connection or ran out of time, or the
+     * wait held it back) before the read came to it is held, not failed at once (the re-review's F1, rule 8). When the
+     * read comes to it with no press since, it ends there with that cause, as before; his play on the paused read
+     * (resume with `press`) ends the wait and asks for it again, so the read goes on. */
+    const held = new Map(); // index → { error, sentence, signal, resolve, reject }
+    const fetchOne = (sentence, index, signal) => clipFor(sentence, voiceKey, signal, owner).catch((error) => {
+      const q = owner.queue;
+      if (!WAITS.has(error?.code) || signal.aborted || (q.state === 'loading' && q.index === index)) throw error;
+      return new Promise((resolve, reject) => {
+        const entry = { error, sentence, signal, resolve, reject };
+        held.set(index, entry);
+        signal.addEventListener('abort', () => { if (held.get(index) === entry) held.delete(index); reject(abortError()); }, { once: true });
+      });
+    });
+    /** The read has come to a held sentence: it ends there with its cause (true), as it did before. */
+    const due = () => {
+      const q = owner.queue, entry = held.get(q.index);
+      if (!entry || q.state !== 'loading') return false;
+      held.delete(q.index);
+      entry.reject(entry.error);
+      return true;
+    };
+    /** His press on the paused read: the short wait ends, and the sentences it held back are asked again. */
+    const askAgain = () => {
+      endWaits();
+      for (const [index, entry] of [...held]) {
+        if (index < owner.queue.index) continue;
+        held.delete(index);
+        fetchOne(entry.sentence, index, entry.signal).then(entry.resolve, entry.reject);
+      }
+    };
     const queue = createSpeechQueue({
-      fetchClip: (sentence, _index, signal) => clipFor(sentence, voiceKey, signal, owner),
+      fetchClip: fetchOne,
       player: composite(owner),
       prefetch, gapMs, sleep: gapSleep || sleep,
       onSentence: (index) => { if (session === owner || index < 0) onSentence(index); },
       onState: (state, code) => {
+        // come to a held sentence: the read ends there at once (the next state is its error), as before
+        if (state === 'loading' && due()) return;
         if (['done', 'stopped', 'error'].includes(state)) { owner.ended = true; if (session === owner) session = null; }
         // a pairing the server ended is named so as the tap happens, and reads so afterwards ("pair again", not "not
         // paired": the amendment of 2026-11-14), wherever the tap is shown
@@ -364,13 +413,15 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     owner.queue = queue;
     const controls = {
       pause: () => queue.pause(),
-      resume: () => queue.resume(),
+      /** `press`: his play (the bar, the lock screen, the earphones), which ends the short wait and asks again for what
+       * it held back; a resume nobody pressed goes on as before. */
+      resume: ({ press = false } = {}) => { if (press && !owner.ended && queue.state === 'paused') askAgain(); queue.resume(); },
       stop: () => { queue.stop(); },
       /** The read ends now, as stop() does, but a sentence already asked of the server is still received and kept, so
        * asking for it again plays at once (the ear's own time limit, the review's K3); if nobody else asks for it, its
        * end, whatever it is, is nobody's (the re-check's R1). */
       cut: () => { owner.keep = true; queue.stop(); },
-      jump: (index) => { if (!owner.ended) queue.jump(index); },
+      jump: (index) => { if (!owner.ended) { queue.jump(index); due(); } },
       setRate: (next) => queue.setRate(next),
       get state() { return queue.state; },
       get index() { return queue.index; },
@@ -422,6 +473,6 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     },
     active: () => (session && !session.ended ? session.controls : null),
     /** Pairing changed (paired, or the token was dropped): what was blocked is asked again. */
-    repaired() { pairAgain = false; off = null; silent = null; blockedUntil = { 'day-budget': 0, 'request-rate-limit': 0, 'network-failed': 0, 'voice-timeout': 0 }; tell(); },
+    repaired() { pairAgain = false; off = null; silent = null; blockedUntil = { 'day-budget': 0, 'request-rate-limit': 0, 'network-failed': 0, 'voice-timeout': 0 }; clearWaitTimers(); tell(); },
   };
 }

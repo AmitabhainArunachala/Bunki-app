@@ -557,7 +557,9 @@ export function installVoiceLayer(host) {
         if (state !== 'paused') reader.session.pause();
         // the page may have been drawn again while paused; if it now shows another text, the read starts over on it
         else if (reader.sentences.some(stale) && !remapReader()) { startReader(p, 0, { press: true }); return; }
-        else { prime(); reader.session.resume(); showSentence(reader.session.index); }
+        // his play on the paused read is his press: it ends the short wait after a lost connection or a slow answer, so
+        // the read asks for the sentence it held back and goes on (rule 8; the bar, the lock screen and the earphones)
+        else { prime(); reader.session.resume({ press: true }); showSentence(reader.session.index); }
         barChanged();
         return;
       }
