@@ -355,7 +355,9 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
       onSentence: (index) => { if (session === owner || index < 0) onSentence(index); },
       onState: (state, code) => {
         if (['done', 'stopped', 'error'].includes(state)) { owner.ended = true; if (session === owner) session = null; }
-        if (state === 'error') { silent = { reason: code || 'speak-failed', at: now() }; tell(); }
+        // a pairing the server ended is named so as the tap happens, and reads so afterwards ("pair again", not "not
+        // paired": the amendment of 2026-11-14), wherever the tap is shown
+        if (state === 'error') { silent = { reason: code === 'not-paired' && status().pairAgain ? 'authentication-required' : code || 'speak-failed', at: now() }; tell(); }
         onState(state, code);
       },
     });

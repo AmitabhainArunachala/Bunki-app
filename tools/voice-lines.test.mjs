@@ -151,6 +151,18 @@ describe('every cause, in both languages and both forms, exactly as ruled', () =
     for (const [word, [english, japanese]] of Object.entries(WORDS))
       expect([...lines.VOICE_WORDS[word]]).toEqual([japanese, english]);
   });
+  it('Settings’ last tap names an ended pairing "pair again", and a device never paired "not paired"', () => {
+    expect(
+      lines.VOICE_SETTINGS.lastTap(lines.voiceShortOf('authentication-required'), '10:12'),
+    ).toEqual([
+      '最後のタップ：声なし（再ペアリング、10:12）',
+      'Last tap: no voice (pair again), at 10:12.',
+    ]);
+    expect(lines.VOICE_SETTINGS.lastTap(lines.voiceShortOf('not-paired'), '10:12')).toEqual([
+      '最後のタップ：声なし（未ペアリング、10:12）',
+      'Last tap: no voice (not paired), at 10:12.',
+    ]);
+  });
   it('the ear: its five labels, the short form of the cause inside its no-voice label', () => {
     expect(lines.voiceEarLabel('off')).toEqual(['耳：オフ', 'Ear: off']);
     expect(lines.voiceEarLabel('armed')).toEqual([

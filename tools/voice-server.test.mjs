@@ -817,6 +817,19 @@ describe('the seam: one behaviour per error code, and never a stand-in voice', (
     expect(second.states.at(-1)).toBe('error:not-paired');
     expect(r.calls.speak).toHaveLength(1);
     expect(r.calls.deviceSaid).toHaveLength(0);
+    // the tap is recorded with the cause as it was when it happened: a pairing the server ended, "pair again" on every
+    // surface that names the last tap (Settings' row: the review's B1, the amendment of 2026-11-14)
+    expect(r.seam.status().silent).toMatchObject({ reason: 'authentication-required' });
+  });
+  it('a device never paired: its tap is recorded "not paired", not "pair again"', async () => {
+    const r = rig({ paired: false });
+    const first = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: S3.slice(0, 1),
+      press: true,
+    });
+    expect(first.states.at(-1)).toBe('error:not-paired');
+    expect(r.seam.status()).toMatchObject({ pairAgain: false, silent: { reason: 'not-paired' } });
   });
   it.each([
     ['speech-input-invalid', 400],
