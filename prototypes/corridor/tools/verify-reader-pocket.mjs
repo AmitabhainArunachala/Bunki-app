@@ -54,17 +54,16 @@
  *                  paused again at once; the bar and the lock screen stay paused; nothing is asked; his play goes on there.
  *
  * Fix round 2 (the re-check of b61fa7ce4, 2026-11-12; its F3 and F4):
- *  retry-busy      hidden with timers held, a clip the stand-in never sends in time: the read ends with "voice server
- *                  busy". Inside the server's 15 s wait that follows, the lock screen's play (hidden) and the bar's play
- *                  (shown) fail before they sound and ask nothing: the bar still offers play and its line still says
- *                  "voice server busy" (not "no connection"), and the lock screen keeps the article, paused, with its
- *                  play. Once the wait is over the lock screen's play takes the read up at the sentence it could not get.
+ *  retry-busy      hidden with timers held, a clip the stand-in never sends in time: the read ends with "took too long".
+ *                  Rule 8 (the ruling's amendment, 2026-11-14) replaced this round's refusal: inside the 15 s wait that
+ *                  follows, the lock screen's play (hidden) asks; held past the deadline again, it ends with the same
+ *                  cause, the bar still offers play, and the lock screen keeps the article, paused, with its play. Inside
+ *                  the wait that starts again, the bar's play (shown) asks and takes the read up at that sentence.
  *  retry-lost      hidden with timers held, the connection lost (every speak request fails on the way): the read ends with
- *                  "no connection". The lock screen's play with the connection still gone, and again with it back within
- *                  15 s of the loss: nothing sounds, nothing is asked, the line says "no connection", the lock screen
- *                  keeps the article, paused, with its play. After the wait its play takes the read up there. Then the
- *                  network gone as the browser knows it (offline): the lock screen's play while it is still gone keeps
- *                  the article there in the same way.
+ *                  "no connection". Rule 8: the lock screen's play with the connection still gone asks once, fails on the
+ *                  way, and the lock screen keeps the article, paused, with its play; with the connection back within
+ *                  15 s, its play asks and takes the read up there. Then the network gone as the browser knows it
+ *                  (offline): the lock screen's play while it is still gone keeps the article there in the same way.
  *  recorded-outside the one article with a recording of its own (jawiki:5294446; Chromium, where the recording sounds): its
  *                  recording paused from outside (the read pauses), then that element started from outside (an
  *                  interruption that ends): it is paused again at once and stays still; the bar and the lock screen stay
@@ -395,10 +394,10 @@ async function stillThere(s, title, problems, { label, reasons, asked = null }) 
   if (v.media?.title !== title || v.media?.state !== 'paused' || !v.media?.handlers.includes('play')) problems.push(`${label}: the lock screen lets the article go while the bar still offers play: ${JSON.stringify(v.media)}`);
   return v;
 }
-/** The lock screen's play takes the read up at the sentence it could not get: the one after the last played, in the
- * order the sentences were asked (`where`: the last lit word, how many were lit, the texts played). */
-async function takenUpAt(s, where, problems, label) {
-  await lockPlay(s);
+/** The lock screen's play (or `play`, the bar's) takes the read up at the sentence it could not get: the one after the
+ * last played, in the order the sentences were asked (`where`: the last lit word, how many were lit, the texts played). */
+async function takenUpAt(s, where, problems, label, play = lockPlay) {
+  await play(s);
   const on = await until(s, (v) => v.lit > where.lit && v.litFirst > where.heard, 15000);
   if (!(on.lit > where.lit && on.litFirst > where.heard)) { problems.push(`${label}: the read was not taken up after word ${where.heard}: bar ${on.bar} (${on.silent || 'no reason'}: "${on.note}"), lock screen ${JSON.stringify(on.media)}`); return on; }
   const order = [...new Set((await recordOf(s.page)).asked.map((a) => letters(a.text)))];
@@ -1115,24 +1114,26 @@ const CASES = {
       const where = { heard: end.litFirst, lit: end.lit, played: await playedTexts(s) };
       if (end.bar !== 'idle' || end.silent !== 'voice-timeout' || end.media?.state !== 'paused' || end.media?.title !== title) problems.push(`the case did not reach its point: the read ended with bar ${end.bar} (${end.silent || 'no reason'}), the lock screen ${JSON.stringify(end.media)}`);
       steps.push(`ended at word ${end.litFirst}: bar ${end.bar}, "${end.note}" (${end.silent}), lock screen ${end.media?.state}`);
-      // inside the server's 15 s wait after a slow answer: the lock screen's play (hidden), then the bar's play (shown)
+      // Rule 8 (the ruling's amendment, 2026-11-14) replaces fix round 2's refusal here: inside the server's 15 s wait
+      // after a slow answer his play asks. The lock screen's play (hidden) asks, and that answer is held past the client's
+      // deadline too: it fails again with the same cause, the lock screen keeps the article, and the wait starts again
+      holdNth = fake.speaks().length + 1;
       await lockPlay(s);
-      await wait(1500);
-      let v = await stillThere(s, title, problems, { label: 'the lock screen\'s play inside the wait, hidden', reasons: ['voice-timeout'], asked: end.asked });
-      steps.push(`the lock screen's play inside the wait: bar ${v.bar}, "${v.note}" (${v.silent}), lock screen ${v.media?.state}, ${v.asked - end.asked} asked`);
-      await hide(s, false);
-      await s.press('#listen-toggle');
-      await wait(1500);
-      v = await stillThere(s, title, problems, { label: 'the bar\'s play inside the wait, shown', reasons: ['voice-timeout'], asked: end.asked });
-      steps.push(`the bar's play inside the wait: bar ${v.bar}, "${v.note}" (${v.silent}), lock screen ${v.media?.state}, ${v.asked - end.asked} asked`);
-      if (Date.now() - lostAt > 14000) problems.push(`the case was too slow to press play inside the wait (${Math.round((Date.now() - lostAt) / 1000)} s)`);
-      // the wait over: the lock screen's play takes the read up at the sentence it could not get
+      let v = await until(s, (x) => x.asked > end.asked, 5000);
+      if (v.asked !== end.asked + 1) problems.push(`the lock screen's play inside the wait, hidden: ${v.asked - end.asked} sentence(s) asked, not 1`);
+      await until(s, (x) => x.asked > end.asked && x.bar === 'idle', 40000);
+      const again = Date.now();
+      await wait(400);
+      v = await stillThere(s, title, problems, { label: 'the lock screen\'s play inside the wait, hidden, held past the deadline again', reasons: ['voice-timeout'], asked: end.asked + 1 });
+      steps.push(`the lock screen's play inside the wait: asked ${v.asked - end.asked}, then bar ${v.bar}, "${v.note}" (${v.silent}), lock screen ${v.media?.state}`);
+      if (again - lostAt > 40000) problems.push(`the lock screen's play was not inside the wait (${Math.round((again - lostAt) / 1000)} s)`);
+      // inside the wait that started again: the bar's play (shown) asks, and the read is taken up at the sentence it could
+      // not get
       holdNth = 0;
-      await hide(s, true);
-      await wait(Math.max(0, lostAt + 16000 - Date.now()));
-      const on = await takenUpAt(s, where, problems, 'the lock screen\'s play after the wait');
-      steps.push(`after the wait the lock screen's play: on to word ${on.litFirst} (heard to ${where.heard})`);
       await hide(s, false);
+      const on = await takenUpAt(s, where, problems, 'the bar\'s play inside the wait that started again, shown', (t) => t.press('#listen-toggle'));
+      steps.push(`the bar's play inside the wait: on to word ${on.litFirst} (heard to ${where.heard}), ${on.asked - end.asked} asked in all`);
+      if (Date.now() - again > 14000) problems.push(`the case was too slow to press play inside the wait (${Math.round((Date.now() - again) / 1000)} s)`);
     } catch (error) { problems.push(`the case broke: ${String(error.message).split('\n')[0].slice(0, 200)}`); }
     holdNth = 0; holdFor = 5000;
     if (s.errors.length) problems.push(`page errors: ${s.errors.join(' | ')}`);
@@ -1160,19 +1161,19 @@ const CASES = {
       const where = { heard: end.litFirst, lit: end.lit, played: await playedTexts(s) };
       if (end.bar !== 'idle' || end.silent !== 'network-failed' || end.media?.state !== 'paused' || end.media?.title !== title) problems.push(`the case did not reach its point: the read ended with bar ${end.bar} (${end.silent || 'no reason'}), the lock screen ${JSON.stringify(end.media)}`);
       steps.push(`connection lost: ended at word ${end.litFirst}, "${end.note}" (${end.silent}), lock screen ${end.media?.state}`);
+      // Rule 8 (the ruling's amendment, 2026-11-14) replaces fix round 2's refusal here: inside the 15 s wait after a
+      // lost connection his play asks. With the connection still gone it asks once, fails again on the way, and the lock
+      // screen keeps the article, paused, with its play
       await lockPlay(s);
       await wait(1500);
-      let v = await stillThere(s, title, problems, { label: 'the lock screen\'s play with the connection still gone', reasons: ['network-failed', 'offline'], asked: end.asked });
-      steps.push(`the lock screen's play, the connection still gone: bar ${v.bar}, "${v.note}" (${v.silent}), lock screen ${v.media?.state}, ${v.asked - end.asked} asked`);
+      let v = await stillThere(s, title, problems, { label: 'the lock screen\'s play with the connection still gone', reasons: ['network-failed', 'offline'], asked: end.asked + 1 });
+      steps.push(`the lock screen's play, the connection still gone: asked ${v.asked - end.asked}, bar ${v.bar}, "${v.note}" (${v.silent}), lock screen ${v.media?.state}`);
+      const again = Date.now();
+      // the connection back, within 15 s of that second loss: the lock screen's play asks and takes the read up there
       await s.context.unroute('**/v1/audio/speak', cut);
-      await lockPlay(s);
-      await wait(1500);
-      v = await stillThere(s, title, problems, { label: 'the lock screen\'s play with the connection back, within 15 s of its loss', reasons: ['network-failed'], asked: end.asked });
-      steps.push(`the connection back within 15 s, the lock screen's play: bar ${v.bar}, "${v.note}" (${v.silent}), lock screen ${v.media?.state}, ${v.asked - end.asked} asked`);
-      if (Date.now() - lostAt > 14000) problems.push(`the case was too slow to press play inside the wait (${Math.round((Date.now() - lostAt) / 1000)} s)`);
-      await wait(Math.max(0, lostAt + 16000 - Date.now()));
-      const on = await takenUpAt(s, where, problems, 'the lock screen\'s play after the wait');
-      steps.push(`after the wait the lock screen's play: on to word ${on.litFirst} (heard to ${where.heard})`);
+      const on = await takenUpAt(s, where, problems, 'the lock screen\'s play with the connection back, within 15 s of its loss');
+      steps.push(`the connection back within 15 s, the lock screen's play: on to word ${on.litFirst} (heard to ${where.heard}), ${on.asked - end.asked} asked in all`);
+      if (Date.now() - again > 14000) problems.push(`the case was too slow to press play inside the wait (${Math.round((Date.now() - again) / 1000)} s)`);
       // the network gone as the browser knows it (offline): the read ends; the lock screen's play while it is still gone
       await s.context.setOffline(true);
       await until(s, (x) => x.bar === 'idle', 20000);

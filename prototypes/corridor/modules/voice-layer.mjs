@@ -296,7 +296,8 @@ export function installVoiceLayer(host) {
       if (state === 'loading') next.setAttribute('aria-busy', 'true');
     };
     mine.session = seam.read({
-      sentences, voiceKey, prefetch: single ? 0 : 2, gapMs: single ? 0 : 260, rate: rate ?? reader.rate,
+      // his press asks the voice even inside the short wait after a lost connection or a slow answer (rule 8)
+      sentences, voiceKey, prefetch: single ? 0 : 2, gapMs: single ? 0 : 260, rate: rate ?? reader.rate, press: !automatic,
       // a voice answered: the line an earlier silence left beside the control goes
       onSource: () => { if (mine.over) return; mine.voiced = true; if (standing?.onNote === onNote) dropLine(); else onNote?.('', null); },
       onState: (state, code) => {
@@ -451,7 +452,8 @@ export function installVoiceLayer(host) {
   const EAR_FIRST_CLIP_MS = 8000;
   const readerBusy = () => readerActive() || !!reader.yielding;
   let readSessions = 0;
-  function startReader(p, from = 0) {
+  /** `press`: his play (the bar, the lock screen, the earphones); a read taking itself up again after a word is not. */
+  function startReader(p, from = 0, { press = false } = {}) {
     // his play on a read that ended on a sentence it could not get: should it fail again before it sounds (the server's
     // wait after a slow answer or a lost connection, the network still gone), the lock screen keeps the article, paused,
     // as the bar keeps its play (fix round 2, the re-check's F3)
@@ -472,7 +474,7 @@ export function installVoiceLayer(host) {
     // not get (a read that never found a voice leaves nothing there)
     let voiced = false;
     const session = seam.read({
-      sentences: reader.sentences, voiceKey: voiceKeyOf('article', p.id), from: Math.min(from, reader.sentences.length - 1), rate: reader.rate,
+      sentences: reader.sentences, voiceKey: voiceKeyOf('article', p.id), from: Math.min(from, reader.sentences.length - 1), rate: reader.rate, press,
       stopRecorded: () => host.stopRecorded?.(), rateRecorded: (rate) => host.rateRecorded?.(rate),
       onSentence: (index) => {
         if (reader.owner !== mine) return;
@@ -547,19 +549,19 @@ export function installVoiceLayer(host) {
       if (y) {
         if (y.resume) { y.resume = false; barChanged(); return; }
         reader.yielding = null;
-        startReader(p, y.index);
+        startReader(p, y.index, { press: true });
         return;
       }
       if (reader.pid === p.id && readerActive()) {
         const state = reader.session.state;
         if (state !== 'paused') reader.session.pause();
         // the page may have been drawn again while paused; if it now shows another text, the read starts over on it
-        else if (reader.sentences.some(stale) && !remapReader()) { startReader(p, 0); return; }
+        else if (reader.sentences.some(stale) && !remapReader()) { startReader(p, 0, { press: true }); return; }
         else { prime(); reader.session.resume(); showSentence(reader.session.index); }
         barChanged();
         return;
       }
-      startReader(p, reader.pid === p.id ? reader.index : 0);
+      startReader(p, reader.pid === p.id ? reader.index : 0, { press: true });
     },
     nextRate() {
       reader.rate = READER_RATES[(READER_RATES.indexOf(reader.rate) + 1) % READER_RATES.length];
@@ -929,7 +931,8 @@ export function installVoiceLayer(host) {
   };
   const ear = installEar({
     doc, tx,
-    speak: (unit, done) => {
+    // `press`: a tap the ear reads (armed, held on a phone, Option-click, the 読む chip); a resting pointer is not
+    speak: (unit, done, press = false) => {
       // the ear is a deliberate act: a read of the article yields to it and takes itself up again at the same sentence
       // when the ear's voice ends, as it does for the word box's 音 (John, 2026-11-11: only pause stops a read); a read he
       // had paused yields too and stays paused
@@ -945,7 +948,7 @@ export function installVoiceLayer(host) {
       // arrive and be kept, so the next tap on it plays at once (the review's K3)
       let timedOut = false;
       const limit = view.setTimeout(() => { if (!marker.over && !marker.sounding) { timedOut = true; session.cut(); } }, EAR_FIRST_CLIP_MS);
-      const session = seam.read({ sentences: unit.sentences, voiceKey: unit.voiceKey, prefetch: unit.sentences.length > 1 ? 2 : 0, gapMs: 260, rate: reader.rate,
+      const session = seam.read({ sentences: unit.sentences, voiceKey: unit.voiceKey, prefetch: unit.sentences.length > 1 ? 2 : 0, gapMs: 260, rate: reader.rate, press,
         onState: (now, code) => {
           if (now === 'playing') { marker.sounding = true; view.clearTimeout(limit); }
           if (!['done', 'stopped', 'error'].includes(now)) return;
@@ -966,12 +969,12 @@ export function installVoiceLayer(host) {
     plain: { line: (reason) => silenceLine(reason) },
     // the card audio's switch (Settings, 筆と声): off, the ear draws nothing on text either
     highlight: () => highlighting(),
-    cannot: (unit) => {
-      const why = seam.cannot(unit.voiceKey);
+    cannot: (unit, press = false) => {
+      const why = seam.cannot(unit.voiceKey, null, { press });
       if (!why) return null;
       // a unit whose every sentence this device keeps is a voice to be had, connection or not (the offline clips, B3)
       const all = unit.sentences || [];
-      return all.length && all.every((one) => !seam.cannot(unit.voiceKey, one.text)) ? null : told(why);
+      return all.length && all.every((one) => !seam.cannot(unit.voiceKey, one.text, { press })) ? null : told(why);
     },
     context: () => ({ view: host.view(), keyFor: markKey,
       articleOf: (node) => (host.view() === 'reader' && node?.closest?.('#reader') ? host.passage()?.id || null : null),

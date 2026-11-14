@@ -61,10 +61,13 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
   let session = null;        // the one read that may sound
   let last = { source: 'none', reason: null, at: 0 };   // the last sentence that was spoken
   let silent = null;         // { reason, at }: why the last read ended without a voice; cleared by the next spoken sentence
-  // the 15 s wait after a request that ran out of time or lost the connection keeps its cause's name, so a play inside it
-  // ends with the same reason as the first stop (L1 fix round 2, the re-check's F3); neither is shown as blocked
+  // the 15 s wait after a request that ran out of time or lost the connection keeps its cause's name (L1 fix round 2, the
+  // re-check's F3); neither is shown as blocked. It holds back only what would start by itself: his press ends it and
+  // asks, and a press that fails again starts it again from that failure (the ruling's rule 8, 2026-11-14). The minute's
+  // wait and the day's are the ones a line names, and a press does not end them.
   let blockedUntil = { 'day-budget': 0, 'request-rate-limit': 0, 'network-failed': 0, 'voice-timeout': 0 };
   const WAITS = new Set(['network-failed', 'voice-timeout']);
+  const endWaits = () => { for (const wait of WAITS) blockedUntil[wait] = 0; };
   let off = null;            // 'not-in-release' | 'budget-exhausted' for this page
   let pairAgain = false;
   let budget = null;
@@ -92,13 +95,13 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
   });
   const tell = () => { try { onStatus(status()); } catch { /* a listener's own fault */ } };
 
-  /** Why the server is not asked right now, or null when it may be. */
-  function serverSkips(voiceKey) {
+  /** Why the server is not asked right now, or null when it may be. `press`: his press, which the short wait does not hold. */
+  function serverSkips(voiceKey, press = false) {
     if (!client.configured() || !client.paired()) return 'not-paired';
     if (!isVoiceKey(voiceKey)) return 'not-speakable';
     if (off) return off;
     const at = now();
-    for (const [code, until] of Object.entries(blockedUntil)) if (until > at) return code;
+    for (const [code, until] of Object.entries(blockedUntil)) if (until > at && !(press && WAITS.has(code))) return code;
     if (!online()) return 'offline';
     return null;
   }
@@ -336,9 +339,11 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
 
   /** Read sentences aloud. `sentences` is [{ text, recorded? }]; one read at a time: this one ends whatever was speaking.
    * `onSentence(index)` says which sentence starts; `onSource(source)` then says where it comes from ('recorded' or
-   * 'server'). A read that cannot be voiced ends with onState('error', reason). Returns the read's own controls. */
+   * 'server'). A read that cannot be voiced ends with onState('error', reason). Returns the read's own controls.
+   * `press`: the read is his press (a tap on a voice control, a tap the ear reads, play on the bar or the lock screen),
+   * which ends the short wait after a lost connection or a slow answer and asks; a read that starts by itself does not. */
   function read({ sentences, voiceKey, from = 0, rate = 1, prefetch = 2, gapMs = 260, onSentence = () => {}, onState = () => {},
-    onSource = null, stopRecorded = null, rateRecorded = null } = {}) {
+    onSource = null, stopRecorded = null, rateRecorded = null, press = false } = {}) {
     stop();
     try { quiet(); } catch { /* another lane's fault */ }
     // the queue gives up a sentence still on its way when the read ends (`keep`: after cut(), see join above)
@@ -373,6 +378,7 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     owner.controls = controls;
     session = owner;
     if (!Array.isArray(sentences) || !sentences.length) { owner.ended = true; session = null; onState('error', 'nothing-to-say'); return controls; }
+    if (press) endWaits();
     queue.setRate(SPEEDS.includes(rate) ? rate : 1);
     queue.start(sentences, Math.min(Math.max(0, from | 0), sentences.length - 1));
     return controls;
@@ -400,9 +406,10 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     /** Why a sentence could not be voiced right now ('not-paired', 'offline', 'day-budget', …), or null when the
      * server may be asked. Asking is free: a read that would start by itself looks here first, and when there is no
      * voice to be had it does not start, so it stops no other sound. Given the sentence's `text`, a clip this device
-     * keeps for it is a voice to be had, with or without the server. */
-    cannot: (voiceKey = 'word:bunki', text = null) => {
-      const why = serverSkips(voiceKey);
+     * keeps for it is a voice to be had, with or without the server. `press`: asked for his press, which the short wait
+     * after a lost connection or a slow answer does not hold. */
+    cannot: (voiceKey = 'word:bunki', text = null, { press = false } = {}) => {
+      const why = serverSkips(voiceKey, press);
       if (!why || text == null) return why;
       let normal = '';
       try { normal = normaliseSpeechText(String(text)); } catch { /* not text */ }

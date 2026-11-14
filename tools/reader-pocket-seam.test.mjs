@@ -382,21 +382,25 @@ describe('fix round 2: the wait after a slow server or a lost connection is name
       now: () => r.at,
       online: () => r.online,
     });
-    r.read = () =>
+    // `press`: his play (the bar, the lock screen); without it, a read that starts by itself
+    r.read = ({ press = false } = {}) =>
       new Promise((done) =>
         r.seam.read({
           voiceKey: 'article:a1',
           sentences: [X],
+          press,
           onState: (state, code) =>
             ['done', 'stopped', 'error'].includes(state) && done(code ? `${state}:${code}` : state),
         }),
       );
     return r;
   };
-  it('after a slow server, a play inside its 15 s wait ends at once as that slow server (voice-timeout), asking nothing', async () => {
+  // Rule 8 (the ruling's amendment, 2026-11-14; the review's B2) replaces fix round 2's "a play inside the wait ends with
+  // the same reason as the first stop": the wait holds back only a read that starts by itself; his play asks.
+  it('after a slow server, inside its 15 s wait a read by itself ends at once as that slow server (voice-timeout), asking nothing; his play asks and speaks', async () => {
     const r = rig();
     r.next.push('voice-timeout');
-    expect(await r.read()).toBe('error:voice-timeout');
+    expect(await r.read({ press: true })).toBe('error:voice-timeout');
     expect(r.asked).toHaveLength(1);
     r.at += 3000;
     expect(await r.read()).toBe('error:voice-timeout');
@@ -404,20 +408,26 @@ describe('fix round 2: the wait after a slow server or a lost connection is name
     expect(r.seam.cannot('article:a1')).toBe('voice-timeout');
     // a wait, not a refusal: nothing is shown as blocked
     expect(r.seam.status().blocked).toBe(null);
-    r.at += 12_001;
-    expect(r.seam.cannot('article:a1')).toBe(null);
-    expect(await r.read()).toBe('done');
+    expect(await r.read({ press: true })).toBe('done');
     expect(r.asked).toHaveLength(2);
+    expect(r.seam.cannot('article:a1')).toBe(null);
   });
-  it('after a lost connection, a play inside its 15 s wait ends at once as no connection (network-failed)', async () => {
+  it('after a lost connection, inside its 15 s wait a read by itself ends at once as no connection (network-failed); his play asks, and failing again starts the wait again', async () => {
     const r = rig();
     r.next.push('network-failed');
-    expect(await r.read()).toBe('error:network-failed');
+    expect(await r.read({ press: true })).toBe('error:network-failed');
     r.at += 3000;
     expect(await r.read()).toBe('error:network-failed');
     expect(r.asked).toHaveLength(1);
     expect(r.seam.cannot('article:a1')).toBe('network-failed');
     expect(r.seam.status().blocked).toBe(null);
+    r.next.push('network-failed');
+    expect(await r.read({ press: true })).toBe('error:network-failed');
+    expect(r.asked).toHaveLength(2);
+    r.at += 14_000;
+    expect(r.seam.cannot('article:a1')).toBe('network-failed');
+    r.at += 1_001;
+    expect(r.seam.cannot('article:a1')).toBe(null);
   });
   it('the last cause names the wait: a slow server, then a lost connection, is no connection; the network gone, offline', async () => {
     const r = rig();

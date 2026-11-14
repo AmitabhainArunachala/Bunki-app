@@ -842,21 +842,31 @@ describe('the seam: one behaviour per error code, and never a stand-in voice', (
       expect(r.calls.deviceSaid).toHaveLength(0);
     },
   );
-  it('the server out of reach: silence, and no request for 15 s', async () => {
+  it('the server out of reach: silence; for 15 s a read by itself sends no request, and his press asks (rule 8)', async () => {
     const r = rig();
     r.fail({ code: 'network-failed', status: 0 });
     const first = await run(r.seam, {
       voiceKey: 'article:a1',
       sentences: S3.slice(0, 2),
       prefetch: 0,
+      press: true,
     });
     expect(first.states.at(-1)).toBe('error:network-failed');
-    const second = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+    const second = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(1, 2) });
     expect(second.states.at(-1)).toBe('error:network-failed');
     expect(r.calls.speak).toHaveLength(1);
+    // his press inside the wait asks, and speaks when the voice answers
+    const pressed = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: S3.slice(1, 2),
+      press: true,
+    });
+    expect(pressed.states.at(-1)).toBe('done');
+    expect(r.calls.speak).toHaveLength(2);
     r.advance(16_000);
-    const third = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+    const third = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(2, 3) });
     expect(third.states.at(-1)).toBe('done');
+    expect(r.calls.speak).toHaveLength(3);
     expect(r.calls.deviceSaid).toHaveLength(0);
   });
   it('413 speech-input-too-large: the sentence is split further and its parts are spoken in order', async () => {
@@ -1302,6 +1312,107 @@ describe('a request its only asker gave up on belongs to nobody (the re-check’
     r.asked[1].answer();
     await tick();
     expect(second.states.at(-1)).toBe('done');
+  });
+
+  /* Rule 8 (the ruling's amendment, 2026-11-14; the review's B2): a line that says to tap is true while it is shown. His
+   * press ends the 15 s wait after a lost connection or a slow answer and asks; a read that starts by itself stays held
+   * back; a press that fails again starts the wait again from that failure; the minute's wait is not his to end. */
+  const pressing = (seam, options) => reading(seam, { ...options, press: true });
+  /** A press ended by `code` with someone waiting for it: the 15 s wait begins now. */
+  async function waitAfter(r, code) {
+    const first = pressing(r.seam, { sentences: [X] });
+    await tick();
+    r.asked[0].fail(code);
+    await tick();
+    expect(first.states.at(-1)).toBe(`error:${code}`);
+    expect(r.seam.cannot(KEY)).toBe(code);
+  }
+  it.each(['network-failed', 'voice-timeout'])(
+    'rule 8: after %s, a press at +1 s sends one request and speaks when the voice answers',
+    async (code) => {
+      const r = heldRig();
+      await waitAfter(r, code);
+      r.advance(1000);
+      const press = pressing(r.seam, { sentences: [X] });
+      await tick();
+      expect(r.asked).toHaveLength(2);
+      r.asked[1].answer();
+      await tick();
+      expect(press.states.at(-1)).toBe('done');
+      expect(r.played).toEqual([`${KEY}|${X.text}`]);
+      // it spoke: the wait is over for what follows, a read by itself included
+      expect(r.seam.cannot(KEY)).toBe(null);
+    },
+  );
+  it.each(['network-failed', 'voice-timeout'])(
+    'rule 8: after %s, a read that starts by itself at +1 s sends nothing, and cannot() still names the code',
+    async (code) => {
+      const r = heldRig();
+      await waitAfter(r, code);
+      r.advance(1000);
+      expect(r.seam.cannot(KEY)).toBe(code);
+      expect(r.seam.cannot(KEY, Y.text)).toBe(code);
+      // what the ear asks for a resting pointer (no press) is held back too; for his press it is not
+      expect(r.seam.cannot(KEY, Y.text, { press: false })).toBe(code);
+      expect(r.seam.cannot(KEY, Y.text, { press: true })).toBe(null);
+      const bySelf = reading(r.seam, { sentences: [Y] });
+      await tick();
+      expect(bySelf.states.at(-1)).toBe(`error:${code}`);
+      expect(r.asked).toHaveLength(1);
+    },
+  );
+  it.each(['network-failed', 'voice-timeout'])(
+    'rule 8: after %s, a press at +1 s that fails again ends with the same code, and the wait runs 15 s from that second failure',
+    async (code) => {
+      const r = heldRig();
+      await waitAfter(r, code);
+      r.advance(1000);
+      const press = pressing(r.seam, { sentences: [X] });
+      await tick();
+      expect(r.asked).toHaveLength(2);
+      r.advance(2000);
+      r.asked[1].fail(code);
+      await tick();
+      expect(press.states.at(-1)).toBe(`error:${code}`);
+      expect(r.seam.status().silent).toMatchObject({ reason: code });
+      // 14.9 s after the second failure (17.9 s after the first): a read by itself is still held back; at 15.1 s it is not
+      r.advance(14_900);
+      expect(r.seam.cannot(KEY)).toBe(code);
+      r.advance(200);
+      expect(r.seam.cannot(KEY)).toBe(null);
+    },
+  );
+  it('rule 8: a press does not end the minute’s wait (C7): refused at once, asking nothing', async () => {
+    const r = heldRig();
+    const first = pressing(r.seam, { sentences: [X] });
+    await tick();
+    r.asked[0].fail('request-rate-limit', 429);
+    await tick();
+    expect(first.states.at(-1)).toBe('error:request-rate-limit');
+    r.advance(1000);
+    expect(r.seam.cannot(KEY, null, { press: true })).toBe('request-rate-limit');
+    const press = pressing(r.seam, { sentences: [X] });
+    await tick();
+    expect(press.states.at(-1)).toBe('error:request-rate-limit');
+    expect(r.asked).toHaveLength(1);
+  });
+  it('rule 8: inside the wait, a second ask for a sentence still on its way joins it: no second request, and it plays when it arrives', async () => {
+    const r = heldRig();
+    await waitAfter(r, 'network-failed');
+    r.advance(1000);
+    // the ear's press, cut by its own time limit while the sentence is on its way (the request runs on, kept)
+    const ear = pressing(r.seam, { sentences: [X] });
+    await tick();
+    expect(r.asked).toHaveLength(2);
+    ear.session.cut();
+    await tick();
+    const again = pressing(r.seam, { sentences: [X] });
+    await tick();
+    expect(r.asked).toHaveLength(2);
+    r.asked[1].answer();
+    await tick();
+    expect(again.states.at(-1)).toBe('done');
+    expect(r.played).toEqual([`${KEY}|${X.text}`]);
   });
 });
 

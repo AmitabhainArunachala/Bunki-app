@@ -86,6 +86,55 @@ const A = unit('雨');
 const B = unit('晴れ');
 
 describe('a. the ear’s state machine', () => {
+  it('a tap the ear reads is his press; a resting pointer is not (rule 8: his press asks even inside the short wait)', () => {
+    const asked = [];
+    const spoken = [];
+    const machine = createEarMachine({
+      speak: (u, done, press) => {
+        spoken.push([u.key, press]);
+        return { stop() {} };
+      },
+      // inside the wait after a lost connection: no voice for a read by itself, his press asks
+      cannot: (u, press) => {
+        asked.push([u.key, press]);
+        return press ? null : 'network-failed';
+      },
+      schedule: (fn, ms) => {
+        const timer = { fn, ms, live: true };
+        timers.push(timer);
+        return timer;
+      },
+      cancel: (timer) => {
+        if (timer) timer.live = false;
+      },
+    });
+    const timers = [];
+    machine.tapEar();
+    machine.click({ unit: A, pointer: 'mouse' });
+    machine.click({ unit: B, pointer: 'mouse', alt: true });
+    machine.speakNow(unit('読む'));
+    machine.holdEar();
+    machine.click({ unit: unit('指'), pointer: 'touch' });
+    machine.hover({ unit: unit('休'), pointer: 'mouse' });
+    // the pointer rests there for its 0.4 s
+    for (const timer of timers.filter((t) => t.live && t.ms === ear.REST_MS)) timer.fn();
+    expect(asked).toEqual([
+      ['雨', true],
+      ['晴れ', true],
+      ['読む', true],
+      ['指', true],
+      ['休', false],
+    ]);
+    expect(spoken).toEqual([
+      ['雨', true],
+      ['晴れ', true],
+      ['読む', true],
+      ['指', true],
+    ]);
+    expect(machine.display()).toBe('novoice');
+    expect(machine.reason()).toBe('network-failed');
+  });
+
   it('rests off; one tap arms it, another tap rests it', () => {
     const { machine } = rig();
     expect(machine.display()).toBe('off');

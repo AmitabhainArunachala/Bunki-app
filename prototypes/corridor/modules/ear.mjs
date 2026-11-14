@@ -63,12 +63,13 @@ export function createEarMachine({ speak, cannot = () => null, schedule = (fn, m
     current = null;
     if (was && !was.ended) { was.ended = true; try { was.handle?.stop?.(); } catch { /* already gone */ } }
   }
-  /** One sound at a time: whatever the ear was saying ends, then this unit is asked for, or the ear is struck. */
-  function start(unit) {
+  /** One sound at a time: whatever the ear was saying ends, then this unit is asked for, or the ear is struck. `press`: a
+   * tap the ear reads (not a resting pointer), which the short wait after a lost connection or a slow answer does not hold. */
+  function start(unit, press = false) {
     stopCurrent();
     clearNoVoice();
     let why = null;
-    try { why = cannot(unit); } catch { why = 'speak-failed'; }
+    try { why = cannot(unit, press); } catch { why = 'speak-failed'; }
     if (why) { strike(why); changed(); return; }
     const mine = { key: unit.key, handle: null, ended: false };
     current = mine;
@@ -79,7 +80,7 @@ export function createEarMachine({ speak, cannot = () => null, schedule = (fn, m
       if (outcome === 'error' && reason && !QUIET_ENDS.has(reason)) strike(reason);
       changed();
     };
-    try { mine.handle = speak(unit, done); } catch { done('error', 'speak-failed'); return; }
+    try { mine.handle = speak(unit, done, press); } catch { done('error', 'speak-failed'); return; }
     changed();
   }
   const speakingNow = () => (current && !current.ended ? current : null);
@@ -126,9 +127,9 @@ export function createEarMachine({ speak, cannot = () => null, schedule = (fn, m
       const appTap = mode === 'held' && touch && !alt && (control || !!unit.front);
       const now = speakingNow();
       if (now && now.key === unit.key && mode !== 'armed' && !appTap) { if (!dry) { stopCurrent(); changed(); } return 'consume'; }
-      if (mode === 'armed') { if (!dry) { mode = 'off'; start(unit); } return 'consume'; }
-      if (mode === 'held' && touch && !appTap) { if (!dry) start(unit); return 'consume'; }
-      if (alt) { if (!dry) start(unit); return 'consume'; }
+      if (mode === 'armed') { if (!dry) { mode = 'off'; start(unit, true); } return 'consume'; }
+      if (mode === 'held' && touch && !appTap) { if (!dry) start(unit, true); return 'consume'; }
+      if (alt) { if (!dry) start(unit, true); return 'consume'; }
       // a click is not a rest: the rest it lands in asks nothing (the app is about to act on that click)
       if (!dry && mode === 'held' && rest && !rest.asked) { cancel(rest.timer); rest.timer = null; rest.asked = true; }
       return 'pass';
@@ -152,7 +153,7 @@ export function createEarMachine({ speak, cannot = () => null, schedule = (fn, m
       rest = mine;
     },
     /** The 読む chip: a selection, read now, whatever the ear's state. */
-    speakNow(unit) { if (unit) start(unit); },
+    speakNow(unit) { if (unit) start(unit, true); },
     /** The screen changed, or the app stopped every sound: the ear's read ends; its mode stays. */
     stop() { stopCurrent(); clearRest(); changed(); },
     /** A screen with no mark to turn the ear off: the ear rests off, silently (no struck line); a voice speaking goes on. */
@@ -1081,13 +1082,13 @@ export function installEar({ doc, tx, speak, cannot, context = () => ({}), plain
   let askedLast = null;
   let chipEl = null; // the 読む chip (made below)
   const machine = createEarMachine({
-    speak: (unit, done) => {
+    speak: (unit, done, press) => {
       speakingUnit = unit;
-      return speak(unit, (outcome, reason) => { if (speakingUnit === unit) speakingUnit = null; done(outcome, reason); });
+      return speak(unit, (outcome, reason) => { if (speakingUnit === unit) speakingUnit = null; done(outcome, reason); }, press);
     },
     // every read starts here: the unit last asked for is where a line that names no voice belongs, when it is not under
     // a mark (asked by 読む, or where no mark is shown: a study card)
-    cannot: (unit) => { askedLast = unit; return cannot(unit); },
+    cannot: (unit, press) => { askedLast = unit; return cannot(unit, press); },
     schedule: (fn, ms) => view.setTimeout(fn, ms),
     cancel: (timer) => view.clearTimeout(timer),
     onChange: () => paint(),
