@@ -426,6 +426,122 @@ describe('the client speaks the contract', () => {
     expect(c.paired()).toBe(false);
     expect(await store.read()).toMatchObject({ server: fake.origin, token: null, scope: null });
   });
+
+  /* A pairing the server ended reads "ended" after a reload (the first review's C1). The device keeps a plain marker of
+   * it beside where the pairing was kept, under a key of its own; a fresh page reads it. The stand-in below keeps rows by
+   * key as the device store keeps them in IndexedDB (`speak`, `server`, and now `ended`). */
+  const durableStore = () => {
+    const rows = new Map();
+    return {
+      rows,
+      durable: true,
+      async read() {
+        const speak = rows.get('speak');
+        return {
+          server: rows.get('server') ?? null,
+          token: speak?.token ?? null,
+          scope: speak ? { ...speak.scope } : null,
+          ended: rows.get('ended') ?? null,
+        };
+      },
+      async write(value) {
+        rows.set('speak', { token: value.token, scope: { ...value.scope } });
+        rows.set('server', value.server);
+        rows.delete('ended');
+      },
+      async clear() {
+        rows.delete('speak');
+        rows.delete('ended');
+      },
+      async end(marker) {
+        rows.delete('speak');
+        rows.set('ended', marker);
+      },
+    };
+  };
+  const revoked = async (c) => {
+    fake.revokeAll();
+    await expect(
+      c.speak({ text: '雨の日は本を読む。', voiceKey: 'article:a1' }),
+    ).rejects.toMatchObject({ code: 'authentication-required', status: 401 });
+  };
+  const quiet = { play: async () => 'ended', pause() {}, resume() {}, stop() {}, setRate() {} };
+  it('a 401 keeps a plain marker and drops the token; a new page over the same store reads the pairing as ended', async () => {
+    const store = durableStore();
+    const c = await paired(store);
+    const token = store.rows.get('speak').token;
+    const { learner, installation } = c.scope();
+    await revoked(c);
+    expect(c.ended()).toBe(true);
+    expect(store.rows.has('speak')).toBe(false);
+    const marker = store.rows.get('ended');
+    // that the pairing ended, and when: never the token, the learner, the installation or the server's address
+    expect(Object.keys(marker).sort()).toEqual(['at', 'ended']);
+    expect(marker.ended).toBe(true);
+    expect(Number.isFinite(marker.at)).toBe(true);
+    const text = JSON.stringify(marker);
+    for (const secret of [token, learner, installation, fake.origin])
+      expect(text).not.toContain(secret);
+    const reloaded = client(store);
+    await reloaded.ready();
+    expect(reloaded.paired()).toBe(false);
+    expect(reloaded.ended()).toBe(true);
+    // Settings, every tap and the bar read the seam's status: "pair again", not "not paired"
+    expect(createVoiceSeam({ client: reloaded, player: quiet }).status().pairAgain).toBe(true);
+  });
+  it('pairing again clears the marker: paired, and paired after a reload', async () => {
+    const store = durableStore();
+    await revoked(await paired(store));
+    const reloaded = client(store);
+    await reloaded.ready();
+    expect(reloaded.ended()).toBe(true);
+    const answer = await reloaded.pair({
+      code: fake.issue({ learner: 'test-learner' }),
+      learner: 'test-learner',
+    });
+    expect(answer.ok).toBe(true);
+    expect(reloaded.ended()).toBe(false);
+    expect(store.rows.has('ended')).toBe(false);
+    const again = client(store);
+    await again.ready();
+    expect(again.paired()).toBe(true);
+    expect(again.ended()).toBe(false);
+  });
+  it('a pairing he removed himself, and a device never paired, read not paired (C1)', async () => {
+    const store = durableStore();
+    const c = await paired(store);
+    await c.forget();
+    const reloaded = client(store);
+    await reloaded.ready();
+    expect(reloaded.ended()).toBe(false);
+    expect(createVoiceSeam({ client: reloaded, player: quiet }).status().pairAgain).toBe(false);
+    const never = client(durableStore());
+    await never.ready();
+    expect(never.ended()).toBe(false);
+  });
+  it('a device that cannot keep its pairing (durable false) keeps no marker either', async () => {
+    const store = createMemoryTokenStore();
+    const c = await paired(store);
+    await revoked(c);
+    expect(c.ended()).toBe(true); // this page knows
+    expect((await store.read()).ended ?? null).toBe(null);
+    const reloaded = client(store);
+    await reloaded.ready();
+    expect(reloaded.ended()).toBe(false);
+  });
+  it('a store that throws costs nothing: the page works, pairs for itself, and a fresh page reads not paired', async () => {
+    const broken = () => Promise.reject(new Error('storage refused'));
+    const store = { durable: true, read: broken, write: broken, clear: broken, end: broken };
+    const c = await paired(store);
+    expect(c.paired()).toBe(true);
+    await revoked(c);
+    expect(c.ended()).toBe(true);
+    const reloaded = client(store);
+    await reloaded.ready();
+    expect(reloaded.paired()).toBe(false);
+    expect(reloaded.ended()).toBe(false);
+    expect(createVoiceSeam({ client: reloaded, player: quiet }).status().pairAgain).toBe(false);
+  });
   it('a stop aborts the request and is not an error code', async () => {
     const c = await paired();
     const controller = new AbortController();

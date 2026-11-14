@@ -77,25 +77,34 @@ export function parsePairing(input) {
 }
 
 /** A store that lasts as long as the page: for tests, and for a browser that offers nothing better.
- * read() answers { server, token, scope } with nulls for what is not kept; clear() drops the token and keeps the address. */
+ * read() answers { server, token, scope, ended } with nulls for what is not kept; write() keeps a pairing; clear() drops
+ * the token (he removed it) and keeps the address; end(marker) drops the token because the server ended the pairing and
+ * keeps `marker` ({ ended: true, at }) where a store can keep it. This one cannot keep a pairing past the page
+ * (durable false), so it keeps no marker either: the client knows it for this page only. */
 export function createMemoryTokenStore() {
   let kept = { server: null, token: null, scope: null };
   return {
     durable: false,
-    async read() { return { server: kept.server, token: kept.token, scope: kept.scope ? { ...kept.scope } : null }; },
+    async read() { return { server: kept.server, token: kept.token, scope: kept.scope ? { ...kept.scope } : null, ended: null }; },
     async write(value) { kept = { server: value.server, token: value.token, scope: { ...value.scope } }; },
     async clear() { kept = { server: kept.server, token: null, scope: null }; },
+    async end() { kept = { server: kept.server, token: null, scope: null }; },
   };
 }
 
 /** The device store: IndexedDB database `bunki-voice`, the token encrypted with a non-extractable AES-GCM key that is
  * kept beside it. Another page of this origin could still use it; a copy of the stored bytes alone cannot. The server's
- * address is kept in the same place, in the clear: it is an address, not a credential. */
+ * address is kept in the same place, in the clear: it is an address, not a credential.
+ * A pairing the server ended (a 401) leaves a plain marker under a key of its own, `ended`: { ended: true, at } and
+ * nothing else (never the token, the learner, the installation or the address). A fresh page reads it, so the cause
+ * still reads "pair again"; pairing again or his own removal deletes it. An older build reads only `speak` and
+ * `server`, so it neither trips on the marker nor loses anything. */
 export function createDeviceTokenStore(env = globalThis) {
   const idb = env.indexedDB, subtle = env.crypto?.subtle;
   const memory = createMemoryTokenStore();
   if (!idb || !subtle || typeof env.crypto.getRandomValues !== 'function') return memory;
-  const NAME = 'bunki-voice', STORE = 'pairing', KEY = 'speak', ADDRESS = 'server';
+  const NAME = 'bunki-voice', STORE = 'pairing', KEY = 'speak', ADDRESS = 'server', ENDED = 'ended';
+  const markerOf = (row) => (row && row.ended === true && Number.isFinite(row.at) ? { ended: true, at: row.at } : null);
   const open = () => new Promise((resolve, reject) => {
     const request = idb.open(NAME, 1);
     request.onupgradeneeded = () => { if (!request.result.objectStoreNames.contains(STORE)) request.result.createObjectStore(STORE); };
@@ -121,12 +130,12 @@ export function createDeviceTokenStore(env = globalThis) {
       if (broken) return memory.read();
       try {
         // a device that was never paired keeps nothing, not even an empty database (where the browser can tell)
-        if (typeof idb.databases === 'function' && !(await idb.databases()).some((db) => db.name === NAME)) return { server: null, token: null, scope: null };
-        const [row, server] = await run('readonly', (store) => [store.get(KEY), store.get(ADDRESS)]);
+        if (typeof idb.databases === 'function' && !(await idb.databases()).some((db) => db.name === NAME)) return { server: null, token: null, scope: null, ended: null };
+        const [row, server, ended] = await run('readonly', (store) => [store.get(KEY), store.get(ADDRESS), store.get(ENDED)]);
         const address = typeof server === 'string' ? server : null;
-        if (!row) return { server: address, token: null, scope: null };
+        if (!row) return { server: address, token: null, scope: null, ended: markerOf(ended) };
         const plain = await subtle.decrypt({ name: 'AES-GCM', iv: row.iv }, row.key, row.data);
-        return { server: address, token: new TextDecoder().decode(plain), scope: { ...row.scope } };
+        return { server: address, token: new TextDecoder().decode(plain), scope: { ...row.scope }, ended: null };
       } catch { broken = true; return memory.read(); }
     },
     async write(value) {
@@ -135,7 +144,7 @@ export function createDeviceTokenStore(env = globalThis) {
           const key = await subtle.generateKey({ name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
           const iv = env.crypto.getRandomValues(new Uint8Array(12));
           const data = await subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(value.token));
-          await run('readwrite', (store) => [store.put({ key, iv, data, scope: { ...value.scope } }, KEY), store.put(value.server, ADDRESS)]);
+          await run('readwrite', (store) => [store.put({ key, iv, data, scope: { ...value.scope } }, KEY), store.put(value.server, ADDRESS), store.delete(ENDED)]);
           return;
         } catch { broken = true; }
       }
@@ -144,7 +153,15 @@ export function createDeviceTokenStore(env = globalThis) {
     async clear() {
       await memory.clear();
       if (broken) return;
-      try { await run('readwrite', (store) => store.delete(KEY)); } catch { broken = true; }
+      try { await run('readwrite', (store) => [store.delete(KEY), store.delete(ENDED)]); } catch { broken = true; }
+    },
+    /** The server ended the pairing: the token goes and the plain marker stays in its place, in one step. A store that
+     * could not keep the pairing keeps no marker either. */
+    async end(marker) {
+      await memory.end();
+      if (broken) return;
+      const kept = markerOf(marker);
+      try { await run('readwrite', (store) => (kept ? [store.delete(KEY), store.put(kept, ENDED)] : [store.delete(KEY)])); } catch { broken = true; }
     },
   };
 }
@@ -156,6 +173,10 @@ export function createVoiceClient({ fetch: fetchFn = globalThis.fetch?.bind(glob
   let server = '';  // the voice server's origin, once a pairing line has brought it
   let pairing;      // undefined = not read yet · null = unpaired · { token, scope }
   let reading = null;
+  // the server ended the pairing (a 401), whoever asked: the dropped token keeps its reason until a new pairing, so a
+  // later tap and Settings say "the voice server ended this pairing", not "not paired" (the combine's I13); a device
+  // that keeps its pairing keeps that too, as a plain marker, so a fresh page says so as well (the first review's C1)
+  let ended = false;
   const ready = () => {
     if (pairing !== undefined) return Promise.resolve();
     reading ||= Promise.resolve().then(() => store.read()).catch(() => null).then((kept) => {
@@ -163,14 +184,20 @@ export function createVoiceClient({ fetch: fetchFn = globalThis.fetch?.bind(glob
       server = isVoiceServer(kept?.server) ? kept.server : '';
       pairing = server && TOKEN.test(kept?.token || '') && INSTALLATION.test(kept?.scope?.installation || '')
         ? { token: kept.token, scope: kept.scope } : null;
+      if (!pairing && kept?.ended?.ended === true) ended = true;
     });
     return reading;
   };
-  const forget = async () => { pairing = null; try { await store.clear(); } catch { /* nothing kept */ } };
-  // the server ended the pairing (a 401), whoever asked: the dropped token keeps its reason until a new pairing, so a
-  // later tap and Settings say "the voice server ended this pairing", not "not paired" (the combine's I13)
-  let ended = false;
-  const endedByServer = async () => { ended = true; await forget(); };
+  /** He removes the pairing himself: not paired (C1), and no marker of an ended pairing is left. */
+  const forget = async () => { pairing = null; ended = false; try { await store.clear(); } catch { /* nothing kept */ } };
+  const endedByServer = async () => {
+    pairing = null;
+    ended = true;
+    // that it ended, and when: nothing else (never the token, the learner, the installation or the address)
+    // (a device that could not keep its pairing keeps no marker either)
+    const keeps = store.durable !== false && typeof store.end === 'function';
+    try { await (keeps ? store.end({ ended: true, at: Date.now() }) : store.clear()); } catch { /* this page knows */ }
+  };
 
   /** One request with the client's own deadline; a caller's stop is an AbortError, never an error code. */
   async function ask(origin, path, init, signal) {
