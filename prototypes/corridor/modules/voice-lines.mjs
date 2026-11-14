@@ -109,10 +109,13 @@ const VOICE_WORDS = Object.freeze({
   earSpeaking: voiceLinePair('耳：読み上げ中', 'Ear: speaking'),
   speed: voiceLinePair('読む速さ', 'Reading speed'),
   selection: voiceLinePair('選んだ日本語を読む', 'Read the selected Japanese'),
-  speakOnReveal: voiceLinePair('答えを表示したら読み上げる', 'Say answers aloud when shown'),
+  // Bunki's own row (the ruling's amendment, 2026-11-14): in Bunki the one switch also covers an opened word (corridor.js,
+  // WORD_VOICE), so Nihongo Study's "Say answers aloud when shown" would be untrue here; the budget line stands beside it
+  speakOnReveal: voiceLinePair('答えと開いた語を読み上げる', 'Say answers and opened words aloud'),
 });
-/** The ear's title while it is off: its state, then how it is used. */
-const VOICE_EAR_HELP = voiceLinePair('耳：オフ — タップで次のタップを読み上げます。長押しでずっと読み上げます', 'Ear: off — tap: reads your next tap. Hold: keeps reading');
+/** The ear's title while it is off: its state, then how it is used, true on a Mac (a held ear reads what the pointer rests
+ * on) and on a phone (it reads every tap). */
+const VOICE_EAR_HELP = voiceLinePair('耳：オフ。タップ：次にタップした日本語を読み上げます。長押し：耳をオンのままにします。', 'Ear: off. Tap: reads the next Japanese you tap. Hold: keeps the ear on.');
 const VOICE_EAR_STATE = Object.freeze({ off: 'earOff', armed: 'earArmed', held: 'earHeld', speaking: 'earSpeaking' });
 /** The ear's label for its state, as [ja, en]; with no voice, the short form of the cause. */
 function voiceEarLabel(state, code = null) {

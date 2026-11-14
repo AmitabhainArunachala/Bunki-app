@@ -428,7 +428,7 @@ test('speak on reveal is on unless he turned it off, and an Off stored tonight s
   fresh.sandbox.write('on');
   assert.equal(fresh.kept.get(KEY), 'on');
   assert.equal(fresh.sandbox.read(), 'on');
-  // the row in Settings is named in the one vocabulary's words, as in Nihongo Study
+  // the row in Settings is named in the one vocabulary's words for Bunki's switch, which also covers an opened word
   const settings = readFileSync(
     new URL('../prototypes/corridor/modules/learner.mjs', import.meta.url),
     'utf8',
@@ -436,6 +436,6 @@ test('speak on reveal is on unless he turned it off, and an Off stored tonight s
   assert.match(settings, /row\('settings-voice', \.\.\.VOICE_WORDS\.speakOnReveal,/u);
   assert.deepEqual(
     [...VOICE_WORDS.speakOnReveal],
-    ['答えを表示したら読み上げる', 'Say answers aloud when shown'],
+    ['答えと開いた語を読み上げる', 'Say answers and opened words aloud'],
   );
 });

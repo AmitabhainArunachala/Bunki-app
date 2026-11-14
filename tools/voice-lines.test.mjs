@@ -133,7 +133,8 @@ const WORDS = {
   earSpeaking: ['Ear: speaking', '耳：読み上げ中'],
   speed: ['Reading speed', '読む速さ'],
   selection: ['Read the selected Japanese', '選んだ日本語を読む'],
-  speakOnReveal: ['Say answers aloud when shown', '答えを表示したら読み上げる'],
+  // Bunki's switch also covers an opened word (the ruling's amendment, 2026-11-14)
+  speakOnReveal: ['Say answers and opened words aloud', '答えと開いた語を読み上げる'],
 };
 
 describe('every cause, in both languages and both forms, exactly as ruled', () => {
@@ -150,6 +151,12 @@ describe('every cause, in both languages and both forms, exactly as ruled', () =
   it('the state words', () => {
     for (const [word, [english, japanese]] of Object.entries(WORDS))
       expect([...lines.VOICE_WORDS[word]]).toEqual([japanese, english]);
+  });
+  it('the ear’s tooltip while it is off (the ruling’s amendment, 2026-11-14)', () => {
+    expect([...lines.VOICE_EAR_HELP]).toEqual([
+      '耳：オフ。タップ：次にタップした日本語を読み上げます。長押し：耳をオンのままにします。',
+      'Ear: off. Tap: reads the next Japanese you tap. Hold: keeps the ear on.',
+    ]);
   });
   it('Settings’ last tap names an ended pairing "pair again", and a device never paired "not paired"', () => {
     expect(

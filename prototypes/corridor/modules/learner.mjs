@@ -692,7 +692,7 @@ function renderWritingChoice() {
       [['first', '初めての語', 'First meeting'], ['always', 'いつも', 'Always'], ['never', '書かない', 'Never']],
       wordBrush(), (value) => setWordPref(WORD_BRUSH_KEY, 'wordBrush', WORD_BRUSH, value)),
     // on unless he turns it off (John, 2026-11-10: "on reveal"): an answer shown and an opened word say themselves once
-    // (corridor.js, WORD_VOICE); the row is named in the one vocabulary's words, as in Nihongo Study
+    // (corridor.js, WORD_VOICE); the row is named in the one vocabulary's words for Bunki, where it covers both
     row('settings-voice', ...VOICE_WORDS.speakOnReveal,
       [['on', 'オン', 'On'], ['off', 'オフ', 'Off']],
       wordVoice(), (value) => setWordPref(WORD_VOICE_KEY, 'wordVoice', WORD_VOICE, value)),
