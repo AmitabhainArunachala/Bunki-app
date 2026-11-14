@@ -22,6 +22,31 @@
     <meta name="theme-color" content="#fcfbf8" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <!-- BEGIN look-before-first-paint -->
+    <!-- The stored look goes on the html element before anything paints. corridor.js sets it again at the
+         end of boot() (setKairoTheme(themeId())), after the record has opened; until then every load painted
+         the bare default, 藍. These lines do what themeId() and the first lines of setKairoTheme do, and they
+         write nothing to storage. The two lists follow THEME_UI and setKairoTheme in corridor.js:
+         tools/look-before-first-paint.test.mjs fails when they differ. -->
+    <script>
+      (function () {
+        var ids = ['hokusai', 'sumi', 'shu', 'akafuji', 'iwa', 'rokusho', 'yoru', 'nami', 'keyblock', 'hakuu', 'kaku'];
+        var night = ['rokusho', 'yoru', 'nami', 'hakuu', 'kaku'];
+        var id = '';
+        try { id = localStorage.getItem('kairo-theme') || ''; } catch (e) { id = ''; }
+        if (ids.indexOf(id) < 0) {
+          id = 'hokusai';
+          try { if (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) id = 'yoru'; } catch (e) { /* no matchMedia */ }
+        }
+        var root = document.documentElement;
+        var dark = night.indexOf(id) >= 0;
+        root.setAttribute('data-theme', id === 'hokusai' ? '' : id);
+        root.style.colorScheme = dark ? 'dark' : 'light';
+        var meta = document.querySelector('meta[name="color-scheme"]');
+        if (meta) meta.setAttribute('content', dark ? 'dark' : 'light');
+      })();
+    </script>
+    <!-- END look-before-first-paint -->
     <!-- ZEN-DOJO v2 type (operator, 2026-08-20): Shippori Mincho B1 for the
          card's word (the oldstyle metal-type revival — Android has no system
          mincho at all), Yuji Syuku (real shodō hand) for the kana reading,
