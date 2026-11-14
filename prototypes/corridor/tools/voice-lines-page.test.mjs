@@ -17,7 +17,7 @@ import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { startFakeVoiceServer } from './fake-voice-server.mjs';
-import { VOICE_WORDS, voiceEarLabel, voiceLineOf } from '../modules/voice-lines.mjs';
+import { VOICE_LINE_STANDS_MS, VOICE_WORDS, voiceEarLabel, voiceLineOf } from '../modules/voice-lines.mjs';
 
 const CORRIDOR = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const { chromium } = createRequire(join(CORRIDOR, '../../package.json'))('playwright-core');
@@ -98,25 +98,36 @@ async function settled(page) {
 /** The line beside the mark, or null. */
 const lineBeside = (sel) => { const next = document.querySelector(sel)?.nextElementSibling; return next?.classList.contains('voice-note') && next.textContent ? next.textContent : null; };
 const until = (page, read, arg, ms = 60000) => page.waitForFunction(read, arg, { timeout: ms, polling: 50 }).then((handle) => handle.jsonValue());
-/** How long the line stood, in ms, timed in the page from when it was first seen. */
-const stood = (page) => page.evaluate(async (sel) => {
-  const read = () => { const next = document.querySelector(sel)?.nextElementSibling; return next?.classList.contains('voice-note') && next.textContent; };
-  const from = performance.now();
-  while (read() && performance.now() - from < 15000) await new Promise((done) => setTimeout(done, 50));
-  return Math.round(performance.now() - from);
+/** The page stamps, on its own clock, when a line comes to stand beside the mark and when it goes. Set up before the
+ * press, so the time the test takes to look (long on a slow runner) is never part of what is measured (the review's C14). */
+const watchLine = (page) => page.evaluate((sel) => {
+  const stamps = { shown: null, gone: null };
+  globalThis.__lineStamps = stamps;
+  const standing = () => { const next = document.querySelector(sel)?.nextElementSibling; return !!(next?.classList.contains('voice-note') && next.textContent); };
+  const seen = new MutationObserver(() => {
+    const now = standing();
+    if (now && stamps.shown === null) stamps.shown = performance.now();
+    else if (!now && stamps.shown !== null && stamps.gone === null) { stamps.gone = performance.now(); seen.disconnect(); }
+  });
+  seen.observe(document.body, { childList: true, subtree: true, characterData: true });
 }, MARK);
 
 test('a busy voice (503) is said beside the mark in the ruled words, as its title too, and the line goes after about four seconds', async () => {
   const page = await open(WORD, MARK);
   fake.clearNext();
   fake.failNext({ status: 503, error: 'voice-unavailable' }, { status: 503, error: 'voice-unavailable' });
+  await watchLine(page);
   await page.locator(MARK).click();
   const seen = await until(page, lineBeside, MARK);
   assert.equal(seen, en(voiceLineOf('voice-unavailable')));
   assert.equal(await page.locator(MARK).getAttribute('title'), seen);
   assert.notEqual(seen, en(voiceLineOf('voice-timeout')), 'busy is not "took too long"');
-  const ms = await stood(page);
-  assert.ok(ms >= 2500 && ms <= 9000, `the line stood ${ms} ms (about four seconds; the first look came after it appeared)`);
+  // how long it stood, from the page's own stamps: at least the ruled time (less a little for the timer), and gone well
+  // within a bound generous enough for a slow runner
+  const { shown, gone } = await until(page, () => (globalThis.__lineStamps?.gone != null ? globalThis.__lineStamps : null), null, 60000);
+  const ms = Math.round(gone - shown);
+  assert.ok(ms >= VOICE_LINE_STANDS_MS - 200, `the line stood ${ms} ms, under the ruled ${VOICE_LINE_STANDS_MS} ms`);
+  assert.ok(ms <= VOICE_LINE_STANDS_MS + 11000, `the line stood ${ms} ms, far past the ruled ${VOICE_LINE_STANDS_MS} ms`);
   // and the mark is called by its name again
   assert.equal(await page.locator(MARK).getAttribute('title'), en(VOICE_WORDS.listen));
   assert.deepEqual(page.errors, []);
