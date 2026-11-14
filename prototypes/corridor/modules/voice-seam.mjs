@@ -280,6 +280,9 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     if (kept) return kept;
     for (;;) {
       aborted(signal);
+      // a read that has ended at a sentence it held (`due`, in read) asks nothing more: what its queue asked for in that
+      // same turn is given up here, before it leaves, as the queue's own abort did when the sentence had failed at once
+      if (owner.over) throw abortError();
       // a sentence this page already holds never needs the server: a block on the server (a refusal of another turn a
       // moment ago, the minute's limit) does not silence it (the review's B3: a refusal belongs to the turn refused)
       const near = cache.get(key);
@@ -363,7 +366,7 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
     stop();
     try { quiet(); } catch { /* another lane's fault */ }
     // the queue gives up a sentence still on its way when the read ends (`keep`: after cut(), see join above)
-    const owner = { queue: null, stopRecorded, rateRecorded, onSource, ended: false, recordedStops: 0, keep: false };
+    const owner = { queue: null, stopRecorded, rateRecorded, onSource, ended: false, over: false, recordedStops: 0, keep: false };
     /* A sentence of this read that met the short wait (its own request lost the connection or ran out of time, or the
      * wait held it back) before the read came to it is held, not failed at once (the re-review's F1, rule 8). When the
      * read comes to it with no press since, it ends there with that cause, as before; his play on the paused read
@@ -378,12 +381,27 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
         signal.addEventListener('abort', () => { if (held.get(index) === entry) held.delete(index); reject(abortError()); }, { once: true });
       });
     });
-    /** The read has come to a held sentence: it ends there with its cause (true), as it did before. */
+    /** A state of the read, told to its caller. An end is kept: the read is over, the seam is free, and why it was silent. */
+    const told = (state, code) => {
+      if (['done', 'stopped', 'error'].includes(state)) { owner.ended = true; if (session === owner) session = null; }
+      // a pairing the server ended is named so as the tap happens, and reads so afterwards ("pair again", not "not
+      // paired": the amendment of 2026-11-14), wherever the tap is shown
+      if (state === 'error') { silent = { reason: code === 'not-paired' && status().pairAgain ? 'authentication-required' : code || 'speak-failed', at: now() }; tell(); }
+      onState(state, code);
+    };
+    /** The read has come to a held sentence with no press since: it ends there, now, with that cause (true), exactly as
+     * it did when the sentence had failed at once: no sentence is lit and the end is told before this returns (the
+     * follow-up review's M1). The queue learns it through the sentence's own promise and ends a few microtasks later;
+     * until then it is not paused, stopped or cut again (the controls below), what it asks is not sent (clipFor) and
+     * what it says is not passed on (it would be this same end, a second time). */
     const due = () => {
       const q = owner.queue, entry = held.get(q.index);
       if (!entry || q.state !== 'loading') return false;
       held.delete(q.index);
+      owner.over = true;
       entry.reject(entry.error);
+      onSentence(-1);
+      told('error', entry.error.code);
       return true;
     };
     /** His press on the paused read: the short wait ends, and the sentences it held back are asked again. */
@@ -399,31 +417,31 @@ export function createVoiceSeam({ client, player, recorded = null, store = null,
       fetchClip: fetchOne,
       player: composite(owner),
       prefetch, gapMs, sleep: gapSleep || sleep,
-      onSentence: (index) => { if (session === owner || index < 0) onSentence(index); },
+      onSentence: (index) => { if (!owner.over && (session === owner || index < 0)) onSentence(index); },
       onState: (state, code) => {
-        // come to a held sentence: the read ends there at once (the next state is its error), as before
+        // the queue ending after its read ended at a held sentence: that end was told then (`due`)
+        if (owner.over) return;
+        // come to a held sentence: the read ends there at once, as before
         if (state === 'loading' && due()) return;
-        if (['done', 'stopped', 'error'].includes(state)) { owner.ended = true; if (session === owner) session = null; }
-        // a pairing the server ended is named so as the tap happens, and reads so afterwards ("pair again", not "not
-        // paired": the amendment of 2026-11-14), wherever the tap is shown
-        if (state === 'error') { silent = { reason: code === 'not-paired' && status().pairAgain ? 'authentication-required' : code || 'speak-failed', at: now() }; tell(); }
-        onState(state, code);
+        told(state, code);
       },
     });
     owner.queue = queue;
+    // pause, stop and cut leave a read that has ended alone, as the queue itself does once it has ended: after `due`
+    // the queue is still on its way to its own end, and must reach it
     const controls = {
-      pause: () => queue.pause(),
+      pause: () => { if (!owner.ended) queue.pause(); },
       /** `press`: his play (the bar, the lock screen, the earphones), which ends the short wait and asks again for what
        * it held back; a resume nobody pressed goes on as before. */
       resume: ({ press = false } = {}) => { if (press && !owner.ended && queue.state === 'paused') askAgain(); queue.resume(); },
-      stop: () => { queue.stop(); },
+      stop: () => { if (!owner.ended) queue.stop(); },
       /** The read ends now, as stop() does, but a sentence already asked of the server is still received and kept, so
        * asking for it again plays at once (the ear's own time limit, the review's K3); if nobody else asks for it, its
        * end, whatever it is, is nobody's (the re-check's R1). */
-      cut: () => { owner.keep = true; queue.stop(); },
+      cut: () => { if (!owner.ended) { owner.keep = true; queue.stop(); } },
       jump: (index) => { if (!owner.ended) { queue.jump(index); due(); } },
       setRate: (next) => queue.setRate(next),
-      get state() { return queue.state; },
+      get state() { return owner.over ? 'error' : queue.state; },
       get index() { return queue.index; },
       get rate() { return queue.rate; },
       get ended() { return owner.ended; },

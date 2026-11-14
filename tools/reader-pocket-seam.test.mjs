@@ -579,6 +579,148 @@ describe('play on a read he had paused is his press (the re-review’s F1; rule 
   });
 });
 
+describe('with no press, a read that comes to a sentence it held ends there at once and asks nothing more (the follow-up review’s M1)', () => {
+  const S5 = [
+    { text: '雨の日は本を読む。' },
+    { text: '猫が窓の外を見ている。' },
+    { text: '駅の前で友達を待った。' },
+    { text: '新しい靴を買いました。' },
+    { text: '明日は晴れるでしょう。' },
+  ];
+  const texts = (list) => list.map((s) => s.text);
+  /** A read of five sentences on a clock the test moves, with no device store (the quickest way to the server). The
+   * client answers in order with `next` (a code: that refusal; 'hang': an answer that never comes; none: a clip) and
+   * keeps each request's signal. `told` is everything the read tells its caller, in order: a sentence's index (-1: no
+   * sentence is lit any more) or a state. The first sentence plays until the test lets it end. */
+  const rig = () => {
+    const r = {
+      at: Date.parse('2026-11-12T02:00:00Z'),
+      asked: [],
+      signals: [],
+      next: [],
+      played: [],
+      told: [],
+      stops: 0,
+    };
+    let release = null;
+    r.endFirst = () => release?.('ended');
+    const client = {
+      configured: () => true,
+      ready: async () => {},
+      paired: () => true,
+      scope: () => ({ installation: 'bunki-' + 'b'.repeat(32) }),
+      async speak({ text, signal }) {
+        r.asked.push(text);
+        r.signals.push(signal);
+        const code = r.next.shift();
+        if (code === 'hang') return new Promise(() => {});
+        if (code) throw new VoiceError(code, 0);
+        return {
+          bytes: new Uint8Array([1]),
+          contentType: 'audio/wav',
+          voiceId: 'v',
+          inputKey: text,
+        };
+      },
+    };
+    const player = {
+      play: (clip) => {
+        r.played.push(clip.inputKey);
+        return r.played.length === 1
+          ? new Promise((done) => (release = done))
+          : Promise.resolve('ended');
+      },
+      pause() {},
+      resume() {},
+      stop() {
+        r.stops += 1;
+      },
+      setRate() {},
+    };
+    r.seam = createVoiceSeam({
+      client,
+      player,
+      sleep: async () => {},
+      gapSleep: async () => {},
+      now: () => r.at,
+    });
+    r.end = new Promise((done) => {
+      r.session = r.seam.read({
+        voiceKey: 'article:a1',
+        sentences: S5,
+        press: true,
+        onSentence: (index) => r.told.push(index),
+        onState: (state, code) => {
+          const name = code ? `${state}:${code}` : state;
+          r.told.push(name);
+          if (['done', 'stopped', 'error'].includes(state)) done(name);
+        },
+      });
+    });
+    return r;
+  };
+  /** The read is on its first sentence; the third lost its connection on the way (the short wait began then). */
+  const thirdLost = async (second) => {
+    const r = rig();
+    r.next.push(undefined, second, 'network-failed');
+    await tick(10);
+    expect(r.asked).toEqual(texts(S5.slice(0, 3)));
+    expect(r.session.state).toBe('playing');
+    return r;
+  };
+  /** The end was told once, and nothing after it: no sentence lit, then the cause. */
+  const endedOnceWithNoConnection = (r) => {
+    expect(r.told.slice(-2)).toEqual([-1, 'error:network-failed']);
+    expect(r.told.filter((entry) => entry === -1)).toHaveLength(1);
+    expect(r.told.filter((entry) => String(entry).startsWith('error'))).toHaveLength(1);
+  };
+  it('it reaches that sentence after the wait has run out: it ends there, and the sentence its queue asked for in the same turn is never sent', async () => {
+    const r = await thirdLost();
+    r.at += 16_000;
+    r.endFirst();
+    expect(await Promise.race([r.end, tick(500).then(() => 'still going')])).toBe(
+      'error:network-failed',
+    );
+    await tick(10);
+    // the fourth was asked while the second played (the wait was over by then), as it always was; the fifth, asked for
+    // as the read came to the lost third, is given up before it leaves
+    expect(r.asked).toEqual(texts(S5.slice(0, 4)));
+    expect(r.played).toEqual(texts(S5.slice(0, 2)));
+    endedOnceWithNoConnection(r);
+    expect(r.stops).toBe(0);
+  });
+  it('a jump onto that sentence (the lock screen’s next) ends the read before the jump returns, and nothing is sent', async () => {
+    const r = await thirdLost();
+    r.at += 16_000;
+    r.session.jump(2);
+    expect(r.told.slice(-2)).toEqual([-1, 'error:network-failed']);
+    expect(r.session.state).toBe('error');
+    expect(r.session.ended).toBe(true);
+    expect(r.seam.active()).toBe(null);
+    await tick(10);
+    expect(r.asked).toEqual(texts(S5.slice(0, 3)));
+    endedOnceWithNoConnection(r);
+    // the jump's own stop of the player, and no other
+    expect(r.stops).toBe(1);
+  });
+  it.each(['pause', 'stop', 'cut'])(
+    'after that end %s does nothing more: the request still on its way is given up, the player is not stopped again, and a play on the ended read ends no wait',
+    async (control) => {
+      const r = await thirdLost('hang');
+      r.at += 1000;
+      r.session.jump(2);
+      r.session.resume({ press: true });
+      r.session[control]();
+      await tick(10);
+      expect(r.signals[1].aborted).toBe(true);
+      expect(r.asked).toEqual(texts(S5.slice(0, 3)));
+      endedOnceWithNoConnection(r);
+      expect(r.stops).toBe(1);
+      expect(r.seam.cannot('article:a1')).toBe('network-failed');
+    },
+  );
+});
+
 describe('a wait Settings shows tells its listeners once when it ends (the first review’s C2)', () => {
   const S2 = [{ text: '雨の日は本を読む。' }, { text: '猫が窓の外を見ている。' }];
   /** A seam on a clock and an `after` the test moves; the client's answers are held until the test settles them. */
