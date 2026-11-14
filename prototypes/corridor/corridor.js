@@ -13426,8 +13426,9 @@ function retireCardAudioOnFaceChange() {
 
 function cardVoiceStatus(btn, reason, flag) {
   if (!btn) return;
+  btn.title = reason;
   // the line is the control's title while it stands; then the word box's 音 is called by its name again
-  btn.title = reason || (btn.id === 'mini-voice' ? btn.getAttribute('aria-label') || '' : '');
+  if (!reason) btn.title = btn.id === 'mini-voice' ? btn.getAttribute('aria-label') || '' : '';
   if (flag) btn.dataset.voiceUnavailable = flag;
   else delete btn.dataset.voiceUnavailable;
   const note = btn.parentElement?.querySelector('.say-note');
