@@ -1162,11 +1162,13 @@ const CASES = {
       if (end.bar !== 'idle' || end.silent !== 'network-failed' || end.media?.state !== 'paused' || end.media?.title !== title) problems.push(`the case did not reach its point: the read ended with bar ${end.bar} (${end.silent || 'no reason'}), the lock screen ${JSON.stringify(end.media)}`);
       steps.push(`connection lost: ended at word ${end.litFirst}, "${end.note}" (${end.silent}), lock screen ${end.media?.state}`);
       // Rule 8 (the ruling's amendment, 2026-11-14) replaces fix round 2's refusal here: inside the 15 s wait after a
-      // lost connection his play asks. With the connection still gone it asks once, fails again on the way, and the lock
-      // screen keeps the article, paused, with its play
+      // lost connection his play asks. With the connection still gone it asks (the sentence it could not get and the read's
+      // window after it, at most three), fails again on the way, and the lock screen keeps the article, paused, with its play
       await lockPlay(s);
       await wait(1500);
-      let v = await stillThere(s, title, problems, { label: 'the lock screen\'s play with the connection still gone', reasons: ['network-failed', 'offline'], asked: end.asked + 1 });
+      const tried = await look(s.page);
+      if (tried.asked - end.asked < 1 || tried.asked - end.asked > 3) problems.push(`the lock screen's play with the connection still gone: ${tried.asked - end.asked} sentence(s) asked, not 1 to 3`);
+      let v = await stillThere(s, title, problems, { label: 'the lock screen\'s play with the connection still gone', reasons: ['network-failed', 'offline'], asked: tried.asked });
       steps.push(`the lock screen's play, the connection still gone: asked ${v.asked - end.asked}, bar ${v.bar}, "${v.note}" (${v.silent}), lock screen ${v.media?.state}`);
       const again = Date.now();
       // the connection back, within 15 s of that second loss: the lock screen's play asks and takes the read up there
