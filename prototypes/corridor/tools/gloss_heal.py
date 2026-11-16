@@ -19,6 +19,7 @@ Pure standard library, so it runs without the tokenizer:
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 GLOSS_CAP = 32
@@ -30,7 +31,62 @@ REVIEWED_GLOSSES = {
     ("拍子", "ひょうし"): "time; meter; rhythm",
     ("初耳", "はつみみ"): "something heard for the first time",
     ("金", "かね"): "money; metal",
+    ("正確", "せいかく"): "accurate, correct, precise",
+    ("～等", "～とう"): "class, rank",
+    ("伯父さん", "おじさん"): "uncle",
+    ("納める", "おさめる"): "to pay (fees, taxes), to supply",
+    ("人目", "ひとめ"): "public gaze, notice",
+    ("繊維", "せんい"): "fiber",
+    ("着色", "ちゃくしょく"): "coloring",
 }
+
+REVIEWED_SKY_GLOSSES = {
+    ("撮る", "とる"): "to take (a photograph)",
+    ("正確", "せいかく"): "accurate, correct, precise",
+    ("～等", "～とう"): "class, rank",
+    ("伯父さん", "おじさん"): "uncle",
+    ("納める", "おさめる"): "to pay (fees, taxes), to supply",
+    ("空く", "あく"): "to open, to become empty",
+    ("人目", "ひとめ"): "public gaze, notice",
+    ("現在", "げんざい"): "the present, now",
+    ("者", "もの"): "person",
+    ("多少", "たしょう"): "a little, some",
+    ("昼食", "ちゅうしょく"): "lunch",
+    ("親類", "しんるい"): "relative, relation",
+    ("関西", "かんさい"): "Kansai region",
+    ("関東", "かんとう"): "Kantō region",
+    ("繊維", "せんい"): "fiber",
+    ("着色", "ちゃくしょく"): "coloring",
+    ("凍結", "とうけつ"): "freezing",
+    ("重み", "おもみ"): "weight",
+}
+
+
+def short(gloss: str) -> str:
+    text = str(gloss or "")
+    unparenthesized = []
+    depth = 0
+    for char in text:
+        if char == "(":
+            if depth == 0:
+                while unparenthesized and unparenthesized[-1].isspace():
+                    unparenthesized.pop()
+            depth += 1
+        elif char == ")":
+            depth = max(0, depth - 1)
+        elif depth == 0:
+            unparenthesized.append(char)
+    parts = [part.strip() for part in re.split(r"[;,]", "".join(unparenthesized)) if part.strip()]
+    parts = list(dict.fromkeys(parts))
+    out = parts[0] if parts else ""
+    if len(parts) > 1 and len(out) + len(parts[1]) < 26:
+        out += ", " + parts[1]
+    return out[:44]
+
+
+def sky_gloss(word: str, reading: str, gloss: str) -> str:
+    reviewed = REVIEWED_SKY_GLOSSES.get((word, reading))
+    return reviewed if reviewed is not None else short(gloss)
 
 
 def apply_reviewed_glosses(words: dict[str, dict]) -> int:

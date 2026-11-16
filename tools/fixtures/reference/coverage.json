@@ -109,7 +109,7 @@
         },
         "words": {
           "path": "prototypes/corridor/data/share_alike/words.json",
-          "sha256": "d21ff76508a3ed88cec9c096510feac9b5ff2df639061a3be46cb85c6fdf985b"
+          "sha256": "ed485e7caf2956ef6d7aac03352b32feabbb04224898acc41f2deaaaa6b12aed"
         },
         "kanji": {
           "path": "prototypes/corridor/data/share_alike/kanji.json",
@@ -133,11 +133,11 @@
         },
         "wbig": {
           "path": "prototypes/drift/data/wbig.json",
-          "sha256": "cd21316538833aa2f3623be889bc0bc75d30da7ea27af9f2cc6d5c22fda6a277"
+          "sha256": "09fde345ece20544581ad11218dad723baa8e45b0f77e50b9f159329eb0444ee"
         },
         "driftWords": {
           "path": "apps/app/src/data/generated/drift-words.json",
-          "sha256": "ef1f0ce0c2dd0c44b79241e1b4fe710832c3ce645f9df18cd225586c45ee65a1"
+          "sha256": "27b0520adffe1970b50705765c0e82f39bf3112a1c2bbba9ede6707ed37ffbf9"
         },
         "driftKanji": {
           "path": "apps/app/src/data/generated/drift-kanji.json",

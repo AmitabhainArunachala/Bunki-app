@@ -28,11 +28,34 @@ const STORED = json('data/proprietary_safe/sem.json').edges;
 const REPO = new URL('../', import.meta.url);
 const RELATIONS = new Set(['syn', 'ant', 'reg', 'fam', 'col', 'thm']);
 const unbracketed = (text) => String(text || '').replace(/\s*\([^)]*\)/gu, '');
+const REVIEWED_GLOSSES = new Map([
+  ['撮る\tとる', 'to take (a photograph)'],
+  ['正確\tせいかく', 'accurate, correct, precise'],
+  ['～等\t～とう', 'class, rank'],
+  ['伯父さん\tおじさん', 'uncle'],
+  ['納める\tおさめる', 'to pay (fees, taxes), to supply'],
+  ['空く\tあく', 'to open, to become empty'],
+  ['人目\tひとめ', 'public gaze, notice'],
+  ['現在\tげんざい', 'the present, now'],
+  ['者\tもの', 'person'],
+  ['多少\tたしょう', 'a little, some'],
+  ['昼食\tちゅうしょく', 'lunch'],
+  ['親類\tしんるい', 'relative, relation'],
+  ['関西\tかんさい', 'Kansai region'],
+  ['関東\tかんとう', 'Kantō region'],
+  ['繊維\tせんい', 'fiber'],
+  ['着色\tちゃくしょく', 'coloring'],
+  ['凍結\tとうけつ', 'freezing'],
+  ['重み\tおもみ', 'weight'],
+]);
 
 describe('the sky data, one file per licence pool', () => {
   test('each file names its pool, and every retained source it names exists in that record', () => {
     expect(SKY.pool).toBe('share_alike');
     expect(SEM.pool).toBe('proprietary_safe');
+    expect(SKY.sources).toContainEqual(
+      expect.objectContaining({ path: 'prototypes/corridor/tools/gloss_heal.py' }),
+    );
     for (const [file, pool] of [
       [SKY, 'share_alike'],
       [SEM, 'proprietary_safe'],
@@ -106,6 +129,11 @@ describe('the sky data, one file per licence pool', () => {
       const written = [...new Set(word)].filter((ch) => KANJI[ch] || outside.has(ch));
       expect(chars, word).toEqual(written);
       for (const ch of stored.k || []) expect(chars, `${word} carries ${ch}`).toContain(ch);
+      const reviewed = REVIEWED_GLOSSES.get(`${word}\t${reading}`);
+      if (reviewed !== undefined) {
+        expect(gloss, `${word}: reviewed gloss`).toBe(reviewed);
+        continue;
+      }
       if (!gloss) continue;
       const sources = [
         stored.g,

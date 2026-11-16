@@ -164,3 +164,26 @@ def test_reviewed_final_pass_covers_words_added_after_the_dictionary_pass(share:
     assert words["初耳"]["g"] == "something heard for the first time"
     assert words["光沢"] == other, "final pass must not broaden dictionary healing"
     assert gloss_heal.apply_reviewed_glosses(words) == 0
+
+
+@pytest.mark.parametrize(
+    ("source", "expected"),
+    [
+        (None, ""),
+        ("to take; to pick up; to grab", "to take, to pick up"),
+        ("now (same as 今 (いま)), present", "now, present"),
+        ("person (same as 人 (ひと))", "person"),
+        ("clear (sunny) weather", "clear weather"),
+        ("fiber, fiber", "fiber"),
+        ("coloring, coloring, pigment", "coloring, pigment"),
+    ],
+)
+def test_sky_short_glosses_are_balanced_and_deduplicated(source, expected):
+    assert gloss_heal.short(source) == expected
+
+
+def test_reviewed_sky_glosses_keep_the_exact_word_and_reading():
+    assert gloss_heal.sky_gloss("撮る", "とる", "to take; to record") == "to take (a photograph)"
+    assert gloss_heal.sky_gloss("納める", "おさめる", "to store") == "to pay (fees, taxes), to supply"
+    assert gloss_heal.sky_gloss("空く", "あく", "to open") == "to open, to become empty"
+    assert gloss_heal.sky_gloss("空く", "すく", "to be hungry") == "to be hungry"

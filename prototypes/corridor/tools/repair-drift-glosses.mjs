@@ -6,7 +6,7 @@
  * text is not cosmetic — it is the data, so it reaches the 宙 card, Today's list and the screen
  * reader's accessible name, where a sentence that stops mid-word is simply wrong.
  *
- * Two repairs, in this order:
+ * Reviewed exact meaning corrections run first. Two generic repairs then handle clipped rows:
  *   1. CARRY THE WHOLE GLOSS. `data/share_alike/words.json` is the dictionary this app already
  *      ships and reads; for 460 of the 482 clipped rows it holds the complete sense list, so the
  *      gloss is restored outright rather than patched. The share_alike wording is preferred
@@ -54,8 +54,20 @@ export function installOracle() {
   ));
 }
 
+const REVIEWED_GLOSSES = new Map([
+  ['正確\tせいかく', 'accurate, correct, precise'],
+  ['～等\t～とう', 'class, rank'],
+  ['伯父さん\tおじさん', 'uncle'],
+  ['納める\tおさめる', 'to pay (fees, taxes), to supply'],
+  ['人目\tひとめ', 'public gaze, notice'],
+  ['繊維\tせんい', 'fiber'],
+  ['着色\tちゃくしょく', 'coloring'],
+]);
+
 /** The gloss a row should carry. Returns null when the row is already whole. */
-export function repairedGloss(headword, gloss, words) {
+export function repairedGloss(headword, gloss, words, reading) {
+  const reviewed = REVIEWED_GLOSSES.get(`${headword}\t${reading}`);
+  if (reviewed !== undefined) return reviewed === gloss ? null : reviewed;
   if (!looksClipped(gloss)) return null;
   const full = String(words?.[headword]?.g || '');
   // the dictionary's own wording, whenever it is itself whole — complete beats long
@@ -69,7 +81,7 @@ export function repairRows(rows, words) {
   const changes = [];
   const out = rows.map((row) => {
     if (!Array.isArray(row) || typeof row[0] !== 'string' || typeof row[2] !== 'string') return row;
-    const next = repairedGloss(row[0], row[2], words);
+    const next = repairedGloss(row[0], row[2], words, row[1]);
     if (next === null) return row;
     changes.push({ word: row[0], from: row[2], to: next });
     const copy = row.slice();

@@ -9,9 +9,9 @@ set (prototypes/corridor/README.md, "Licence pools"):
 
 The app's mount (sky/mount.mjs, joinSkyData) joins the two in memory into the one object the engine reads, with each
 link's two words turned into row numbers of the share_alike file. Nothing is invented: every relation is stored in a
-source file or is a plain equality over stored fields (same kanji, same stored part, same stored on-reading). The only
-hand-written content is the table of standard radical names and meanings below (RAD_NAME, RAD_GLOSS), used for parts
-that are not kanji in the app's kanji table.
+source file or is a plain equality over stored fields (same kanji, same stored part, same stored on-reading). Hand-written
+content is limited to the standard radical names and meanings below (RAD_NAME, RAD_GLOSS) and the reviewed exact
+word/reading gloss corrections in gloss_heal.py; both generator files are retained and hashed in sky.json.
 
   words, readings, glosses, level, kanji of a word   share_alike/words.json
   glosses the word list leaves empty                 share_alike/dict.json (same reading only)
@@ -40,6 +40,8 @@ import sys
 import time
 
 import numpy as np
+
+from gloss_heal import sky_gloss
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.normpath(os.path.join(HERE, '..', '..', '..'))
@@ -116,15 +118,6 @@ ON_COUNT = collections.Counter(r for e in K.values() for r in set(e.get('on') or
 NK_ALL = len(K)
 
 
-def short(g):
-    g = re.sub(r'\s*\([^)]*\)', '', str(g or ''))
-    parts = [p.strip() for p in re.split(r'[;,]', g) if p.strip()]
-    out = parts[0] if parts else ''
-    if len(parts) > 1 and len(out) + len(parts[1]) < 26:
-        out += ', ' + parts[1]
-    return out[:44]
-
-
 # ---- words ----------------------------------------------------------------------------------
 def kanji_in_order(w, ks):
     seen, out = set(), []
@@ -153,19 +146,19 @@ for w in kept:
 
 def gloss_of(w):
     e = W[w]
-    g = short(e.get('g'))
+    g = sky_gloss(w, e['r'], e.get('g'))
     if g:
         gloss_stats['from the word list'] += 1
         return g
     d = DICT.get(w)
     if d and d.get('m') and not (d.get('r') and d['r'] != e['r']):
-        g = short('; '.join(d['m'])[:120])
+        g = sky_gloss(w, e['r'], '; '.join(d['m'])[:120])
         if g:
             gloss_stats['from the dictionary'] += 1
             return g
     m = EXTRA_W.get((w, e['r']))
     if m:
-        g = short('; '.join(str(x) for x in m)[:120])
+        g = sky_gloss(w, e['r'], '; '.join(str(x) for x in m)[:120])
         if g:
             gloss_stats['from the extra word list'] += 1
             return g
@@ -916,11 +909,12 @@ def retained(ident, path):
 
 
 generator = retained('generator', os.path.abspath(__file__))
+gloss_generator = retained('generator-glosses', os.path.join(HERE, 'gloss_heal.py'))
 sky_file = {
     'v': data['v'],
     'built': BUILT,
     'pool': 'share_alike',
-    'sources': [retained(i, os.path.join(SRC, p)) for i, p in SKY_INPUTS] + [generator],
+    'sources': [retained(i, os.path.join(SRC, p)) for i, p in SKY_INPUTS] + [generator, gloss_generator],
     'scope': 'The sky of the first screen (prototypes/corridor/sky/), less its meaning links, which are a '
              'proprietary_safe record set of their own (proprietary_safe/sky-sem.json). sky/mount.mjs joins the two in memory.',
     'counts': {k: v for k, v in data['counts'].items() if k != 'sem'},

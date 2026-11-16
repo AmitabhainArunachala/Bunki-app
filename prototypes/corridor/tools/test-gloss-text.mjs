@@ -51,3 +51,20 @@ test('negative: a 32-character string with a mid & ending on a word boundary is 
 test('a repair never writes an empty gloss', () => {
   assert.notEqual(repairedGloss('missing-headword', 'to take up, to pick up; to confi', {}), '');
 });
+
+test('reviewed meaning corrections are exact and idempotent', () => {
+  const corrections = [
+    ['正確', 'せいかく', 'accurate, punctuality', 'accurate, correct, precise'],
+    ['～等', '～とう', 'level, place', 'class, rank'],
+    ['伯父さん', 'おじさん', '(hon.) middle-aged gentleman; uncle', 'uncle'],
+    ['納める', 'おさめる', 'to store to pay, to supply', 'to pay (fees, taxes), to supply'],
+    ['人目', 'ひとめ', 'glimpse, public gaze', 'public gaze, notice'],
+    ['繊維', 'せんい', 'fiber, fiber', 'fiber'],
+    ['着色', 'ちゃくしょく', 'coloring, coloring', 'coloring'],
+  ];
+  for (const [word, reading, before, after] of corrections) {
+    assert.equal(repairedGloss(word, before, {}, reading), after);
+    assert.equal(repairedGloss(word, after, {}, reading), null);
+    assert.equal(repairedGloss(word, before, {}, '別のよみ'), null);
+  }
+});
