@@ -1,36 +1,4 @@
 {
-  "37980085769/44": {
-    "result": "observed",
-    "startedAt": "2026-11-01T00:29:25Z"
-  },
-  "38950321223/36": {
-    "result": "observed",
-    "startedAt": "2026-11-01T00:29:06Z"
-  },
-  "38919512644/36": {
-    "result": "observed",
-    "startedAt": "2026-11-01T00:29:09Z"
-  },
-  "37925123360/45": {
-    "result": "observed",
-    "startedAt": "2026-11-01T00:29:26Z"
-  },
-  "37980085769/45": {
-    "result": "observed",
-    "startedAt": "2026-11-01T09:32:55Z"
-  },
-  "38950321223/37": {
-    "result": "observed",
-    "startedAt": "2026-11-01T09:32:38Z"
-  },
-  "38919512644/37": {
-    "result": "observed",
-    "startedAt": "2026-11-01T09:32:42Z"
-  },
-  "37925123360/46": {
-    "result": "observed",
-    "startedAt": "2026-11-01T09:32:56Z"
-  },
   "37980085769/46": {
     "result": "observed",
     "startedAt": "2026-11-01T16:35:55Z"
@@ -1254,5 +1222,13 @@
   "42406261624/25": {
     "result": "observed",
     "startedAt": "2026-11-15T18:02:28Z"
+  },
+  "42418249759/24": {
+    "result": "observed",
+    "startedAt": "2026-11-16T10:02:05Z"
+  },
+  "42780186199/17": {
+    "result": "observed",
+    "startedAt": "2026-11-16T10:01:35Z"
   }
 }
