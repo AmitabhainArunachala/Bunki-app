@@ -36,6 +36,13 @@ const kt3 = kt3LabelContract(
     ),
   ),
 );
+// Frozen fixture adapter: missing helper preserves the original synthetic failbase.
+let historicalFixtureModule = null;
+try {
+  historicalFixtureModule = await import('./fixtures/vh-batch3/historical-fixture.mjs');
+} catch (error) {
+  if (error.code !== 'ERR_MODULE_NOT_FOUND' || error.url !== new URL('./fixtures/vh-batch3/historical-fixture.mjs', import.meta.url).href) throw error;
+}
 function sample(suite, engine) {
   const native = unitFixture(suite, engine),
     value = native.value,
@@ -108,12 +115,20 @@ function sample(suite, engine) {
       head: identity.gitSha,
     };
   }
-  return {
+  const fixture = {
     value,
     pins,
     extras,
     files: { 'unit-fixture.json': sha },
+    historicalBaselineFiles: {
+      'corridor.js': 'synthetic corridor',
+      'editorial.css': 'synthetic editorial',
+    },
   };
+  if (suite === 'hfix2e2' && historicalFixtureModule) {
+    return historicalFixtureModule.createHistoricalFixture({ ...fixture, engine });
+  }
+  return fixture;
 }
 for (const suite of BATCH3_SUITES)
   for (const engine of ['chromium', 'webkit']) {
@@ -447,8 +462,8 @@ for (const suite of BATCH3_SUITES)
       if (suite === 'hfix2e2') {
         const dir = join(out, 'e2-base');
         mkdirSync(dir);
-        writeFileSync(join(dir, 'corridor.js'), 'synthetic corridor');
-        writeFileSync(join(dir, 'editorial.css'), 'synthetic editorial');
+        writeFileSync(join(dir, 'corridor.js'), f.historicalBaselineFiles['corridor.js']);
+        writeFileSync(join(dir, 'editorial.css'), f.historicalBaselineFiles['editorial.css']);
         writeFileSync(join(dir, 'base.json'), JSON.stringify(f.pins.baseline));
         f.value.base.dir = dir;
         put('base-process.json', {
@@ -672,8 +687,8 @@ test('E2 base files are checked against independent expected bytes, not a self-c
     for (const name of ['base.json', 'corridor.js', 'editorial.css'])
       rmSync(join(dir, name), { force: true });
     writeFileSync(join(dir, 'base.json'), JSON.stringify(f.pins.baseline));
-    writeFileSync(join(dir, 'corridor.js'), 'synthetic corridor');
-    writeFileSync(join(dir, 'editorial.css'), 'synthetic editorial');
+    writeFileSync(join(dir, 'corridor.js'), f.historicalBaselineFiles['corridor.js']);
+    writeFileSync(join(dir, 'editorial.css'), f.historicalBaselineFiles['editorial.css']);
   };
   try {
     restore();
@@ -688,7 +703,7 @@ test('E2 base files are checked against independent expected bytes, not a self-c
     assert.throws(() => readBatch3Base(out, f.pins));
     restore();
     rmSync(join(dir, 'corridor.js'));
-    writeFileSync(join(out, 'foreign.js'), 'synthetic corridor');
+    writeFileSync(join(out, 'foreign.js'), f.historicalBaselineFiles['corridor.js']);
     symlinkSync(join(out, 'foreign.js'), join(dir, 'corridor.js'));
     assert.throws(() => readBatch3Base(out, f.pins));
     restore();
