@@ -9,7 +9,8 @@ import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { extname, resolve, sep } from 'node:path';
-import { chromium } from 'playwright-core';
+import { chromium, webkit } from 'playwright-core';
+import { requireHitGrid, registerSheetControls, measurements, CASE_NAMES } from './sheet-controls-oracle.mjs';
 import { createRequire } from 'node:module';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
@@ -19,6 +20,12 @@ const shotsIndex = process.argv.indexOf('--shots');
 const shots = shotsIndex < 0 ? resolveCorridorEvidence() : resolve(process.argv[shotsIndex + 1]);
 const caseIndex = process.argv.indexOf('--case');
 const selectedCase = caseIndex < 0 ? null : process.argv[caseIndex + 1];
+const sheetOnly = process.argv.includes('--sheet-controls-only');
+assert(!(sheetOnly && selectedCase), 'sheet-only is an explicit separate scope, never a source-return claim');
+const cssUnderTest = process.env.P3_SHEET_CSS_UNDER_TEST || null;
+assert(!cssUnderTest || sheetOnly, 'CSS source substitution is narrow targeted testing only, never full admission');
+if (cssUnderTest) assert.equal(resolve(cssUnderTest), resolve(process.cwd(), 'prototypes/corridor/editorial.css'));
+const cssWitness = cssUnderTest ? { artifact: createHash('sha256').update(readFileSync(resolve(root, 'editorial.css'))).digest('hex'), served: createHash('sha256').update(readFileSync(cssUnderTest)).digest('hex'), path: resolve(cssUnderTest), acceptanceEligible: false } : null;
 assert.ok(caseIndex < 0 || selectedCase === 'source-return', '--case must be source-return');
 if (shots) mkdirSync(shots, { recursive: true });
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.css': 'text/css' };
@@ -34,7 +41,9 @@ const server = createServer((request, response) => {
 });
 await new Promise((done) => server.listen(0, '127.0.0.1', done));
 const base = `http://127.0.0.1:${server.address().port}`;
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
+const runtimeEngine = process.env.KAIRO_BROWSER || 'chromium';
+assert(['chromium','webkit'].includes(runtimeEngine));
+const browser = runtimeEngine === 'webkit' ? await webkit.launch() : await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
 await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1')); // Returning device fixture.
 await silenceBrowserAudio(context);
@@ -45,6 +54,7 @@ await context.route('**/*', route => {
   externalRequests.push({ origin: url.origin, pathname: url.pathname });
   return route.abort();
 });
+if (cssUnderTest) await context.route(/\/editorial\.css(?:\?.*)?$/, async route => { const response = await route.fetch(); await route.fulfill({ response, body: readFileSync(cssUnderTest, 'utf8') }); });
 const page = await context.newPage();
 page.setDefaultTimeout(12000);
 const errors = [];
@@ -52,6 +62,7 @@ page.on('pageerror', (error) => errors.push(String(error)));
 const results = [];
 const excludedChecks = [];
 const check = async (name, run, caseId = null) => {
+  if (sheetOnly && caseId !== 'sheet-controls') { excludedChecks.push(name); return; }
   if (selectedCase && selectedCase !== caseId) { excludedChecks.push(name); return; }
   try { await run(); results.push({ name, pass: true }); console.log(`PASS ${name}`); }
   catch (error) {
@@ -170,7 +181,7 @@ try {
     await entry(); await page.click('[data-kanjirow="学"]');
     for (const prefix of ['kanken:', 'jlpt-kanji:']) {
       const chip = page.locator(`[data-reference-door^="${prefix}"]`); const label = await chip.textContent();
-      const box = await chip.boundingBox(); assert.ok(box.height >= 44, 'interactive metadata needs a 44px target');
+      const box = await requireHitGrid(page, chip, 'original metadata44px assertion'); assert.ok(box.height >= 44, 'interactive metadata needs a 44px target');
       await chip.click(); await page.waitForSelector('#reference-library[data-view="collection"]'); await page.click('#reference-back');
       await nodeIs('kanji:学'); assert.equal(await focusedText(), label);
     }
@@ -357,13 +368,17 @@ try {
     assert.deepEqual(errors, []);
     if (shots) writeFileSync(resolve(shots, 'source-return-one-explicit-grade.json'), `${JSON.stringify(graded, null, 2)}\n`);
   }, 'source-return');
+  await registerSheetControls({page,context,check,entry,nodeIs,stable,catalog});
   await check('no uncaught application exceptions', async () => assert.deepEqual(errors, []));
 } finally {
   await browser.close(); await new Promise((done) => server.close(done));
   if (shots) writeFileSync(resolve(shots, 'connections-results.json'), `${JSON.stringify(results, null, 2)}\n`);
   if (shots) writeFileSync(resolve(shots, 'execution.json'), `${JSON.stringify({ selectedCase, excludedChecks, externalRequests, site: root, runId: process.env.KAIRO_GATE_RUN_ID ?? null,
-    browser: { engine: 'Chromium', version: browser.version(), headless: true, maximumContexts: 1 } }, null, 2)}\n`);
+    sheetControlsOnly: sheetOnly, cssWitness, acceptanceEligible: !sheetOnly && !cssUnderTest,
+    browser: { engine: runtimeEngine === 'webkit' ? 'WebKit' : 'Chromium', version: browser.version(), headless: true, maximumContexts: 1 } }, null, 2)}\n`);
 }
+if (shots) writeFileSync(resolve(shots, 'sheet-controls-results.json'), JSON.stringify({ schemaVersion: 1, scope: sheetOnly ? 'sheet-controls-only' : selectedCase || 'full-reference-connections', cssWitness, measurements, originalAssertionsPreserved: true }, null, 2));
+if (sheetOnly) { assert.deepEqual(results.map(row => row.name), CASE_NAMES); assert(results.every(row => row.pass), 'all13 sheet-control behavioral and detector-control cases required'); assert.deepEqual(errors, [], 'no application exceptions in targeted sheet journey'); }
 const failures = results.filter((r) => !r.pass);
 console.log(`\n${results.length - failures.length}/${results.length} recursive connection checks passed.`);
 process.exitCode = failures.length ? 1 : 0;

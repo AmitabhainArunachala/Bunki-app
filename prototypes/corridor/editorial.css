@@ -2066,7 +2066,8 @@ body .sheet .hero-meta { min-width: 0; }
 /* tighten pass (2026-11-10) · an entry page's facts are one sleek line of text (the kanji page's under its meaning, the
  * word page's JLPT level); its doors stand together under the hero, one outlined family; its own kanji is drawn at list
  * strength in the lists below; the builder's sources wait in one closed disclosure at the foot of the page */
-body .sheet .entry-facts { display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; margin: 0; font: 500 var(--type-label)/1.4 var(--sans); color: var(--text-2); }
+body .sheet .entry-facts { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin: 0; font: 500 var(--type-label)/1.4 var(--sans); color: var(--text-2); }
+html[data-live-depth='1'] body #sheet.sheet .hero .entry-facts { row-gap: 12px; }
 /* a fact that goes somewhere reads as linked text (a dotted rule under it); its 32px line keeps a 44px target */
 body .sheet .entry-facts :is(button.pool-tag.cat-chip, button.kanji-fact) {
   position: relative; display: inline-flex; align-items: center; min-height: 32px; padding: 0; border: 0; border-radius: 0;
@@ -4980,6 +4981,18 @@ body:not(.zen) :is(#app > .chrome, #sheet > .sheet-bar) > button.bar-gate::after
 .bar-gate[aria-expanded='true'] svg { rotate: 90deg; }
 body:not(.zen) :is(#app > .chrome, #sheet > .sheet-bar) > .bar-gate + * { margin-left: auto; }
 body:not(.zen) #sheet > .sheet-bar:has(> .bar-gate) > .sheet-take { margin-left: 4px; }
+body:not(.zen) #sheet > .sheet-bar > .sheet-search { border-radius: 0; }
+@media (min-width: 641px) {
+  body #sheet > .sheet-bar > .bar-gate + .ear-spot { left: calc(50% + 23px); }
+}
+@media (max-width: 520px) {
+  body:not(.zen) #sheet > .sheet-bar:has(> .bar-gate) > .sheet-search { margin-left: 0; }
+  body:not(.zen) #sheet > .sheet-bar:has(> .bar-gate) > .sheet-take { margin-left: auto; }
+}
+@media (max-width: 380px) {
+  body:not(.zen) #sheet > .sheet-bar:has(> .bar-gate) { gap: 0; padding-left: 4px; }
+  body:not(.zen) #sheet > .sheet-bar:has(> .bar-gate) > .sheet-take { min-width: 70px; padding-inline: 8px; }
+}
 /* the room's name and the article's level go where the tabs or the trail already say them (the name stays the bar's
    words for a screen reader); a screen with neither keeps its name, short of the gate, as does the layout under test */
 html:not([data-register='attempt'], [data-layout='places']) :is(body.has-primary-tabs, body:has(#app > .scale-thread)):not(.zen) #app > .chrome:has(> .bar-gate) > .crumb {
