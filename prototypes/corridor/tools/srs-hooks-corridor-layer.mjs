@@ -352,7 +352,7 @@ export function readerTicketFixture(source, options) {
     focusProseWord: node => { focusCount++; c.document.activeElement = node; c.onFocus?.(); },
     requestAnimationFrame: fn => { frames.push(fn); }, queueMicrotask: fn => { queued.push(fn); },
     keepScroll() {}, rememberSheet() {}, rememberScaleEntry() {}, stopReadAloud() {}, restoreDialogInvoker() {},
-    restoreDialogFocus() {}, clearTimeout() {}, saveReaderPosition() { throw new Error('ticket unexpectedly writes readerPos'); },
+    restoreDialogFocus() {}, wordVoice: () => 'off', clearTimeout() {}, saveReaderPosition() { throw new Error('ticket unexpectedly writes readerPos'); },
     finishPageTransition() {}, layerPathFor: () => false, takePrebuiltPage: () => null,
     sampleWhere: () => null, pageCutAllowed: () => false, removeMini() {}, sampleTransition() {},
     kanjiCourseReferenceHelp: () => null, scaleNodeBelongs: () => false, returnScroll() {},

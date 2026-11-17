@@ -35,7 +35,7 @@ function app() {
     reviewExitUi() {}, // This fixture stops before DOM drawing; exit suite below uses real helpers.
     syncReviewExitNotice() {},
     keepScroll() {}, rememberSheet() {}, invokerKey: value => value,
-    restoreDialogInvoker() {}, stopReadAloud() {}, clearTimeout() {},
+    restoreDialogInvoker() {}, stopReadAloud() {}, voiceLayer: { stop() {} }, clearTimeout() {},
     clearReaderReadings() {},
     requestAnimationFrame() {}, passage: () => null,
     recordReady: epoch => epoch === undefined || epoch === 4,

@@ -85,7 +85,7 @@ function domFixture() {
     const classes = new Set(className.split(/\s+/).filter(Boolean)), attributes = new Map();
     let id = '', text = content;
     const node = {
-      tagName, className, children: [], dataset: {}, handlers: {}, isConnected: true, title: '',
+      tagName, className, children: [], dataset: {}, handlers: {}, isConnected: true, title: '', disabled: false,
       classList: { add: name => classes.add(name), remove: name => classes.delete(name), contains: name => classes.has(name) },
       style: { setProperty(name, value) { this[name] = value; } },
       get id() { return id; }, set id(value) { id = value; ids.set(value, node); },
@@ -822,7 +822,7 @@ function installActualRender(f) {
     kanjiWorldVisit:null,readerTicket:null,pageEpoch:0,recordEpoch:1,personalHost:null,retainedRetryView:null,pendingReferenceCollection:null,
     lastRenderedView:'review',publisherOpenRequest:0,olderStartToken:0,guidedRoom:null,deckPlayer:null,deckPresentation:null,
     maintenanceReports:null,roomTransitionUpdating:false,scheduler:{},fsrsApi:{},SEARCH_SVG:'',
-    renderRoomError:(_main,_view,error)=>{throw error;}, placesLayout:()=>true, buildRoomSign:()=>null, syncReviewExitNotice:()=>{}, readerTicketSync:()=>{}, back:()=>{}, revealFocusedChromeDoor:()=>{},
+    renderRoomError:(_main,_view,error)=>{throw error;}, placesLayout:()=>true, buildRoomSign:()=>null, syncReviewExitNotice:()=>{}, readerTicketSync:()=>{}, barBack:()=>el('button'), chromeSearch:()=>el('button'), back:()=>{}, revealFocusedChromeDoor:()=>{},
     renderReview:main=>{const row=el('div');c.appendReviewVoice(row,{text:'でんしゃ',word:'電車'});main.append(row);},
   });
   Object.assign(c.S,{ready:true,variants:{nav:'tabs'},taken:[],dials:{furigana:0},lang:'en'});
