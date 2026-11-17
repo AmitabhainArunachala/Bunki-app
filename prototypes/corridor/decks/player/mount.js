@@ -2680,7 +2680,7 @@ function watchWindowEdges(passage, face) {
   return edges;
 }
 
-const SETTLE_GAP = 12;
+const SETTLE_GAP = 16;
 /**
  * After the reveal, at phone width (STANDARD A38, A39): the target sentence, the word and its
  * definition in view between the host's pinned header and the pinned grade bar, by the least

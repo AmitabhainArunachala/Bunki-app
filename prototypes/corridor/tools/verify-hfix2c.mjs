@@ -13,6 +13,8 @@ import { createRequire } from 'node:module';
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecord } from './record-test-support.mjs';
+import { extraLayoutRows, EXTRA_NAMES } from './answer-layout-oracle.mjs';
+const originalX4Predicate = g => (g.cut.length === 0 && g.foldBad.length === 0 && g.answer[0].top >= g.header.bottom + 12 - 1 && g.answer.at(-1).bottom <= g.bar.top - 12 + 1 && (!g.targetCanFit || (g.target.top >= Math.max(g.header.bottom + 12, g.view.top) - 1 && g.target.bottom <= Math.min(g.bar.top - 12, g.view.bottom) + 1 && (!g.toggle || g.toggle.top >= g.header.bottom + 12 - 1))) && g.overflow === 0);
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const require = createRequire(join(ROOT, 'package.json'));
 const { startStaticHost } = require(join(ROOT, 'prototypes/bunki-desktop/lib/static-host.cjs'));
@@ -22,6 +24,11 @@ const engine = process.env.KAIRO_BROWSER || 'webkit', mode = process.env.HFIX2C_
 assert(['webkit', 'chromium'].includes(engine)); assert(['base', 'branch', 'control'].includes(mode));
 const only = process.env.HFIX2C_CASE;
 assert(!only || ['X20','X8','X4','X4-return','readings','KT1','X21'].includes(only), 'Known selected case');
+const p3Extra = process.argv.includes('--answer-layout-extra');
+assert(!p3Extra || only === 'X4' && mode === 'branch', 'extra layout is explicit partial:X4 branch scope');
+const p3SourceDir = process.env.P3_ANSWER_SOURCE_DIR || null;
+assert(!p3SourceDir || mode === 'branch' && ['X4','X4-return'].includes(only), 'source substitution is targeted only');
+if(p3SourceDir) assert.equal(resolve(p3SourceDir),resolve(process.cwd(),'prototypes/corridor/decks/player'));
 const hash = s => createHash('sha256').update(s).digest('hex');
 const uptime = () => execFileSync('uptime', { encoding: 'utf8' }).trim();
 const read = (file, base = SITE) => readFileSync(join(base, file), 'utf8');
@@ -33,6 +40,8 @@ const receipt = { schemaVersion: 2, suite: 'hfix2c', runId: process.env.KAIRO_GA
   sources: { nativeRecordHelper: hash(readFileSync(new URL('./record-test-support.mjs', import.meta.url))) },
   identity, engine, mode, uptimeStart: uptime(), rows: [], mutations: [], errors: [],
   boundary: 'Automated isolated browsers, not a physical phone. Date rows use the shipped public sentence renderer on unchanged built cards. Five kanji rows use explicit display-contract fixtures; the real-data rows verify complete readings and a held-response pending-to-complete repaint.' };
+receipt.p3SourceWitness = p3SourceDir ? Object.fromEntries(['mount.js','player.css'].map(file=>[file,{artifact:hash(read('decks/player/'+file)),served:hash(readFileSync(join(p3SourceDir,file),'utf8'))}])) : null;
+if(p3SourceDir || p3Extra) receipt.acceptanceEligible = false;
 const check = (group, name, pass, observed) => { receipt.rows.push({ group, name, pass: !!pass, observed, uptime: uptime() }); console.log(`${pass ? 'PASS' : 'RED'} ${group} ${name}`); };
 const host = await startStaticHost({ site: SITE, port: 0 });
 const browser = await ({ chromium, webkit })[engine].launch(); receipt.browserVersion = browser.version();
@@ -60,6 +69,7 @@ async function newPage(group, width = 390, height = 844) {
       return JSON.stringify(data);
     }, 'every numeric date reading and custom gloss corrupted');
   }
+  if(p3SourceDir) for(const file of ['mount.js','player.css']) await page.route(new RegExp('/decks/player/'+file.replaceAll('.', '\\.')+'(\\?.*)?$'),route=>route.fulfill({body:readFileSync(join(p3SourceDir,file),'utf8'),contentType:file.endsWith('.css')?'text/css':'application/javascript'}));
   // A blank same-origin seed page avoids booting and aborting the app during fixture setup.
   await page.route('**/__hfix-seed', route => route.fulfill({body:'<!doctype html><title>Fixture seed</title>',contentType:'text/html'}));
   await page.goto(host.origin + '/__hfix-seed');
@@ -458,11 +468,13 @@ try {
     if (only && only !== key) continue;
     try { await fn(); } catch (error) { receipt.errors.push({ group: key, error: error.stack }); console.error(error); }
   }
+  if(p3Extra) await extraLayoutRows({newPage,deckStart,resting,layoutCensus,originalPredicate:originalX4Predicate,check,out:OUT});
 } finally { await browser.close(); await host.close(); }
 const groups = [...new Set(receipt.rows.map(r => r.group))];
 receipt.groups = Object.fromEntries(groups.map(g => [g, { rows: receipt.rows.filter(r => r.group === g).length, red: receipt.rows.filter(r => r.group === g && !r.pass).length }]));
 const expectedCounts = {X20:4,'X20-key':4,X8:10,X4:4,'X4-return':1,KT1:7,X21:1,inventory:1,readings:104};
 const selectedGroups = only ? (only === 'X20' ? ['X20','X20-key'] : only === 'readings' ? ['readings','inventory'] : [only]) : Object.keys(expectedCounts);
+if(p3Extra){ expectedCounts['X4-extra']=EXTRA_NAMES.length; selectedGroups.push('X4-extra'); }
 function expectedBase(row) {
   if (['inventory','X20-key','X21'].includes(row.group)) return true;
   if (row.group === 'X20') return row.name.startsWith('390:');
