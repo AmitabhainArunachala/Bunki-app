@@ -379,8 +379,321 @@ export const RETAINED_CASES = Object.freeze({
 
 import { createHash } from 'node:crypto';
 import { lstatSync, readFileSync, realpathSync, statSync } from 'node:fs';
-import { isAbsolute, join, relative, resolve } from 'node:path';
+import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
+import { parse } from 'acorn';
 import { readAuthoredCorridor } from '../../prototypes/corridor/tools/authored-corridor-source.mjs';
+const graphSlash = (path) => path.split(sep).join('/');
+const graphInside = (root, path) => {
+  const child = relative(root, path);
+  return child !== '' && child !== '..' && !child.startsWith(`..${sep}`) && !isAbsolute(child);
+};
+const graphName = (node) => (node?.type === 'Literal' ? node.value : node?.name);
+const graphIdentifier = (node) => (node?.type === 'Identifier' ? node.name : null);
+function graphPatternNames(node, names = []) {
+  if (!node) return names;
+  if (node.type === 'Identifier') names.push(node.name);
+  else if (node.type === 'ObjectPattern')
+    for (const property of node.properties)
+      graphPatternNames(
+        property.type === 'RestElement' ? property.argument : property.value,
+        names,
+      );
+  else if (node.type === 'ArrayPattern')
+    for (const element of node.elements) graphPatternNames(element, names);
+  else if (node.type === 'RestElement') graphPatternNames(node.argument, names);
+  else if (node.type === 'AssignmentPattern') graphPatternNames(node.left, names);
+  return names;
+}
+const graphDeclarationNames = (declaration) =>
+  declaration.type === 'FunctionDeclaration' || declaration.type === 'ClassDeclaration'
+    ? [declaration.id?.name]
+    : declaration.type === 'VariableDeclaration'
+      ? declaration.declarations.flatMap((entry) => graphPatternNames(entry.id))
+      : [];
+function graphStatements(statement) {
+  if (statement.type === 'ExportNamedDeclaration')
+    return statement.declaration ? [statement.declaration] : [];
+  return [statement];
+}
+export function deriveWordSavedAnswerIdentity(root) {
+  const appRoot = resolve(root, 'prototypes/corridor');
+  const corridorPath = resolve(appRoot, 'corridor.js');
+  const modulesRoot = resolve(appRoot, 'modules');
+  const helperPath = resolve(appRoot, 'tools/authored-corridor-source.mjs');
+  let realAppRoot, realModulesRoot;
+  try {
+    realAppRoot = realpathSync(appRoot);
+    realModulesRoot = realpathSync(modulesRoot);
+  } catch (error) {
+    throw new Error(`Missing authored corridor root ${graphSlash(appRoot)}: ${error.message}`, {
+      cause: error,
+    });
+  }
+  const label = (path) => graphSlash(relative(appRoot, path));
+  const records = new Map();
+  const owners = new Map();
+  const declarations = [];
+  const readModule = (path) => {
+    let info, realPath, bytes;
+    try {
+      info = lstatSync(path);
+      if (!info.isFile() || info.isSymbolicLink())
+        throw new Error('not a regular non-symlink file');
+      realPath = realpathSync(path);
+      bytes = readFileSync(realPath);
+    } catch (error) {
+      throw new Error(`Missing authored corridor source ${label(path)}: ${error.message}`, {
+        cause: error,
+      });
+    }
+    const expectedRealPath = resolve(realAppRoot, relative(appRoot, path));
+    if (realPath !== expectedRealPath)
+      throw new Error(`Authored corridor source ${label(path)} resolves through a symlink`);
+    if (path === corridorPath) {
+      if (realPath !== resolve(realAppRoot, 'corridor.js'))
+        throw new Error(
+          `Authored corridor source ${label(path)} resolves outside its selected root`,
+        );
+    } else if (!graphInside(realModulesRoot, realPath)) {
+      throw new Error(
+        `Authored corridor source ${label(path)} resolves outside modules/: ${graphSlash(realPath)}`,
+      );
+    }
+    const text = bytes.toString('utf8');
+    let ast;
+    try {
+      ast = parse(text, { ecmaVersion: 'latest', sourceType: 'module' });
+    } catch (error) {
+      throw new Error(`Unparseable authored corridor source ${label(path)}: ${error.message}`, {
+        cause: error,
+      });
+    }
+    return { bytes, text, ast, realPath };
+  };
+  const makeRecord = (path, realPath, ast) => {
+    const record = {
+      path: label(path),
+      realPath,
+      declarations: new Set(),
+      localExports: new Set(),
+      forwardExports: [],
+      imports: [],
+      hash: null,
+    };
+    const exports = new Set();
+    for (const statement of ast.body) {
+      if (statement.type === 'ExportDefaultDeclaration')
+        throw new Error(
+          `Unsupported default export in authored corridor source ${record.path}: only named declarations are lifted`,
+        );
+      if (statement.type === 'ExportAllDeclaration')
+        throw new Error(
+          `Unsupported star or namespace export ${graphName(statement.exported ?? statement.source)} in authored corridor source ${record.path}: only same-name named exports are lifted`,
+        );
+      for (const declaration of graphStatements(statement)) {
+        for (const name of graphDeclarationNames(declaration)) {
+          if (!name) continue;
+          record.declarations.add(name);
+          const owner = owners.get(name);
+          if (owner)
+            throw new Error(
+              `Duplicate authored declaration ${name} in ${owner} and ${record.path}`,
+            );
+          owners.set(name, record.path);
+        }
+      }
+      if (statement.type !== 'ExportNamedDeclaration') continue;
+      for (const name of statement.declaration
+        ? graphDeclarationNames(statement.declaration)
+        : []) {
+        if (!name) continue;
+        if (exports.has(name))
+          throw new Error(`Ambiguous authored export ${name} in ${record.path}`);
+        exports.add(name);
+        record.localExports.add(name);
+      }
+      for (const specifier of statement.specifiers) {
+        const local = graphIdentifier(specifier.local);
+        const exported = graphIdentifier(specifier.exported);
+        if (
+          specifier.type !== 'ExportSpecifier' ||
+          !local ||
+          !exported ||
+          local !== exported ||
+          exported === 'default'
+        )
+          throw new Error(
+            `Unsupported export alias ${graphName(specifier.exported)} in authored corridor source ${record.path}: only same-name named exports are lifted`,
+          );
+        if (exports.has(exported))
+          throw new Error(`Ambiguous authored export ${exported} in ${record.path}`);
+        exports.add(exported);
+        if (statement.source)
+          record.forwardExports.push({
+            name: exported,
+            source: statement.source.value,
+            target: null,
+          });
+        else record.localExports.add(exported);
+      }
+    }
+    return record;
+  };
+  const declarationSource = (text, ast) => {
+    const pieces = [];
+    for (const statement of ast.body) {
+      if (statement.type === 'ImportDeclaration') continue;
+      if (statement.type === 'ExportNamedDeclaration') {
+        if (statement.declaration)
+          pieces.push(text.slice(statement.declaration.start, statement.declaration.end));
+        continue;
+      }
+      pieces.push(text.slice(statement.start, statement.end));
+    }
+    return pieces.join('\n\n');
+  };
+  const follow = (path, specifier, from) => {
+    if (isAbsolute(specifier))
+      throw new Error(
+        `Authored corridor import escapes its source root: ${specifier} from ${from}`,
+      );
+    if (!specifier.startsWith('.')) return null;
+    if (path === corridorPath && !specifier.startsWith('./modules/')) return null;
+    const target = resolve(dirname(path), specifier);
+    if (target === corridorPath) return visit(corridorPath);
+    if (!graphInside(modulesRoot, target))
+      throw new Error(`Authored corridor import escapes modules/: ${specifier} from ${from}`);
+    const info = lstatSync(target, { throwIfNoEntry: false });
+    if (!info?.isFile() || info.isSymbolicLink())
+      throw new Error(`Missing authored corridor source ${label(target)} imported by ${from}`);
+    return visit(target);
+  };
+  const visit = (path) => {
+    const known = [...records.values()].find((record) => record.path === label(path));
+    if (known) return known;
+    const { bytes, text, ast, realPath } = readModule(path);
+    if (records.has(realPath)) return records.get(realPath);
+    const record = makeRecord(path, realPath, ast);
+    record.hash = sha256(bytes);
+    records.set(realPath, record);
+    declarations.push(declarationSource(text, ast));
+    for (const statement of ast.body) {
+      if (statement.type === 'ImportDeclaration') {
+        const specifier = statement.source?.value;
+        if (!specifier) continue;
+        const target = follow(path, specifier, record.path);
+        for (const entry of statement.specifiers || []) {
+          if (!target) {
+            if (entry.local?.name) record.imports.push({ name: entry.local.name, target: null });
+            continue;
+          }
+          if (entry.type === 'ImportDefaultSpecifier')
+            throw new Error(
+              `Unsupported default import ${entry.local?.name || ''} in authored corridor source ${record.path}: only same-name named imports are followed`,
+            );
+          if (entry.type === 'ImportNamespaceSpecifier')
+            throw new Error(
+              `Unsupported namespace import ${entry.local?.name || ''} in authored corridor source ${record.path}: only same-name named imports are followed`,
+            );
+          const imported = graphIdentifier(entry.imported);
+          const local = graphIdentifier(entry.local);
+          if (!imported || !local || imported !== local || imported === 'default')
+            throw new Error(
+              `Unsupported import alias ${graphName(entry.imported)} in authored corridor source ${record.path}: only same-name named imports are followed`,
+            );
+          record.imports.push({ name: local, target });
+        }
+      } else if (statement.type === 'ExportNamedDeclaration' && statement.source) {
+        const target = follow(path, statement.source.value, record.path);
+        if (!target)
+          throw new Error(
+            `Unsupported external reexport in authored corridor source ${record.path}: only same-name named reexports are followed`,
+          );
+        for (const forwarded of record.forwardExports)
+          if (forwarded.source === statement.source.value) forwarded.target = target;
+      }
+    }
+    return record;
+  };
+  visit(corridorPath);
+  const grounded = new Map([...records.values()].map((record) => [record, new Set()]));
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const record of records.values()) {
+      const names = grounded.get(record);
+      const add = (name) => {
+        if (!names.has(name)) {
+          names.add(name);
+          changed = true;
+        }
+      };
+      for (const name of record.localExports) {
+        if (record.declarations.has(name)) {
+          add(name);
+          continue;
+        }
+        const imported = record.imports.find((entry) => entry.name === name);
+        if (imported && (!imported.target || grounded.get(imported.target)?.has(name))) add(name);
+      }
+      for (const forwarded of record.forwardExports)
+        if (forwarded.target && grounded.get(forwarded.target)?.has(forwarded.name))
+          add(forwarded.name);
+    }
+  }
+  for (const record of records.values()) {
+    for (const name of record.localExports)
+      if (!grounded.get(record).has(name))
+        throw new Error(
+          `Unsupported authored export ${name} in ${record.path}: no grounded declaration or same-name export`,
+        );
+    for (const forwarded of record.forwardExports)
+      if (!forwarded.target || !grounded.get(record).has(forwarded.name))
+        throw new Error(
+          `Unsupported reexport ${forwarded.name} in ${record.path}: ${graphName(forwarded.source)} does not export it`,
+        );
+    for (const imported of record.imports)
+      if (imported.target && !grounded.get(imported.target).has(imported.name))
+        throw new Error(
+          `Unsupported import ${imported.name} in ${record.path}: ${imported.target.path} does not export it`,
+        );
+  }
+  const helperInfo = lstatSync(helperPath, { throwIfNoEntry: false });
+  if (!helperInfo?.isFile() || helperInfo.isSymbolicLink())
+    throw new Error('Missing authored corridor extraction helper');
+  const realHelperPath = realpathSync(helperPath);
+  if (realHelperPath !== resolve(realAppRoot, 'tools/authored-corridor-source.mjs'))
+    throw new Error('Authored corridor extraction helper resolves through a symlink');
+  return {
+    schemaVersion: 1,
+    sourceSha256: sha256(declarations.join('\n\n')),
+    moduleHashes: Object.fromEntries(
+      [...records.values()].map((record) => [`prototypes/corridor/${record.path}`, record.hash]),
+    ),
+    extractionHelperSha256: sha256(readFileSync(realHelperPath)),
+  };
+}
+function sameWordSavedAnswerIdentity(actual, expected) {
+  if (
+    actual === null ||
+    typeof actual !== 'object' ||
+    Array.isArray(actual) ||
+    !exact(Object.keys(expected), Object.keys(actual)) ||
+    actual.schemaVersion !== expected.schemaVersion ||
+    actual.sourceSha256 !== expected.sourceSha256 ||
+    actual.extractionHelperSha256 !== expected.extractionHelperSha256 ||
+    actual.moduleHashes === null ||
+    typeof actual.moduleHashes !== 'object' ||
+    Array.isArray(actual.moduleHashes)
+  )
+    return false;
+  return (
+    exact(Object.keys(expected.moduleHashes), Object.keys(actual.moduleHashes)) &&
+    Object.entries(expected.moduleHashes).every(
+      ([path, hash]) => actual.moduleHashes[path] === hash,
+    )
+  );
+}
 const WORD_IDS = [
   'T1',
   'T2',
@@ -537,11 +850,19 @@ function checkReport(name, producer, expected, { sourceOnly = false, browser = t
             ),
           'Wrong independent word inventory',
         );
-        if (name === 'word-saved-answer')
+        if (name === 'word-saved-answer') {
+          const expectedIdentity = deriveWordSavedAnswerIdentity(c.root);
           s.require(
-            sha(c.sourceSha256) && r.sourceSha256 === c.sourceSha256,
+            sha(c.sourceSha256) &&
+              r.sourceSha256 === c.sourceSha256 &&
+              expectedIdentity.sourceSha256 === c.sourceSha256,
             'Wrong extracted app source',
           );
+          s.require(
+            sameWordSavedAnswerIdentity(r.applicationIdentity, expectedIdentity),
+            'Missing, stale or forged application graph identity',
+          );
+        }
       } else if (name === 'corridor-build') {
         const first = r.results.find((row) => row.name === expected[0])?.detail,
           reused = r.results.find((row) => row.name === expected[1])?.detail;
