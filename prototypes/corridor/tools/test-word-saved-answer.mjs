@@ -60,6 +60,7 @@ import * as fsrsApi from '../vendor/ts-fsrs.mjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAuthoredCorridor } from './authored-corridor-source.mjs';
 import { INVENTORY, WORD_CONTROLS, applyControl, inventoryReport, runControls, sha256, sourceMarker, stageAssessmentAuthority } from './word-saved-answer-controls.mjs';
+import { deriveWordSavedAnswerIdentity } from '../../../scripts/ci/vh-retained-report-contracts.mjs';
 
 const here = (path) => new URL(path, import.meta.url);
 const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
@@ -266,7 +267,7 @@ function defineRows() {
       parent.children.splice(parent.children.indexOf(this) + 1, 0, ...nodes);
     }
     contains(node) { for (let at = node; at; at = at.parentNode) if (at === this) return true; return false; }
-    closest(selector) { const hit = matcher(selector); for (let at = this; at; at = at.parentNode) if (hit(at)) return at; return null; }
+    closest(selector) { const hit = matcher(selector); const walk = (node) => { if (!node) return null; return hit(node) ? node : walk(node.parentNode); }; return walk(this); }
     querySelectorAll(selector) {
       assert.match(selector, /^([a-z]+|input\[type="checkbox"\]|\[data-fold\])$/u, 'the fake DOM answers tag selectors, [data-fold], or the menu’s checkbox query, only');
       const hit = matcher(selector);
@@ -643,8 +644,10 @@ function defineRows() {
   }
   after(() => {
     const { exact, report } = inventoryReport('word-saved-answer', INVENTORY, observed);
+    const applicationIdentity = deriveWordSavedAnswerIdentity(ROOT);
     Object.assign(report, { schemaVersion: 1, runId: process.env.KAIRO_GATE_RUN_ID || randomUUID(),
-      verifierSha256: sha256(readFileSync(fileURLToPath(import.meta.url))), sourceSha256: sha256(source), sourceOnly: true });
+      verifierSha256: sha256(readFileSync(fileURLToPath(import.meta.url))), sourceSha256: sha256(source),
+      applicationIdentity, sourceOnly: true });
     // the release gate's 'checks' report; a control run writes none
     if (process.env.KAIRO_EVIDENCE_DIR && !controlName) {
       writeFileSync(join(resolveCorridorEvidence(), 'verification-report.json'), JSON.stringify(report, null, 2) + '\n');

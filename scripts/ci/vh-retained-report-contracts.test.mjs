@@ -1,7 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
+import {
+  lstatSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  realpathSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -85,7 +93,11 @@ function fixture(name) {
         modules: [{ inputs: [{ path: 'packages/domain/src/reading.ts', sha256: A }] }],
       },
     };
-    report.results[1].detail = { mode: 'supplied', status: 'passed', artifactSha256: C };
+    report.results[1].detail = {
+      mode: 'supplied',
+      status: 'passed',
+      artifactSha256: C,
+    };
   }
   if (name === 'drift-fast') {
     context.args = [
@@ -100,7 +112,11 @@ function fixture(name) {
     report.schemaVersion = 2;
     report.sourceSha256 = B;
     report.mode = 'fast';
-    report.gate = { scope: 'bounded PR regression slice', status: 'pass', exitCode: 0 };
+    report.gate = {
+      scope: 'bounded PR regression slice',
+      status: 'pass',
+      exitCode: 0,
+    };
     report.configuration = {
       words: 3,
       scaleNavigation: 'hosted',
@@ -122,7 +138,12 @@ function fixture(name) {
     }));
     report.fatalError = null;
     report.pageErrors = [];
-    report.totals = { total: expected.length, ok: expected.length, violations: 0, pageErrors: 0 };
+    report.totals = {
+      total: expected.length,
+      ok: expected.length,
+      violations: 0,
+      pageErrors: 0,
+    };
     report.coverage = {
       matrix: {
         requestedWords: 3,
@@ -147,11 +168,54 @@ function fixture(name) {
         observed: Object.fromEntries(
           ['穏やか', 'うるさい'].map((word) => [
             word,
-            { exists: true, interactive: true, satellite: true, onScreen: true },
+            {
+              exists: true,
+              interactive: true,
+              satellite: true,
+              onScreen: true,
+            },
           ]),
         ),
       },
     };
+  }
+  // Reviewed fixture-only source authority: literal authored bytes and literal declaration order.
+  // Never call the candidate consumer/identity derivation to manufacture its expected identity.
+  if (name === 'word-saved-answer') {
+    // SITE was exclusively created by this suite's own mkdtemp above.
+    // Canonicalize the OS temp parent (macOS may spell it through /var), but
+    // never accept a substituted symlink for the newly owned SITE itself.
+    assert(lstatSync(SITE).isDirectory() && !lstatSync(SITE).isSymbolicLink());
+    const ownedSite = realpathSync(SITE);
+    const canonicalTemp = realpathSync(tmpdir());
+    assert(ownedSite.startsWith(canonicalTemp + '/'), 'Fixture SITE escaped its temp parent');
+    const root = mkdtempSync(join(ownedSite, 'retained-identity-'));
+    assert.equal(realpathSync(root), root, 'Synthetic fixture root must be canonical');
+    assert(lstatSync(root).isDirectory() && !lstatSync(root).isSymbolicLink());
+    const app = join(root, 'prototypes/corridor');
+    mkdirSync(join(app, 'modules'), { recursive: true });
+    mkdirSync(join(app, 'tools'), { recursive: true });
+    const entry = "import { leaf } from './modules/leaf.mjs';\nconst entry = leaf;\n";
+    const leaf = 'export const leaf = 7;\n';
+    const helper = '// retained fixture extraction helper byte identity\n';
+    writeFileSync(join(app, 'corridor.js'), entry);
+    writeFileSync(join(app, 'modules/leaf.mjs'), leaf);
+    writeFileSync(join(app, 'tools/authored-corridor-source.mjs'), helper);
+    const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
+    const source = 'const entry = leaf;\n\nconst leaf = 7;';
+    const identity = {
+      schemaVersion: 1,
+      sourceSha256: hash(source),
+      moduleHashes: {
+        'prototypes/corridor/corridor.js': hash(entry),
+        'prototypes/corridor/modules/leaf.mjs': hash(leaf),
+      },
+      extractionHelperSha256: hash(helper),
+    };
+    context.root = root;
+    context.sourceSha256 = identity.sourceSha256;
+    report.sourceSha256 = identity.sourceSha256;
+    report.applicationIdentity = identity;
   }
   return { report, context, contract };
 }
@@ -220,7 +284,10 @@ for (const name of Object.keys(retainedReportContracts).filter((name) => name !=
       assert.equal(contract.validate(report, { ...context, ...patch }).passed, false);
     if (contract.sourceOnly)
       assert.equal(
-        contract.validate(report, { ...context, sourceVerifiedBeforeAndAfter: false }).passed,
+        contract.validate(report, {
+          ...context,
+          sourceVerifiedBeforeAndAfter: false,
+        }).passed,
         false,
       );
     else
@@ -233,7 +300,10 @@ for (const name of Object.keys(retainedReportContracts).filter((name) => name !=
       ])
         assert.equal(contract.validate(report, { ...context, ...patch }).passed, false);
     assert.equal(
-      contract.validate(report, { ...context, args: [...context.args, '--case', 'one'] }).passed,
+      contract.validate(report, {
+        ...context,
+        args: [...context.args, '--case', 'one'],
+      }).passed,
       false,
       'filtered invocation',
     );
@@ -532,7 +602,11 @@ function syntheticMutationControls({
       children: childIds.length,
       expectedChildren: childIds.length,
       controls: verdicts.length,
-      bounds: { timeoutMs: 300000, killSignal: 'SIGKILL', maxBufferBytesPerStream: 16777216 },
+      bounds: {
+        timeoutMs: 300000,
+        killSignal: 'SIGKILL',
+        maxBufferBytesPerStream: 16777216,
+      },
       totalBound: null,
     },
     pins: { before: pins, after: structuredClone(pins), stable: true },
@@ -556,7 +630,11 @@ function materialize(model) {
     for (const stream of ['stdout', 'stderr']) {
       const bytes = Buffer.from(model[stream][id], 'utf8');
       writeFileSync(join(gate, 'children', `${id}.${stream}`), bytes);
-      record[stream] = { path: `${id}.${stream}`, bytes: bytes.length, sha256: digestOf(bytes) };
+      record[stream] = {
+        path: `${id}.${stream}`,
+        bytes: bytes.length,
+        sha256: digestOf(bytes),
+      };
     }
     if (model.receipts[id]) {
       const bytes = Buffer.from(JSON.stringify(model.receipts[id], null, 2) + '\n', 'utf8');
@@ -619,7 +697,11 @@ test('word-saved-answer mutation controls: survived, missing, tampered, unstable
   };
   let m = fresh();
   m.records['tap-C1'].observation.rows.T1 = true;
-  m.records['tap-C1'].verdict = { ...m.records['tap-C1'].verdict, verdict: 'survived', failed: [] };
+  m.records['tap-C1'].verdict = {
+    ...m.records['tap-C1'].verdict,
+    verdict: 'survived',
+    failed: [],
+  };
   m.report.verdicts.find((row) => row.control === 'C1').verdict = 'survived';
   m.report.pass = false;
   retap(m, 'tap-C1');
@@ -646,11 +728,17 @@ test('word-saved-answer mutation controls: survived, missing, tampered, unstable
     return fx;
   });
   m = fresh();
-  m.report.pins.after['corridor.js'] = { ...m.report.pins.after['corridor.js'], sha256: A };
+  m.report.pins.after['corridor.js'] = {
+    ...m.report.pins.after['corridor.js'],
+    sha256: A,
+  };
   m.report.pins.stable = false;
   fail('unstable pins', m);
   m = fresh();
-  m.report.pins.after['dict.json'] = { ...m.report.pins.after['dict.json'], sha256: A };
+  m.report.pins.after['dict.json'] = {
+    ...m.report.pins.after['dict.json'],
+    sha256: A,
+  };
   fail('pins before/after differ though marked stable', m);
   m = fresh();
   for (const side of ['before', 'after']) m.report.pins[side]['corridor.js'].sha256 = A;
@@ -679,19 +767,28 @@ test('word-saved-answer mutation controls: survived, missing, tampered, unstable
   fail('reduced self-consistent roster', syntheticMutationControls({ word: reduced }));
   fail(
     'reduced learning roster',
-    syntheticMutationControls({ learning: { RB: LEARNING_RECORD_CONTROLS.RB } }),
+    syntheticMutationControls({
+      learning: { RB: LEARNING_RECORD_CONTROLS.RB },
+    }),
   );
   fail(
     'producer witnesses narrowed',
     syntheticMutationControls({
-      word: { ...WORD_CONTROLS, C5: { ...WORD_CONTROLS.C5, witnesses: ['T12'] } },
+      word: {
+        ...WORD_CONTROLS,
+        C5: { ...WORD_CONTROLS.C5, witnesses: ['T12'] },
+      },
     }),
   );
   m = fresh();
   Object.assign(m.records['tap-C4'], { status: null, signal: 'SIGKILL' });
   fail('timeout counted as kill', m);
   m = fresh();
-  m.records['tap-C4'].error = { class: 'timeout', code: 'ETIMEDOUT', message: 'ETIMEDOUT' };
+  m.records['tap-C4'].error = {
+    class: 'timeout',
+    code: 'ETIMEDOUT',
+    message: 'ETIMEDOUT',
+  };
   fail('spawn error counted as kill', m);
   m = fresh();
   m.stdout['tap-C6a'] = m.stdout['tap-C6a'].replace(
@@ -909,7 +1006,10 @@ for (const mutation of ['old62', 'missing', 'duplicate', 'extra', 'renamed', 're
     if (mutation === 'extra') report.results.push({ name: 'unreviewed extra check', pass: true });
     if (mutation === 'renamed') report.results[0].name = 'unreviewed renamed check';
     if (mutation === 'red') report.results[0].pass = false;
-    report.summary = { total: report.results.length, failed: mutation === 'red' ? 1 : 0 };
+    report.summary = {
+      total: report.results.length,
+      failed: mutation === 'red' ? 1 : 0,
+    };
     const result = contract.validate(report, context);
     assert.equal(result.passed, false);
     if (mutation !== 'red')

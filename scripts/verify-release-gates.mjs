@@ -43,6 +43,7 @@ import {
   validateGateEvidence,
   RELEASE_GROUPS,
 } from './ci/gate-evidence.mjs';
+import { deriveWordSavedAnswerIdentity } from './ci/vh-retained-report-contracts.mjs';
 import { commandCheckEvidence } from './ci/command-check-contracts.mjs';
 import { validateReaderEnglishEvidence } from './ci/vh-media-report-contracts.mjs';
 import {
@@ -2883,6 +2884,10 @@ async function runGate(gate, root, out, signal, boundary = {}) {
       {
         ...boundary,
         root,
+        sourceSha256:
+          gate.name === 'word-saved-answer'
+            ? deriveWordSavedAnswerIdentity(root).sourceSha256
+            : boundary.sourceSha256,
         out,
         startedAt,
         runId,
