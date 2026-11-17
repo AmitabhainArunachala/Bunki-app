@@ -1,7 +1,6 @@
 /** word-entry seam: split out of corridor.js (G3); now edited here directly. */
 import { $, barSavedVerb, savedInParts, savedPlace, AI_DEVICE_STORE, AI_KEY_STORE, D, DEPTH_OWNED_S, DEPTH_RECALLED_S, DEPTH_RECALL_R, GESTURE, NODE_KIND, NOTE_TEXT, REPORT_RELAY_STORE, S, SAVE_PRESS_MS, SLIP_NODE, SLIP_OWN_MEANING, TODAY_SKY_MISS_DAYS, VOICE_LOCK, activateWordLadder, anchorBox, bi, biLabel, capturePending, closeSealStrip, commitCapture, commitStorePatch, deeperDepth, depthRank, depthRetrievability, dictionaryRowBySeq, diveFromSlip, el, encounterKey, ensureArchiveIndex, ensureArticle, entryKanaIndex, explicitWordSnapshot, finiteNumber, fitChromeKeep, glyphBox, go, heldWordCardNode, hideReaderToast, holdPageUnderDrawer, kanaReadingKey, kataToHira, metReadable, motionEase, motionMs, nonEmptyString, notYetReleased, noteEncounter, openPlainSaveMenu, openSealStrip, openVocabularyListPopover, owns, pageCutAllowed, placeFloating, plainRecord, recordWritable, relayServiceUrl, removeMini, render, revalidateTutorRequests, revealFloatingFocus, rubyNode, sameItem, sameWordIdentity, savedAnswerFor, setOwnRecordValue, shallowerDepth, sheetActionLine, sheetActionLineKeys, showMini, srsKey, suppressAssessmentCards, tx, validInstant, wordCardIdentity, wordNodeIdentity, wordStudied } from '../corridor.js';
 import { encounterIdentity, readerQuickRecord } from './capture.mjs';
-import { listsByRecency } from './save-places.mjs';
 import { dictionaryAnsweredForm, inlineWordReading, lookup, partGloss, readyTokenReading, senseNameHeldText, senseRecord, teFormRecord } from './dictionary.mjs';
 import { dayKey, depthIdentityMatch, depthIndex, notYetMarks, todaySkyWhy } from './drift.mjs';
 import { readRecordDrafts } from './learner.mjs';
@@ -668,7 +667,19 @@ function wordClipKey(surface, reading) {
   return surface && reading ? `${surface}|${reading}` : null;
 }
 
+/** Manifest v2 only: { v:2, lock:{model}, words:{ "<surface>|<reading>": {...} } }. A v1 manifest
+ * is legacy — readable, but it declares no approved clips, because its keys are spellings and a
+ * spelling cannot choose between 年 ねん and 年 とし. A manifest whose lock names another model is
+ * refused outright: that is how an unauditioned voice would otherwise slip in. */
+function approvedWordManifest(m) {
+  if (!m || typeof m !== 'object') return null;
+  if (m.v !== 2) return { v: 1, legacy: true, words: {} };
+  if (m.lock?.model !== VOICE_LOCK.model) return { v: 1, legacy: true, words: {} };
+  return m && m.words && typeof m.words === 'object' ? m : { v: 1, legacy: true, words: {} };
+}
+
 function wordClipFor(m, surface, reading, role = 'word', entrySeq = null) {
+  m = approvedWordManifest(m);
   const key = wordClipKey(surface, reading);
   if (!m || m.legacy || !key) return null;
   const entry = m.words?.[key];

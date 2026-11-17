@@ -9777,7 +9777,7 @@ function openPlainSaveMenu(invoker, { more = [], place = null, home = null, keep
       if (isSaved()) { closeVocabularyListPopover({ restoreFocus: true }); return; }
       one.disabled = true;
       savePickInFlight = true;
-      let ok = false;
+      let ok;
       // a keep answers true, or leaves the item saved (a batch of words reads false until its room is drawn again)
       try { const result = await keep(); ok = result === true || (result !== false && isSaved()); }
       catch { ok = false; } finally { savePickInFlight = false; }
@@ -13359,16 +13359,6 @@ function lockedNarrationClip(src) {
     clip.src === src && clip.model === provider.model && Object.hasOwn(provider.voices, clip.voice)));
 }
 
-/** Manifest v2 only: { v:2, lock:{model}, words:{ "<surface>|<reading>": {...} } }. A v1 manifest
- * is legacy — readable, but it declares no approved clips, because its keys are spellings and a
- * spelling cannot choose between 年 ねん and 年 とし. A manifest whose lock names another model is
- * refused outright: that is how an unauditioned voice would otherwise slip in. */
-function approvedWordManifest(m) {
-  if (!m || typeof m !== 'object') return null;
-  if (m.v !== 2) return { v: 1, legacy: true, words: {} };
-  if (m.lock?.model !== VOICE_LOCK.model) return { v: 1, legacy: true, words: {} };
-  return m && m.words && typeof m.words === 'object' ? m : { v: 1, legacy: true, words: {} };
-}
 /** The word-clip key. Identity is the surface AND the reading the learner was shown — the same
  * identity R persists as cueReading/entrySeq. A spelling alone is never a key. */
 /** The one admissible clip for a (surface, reading) on a single-speaker surface. Returns null
@@ -13382,10 +13372,9 @@ const deviceVoice = createDeviceVoice();
  * voice above never speaks). It is loaded beside the app; null until it has arrived, and for good in the single-file
  * build, where every voice door then stays as it was. */
 let voiceLayer = null;
-let cardAudioSerial = 0, cardFaceKey = '', cardFaceReview = null, cardFaceItem = null;
+let cardFaceKey = '', cardFaceReview = null, cardFaceItem = null;
 let reviewVoiceFace = null;
 function retireCardSpeech() {
-  cardAudioSerial += 1;
   // a word or a line the seam is saying ends with the card; an article being read is the reader's own to end
   voiceLayer?.stop({ keepReader: true });
   deviceVoice.cancel();
@@ -13417,7 +13406,6 @@ function retireCardAudioOnFaceChange() {
   if (key === cardFaceKey && cardFaceReview === rv && cardFaceItem === item) return;
   cardFaceKey = key;
   cardFaceReview = rv; cardFaceItem = item;
-  cardAudioSerial += 1;
   // the screen changed: a word, an example or a line being said ends with it (the seam's reads are stopped on navigation)
   voiceLayer?.stop({ keepReader: true });
   deviceVoice.cancel();
@@ -15388,7 +15376,7 @@ function todayKnownWords(record = S) {
  * Decided from the date and the record, never by chance: within a rule the word that ranks first by the day's hash
  * wins, so it holds all day, saving or studying another word leaves it standing, and saving or studying it moves the
  * next load on to the next candidate. Reads the record only; writes nothing. */
-function todayWordOfDay(today) {
+function todayWordOfDay() {
   const day = dayKey();
   const dayStart = startOfDay(new Date());
   const dayEnd = dayStart + 86400000;

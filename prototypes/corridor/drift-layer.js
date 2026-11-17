@@ -2571,7 +2571,7 @@ addEventListener("keydown",e=>{ if(!DRIFT_ON||e.key!=="Escape")return; const sli
 
 // ---- interaction ----
 /** The ear (modules/ear.mjs) is asked as the finger lifts: true when this tap is the ear's to speak. */
-function earTakes(e){ try{ return !!(window.__BUNKI_EAR&&window.__BUNKI_EAR.takes(e)); }catch(_){ return false; } }
+function earTakes(e){ try{ return !!(window.__BUNKI_EAR&&window.__BUNKI_EAR.takes(e)); }catch{ return false; } }
 function tapNode(n){
   if(recordPending.size){setHint("判断を保存しています。");return;}
   cueRetire(n,"tap");   // retain the identity of the answered gesture
