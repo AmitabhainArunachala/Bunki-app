@@ -3,17 +3,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
-import {
-  lstatSync,
-  readFileSync,
-  realpathSync,
-  mkdirSync,
-  mkdtempSync,
-  readdirSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs';
-import { homedir } from 'node:os';
+import { lstatSync, readFileSync, realpathSync, readdirSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { kt3LabelContract } from '../../prototypes/corridor/tools/hfix2e-kt3-proof.test.mjs';
@@ -76,8 +66,7 @@ export const BATCH3_DYNAMIC_SOURCES = Object.freeze({
 const shared = 'prototypes/corridor/tools/verify-contrast-sweep.mjs';
 const arrival = 'prototypes/corridor/tools/vh-contrast-arrival.mjs';
 
-// Independent canonical baseline: exact accepted product commits, newest first.
-// No hash, commit, directory or metadata supplied by the caller becomes this oracle.
+// Independent effective-delta reconstruction from pinned historical and superseding Git objects.
 export const E2_BASE_TOOL = 'prototypes/corridor/tools/hfix2e2-base.mjs';
 export const E2_BASE_COMMITS = Object.freeze([
   'd61334a538a6e34ebd0701862521914cc1c2ff4b',
@@ -89,71 +78,176 @@ export const E2_BASE_FILES = Object.freeze([
   'prototypes/corridor/corridor.js',
   'prototypes/corridor/editorial.css',
 ]);
-function deriveE2Base(root, site, identity) {
-  const head = identity.gitSha;
+const E2_HISTORICAL_BASE = '1f790977139e3da318b6260b31d21edfde8a1c97';
+const E2_SUPERSEDING_COMMITS = Object.freeze([
+  '8db0ff2fa316c65dd0e2f5845d0fb5f051e60772',
+  'da0e3e6153735e31437dbf2e83e667f7a7cf20ec',
+  '2462bb079a4fa9e407aef41f9b4b197fbce96f23',
+  'e53a7eb08909d735c68884c7c6e47947dcf643c2',
+  '4fde751588e421a6f84e9aa8373648f315f5b477',
+]);
+export function deriveE2Base(root, site, identity) {
+  const head = identity?.gitSha;
   assert.match(head || '', /^[a-f0-9]{40}$/u);
-  // Repository selection and patch interpretation cannot come from ambient git overrides.
   const env = Object.fromEntries(
     Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_')),
   );
-  const git = (...args) => execFileSync('git', args, { cwd: root, env, maxBuffer: 1 << 29 });
-  assert.equal(git('rev-parse', '--verify', `${head}^{commit}`).toString().trim(), head);
-  const parent = join(homedir(), '.dharma', 'bunki', 'e2-base-oracle');
-  mkdirSync(parent, { recursive: true });
-  const work = mkdtempSync(join(parent, 'derive-'));
-  try {
-    for (const file of E2_BASE_FILES) {
-      const bytes = git('show', `${head}:${file}`),
-        name = file.split('/').pop();
-      assert.equal(
-        batch3Digest(regular(site, name)),
-        batch3Digest(bytes),
-        `Artifact differs from its committed ${name}`,
-      );
-      mkdirSync(dirname(join(work, file)), { recursive: true });
-      writeFileSync(join(work, file), bytes);
-    }
-    for (const commit of E2_BASE_COMMITS) {
-      assert.equal(git('rev-parse', '--verify', `${commit}^{commit}`).toString().trim(), commit);
-      git('merge-base', '--is-ancestor', commit, head);
-      const touched = git('diff-tree', '--no-commit-id', '--name-only', '-r', commit)
-        .toString()
-        .trim()
-        .split('\n');
-      assert(
-        touched.length && touched.every((file) => E2_BASE_FILES.includes(file)),
-        'Non-E2 product delta',
-      );
-      const patch = git(
-        'diff',
-        '--no-ext-diff',
-        '--no-textconv',
-        '--src-prefix=a/',
-        '--dst-prefix=b/',
-        `${commit}^`,
-        commit,
-        '--',
-        ...E2_BASE_FILES,
-      );
-      assert(patch.length > 0, 'Empty E2 product delta');
-      // Independent reconstruction: no helper output or caller-supplied base is used.
-      execFileSync('git', ['apply', '-R', '--check', '-'], { cwd: work, env, input: patch });
-      execFileSync('git', ['apply', '-R', '-'], { cwd: work, env, input: patch });
-    }
-    return {
-      head,
-      reverted: E2_BASE_COMMITS.map((commit) => commit.slice(0, 8)),
-      files: [...E2_BASE_FILES],
-      sha256: Object.fromEntries(
-        E2_BASE_FILES.map((file) => [
-          file.split('/').pop(),
-          batch3Digest(readFileSync(join(work, file))),
-        ]),
-      ),
-    };
-  } finally {
-    rmSync(work, { recursive: true, force: true });
+  const git = (...args) =>
+    execFileSync('git', args, { cwd: root, env, maxBuffer: 1 << 29 }).toString();
+  assert.equal(git('rev-parse', '--verify', `${head}^{commit}`).trim(), head);
+  assert.equal(git('rev-parse', `${E2_BASE_COMMITS[3]}^`).trim(), E2_HISTORICAL_BASE);
+  for (const commit of [...E2_BASE_COMMITS, ...E2_SUPERSEDING_COMMITS])
+    git('merge-base', '--is-ancestor', commit, head);
+
+  const inputs = [],
+    rules = [];
+  function blob(commit, name) {
+    const path = `prototypes/corridor/${name}`,
+      text = git('show', `${commit}:${path}`);
+    inputs.push({
+      commit,
+      path,
+      blob: git('rev-parse', `${commit}:${path}`).trim(),
+      sha256: batch3Digest(text),
+    });
+    return text;
   }
+  function hunks(commit, context = 3) {
+    const diff = git(
+      'diff',
+      '--no-ext-diff',
+      '--no-textconv',
+      `--unified=${context}`,
+      `${commit}^`,
+      commit,
+      '--',
+      'prototypes/corridor/editorial.css',
+    );
+    return diff
+      .split(/^@@.*@@.*\n/m)
+      .slice(1)
+      .map((hunk) => {
+        const lines = hunk.split('\n');
+        return {
+          before: lines
+            .filter((line) => line.startsWith('-') || line.startsWith(' '))
+            .map((line) => `${line.slice(1)}\n`)
+            .join(''),
+          after: lines
+            .filter((line) => line.startsWith('+') || line.startsWith(' '))
+            .map((line) => `${line.slice(1)}\n`)
+            .join(''),
+        };
+      });
+  }
+
+  const js = blob(head, 'corridor.js');
+  let css = blob(head, 'editorial.css');
+  for (const [name, text] of [
+    ['corridor.js', js],
+    ['editorial.css', css],
+  ])
+    assert.equal(
+      batch3Digest(regular(site, name)),
+      batch3Digest(text),
+      `Artifact differs from its committed ${name}`,
+    );
+  function replace(from, to, label) {
+    assert(from.length > 0);
+    assert.equal(css.split(from).length, 2, `exactly one ${label}`);
+    css = css.replace(from, to);
+    rules.push({
+      label,
+      removedSha256: batch3Digest(from),
+      insertedSha256: batch3Digest(to),
+      removedBytes: Buffer.byteLength(from),
+      insertedBytes: Buffer.byteLength(to),
+    });
+  }
+
+  const deleted = hunks(E2_SUPERSEDING_COMMITS[0], 0);
+  assert.equal(deleted.length, 1);
+  assert.equal(deleted[0].after, '');
+  for (const [index, hunk] of hunks(E2_BASE_COMMITS[0]).entries()) {
+    assert(hunk.after.includes(deleted[0].before));
+    replace(
+      hunk.after.replace(deleted[0].before, ''),
+      hunk.before,
+      `X13.round2.${index}: later tab transition deletion vacuous`,
+    );
+  }
+  const namiFirst = hunks(E2_BASE_COMMITS[1], 1)[0];
+  replace(namiFirst.after, namiFirst.before, 'NAMI original shelf label');
+  const dead = blob(E2_SUPERSEDING_COMMITS[3], 'editorial.css'),
+    deadRule = 'body .sheet .teacher-door .chip.btn-tertiary { flex-direction: row; }';
+  assert(dead.includes(deadRule));
+  assert(css.includes(deadRule));
+  rules.push({
+    label: 'NAMI old chip rule deleted by later controls fix; preserve deletion',
+    supersededBy: E2_SUPERSEDING_COMMITS[3],
+  });
+  const extended = blob(E2_SUPERSEDING_COMMITS[4], 'editorial.css'),
+    namiStart = extended.indexOf('/* 浪 (Hfix-2e2):');
+  assert(namiStart >= 0);
+  const namiEnd = extended.indexOf('/* 殻 is already phosphor', namiStart);
+  assert(namiEnd > namiStart);
+  replace(
+    extended.slice(namiStart, namiEnd),
+    '',
+    'NAMI extended later selector: remove historical label ink definition',
+  );
+
+  const laterCss = blob(E2_SUPERSEDING_COMMITS[2], 'editorial.css'),
+    g61Start = laterCss.indexOf('/* Hfix-2e2 · G6-1 · only opacity transitions.');
+  assert(g61Start >= 0);
+  const g61End = laterCss.indexOf('/* at 200 % text', g61Start);
+  assert(g61End > g61Start);
+  const g61 = laterCss.slice(g61Start, g61End);
+  assert(g61.includes('data-touch-fading'));
+  assert(g61.includes('transition: opacity'));
+  replace(g61, '', 'G61: later opacity-only CSS supersedes original discrete display block');
+  for (const [index, hunk] of hunks(E2_BASE_COMMITS[3]).entries())
+    replace(hunk.after, hunk.before, `X13.original.${index}`);
+
+  for (const commit of [E2_BASE_COMMITS[0], E2_BASE_COMMITS[1], E2_BASE_COMMITS[3]])
+    assert.equal(git('diff', `${commit}^`, commit, '--', 'prototypes/corridor/corridor.js'), '');
+  const legacy = git(
+    'diff',
+    `${E2_BASE_COMMITS[2]}^`,
+    E2_BASE_COMMITS[2],
+    '--',
+    'prototypes/corridor/corridor.js',
+  );
+  assert(legacy.includes('new WeakSet()'));
+  assert(legacy.includes('if (touchReadingFading(rt)) return;'));
+  const laterJs = blob(E2_SUPERSEDING_COMMITS[1], 'corridor.js');
+  assert(laterJs.includes('const TOUCH_READING_FADES = new Map();'));
+  assert(laterJs.includes('if (!(time > 0)) { complete(); return; }'));
+  assert(!css.includes('/* Hfix-2e2 · G6-1'));
+  assert(!css.includes('/* Hfix-2e2 · X-13'));
+  assert(!css.includes('--color-accent-label: #a8c4db'));
+  for (const text of [js, css]) assert(!/^(?:<{7}|={7}|>{7})/mu.test(text));
+
+  return {
+    head,
+    reverted: E2_BASE_COMMITS.map((commit) => commit.slice(0, 8)),
+    files: [...E2_BASE_FILES],
+    sha256: {
+      'corridor.js': batch3Digest(js),
+      'editorial.css': batch3Digest(css),
+    },
+    derivation: {
+      schemaVersion: 1,
+      strategy: 'historical-e2-effective-delta-v2',
+      historicalBase: E2_HISTORICAL_BASE,
+      historicalCommits: [...E2_BASE_COMMITS],
+      supersedingCommits: [...E2_SUPERSEDING_COMMITS],
+      inputs,
+      rules,
+      jsResolution:
+        'retain later shared-seat/owned-cycle implementation; zero-transition conceal is synchronous',
+    },
+  };
 }
 function e2BasePinsValid(p) {
   sha(p.sources[E2_BASE_TOOL]);
@@ -169,6 +263,8 @@ function e2BasePinsValid(p) {
 export function readBatch3Base(out, p) {
   assert.equal(p.suite, 'hfix2e2');
   e2BasePinsValid(p);
+  const expected = deriveE2Base(p.rootDir, realpathSync(p.siteDir), p.identity);
+  exact(p.baseline, expected, 'E2 pins differ from the independently derived witness');
   const dir = join(realpathSync(out), 'e2-base'),
     stat = lstatSync(dir);
   assert(
@@ -180,13 +276,13 @@ export function readBatch3Base(out, p) {
     metadata = JSON.parse(metadataBytes);
   exact(
     metadata,
-    p.baseline,
-    'E2 base was not reconstructed from this artifact and the four owned commits',
+    expected,
+    'E2 base was not reconstructed from this artifact and its effective historical delta',
   );
   const files = { 'e2-base/base.json': batch3Digest(metadataBytes) };
   for (const name of ['corridor.js', 'editorial.css']) {
     const digest = batch3Digest(regular(dir, name));
-    assert.equal(digest, p.baseline.sha256[name], `Foreign E2 baseline ${name}`);
+    assert.equal(digest, expected.sha256[name], `Foreign E2 baseline ${name}`);
     files[`e2-base/${name}`] = digest;
   }
   return { dir, metadata, files };
@@ -262,10 +358,11 @@ export function loadBatch3Pins({ root, siteDir, suite, engine, runId }) {
   assert(BATCH3_SUITES.includes(suite));
   assert(['chromium', 'webkit'].includes(engine));
   nonempty(runId);
-  const site = realpathSync(siteDir),
-    require = createRequire(pathToFileURL(resolve(root, 'package.json')));
+  const rootDir = realpathSync(root),
+    site = realpathSync(siteDir),
+    require = createRequire(pathToFileURL(resolve(rootDir, 'package.json')));
   const { verifyBundledArtifact } = require(
-    resolve(root, 'prototypes/bunki-desktop/lib/artifact.cjs'),
+    resolve(rootDir, 'prototypes/bunki-desktop/lib/artifact.cjs'),
   );
   const identity = verifyBundledArtifact(site);
   assert.equal(identity.sourceDirty, false);
@@ -283,9 +380,9 @@ export function loadBatch3Pins({ root, siteDir, suite, engine, runId }) {
   if (['hfix2e-contrast', 'hfix2e2'].includes(suite)) seeds.push(shared, arrival);
   if (suite === 'hfix2e2') seeds.push(E2_BASE_TOOL);
   seeds.push(...(BATCH3_DYNAMIC_SOURCES[suite] || []));
-  const sources = sourceClosure(root, seeds);
-  const baseline = suite === 'hfix2e2' ? deriveE2Base(root, site, identity) : null;
-  return { suite, engine, runId, siteDir: site, identity, sources, baseline };
+  const sources = sourceClosure(rootDir, seeds);
+  const baseline = suite === 'hfix2e2' ? deriveE2Base(rootDir, site, identity) : null;
+  return { suite, engine, runId, rootDir, siteDir: site, identity, sources, baseline };
 }
 function pinsValid(p) {
   assert(BATCH3_SUITES.includes(p.suite));
