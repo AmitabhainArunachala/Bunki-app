@@ -43,8 +43,7 @@ function derive(root) {
     });
     return text;
   };
-  for (const commit of [...COMMITS, ...LATER])
-    git('merge-base', '--is-ancestor', commit, SUBJECT);
+  for (const commit of [...COMMITS, ...LATER]) git('merge-base', '--is-ancestor', commit, SUBJECT);
 
   const js = blob(SUBJECT, 'corridor.js');
   const subjectCss = blob(SUBJECT, 'editorial.css');
@@ -135,17 +134,8 @@ function derive(root) {
     replace(hunk.after, hunk.before, `X13.original.${index}`);
 
   for (const commit of [COMMITS[0], COMMITS[1], COMMITS[3]])
-    assert.equal(
-      git('diff', `${commit}^`, commit, '--', 'prototypes/corridor/corridor.js'),
-      '',
-    );
-  const legacy = git(
-    'diff',
-    `${COMMITS[2]}^`,
-    COMMITS[2],
-    '--',
-    'prototypes/corridor/corridor.js',
-  );
+    assert.equal(git('diff', `${commit}^`, commit, '--', 'prototypes/corridor/corridor.js'), '');
+  const legacy = git('diff', `${COMMITS[2]}^`, COMMITS[2], '--', 'prototypes/corridor/corridor.js');
   assert(legacy.includes('new WeakSet()'));
   assert(legacy.includes('if (touchReadingFading(rt)) return;'));
   const laterJs = blob(LATER[1], 'corridor.js');
@@ -206,9 +196,7 @@ export function createHistoricalFixture({ value, pins, extras, files, engine }) 
   if (Object.hasOwn(value, 'gitSha')) value.gitSha = SUBJECT;
   if (value.identity) value.identity.gitSha = SUBJECT;
   value.base.head = SUBJECT;
-  value.base.sha256 = ['corridor.js', 'editorial.css'].map(
-    (name) => fixture.baseline.sha256[name],
-  );
+  value.base.sha256 = ['corridor.js', 'editorial.css'].map((name) => fixture.baseline.sha256[name]);
 
   extras.sweep.gitSha = SUBJECT;
   extras.sweep.identity.gitSha = SUBJECT;

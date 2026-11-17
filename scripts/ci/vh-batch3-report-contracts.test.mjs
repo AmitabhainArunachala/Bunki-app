@@ -41,7 +41,11 @@ let historicalFixtureModule = null;
 try {
   historicalFixtureModule = await import('./fixtures/vh-batch3/historical-fixture.mjs');
 } catch (error) {
-  if (error.code !== 'ERR_MODULE_NOT_FOUND' || error.url !== new URL('./fixtures/vh-batch3/historical-fixture.mjs', import.meta.url).href) throw error;
+  if (
+    error.code !== 'ERR_MODULE_NOT_FOUND' ||
+    error.url !== new URL('./fixtures/vh-batch3/historical-fixture.mjs', import.meta.url).href
+  )
+    throw error;
 }
 function sample(suite, engine) {
   const native = unitFixture(suite, engine),
