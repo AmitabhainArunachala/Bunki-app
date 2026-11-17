@@ -28,11 +28,18 @@ import { isDeepStrictEqual } from 'node:util';
 import { buildCorridorModules } from './build-reading-module.mjs';
 import { corridorAssetFiles } from './corridor-assets.mjs';
 import { verifyRelease } from './release/version.mjs';
-import { acceptanceEnvironment, digest, sourceSnapshot } from './ci/verification-admission.mjs';
+import {
+  acceptanceEnvironment,
+  digest,
+  exactIds,
+  requireGateAttemptEvidence,
+  sourceSnapshot,
+} from './ci/verification-admission.mjs';
 import {
   gateEvidenceDeclaration,
   evidenceInvocation,
   requireApprovedInvocation,
+  plannedProofContract,
   validateGateEvidence,
   RELEASE_GROUPS,
 } from './ci/gate-evidence.mjs';
@@ -2679,16 +2686,35 @@ async function runGate(gate, root, out, signal, boundary = {}) {
   const attemptPath = join(out, `${gate.name}.attempt.json`);
   const stdoutPath = join(out, `${gate.name}.stdout.json`);
   let proof = null;
+  let cleanupError = null;
   let declaration, invocation, instrumentation, commandBefore, sourceBefore, fd, stdoutFd;
+  const cleanup = (action) => {
+    try {
+      action();
+    } catch (error) {
+      cleanupError = [cleanupError, String(error.message || error)].filter(Boolean).join('; ');
+    }
+  };
+  const closeFiles = () => {
+    if (fd !== undefined) cleanup(() => closeSync(fd));
+    if (stdoutFd !== undefined) cleanup(() => closeSync(stdoutFd));
+  };
   writeFileSync(log, '');
   const finish = (status, exitCode, detail = '', processExitCode = null) => {
     const result = {
+      receiptSchemaVersion: 2,
       name: gate.name,
       runId,
       attemptReceipt: attemptPath,
       status,
       exitCode,
       processExitCode,
+      producerStatus: status,
+      producerDetail: detail,
+      producerEvidenceSha256: null,
+      cleanupError,
+      boundaryError: null,
+      admissionStatus: status === 'passed' && cleanupError ? 'incomplete' : status,
       detail,
       log,
       startedAt,
@@ -2707,6 +2733,11 @@ async function runGate(gate, root, out, signal, boundary = {}) {
         proof,
       };
       result.evidenceReceiptSha256 = digest(JSON.stringify(result.evidenceReceipt));
+      result.producerEvidenceSha256 = result.evidenceReceiptSha256;
+    }
+    if (status === 'passed' && cleanupError) {
+      result.status = 'incomplete';
+      result.exitCode = 78;
     }
     writeJson(attemptPath, {
       schemaVersion: 1,
@@ -2763,7 +2794,7 @@ async function runGate(gate, root, out, signal, boundary = {}) {
     fd = openSync(log, 'a');
     stdoutFd = openSync(stdoutPath, 'wx');
   } catch (error) {
-    if (fd !== undefined) closeSync(fd);
+    closeFiles();
     return finish('incomplete', 78, error.message);
   }
   const tee = (chunk) => {
@@ -2825,9 +2856,8 @@ async function runGate(gate, root, out, signal, boundary = {}) {
     clearTimeout(killTimer);
     clearTimeout(drainTimer);
     signal?.removeEventListener('abort', abort);
-    child?.stdout?.destroy();
-    closeSync(fd);
-    closeSync(stdoutFd);
+    cleanup(() => child?.stdout?.destroy());
+    closeFiles();
   }
   if (killed)
     return finish(killed, killed === 'timed-out' ? 124 : 130, `Gate ${killed}`, result.code);
@@ -2872,7 +2902,189 @@ async function runGate(gate, root, out, signal, boundary = {}) {
   return finish('passed', 0, '', 0);
 }
 
-export async function runGates({ gates, root, out, source = null, signal }) {
+function requireBatteryBoundary(receipt) {
+  assert(Object.hasOwn(receipt, 'sourceBefore'), 'Initial source check missing');
+  assert(Object.hasOwn(receipt, 'sourceAfter'), 'Final source check missing');
+  assert.deepEqual(receipt.sourceAfter, receipt.sourceBefore, 'Source boundary differs');
+  if (receipt.source?.sha)
+    assert.equal(receipt.sourceBefore?.head, receipt.source.sha, 'Source identity differs');
+  if (
+    receipt.source?.site ||
+    receipt.source?.artifactSha256 ||
+    receipt.artifactBefore ||
+    receipt.artifactAfter
+  ) {
+    assert(receipt.artifactBefore && receipt.artifactAfter, 'Final artifact check missing');
+    assert.match(receipt.artifactBefore.artifactSha256, /^[a-f0-9]{64}$/u);
+    assert.equal(
+      receipt.artifactAfter.artifactSha256,
+      receipt.artifactBefore.artifactSha256,
+      'Artifact boundary differs',
+    );
+    if (receipt.source?.artifactSha256)
+      assert.equal(
+        receipt.artifactAfter.artifactSha256,
+        receipt.source.artifactSha256,
+        'Artifact identity differs',
+      );
+    for (const artifact of [receipt.artifactBefore, receipt.artifactAfter])
+      if (Object.hasOwn(artifact, 'gitSha'))
+        assert.equal(artifact.gitSha, receipt.sourceBefore?.head, 'Artifact source differs');
+  }
+}
+
+// Validate transported lifecycle state independently of the producer. Full admission
+// additionally requires the canonical roster and its existing proof contracts.
+export function validateBatteryReceipt(receipt, { fullBattery = false } = {}) {
+  assert.equal(receipt.receiptSchemaVersion, 2, 'Legacy battery receipt rejected');
+  assert.equal(receipt.kind, 'kairo-required-battery');
+  assert.equal(receipt.status, 'passed');
+  assert.equal(receipt.admissionStatus, 'passed');
+  assert.equal(receipt.exitCode, 0);
+  assert(receipt.completedAt, 'Battery did not finish');
+  assert(!receipt.signalAborted, 'Battery interrupted');
+  for (const key of [
+    'cleanupError',
+    'boundaryError',
+    'sourceBoundaryError',
+    'artifactBoundaryError',
+    'admissionError',
+  ])
+    assert(!receipt[key], `Battery ${key}`);
+  requireBatteryBoundary(receipt);
+  assert(Array.isArray(receipt.gates) && receipt.gates.length > 0, 'Empty battery');
+  const names = receipt.gates.map((gate) => gate.name);
+  assert.equal(new Set(names).size, names.length, 'Duplicate gate');
+  const full = fullBattery || receipt.scope === 'full-battery';
+  const canonical = full ? batteryGates('/unused', {}) : [];
+  if (full) {
+    exactIds(
+      canonical.map((gate) => gate.name),
+      names,
+      'Full battery gates',
+    );
+    assert(
+      receipt.source?.sha && receipt.source?.site && receipt.source?.artifactSha256,
+      'Full battery requires source and artifact identity',
+    );
+  }
+  for (const gate of receipt.gates) {
+    assert.equal(gate.status, 'passed');
+    assert.equal(gate.producerStatus, 'passed');
+    assert.equal(gate.admissionStatus, 'passed');
+    assert.equal(gate.exitCode, 0);
+    assert.equal(gate.processExitCode, 0);
+    assert.equal(typeof gate.producerDetail, 'string');
+    assert.equal(gate.detail, gate.producerDetail, 'Producer detail differs');
+    assert(!gate.cleanupError && !gate.boundaryError, 'Gate finalization failed');
+    const evidence = gate.evidenceReceipt;
+    assert(evidence && [1, 2].includes(evidence.schemaVersion), 'Gate evidence missing');
+    assert.equal(evidence.kind, 'bunki-gate-evidence');
+    assert.equal(evidence.name, gate.name);
+    assert(typeof gate.runId === 'string' && gate.runId.length > 0, 'Gate nonce missing');
+    assert.equal(evidence.runId, gate.runId, 'Gate nonce differs');
+    assert.equal(evidence.fullAcceptance, true);
+    assert(gate.proof && typeof gate.proof === 'object', 'Producer proof missing');
+    assert.deepEqual(evidence.proof, gate.proof, 'Producer proof differs');
+    assert.equal(
+      gate.evidenceReceiptSha256,
+      digest(JSON.stringify(evidence)),
+      'Evidence digest differs',
+    );
+    assert.equal(
+      gate.producerEvidenceSha256,
+      gate.evidenceReceiptSha256,
+      'Producer digest differs',
+    );
+    const identity = {
+      gitSha: receipt.sourceBefore?.head || null,
+      artifactSha256: receipt.artifactBefore?.artifactSha256 || null,
+    };
+    for (const key of Object.keys(identity))
+      if (full || evidence.schemaVersion === 1 || Object.hasOwn(evidence, key))
+        assert.equal(evidence[key], identity[key], `Evidence ${key} differs`);
+    if (full || (evidence.schemaVersion === 1 && gate.proof.kind !== 'process-probe'))
+      requireGateAttemptEvidence(gate, identity);
+    if (full) {
+      plannedProofContract(
+        canonical.find((item) => item.name === gate.name),
+        ROOT,
+      ).require(gate.proof);
+    }
+  }
+  return receipt;
+}
+
+export function finalizeBatteryReceipt(receipt, boundary = {}) {
+  assert.equal(receipt.receiptSchemaVersion, 2, 'Legacy battery receipt rejected');
+  for (const key of ['sourceAfter', 'artifactAfter'])
+    if (Object.hasOwn(boundary, key)) receipt[key] = boundary[key];
+  receipt.signalAborted = Boolean(receipt.signalAborted || boundary.signalAborted);
+  receipt.sourceBoundaryError ||= boundary.sourceError || null;
+  receipt.artifactBoundaryError ||= boundary.artifactError || null;
+  receipt.cleanupError =
+    [receipt.cleanupError, boundary.cleanupError, ...receipt.gates.map((gate) => gate.cleanupError)]
+      .filter(Boolean)
+      .join('; ') || null;
+  const errors = [
+    receipt.boundaryError,
+    receipt.sourceBoundaryError,
+    receipt.artifactBoundaryError,
+  ];
+  if (receipt.signalAborted) errors.push('Battery interrupted');
+  try {
+    requireBatteryBoundary(receipt);
+  } catch (error) {
+    errors.push(error.message);
+  }
+  receipt.boundaryError = errors.filter(Boolean).join('; ') || null;
+  const interrupted =
+    receipt.signalAborted || receipt.gates.some((gate) => gate.producerStatus === 'interrupted');
+  for (const gate of receipt.gates) {
+    gate.producerStatus ??= gate.status;
+    gate.producerDetail ??= gate.detail || '';
+    gate.processExitCode ??= null;
+    gate.producerEvidenceSha256 ??= null;
+    gate.cleanupError ??= null;
+    gate.boundaryError = receipt.boundaryError;
+    gate.admissionStatus =
+      gate.producerStatus === 'passed' &&
+      (receipt.boundaryError || receipt.cleanupError || interrupted)
+        ? 'incomplete'
+        : gate.producerStatus;
+    if (gate.producerStatus === 'passed' && gate.admissionStatus !== 'passed') {
+      gate.status = 'incomplete';
+      gate.exitCode = 78;
+    }
+  }
+  receipt.status = interrupted
+    ? 'interrupted'
+    : !receipt.boundaryError &&
+        !receipt.cleanupError &&
+        receipt.gates.length > 0 &&
+        receipt.gates.every((gate) => gate.admissionStatus === 'passed')
+      ? 'passed'
+      : 'failed';
+  receipt.exitCode = receipt.status === 'passed' ? 0 : interrupted ? 130 : 1;
+  receipt.admissionStatus = receipt.status;
+  receipt.completedAt = now();
+  if (receipt.status === 'passed') {
+    try {
+      validateBatteryReceipt(receipt);
+    } catch (error) {
+      receipt.admissionError = error.message;
+      receipt.status = receipt.admissionStatus = 'failed';
+      receipt.exitCode = 1;
+      for (const gate of receipt.gates) {
+        gate.admissionStatus = gate.status = 'incomplete';
+        gate.exitCode = 78;
+      }
+    }
+  }
+  return receipt;
+}
+
+export async function runGates({ gates, root, out, source = null, signal, fullBattery = false }) {
   assert(gates.length > 0, 'An empty battery cannot pass');
   assert.equal(
     new Set(gates.map((gate) => gate.name)).size,
@@ -2880,10 +3092,22 @@ export async function runGates({ gates, root, out, source = null, signal }) {
     'Gate names must be unique',
   );
   for (const gate of gates) assert(/^[a-z][a-z0-9-]*$/.test(gate.name), 'Unsafe gate name');
+  if (fullBattery)
+    assert.deepEqual(
+      gates,
+      batteryGates(out, {
+        ...process.env,
+        KAIRO_SITE_DIR: source?.site,
+        KAIRO_VERIFIED_ARTIFACT_SHA256: source?.artifactSha256,
+      }),
+      'Full battery requires the canonical invocations',
+    );
   mkdirSync(out, { recursive: true });
   const receipt = {
     schemaVersion: 1,
+    receiptSchemaVersion: 2,
     kind: 'kairo-required-battery',
+    scope: fullBattery ? 'full-battery' : 'selected-gates',
     status: 'running',
     source,
     startedAt: now(),
@@ -2893,6 +3117,8 @@ export async function runGates({ gates, root, out, source = null, signal }) {
   };
   const persist = () => {
     writeJson(join(out, 'battery.json'), receipt);
+    if (receipt.status === 'passed')
+      validateBatteryReceipt(json(join(out, 'battery.json')), { fullBattery });
     const safe = (value) =>
       String(value ?? '')
         .replaceAll('|', '/')
@@ -2904,13 +3130,16 @@ export async function runGates({ gates, root, out, source = null, signal }) {
         '',
         `Source: ${source?.sha || 'behavioral fixture'}; dirty: ${source?.dirty ?? 'fixture'}`,
         '',
-        '| gate | status | exit | detail |',
-        '| --- | --- | --- | --- |',
+        '| gate | producer | admission | process exit | detail |',
+        '| --- | --- | --- | --- | --- |',
         ...receipt.gates.map(
           (gate) =>
-            `| ${gate.name} | ${gate.status} | ${gate.exitCode ?? ''} | ${safe(gate.detail)} |`,
+            `| ${gate.name} | ${gate.producerStatus || gate.status} | ${gate.admissionStatus || 'pending'} | ${gate.processExitCode ?? ''} | ${safe(gate.detail)} |`,
         ),
         '',
+        ...['cleanupError', 'boundaryError', 'admissionError']
+          .filter((key) => receipt[key])
+          .map((key) => `${key}: ${safe(receipt[key])}`),
         `Started: ${receipt.startedAt}`,
         `Completed: ${receipt.completedAt || 'incomplete'}`,
         '',
@@ -2969,24 +3198,6 @@ export async function runGates({ gates, root, out, source = null, signal }) {
       `[battery] ${gate.name} -> ${receipt.gates[index].status} (${receipt.gates[index].exitCode})`,
     );
   }
-  const invalidatePassed = (detail) => {
-    for (const gate of receipt.gates)
-      if (gate.status === 'passed') {
-        gate.status = 'incomplete';
-        gate.exitCode = 78;
-        gate.detail = detail;
-        gate.proof = null;
-        delete gate.evidenceReceipt;
-        delete gate.evidenceReceiptSha256;
-        if (gate.attemptReceipt)
-          writeJson(gate.attemptReceipt, {
-            ...json(gate.attemptReceipt),
-            ...gate,
-            evidenceReceipt: null,
-            evidenceReceiptSha256: null,
-          });
-      }
-  };
   try {
     receipt.sourceAfter = sourceSnapshot(root);
     assert.deepEqual(
@@ -2996,24 +3207,20 @@ export async function runGates({ gates, root, out, source = null, signal }) {
     );
   } catch (error) {
     receipt.sourceBoundaryError = String(error.message);
-    invalidatePassed('Source boundary failed: ' + error.message);
   }
   if (source?.site) {
     try {
-      receipt.artifactAfter = verifyArtifact(source.site);
-      assert.equal(receipt.artifactAfter.artifactSha256, receipt.artifactBefore.artifactSha256);
+      const verified = verifyArtifact(source.site);
+      assert.equal(verified.artifactSha256, receipt.artifactBefore.artifactSha256);
+      receipt.artifactAfter = verified;
     } catch (error) {
       receipt.artifactBoundaryError = String(error.message);
-      invalidatePassed('Artifact boundary failed: ' + error.message);
     }
   }
-  receipt.status = signal?.aborted
-    ? 'interrupted'
-    : receipt.gates.every((gate) => gate.status === 'passed')
-      ? 'passed'
-      : 'failed';
-  receipt.exitCode = receipt.status === 'passed' ? 0 : receipt.status === 'interrupted' ? 130 : 1;
-  receipt.completedAt = now();
+  finalizeBatteryReceipt(receipt, { signalAborted: signal?.aborted });
+  for (const gate of receipt.gates)
+    if (gate.attemptReceipt)
+      writeJson(gate.attemptReceipt, { ...json(gate.attemptReceipt), ...gate });
   persist();
   return receipt;
 }
@@ -6896,6 +7103,7 @@ async function main() {
           out,
           source,
           signal: controller.signal,
+          fullBattery: true,
         })
       ).exitCode;
     } finally {
