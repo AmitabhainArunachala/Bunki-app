@@ -59,7 +59,7 @@ export const REFERENCE_DATA_PINS = Object.freeze({
   'data/share_alike/dict.json': 'a752529ab0e93d094a0eb04a89bdc2bc01f761c728590d6a485f38a256f175fd',
   // FULL-R1 (A): followed Hfix-2b's words.json fix (a1dbed8f; was the a1dbed8f^ bytes, 69d73f92…)
   // R2 E2: three reviewed word/reading gloss repairs.
-  'data/share_alike/words.json': 'd21ff76508a3ed88cec9c096510feac9b5ff2df639061a3be46cb85c6fdf985b',
+  'data/share_alike/words.json': 'ed485e7caf2956ef6d7aac03352b32feabbb04224898acc41f2deaaaa6b12aed',
   'data/share_alike/kanji.json': '8ce7ad0151a2bf487bda72c384460eca908fc1bdc2a4073042b9e3db7342d2ce',
   'data/proprietary_safe/kanken.json':
     '6efa199b7caec160c95e87c260b4184694fb8e4778a4563327bf1d79741ff444',
@@ -69,7 +69,7 @@ export const REFERENCE_DATA_PINS = Object.freeze({
   // was the pre-FIXR bytes, 8a5c953e…)
   // R2 E3: adds full Jōyō on/kun projections; E2 words audit and KANJI-NEXT facts remain exact.
   'data/share_alike/reference-extra.json':
-    'fdeb4a2c9d04248e7b6c6147b272555386a6e2e850ae4448f59b93c7797eedf8',
+    'afc5a15205f129813ce183d5e3ef81c46ffe83d265bb8c075d02e3c27b2f889e',
 });
 export const SKIP_BROWSER_NAMES = Object.freeze([
   'dictionary tool includes its label in the accessible name',
