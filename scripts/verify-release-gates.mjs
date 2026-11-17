@@ -2818,13 +2818,13 @@ async function runGate(gate, root, out, signal, boundary = {}) {
   const stop = (reason) => {
     if (killed) return;
     killed = reason;
-    killGroup('SIGTERM');
+    cleanup(() => killGroup('SIGTERM'));
     // A browser grandchild can outlive its parent and ignore TERM. Kill the
     // group after the grace period even when the direct child exits first.
     stopPromise = new Promise((accept) => {
       killTimer = setTimeout(() => {
-        killGroup('SIGKILL');
-        child?.stdout?.destroy();
+        cleanup(() => killGroup('SIGKILL'));
+        cleanup(() => child?.stdout?.destroy());
         accept();
       }, 250);
     });
@@ -2840,8 +2840,12 @@ async function runGate(gate, root, out, signal, boundary = {}) {
         detached: process.platform !== 'win32',
       });
       child.stdout?.on('data', tee);
-      child.once('exit', () => {
-        drainTimer = setTimeout(() => child.stdout?.destroy(), 2000);
+      child.once('exit', (code, processSignal) => {
+        drainTimer = setTimeout(() => {
+          cleanup(() => child.stdout?.destroy());
+          // A faulty destroy must not leave us waiting forever for close.
+          accept({ code, processSignal });
+        }, 2000);
       });
       child.once('error', (error) => accept({ error }));
       child.once('close', (code, processSignal) => accept({ code, processSignal }));
@@ -2902,10 +2906,77 @@ async function runGate(gate, root, out, signal, boundary = {}) {
   return finish('passed', 0, '', 0);
 }
 
-function requireBatteryBoundary(receipt) {
+function requireStableBatterySnapshots(receipt) {
+  const sourceFields = ['head', 'statusSha256', 'diffSha256', 'untrackedSha256'];
+  const artifactFields = [
+    'schemaVersion',
+    'gitSha',
+    'sourceDirty',
+    'sourceAssetSha256',
+    'artifactSha256',
+    'modules',
+    'files',
+    'site',
+  ];
+  const stable = (snapshot, fields) =>
+    Object.fromEntries(fields.map((key) => [key, snapshot[key]]));
+  for (const snapshot of [receipt.sourceBefore, receipt.sourceAfter]) {
+    assert(snapshot && typeof snapshot === 'object', 'Source snapshot missing');
+    assert.match(snapshot.head, /^[a-f0-9]{40}$/u, 'Invalid source HEAD');
+    for (const key of sourceFields.slice(1))
+      assert.match(snapshot[key], /^[a-f0-9]{64}$/u, `Invalid source ${key}`);
+  }
+  assert.deepEqual(
+    stable(receipt.sourceAfter, sourceFields),
+    stable(receipt.sourceBefore, sourceFields),
+    'Source boundary differs',
+  );
+  assert.equal(typeof receipt.source?.dirty, 'boolean', 'Source dirty state missing');
+  assert.equal(typeof receipt.source?.site, 'string', 'Source site missing');
+  assert(isAbsolute(receipt.source.site), 'Source site must be absolute');
+  for (const artifact of [receipt.artifactBefore, receipt.artifactAfter]) {
+    assert(artifact && typeof artifact === 'object', 'Artifact snapshot missing');
+    assert.equal(artifact.schemaVersion, 1, 'Invalid artifact snapshot schema');
+    assert.match(artifact.gitSha, /^[a-f0-9]{40}$/u, 'Invalid artifact source');
+    assert.equal(artifact.sourceDirty, receipt.source.dirty, 'Artifact dirty state differs');
+    for (const key of ['sourceAssetSha256', 'artifactSha256'])
+      assert.match(artifact[key], /^[a-f0-9]{64}$/u, `Invalid artifact ${key}`);
+    assert(Array.isArray(artifact.modules), 'Artifact modules missing');
+    for (const module of artifact.modules) {
+      assert(typeof module.path === 'string' && module.path.length > 0, 'Module path missing');
+      for (const key of ['name', 'version'])
+        assert(
+          typeof module.compiler?.[key] === 'string' && module.compiler[key].length > 0,
+          `Module compiler ${key} missing`,
+        );
+      assert(Array.isArray(module.inputs) && module.inputs.length > 0, 'Module inputs missing');
+      for (const input of module.inputs) {
+        assert(
+          typeof input.path === 'string' && input.path.length > 0,
+          'Module input path missing',
+        );
+        assert.match(input.sha256, /^[a-f0-9]{64}$/u, 'Invalid module input digest');
+      }
+    }
+    assert(
+      Number.isSafeInteger(artifact.files) && artifact.files > 0,
+      'Invalid artifact file count',
+    );
+    assert.equal(artifact.site, receipt.source.site, 'Artifact site differs');
+  }
+  // Verification timestamps identify separate observations, not different bytes.
+  assert.deepEqual(
+    stable(receipt.artifactAfter, artifactFields),
+    stable(receipt.artifactBefore, artifactFields),
+    'Artifact stable fields differ',
+  );
+}
+
+function requireBatteryBoundary(receipt, finalAdmission = false) {
   assert(Object.hasOwn(receipt, 'sourceBefore'), 'Initial source check missing');
   assert(Object.hasOwn(receipt, 'sourceAfter'), 'Final source check missing');
-  assert.deepEqual(receipt.sourceAfter, receipt.sourceBefore, 'Source boundary differs');
+  if (finalAdmission) requireStableBatterySnapshots(receipt);
+  else assert.deepEqual(receipt.sourceAfter, receipt.sourceBefore, 'Source boundary differs');
   if (receipt.source?.sha)
     assert.equal(receipt.sourceBefore?.head, receipt.source.sha, 'Source identity differs');
   if (
@@ -2935,7 +3006,16 @@ function requireBatteryBoundary(receipt) {
 
 // Validate transported lifecycle state independently of the producer. Full admission
 // additionally requires the canonical roster and its existing proof contracts.
-export function validateBatteryReceipt(receipt, { fullBattery = false } = {}) {
+export function validateBatteryReceipt(
+  receipt,
+  {
+    fullBattery = false,
+    finalAdmission = false,
+    expectedGateNames,
+    expectedSourceSha,
+    expectedArtifactSha256,
+  } = {},
+) {
   assert.equal(receipt.receiptSchemaVersion, 2, 'Legacy battery receipt rejected');
   assert.equal(receipt.kind, 'kairo-required-battery');
   assert.equal(receipt.status, 'passed');
@@ -2951,11 +3031,11 @@ export function validateBatteryReceipt(receipt, { fullBattery = false } = {}) {
     'admissionError',
   ])
     assert(!receipt[key], `Battery ${key}`);
-  requireBatteryBoundary(receipt);
+  requireBatteryBoundary(receipt, finalAdmission);
   assert(Array.isArray(receipt.gates) && receipt.gates.length > 0, 'Empty battery');
   const names = receipt.gates.map((gate) => gate.name);
   assert.equal(new Set(names).size, names.length, 'Duplicate gate');
-  const full = fullBattery || receipt.scope === 'full-battery';
+  const full = finalAdmission || fullBattery || receipt.scope === 'full-battery';
   const canonical = full ? batteryGates('/unused', {}) : [];
   if (full) {
     exactIds(
@@ -2968,7 +3048,28 @@ export function validateBatteryReceipt(receipt, { fullBattery = false } = {}) {
       'Full battery requires source and artifact identity',
     );
   }
+  if (finalAdmission) {
+    exactIds(
+      canonical.map((gate) => gate.name),
+      expectedGateNames,
+      'Trusted final battery gates',
+    );
+    assert.match(expectedSourceSha, /^[a-f0-9]{40}$/u, 'Trusted source SHA missing or invalid');
+    assert.match(
+      expectedArtifactSha256,
+      /^[a-f0-9]{64}$/u,
+      'Trusted artifact SHA missing or invalid',
+    );
+    assert.equal(receipt.source.sha, expectedSourceSha, 'Source differs from trusted candidate');
+    assert.equal(
+      receipt.source.artifactSha256,
+      expectedArtifactSha256,
+      'Artifact differs from trusted candidate',
+    );
+  }
   for (const gate of receipt.gates) {
+    if (finalAdmission)
+      assert.equal(gate.receiptSchemaVersion, 2, 'Legacy gate lifecycle rejected');
     assert.equal(gate.status, 'passed');
     assert.equal(gate.producerStatus, 'passed');
     assert.equal(gate.admissionStatus, 'passed');
@@ -2997,8 +3098,10 @@ export function validateBatteryReceipt(receipt, { fullBattery = false } = {}) {
       'Producer digest differs',
     );
     const identity = {
-      gitSha: receipt.sourceBefore?.head || null,
-      artifactSha256: receipt.artifactBefore?.artifactSha256 || null,
+      gitSha: finalAdmission ? expectedSourceSha : receipt.sourceBefore?.head || null,
+      artifactSha256: finalAdmission
+        ? expectedArtifactSha256
+        : receipt.artifactBefore?.artifactSha256 || null,
     };
     for (const key of Object.keys(identity))
       if (full || evidence.schemaVersion === 1 || Object.hasOwn(evidence, key))
@@ -7046,19 +7149,24 @@ window.__KAIRO_INK_URL__ = standaloneModuleUrl("${inkBytes.toString('base64')}")
   ];
 }
 
-async function main() {
-  const args = process.argv.slice(2);
+export async function runCli(
+  argv,
+  { runGatesImpl = runGates, verifyArtifactImpl = verifyArtifact } = {},
+) {
+  const args = argv;
   if (args[0] === '--verify-artifact') {
     assert(
       args.length === 2 || (args.length === 3 && args[2] === '--require-clean'),
       'Usage: --verify-artifact <site> [--require-clean]',
     );
-    console.log(JSON.stringify(verifyArtifact(args[1], args[2] === '--require-clean'), null, 2));
+    console.log(
+      JSON.stringify(verifyArtifactImpl(args[1], args[2] === '--require-clean'), null, 2),
+    );
   } else if (args[0] === '--run-battery') {
     assert.equal(args.length, 2, 'Usage: --run-battery <fresh-output-directory>');
     const out = freshOutput(args[1]);
     mkdirSync(out, { recursive: true });
-    const site = process.env.KAIRO_SITE_DIR || join(out, 'site');
+    const site = resolve(process.env.KAIRO_SITE_DIR || join(out, 'site'));
     if (!process.env.KAIRO_SITE_DIR) {
       const assembly = spawnSync(
         process.execPath,
@@ -7076,7 +7184,7 @@ async function main() {
         `Battery assembly failed: ${assembly.error || 'see assembly.log'}`,
       );
     }
-    const verified = verifyArtifact(site);
+    const verified = verifyArtifactImpl(site);
     writeJson(join(out, 'artifact-verification.json'), verified);
     const gateEnvironment = {
       ...process.env,
@@ -7091,21 +7199,35 @@ async function main() {
       site,
       artifactSha256: verified.artifactSha256,
     };
+    const gates = batteryGates(out, gateEnvironment);
+    // The executor owns a mutable request. Its result cannot redefine the
+    // canonical roster or the candidate identities selected by this caller.
+    const expectations = Object.freeze({
+      finalAdmission: true,
+      expectedGateNames: Object.freeze(gates.map((gate) => gate.name)),
+      expectedSourceSha: source.sha,
+      expectedArtifactSha256: source.artifactSha256,
+    });
     const controller = new globalThis.AbortController();
     const interrupt = () => controller.abort();
     process.once('SIGINT', interrupt);
     process.once('SIGTERM', interrupt);
     try {
-      process.exitCode = (
-        await runGates({
-          gates: batteryGates(out, gateEnvironment),
-          root: ROOT,
-          out,
-          source,
-          signal: controller.signal,
-          fullBattery: true,
-        })
-      ).exitCode;
+      const receipt = await runGatesImpl({
+        gates,
+        root: ROOT,
+        out,
+        source,
+        signal: controller.signal,
+        fullBattery: true,
+      });
+      if (controller.signal.aborted) return 130;
+      if (receipt.exitCode !== 0)
+        return Number.isSafeInteger(receipt.exitCode) && receipt.exitCode > 0
+          ? receipt.exitCode
+          : 1;
+      validateBatteryReceipt(receipt, expectations);
+      return 0;
     } finally {
       process.removeListener('SIGINT', interrupt);
       process.removeListener('SIGTERM', interrupt);
@@ -7141,11 +7263,16 @@ async function main() {
     });
     console.log(`${checks.length} release-gate checks passed; evidence: ${out}`);
   }
+  return 0;
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === SELF) {
-  main().catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-  });
+  runCli(process.argv.slice(2))
+    .then((code) => {
+      process.exitCode = code;
+    })
+    .catch((error) => {
+      console.error(error);
+      process.exitCode = 1;
+    });
 }

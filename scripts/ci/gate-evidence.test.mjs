@@ -14,7 +14,7 @@ import { dirname, join, resolve } from 'node:path';
 import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { runGates } from '../verify-release-gates.mjs';
+import { runGates, validateBatteryReceipt } from '../verify-release-gates.mjs';
 import { supplementalGates } from './supplemental.mjs';
 import { frameworkGateRoster } from './framework-rosters.mjs';
 import {
@@ -311,11 +311,26 @@ test('between-gate source drift prevents the next launch and invalidates prior a
           'earlier success is invalidated in memory and on disk',
         );
         assert.equal(gate.exitCode, 78);
-        assert.equal(gate.proof, null);
-        assert.equal(Boolean(gate.evidenceReceipt), false);
-        assert.equal(Boolean(gate.evidenceReceiptSha256), false);
-        assert.match(gate.detail, /Source boundary failed/u);
-        assert.throws(() => requireGateAttemptEvidence(gate, { gitSha, artifactSha256: null }));
+        assert.equal(gate.receiptSchemaVersion, 2);
+        assert.equal(gate.producerStatus, 'passed', 'producer truth survives failed admission');
+        assert.equal(gate.processExitCode, 0);
+        assert.equal(gate.producerDetail, '', 'original successful producer detail is retained');
+        assert.equal(gate.detail, gate.producerDetail);
+        assert.equal(gate.admissionStatus, 'incomplete');
+        assert.match(gate.boundaryError, /Source\/input tree changed across the battery/u);
+        assert.equal(gate.proof.kind, 'adapter');
+        assert.deepEqual(gate.proof.obligation.expectedCases, ['a', 'b']);
+        assert.deepEqual(gate.proof.obligation.observedCases, ['a', 'b']);
+        assert.deepEqual(gate.evidenceReceipt.proof, gate.proof);
+        assert.equal(gate.evidenceReceiptSha256, digest(JSON.stringify(gate.evidenceReceipt)));
+        assert.equal(gate.producerEvidenceSha256, gate.evidenceReceiptSha256);
+        assert.doesNotThrow(() =>
+          requireGateAttemptEvidence(gate, { gitSha, artifactSha256: null }),
+        );
+        assert.throws(
+          () => validateBatteryReceipt(result),
+          'producer evidence is not battery admission',
+        );
       }
     } finally {
       process.env.PATH = prior;
