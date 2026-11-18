@@ -748,12 +748,22 @@ const articleBlock = between(
 // N2 and R3 (2026-10-18): an arriving article's tokens are marked for the te-form's auxiliaries and for their place in
 // the text, and the shelf's sense sidecar is asked for once (through fetchData); the arrival runs those actual functions
 const articleArrival = definitions('pageLoads', 'DATA_RETRY_MS', 'fetchData', 'TE_FORM_AUXILIARY', 'markTeFormAuxiliaries',
-  'TOKEN_CONTEXT', 'markSenseContext', 'senseSidecarPromise', 'ensureSenseSidecar', 'READER_KANA');
+  'TOKEN_CONTEXT', 'markSenseContext', 'senseSidecarPromise', 'ensureSenseSidecar', 'READER_KANA', 'settleShownFrontVoice');
 await verifiedAsync('article-rejection-http-failure-and-retry', async () => {
   let fetches = 0, sidecarFetches = 0;
+  const passage = { id: 'retry', file: 'retry.json' };
+  const words = [0, 1, 2].map(n => Object.freeze({ t: 'word', id: `synthetic-settled-word-${n}` }));
+  const review = { queue: words, ix: 0 };
+  const settlements = [];
   const articleContext = vm.createContext({
     window: {},
     D: {},
+    S: { review },
+    mountSettledFrontVoice: item => {
+      assert.strictEqual(item, review.queue[review.ix], 'settlement targets the currently shown word');
+      assert.equal(Object.hasOwn(passage, '_loading'), false, 'load cleanup precedes voice settlement');
+      settlements.push({ id: item.id, fetches, sidecarFetches, failed: passage._loadFailed === true, tokens: !!passage.tokens });
+    },
     AbortController,
     fetch: async (url) => {
       if (url === 'data/articles/senses.json') {
@@ -770,12 +780,16 @@ await verifiedAsync('article-rejection-http-failure-and-retry', async () => {
   vm.runInContext(`${articleArrival}\n${articleBlock}\n;globalThis.__articleApi = { ensureArticle, TOKEN_CONTEXT };`, articleContext, {
     filename: 'corridor-article-block.js',
   });
-  const passage = { id: 'retry', file: 'retry.json' };
   await assert.rejects(articleContext.__articleApi.ensureArticle(passage), /network failed/);
   assert.equal(Object.hasOwn(passage, '_loading'), false);
+  assert.deepEqual(settlements, [{ id: words[0].id, fetches: 1, sidecarFetches: 0, failed: true, tokens: false }], 'network failure settles current word exactly once after cleanup');
+  review.ix = 1;
   await assert.rejects(articleContext.__articleApi.ensureArticle(passage), /503/);
   assert.equal(Object.hasOwn(passage, '_loading'), false);
   assert.equal(sidecarFetches, 0, 'a load that failed marks nothing and asks for no sidecar');
+  assert.deepEqual(settlements[1], { id: words[1].id, fetches: 2, sidecarFetches: 0, failed: true, tokens: false });
+  assert.equal(settlements.length, 2, 'HTTP failure settles current word exactly once after cleanup');
+  review.ix = 2;
   await articleContext.__articleApi.ensureArticle(passage);
   assert.equal(fetches, 3);
   assert.equal(passage.text, '本文');
@@ -786,6 +800,8 @@ await verifiedAsync('article-rejection-http-failure-and-retry', async () => {
   assert.equal(place?.passage, 'retry');
   assert.equal(place.index, 0);
   assert.equal(sidecarFetches, 1);
+  assert.deepEqual(settlements[2], { id: words[2].id, fetches: 3, sidecarFetches: 1, failed: false, tokens: true });
+  assert.equal(settlements.length, 3, 'success settles the current word once after cleanup and article marks');
 });
 
 

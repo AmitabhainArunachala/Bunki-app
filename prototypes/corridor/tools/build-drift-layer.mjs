@@ -587,6 +587,94 @@ patch('  ripples.push({x,y,r:big?10:4,alpha:big?0.5:0.32,sp:big?4.5:2.6,echo:fal
 patch('  el.style.transition="transform .95s cubic-bezier(.3,.6,.4,1), opacity .95s";\n  if(dir>0){',
   '  if(reduced){\n    el.style.transition="opacity 80ms";\n  } else {\n  el.style.transition="transform .95s cubic-bezier(.3,.6,.4,1), opacity .95s";\n  if(dir>0){',
   'reduced grade crossfades at its rendered position');
+// A known bloom keeps the donor's transform list, but proves its geometry from
+// the live DOM rather than treating the model's coordinates as painted ones.
+// The source fixes nodes at left/top zero in an untransformed #sky. Runtime
+// checks retain that contract and reject any host layout or interpolation we
+// cannot bound; the existing opacity-only departure is the safe fallback.
+patch(
+  'function finishGrade(n,dir,wasCenter){',
+  `function knownDepartureContained(n,departure){
+  let probe=null;
+  try{
+    const el=n.el,parent=el?.parentElement;
+    if(!el?.isConnected||!parent||parent.id!=="sky"||el.offsetParent!==parent)return false;
+    const boxes=paintedBoxes(n);
+    if(!boxes.length)return false;
+    const style=getComputedStyle(el),parts=style.transformOrigin.trim().split(/\\s+/);
+    const origin=parts.map(parseFloat);
+    if(origin.length<2||!Number.isFinite(origin[0])||!Number.isFinite(origin[1])||(origin.length>2&&origin[2]!==0))return false;
+    const matrix=value=>new DOMMatrix(value==="none"?undefined:value);
+    const similarity=m=>{
+      const ab=m.a*m.a+m.b*m.b,cd=m.c*m.c+m.d*m.d,tolerance=1e-7*Math.max(1,ab,cd);
+      return m.is2D&&[m.a,m.b,m.c,m.d,m.e,m.f].every(Number.isFinite)&&ab>1e-12&&
+        m.a*m.d-m.b*m.c>0&&Math.abs(ab-cd)<=tolerance&&Math.abs(m.a*m.c+m.b*m.d)<=tolerance;
+    };
+    const current=matrix(style.transform);
+    if(!similarity(current))return false;
+    const noSeparateTransform=s=>
+      (!s.translate||s.translate==="none")&&(!s.rotate||s.rotate==="none")&&(!s.scale||s.scale==="none");
+    if(!noSeparateTransform(style))return false;
+    for(let ancestor=parent;ancestor;ancestor=ancestor.parentElement){
+      const s=getComputedStyle(ancestor);
+      if(!matrix(s.transform).isIdentity||s.perspective!=="none"||!noSeparateTransform(s))return false;
+    }
+    const pr=parent.getBoundingClientRect();
+    const lx=pr.left+parent.clientLeft+el.offsetLeft,ly=pr.top+parent.clientTop+el.offsetTop;
+    if(!Number.isFinite(lx)||!Number.isFinite(ly))return false;
+    // Native CSS resolves the percentage translation against the real border
+    // box, including fractional pixels that offsetWidth/offsetHeight round.
+    // A synchronous invisible clone measures that target without a paint or a
+    // second hand-authored transform grammar.
+    probe=el.cloneNode(true);
+    probe.setAttribute("aria-hidden","true");
+    probe.style.visibility="hidden";probe.style.pointerEvents="none";
+    probe.style.setProperty("transition","none","important");
+    parent.append(probe);
+    const actual=el.getBoundingClientRect(),copy=probe.getBoundingClientRect();
+    if(!["left","right","top","bottom","width","height"].every(key=>actual[key]===copy[key])||
+      getComputedStyle(probe).transformOrigin!==style.transformOrigin)return false;
+    probe.style.transform=departure;
+    const outgoing=matrix(getComputedStyle(probe).transform);
+    if(!similarity(outgoing))return false;
+    const toViewport=m=>new DOMMatrix().translate(lx+origin[0],ly+origin[1]).multiply(m).translate(-origin[0],-origin[1]);
+    const before=toViewport(current),after=toViewport(outgoing);
+    const delta=after.multiply(before.inverse());
+    if(!similarity(delta))return false;
+    const from=before.transformPoint({x:origin[0],y:origin[1]});
+    const to=after.transformPoint({x:origin[0],y:origin[1]});
+    const ratio=Math.hypot(outgoing.a,outgoing.b)/Math.hypot(current.a,current.b);
+    let radius=0;
+    for(const box of boxes){
+      if(![box.left,box.right,box.top,box.bottom].every(Number.isFinite))return false;
+      for(const point of [
+        {x:box.left,y:box.top},{x:box.right,y:box.top},
+        {x:box.right,y:box.bottom},{x:box.left,y:box.bottom}
+      ])radius=Math.max(radius,Math.hypot(point.x-from.x,point.y-from.y));
+    }
+    // Every source target is a 2D similarity. CSS interpolates its translation
+    // and uniform scale monotonically while rotation follows the short arc.
+    // The largest endpoint-scaled radius around the linearly moving centre is
+    // therefore a capsule containing every intermediate painted rectangle,
+    // not merely the destination. Identity ancestors keep this viewport map
+    // valid for the whole transition.
+    radius*=Math.max(1,ratio);
+    if(!Number.isFinite(radius)||!Number.isFinite(from.x)||!Number.isFinite(from.y)||
+      !Number.isFinite(to.x)||!Number.isFinite(to.y))return false;
+    return Math.min(from.x,to.x)-radius>=-.5&&Math.max(from.x,to.x)+radius<=vw()+.5&&
+      Math.min(from.y,to.y)-radius>=-.5&&Math.max(from.y,to.y)+radius<=vh()+.5;
+  }catch{return false;}finally{probe?.remove();}
+}
+function finishGrade(n,dir,wasCenter){`,
+  'known departure proves its live origin and whole-transition containment',
+);
+patch(
+  '  if(dir>0){\n    el.style.transform=base+"translate(48px,-84px) scale("+(n.s*1.28).toFixed(2)+") rotate("+(n.cr+5).toFixed(1)+"deg)";',
+  `  if(dir>0){
+    const departure=base+"translate(48px,-84px) scale("+(n.s*1.28).toFixed(2)+") rotate("+(n.cr+5).toFixed(1)+"deg)";
+    if(knownDepartureContained(n,departure))el.style.transform=departure;`,
+  'known departure keeps every painted part inside the glass',
+);
 patch('  el.style.opacity="0";\n  removeNode(n,1000);',
   '  }\n  el.style.opacity="0";\n  removeNode(n,reduced?120:1000);', 'retire reduced grade after the short fade');
 patchSection("// The front door's one first-touch cue.", '\n// ---- radical explainer ----',
@@ -770,6 +858,102 @@ patch('        const dx=Math.max(c.x-(n.x+ehw),(n.x-ehw)-(c.x+c.w));\n'
   '        const dx=Math.max(c.x-(pcx+ehw),(pcx-ehw)-(c.x+c.w));\n'
   + '        const dy=Math.max(c.y-(pcy+eDn),(pcy-eUp)-(c.y+c.h));',
   'Hfix-2b r2 H2-1 host chrome is judged against the same painted box');
+
+// P3-4: where ink meets the glass or a family thread, use the browser's own
+// painted rectangles. The cached untransformed box remains the inexpensive
+// fallback elsewhere; these bounded paths judge the actual scaled/rotated ink.
+patch(
+  '// the seat of a node, or of a family member through its word or its name\n'
+  + 'const seatOf=m=>m.el?nodeSeat(m):m.node&&!m.node.gone?nodeSeat(m.node):nameSeat(m);',
+  `function paintedBoxes(n,forThread=false){
+  const el=n.el;
+  if(!el||!el.isConnected)return [];
+  const parts=[n.kind==="word"?el.querySelector(":scope > .base")||el:el];
+  const extras=n.kind==="word"?el.querySelectorAll(":scope > .yomi, :scope > .gloss"):el.querySelectorAll("rt");
+  const cl=el.classList,lod=cl.contains("lod"),furi=document.body.dataset.furigana||"";
+  for(const extra of extras){
+    const reading=extra.classList.contains("yomi")||extra.tagName.toLowerCase()==="rt";
+    const byClass=reading?furi!=="0"&&(cl.contains("unfolded")||cl.contains("glossed")||cl.contains("hosted-reading-shown")||furi==="2"):cl.contains("glossed");
+    const opacity=Number(getComputedStyle(extra).opacity);
+    if((!lod&&!forThread&&byClass)||opacity>(forThread?0.01:0))parts.push(extra);
+  }
+  return parts.map(part=>part.getBoundingClientRect()).filter(r=>r.width>0&&r.height>0);
+}
+function paintedSeat(n){
+  if(n.threadSeatFrame===frameCount&&n.threadSeat)return n.threadSeat;
+  const boxes=paintedBoxes(n,true);
+  if(!boxes.length)return nodeSeat(n);
+  let l=Infinity,t=Infinity,r=-Infinity,b=-Infinity;
+  for(const box of boxes){l=Math.min(l,box.left);t=Math.min(t,box.top);r=Math.max(r,box.right);b=Math.max(b,box.bottom);}
+  const st=n.threadSeat||(n.threadSeat={});
+  st.cx=(l+r)/2;st.cy=(t+b)/2;st.c=1;st.s=0;
+  st.l=l-st.cx;st.r=r-st.cx;st.u=t-st.cy;st.d=b-st.cy;
+  const style=getComputedStyle(n.el),turn=new DOMMatrix(style.transform==="none"?undefined:style.transform);
+  const text=n.el.querySelector(":scope > .base, :scope > .g, :scope > .pch")||n.el;
+  const font=parseFloat(getComputedStyle(text).fontSize)||n.fpx||14;
+  st.g=Math.max(LINE_GAP_MIN,LINE_GAP*font*Math.hypot(turn.a,turn.b));
+  st.R=Math.hypot(st.r,Math.max(st.d,-st.u))+st.g;
+  n.threadSeatFrame=frameCount;
+  return st;
+}
+// the seat of a node, or of a family member through its word or its name
+const seatOf=m=>m.el?paintedSeat(m):m.node&&!m.node.gone?paintedSeat(m.node):nameSeat(m);`,
+  'P3-4 family threads use actual painted boxes',
+);
+patch(
+  'function threadSeats(){\n  SEATS.length=0;\n  if(focusN&&!focusN.gone) SEATS.push(nodeSeat(focusN));\n  for(const wr of FOCUS){\n    if(wr.node&&!wr.node.gone) SEATS.push(nodeSeat(wr.node));\n    else if(wr.vis===frameCount) SEATS.push(nameSeat(wr));\n  }\n  for(const g of LOCKG) if(!g.gone) SEATS.push(nodeSeat(g));\n  for(const s of LOCKS) if(!s.gone) SEATS.push(nodeSeat(s));\n}',
+  'function threadSeats(){\n  SEATS.length=0;\n  if(focusN&&!focusN.gone) SEATS.push(seatOf(focusN));\n  for(const wr of FOCUS){\n    if(wr.node&&!wr.node.gone) SEATS.push(seatOf(wr.node));\n    else if(wr.vis===frameCount) SEATS.push(nameSeat(wr));\n  }\n  for(const g of LOCKG) if(!g.gone) SEATS.push(seatOf(g));\n  for(const s of LOCKS) if(!s.gone) SEATS.push(seatOf(s));\n}',
+  'P3-4 every gathered thread seat uses the same painted box',
+);
+patch(
+  '      let dE=Math.min(pcx-ehw,vw()-pcx-ehw,pcy-eUp,vh()-pcy-eDn);\n'
+  + '      // host chrome (the corridor\'s top bar, its shelf door) counts as an\n'
+  + '      // edge too: words dissolve on approach instead of ducking half-cut\n'
+  + '      // beneath an opaque surface\n'
+  + '      for(const c of hostRects){\n'
+  + '        const dx=Math.max(c.x-(pcx+ehw),(pcx-ehw)-(c.x+c.w));\n'
+  + '        const dy=Math.max(c.y-(pcy+eDn),(pcy-eUp)-(c.y+c.h));',
+  '      let pl=pcx-ehw,pr=pcx+ehw,pt=pcy-eUp,pb=pcy+eDn;\n'
+  + '      if(n.el.isConnected&&Math.min(pcx,vw()-pcx,pcy,vh()-pcy)<220){\n'
+  + '        const boxes=paintedBoxes(n);\n'
+  + '        if(boxes.length){\n'
+  + '          pl=Infinity;pt=Infinity;pr=-Infinity;pb=-Infinity;\n'
+  + '          for(const box of boxes){pl=Math.min(pl,box.left);pt=Math.min(pt,box.top);pr=Math.max(pr,box.right);pb=Math.max(pb,box.bottom);}\n'
+  + '        }\n'
+  + '      }\n'
+  + '      let dE=Math.min(pl,vw()-pr,pt,vh()-pb);\n'
+  + '      // host chrome (the corridor\'s top bar, its shelf door) counts as an\n'
+  + '      // edge too: words dissolve on approach instead of ducking half-cut\n'
+  + '      // beneath an opaque surface\n'
+  + '      for(const c of hostRects){\n'
+  + '        const dx=Math.max(c.x-pr,pl-(c.x+c.w));\n'
+  + '        const dy=Math.max(c.y-pb,pt-(c.y+c.h));',
+  'P3-4 rim fade judges actual painted rectangles',
+);
+patch(
+  '    {\n      const zf=(n.fpx||14)*n.s*cam.z;',
+  '    const zs=(n.mode==="free"||n.mode==="glide")?cam.z:1;\n'
+  + '    const tfStr="translate("+(n.x+n.dragX).toFixed(2)+"px,"+(n.y+n.dragY).toFixed(2)+"px) translate(-50%,-50%) scale("+(n.s*zs).toFixed(3)+") rotate("+n.cr.toFixed(2)+"deg)";\n'
+  + '    if(n._ltf!==tfStr){n._ltf=tfStr;n.el.style.transform=tfStr;}\n'
+  + '    {\n      const zf=(n.fpx||14)*n.s*cam.z;',
+  'P3-4 current transform precedes current painted-box measurement',
+);
+patch(
+  '    const zs=(n.mode==="free"||n.mode==="glide")?cam.z:1;\n'
+  + '    const tfStr="translate("+(n.x+n.dragX).toFixed(2)+"px,"+(n.y+n.dragY).toFixed(2)+"px) translate(-50%,-50%) scale("+(n.s*zs).toFixed(3)+") rotate("+n.cr.toFixed(2)+"deg)";\n'
+  + '    if(n._ltf!==tfStr){n._ltf=tfStr;n.el.style.transform=tfStr;}\n'
+  + '  }\n  // every node is drawn: gather this frame\'s figures and step the faint ones',
+  '  }\n  // every node is drawn: gather this frame\'s figures and step the faint ones',
+  'P3-4 retain one transform write per node frame',
+);
+patch(
+  'if(n._lop!==opStr){n._lop=opStr;n.el.style.opacity=opStr;}',
+  'if(n._lop!==opStr){n._lop=opStr;n.el.style.setProperty("transition","none","important");if(Number(opStr)<0.3)n.el.removeAttribute("data-depth");n.el.style.opacity=opStr;}',
+  'P3-4 rim fade eagerly clears the host depth marker without blocking diagnostic paint',
+);
+patch('// The boxes are the ones the lines use (nodeSeat), turned into the glass\'s own',
+  '// The spatial boxes come from nodeSeat, turned into the glass\'s own',
+  'P3-4 spatial box commentary names its own path');
 patch('vg.addColorStop(1,th.dark?"rgba(0,0,0,.5)":rgba(th.ink,.14));', 'vg.addColorStop(1,th.dark?"rgba(0,0,0,.36)":rgba(th.ink,.07));', 'r4 lighter vignette');
 patch('ictx.globalAlpha=Math.min(.3,th.blobA*b.a);', 'ictx.globalAlpha=th.dark?Math.min(.09,th.blobA*b.a*.4):Math.min(.2,th.blobA*b.a*.8);', 'r4 pools a whisper by night, a cool mist by day');
 patch('pool:["#1E50A2","#1E50A2","#165E83","#165E83","#EB6101"]', 'pool:["#1E50A2","#1E50A2","#165E83","#165E83","#6E87A6"]', 'r4 the day mist stays cool (北斎)');

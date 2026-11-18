@@ -2680,7 +2680,7 @@ function requireCompleteReport({
   }
 }
 
-async function runGate(gate, root, out, signal, boundary = {}) {
+async function runGate(gate, root, out, signal, boundary = {}, preflight) {
   const log = join(out, `${gate.name}.log`);
   const startedAt = now();
   const runId = randomUUID();
@@ -2833,6 +2833,13 @@ async function runGate(gate, root, out, signal, boundary = {}) {
   const abort = () => stop('interrupted');
   let result;
   try {
+    if (preflight) {
+      try {
+        await preflight({ kind: 'gate', gate, root, out, signal });
+      } catch (error) {
+        return finish('incomplete', 78, error.message);
+      }
+    }
     result = await new Promise((accept) => {
       child = spawn(invocation.command, invocation.args, {
         cwd: resolve(root, gate.cwd || '.'),
@@ -3192,7 +3199,16 @@ export function finalizeBatteryReceipt(receipt, boundary = {}) {
   return receipt;
 }
 
-export async function runGates({ gates, root, out, source = null, signal, fullBattery = false }) {
+export async function runGates({
+  gates,
+  root,
+  out,
+  source = null,
+  signal,
+  fullBattery = false,
+  preflight,
+  verifyArtifactImpl = verifyArtifact,
+}) {
   assert(gates.length > 0, 'An empty battery cannot pass');
   assert.equal(
     new Set(gates.map((gate) => gate.name)).size,
@@ -3281,26 +3297,59 @@ export async function runGates({ gates, root, out, source = null, signal, fullBa
       .map((p) => [resolve(root, p), digest(readFileSync(resolve(root, p)))]),
   );
 
+  let preflightUnsafe = false;
+  let artifactHeld = false;
+  const guard = preflight
+    ? async (step) => {
+        try {
+          await preflight(step);
+        } catch (error) {
+          preflightUnsafe ||= Boolean(error?.preflightUnsafe);
+          throw error;
+        }
+      }
+    : null;
   if (source?.site) {
-    const verified = verifyArtifact(source.site);
-    assert.equal(verified.artifactSha256, source.artifactSha256, 'Requested artifact differs');
-    const manifest = json(join(source.site, 'build-identity.json'));
-    assert.equal(manifest.gitSha, boundary.gitSha, 'Artifact and source HEAD differ');
-    Object.assign(boundary, {
-      site: source.site,
-      artifactSha256: verified.artifactSha256,
-      runtimeFiles: manifest.files,
-      artifactVerifiedBeforeAndAfter: true,
-      readArtifactJson: (path) => json(join(source.site, path)),
-    });
-    receipt.artifactBefore = verified;
+    let verified;
+    if (guard) {
+      try {
+        await guard({ kind: 'artifact', phase: 'before', site: source.site });
+      } catch (error) {
+        artifactHeld = true;
+        receipt.artifactBoundaryError = String(error.message);
+      }
+    }
+    artifactHeld ||= Boolean(signal?.aborted || preflightUnsafe);
+    if (!artifactHeld) {
+      try {
+        verified = await verifyArtifactImpl(source.site);
+      } catch (error) {
+        if (!error.resourceHold && !error.preflightUnsafe) throw error;
+        artifactHeld = true;
+        preflightUnsafe ||= Boolean(error.preflightUnsafe);
+        receipt.artifactBoundaryError = String(error.message);
+      }
+    }
+    if (!artifactHeld) {
+      assert.equal(verified.artifactSha256, source.artifactSha256, 'Requested artifact differs');
+      const manifest = json(join(source.site, 'build-identity.json'));
+      assert.equal(manifest.gitSha, boundary.gitSha, 'Artifact and source HEAD differ');
+      Object.assign(boundary, {
+        site: source.site,
+        artifactSha256: verified.artifactSha256,
+        runtimeFiles: manifest.files,
+        artifactVerifiedBeforeAndAfter: true,
+        readArtifactJson: (path) => json(join(source.site, path)),
+      });
+      receipt.artifactBefore = verified;
+    }
   }
   persist();
   for (const [index, gate] of gates.entries()) {
-    if (signal?.aborted) break;
+    if (signal?.aborted || preflightUnsafe || artifactHeld) break;
     receipt.gates[index] = { name: gate.name, status: 'running' };
     persist();
-    receipt.gates[index] = await runGate(gate, root, out, signal, boundary);
+    receipt.gates[index] = await runGate(gate, root, out, signal, boundary, guard);
     persist();
     console.log(
       `[battery] ${gate.name} -> ${receipt.gates[index].status} (${receipt.gates[index].exitCode})`,
@@ -3316,9 +3365,10 @@ export async function runGates({ gates, root, out, source = null, signal, fullBa
   } catch (error) {
     receipt.sourceBoundaryError = String(error.message);
   }
-  if (source?.site) {
+  if (source?.site && !artifactHeld && !signal?.aborted && !preflightUnsafe) {
     try {
-      const verified = verifyArtifact(source.site);
+      await guard?.({ kind: 'artifact', phase: 'after', site: source.site });
+      const verified = await verifyArtifactImpl(source.site);
       assert.equal(verified.artifactSha256, receipt.artifactBefore.artifactSha256);
       receipt.artifactAfter = verified;
     } catch (error) {
@@ -7165,7 +7215,7 @@ export async function runCli(
       'Usage: --verify-artifact <site> [--require-clean]',
     );
     console.log(
-      JSON.stringify(verifyArtifactImpl(args[1], args[2] === '--require-clean'), null, 2),
+      JSON.stringify(await verifyArtifactImpl(args[1], args[2] === '--require-clean'), null, 2),
     );
   } else if (args[0] === '--run-battery') {
     assert.equal(args.length, 2, 'Usage: --run-battery <fresh-output-directory>');
@@ -7189,7 +7239,7 @@ export async function runCli(
         `Battery assembly failed: ${assembly.error || 'see assembly.log'}`,
       );
     }
-    const verified = verifyArtifactImpl(site);
+    const verified = await verifyArtifactImpl(site);
     writeJson(join(out, 'artifact-verification.json'), verified);
     const gateEnvironment = {
       ...process.env,

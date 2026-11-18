@@ -1,3 +1,6 @@
+import { createHash } from 'node:crypto';
+import { Buffer } from 'node:buffer';
+import { adaptSkyReference } from './sky-reference-adapter.mjs';
 /* global URL, process */
 /** The first screen's sky (宙) reads two data files, one per licence pool (2026-11-11).
  *
@@ -16,6 +19,25 @@ import { isDeepStrictEqual } from 'node:util';
 import vm from 'node:vm';
 import { beforeAll, describe, expect, test } from 'vitest';
 import { CORRIDOR, corridorDeclarations } from './corridor-declarations.mjs';
+
+const ORIGINAL_SKY_HASHES = Object.freeze({
+  'sky-data.json': '85c0db0477885b7b34dbc24543cdb25671d638d0e5498ac1aa0539684d40c3e0',
+  'sky-context.json': '5cc8e2f7643fa6b27e6eec2b6c905bacc82dd01de98ca2dd4f5b8ba882633c48',
+});
+function originalSkyBytes(name) {
+  if (!Object.hasOwn(ORIGINAL_SKY_HASHES, name)) throw new Error('Unknown original sky fixture');
+  const overridden = Object.hasOwn(process.env, 'SKY_LIVE_DIR');
+  if (overridden && !process.env.SKY_LIVE_DIR)
+    throw new Error('Explicit SKY_LIVE_DIR must be nonempty');
+  const path = overridden
+    ? `${process.env.SKY_LIVE_DIR}/${name}`
+    : new URL(`./fixtures/sky-reference-original/${name}`, import.meta.url);
+  const bytes = readFileSync(path);
+  expect(createHash('sha256').update(bytes).digest('hex'), `Original raw sky bytes ${name}`).toBe(
+    ORIGINAL_SKY_HASHES[name],
+  );
+  return bytes;
+}
 
 const json = (path) => JSON.parse(readFileSync(new URL(path, CORRIDOR), 'utf8'));
 const SKY = json('data/share_alike/sky.json');
@@ -389,36 +411,378 @@ describe("the sky's context, one file per licence pool", () => {
     expect(() => joinSkyContext(SKY, [files[0], files[2]])).toThrow(/missing/u);
   });
 
-  test.runIf(!!process.env.SKY_LIVE_DIR)(
-    'the pools add up to the live design files (SKY_LIVE_DIR), the 289 rows left out aside',
-    () => {
-      const live = (name) =>
-        JSON.parse(readFileSync(`${process.env.SKY_LIVE_DIR}/${name}`, 'utf8'));
-      const data = live('sky-data.json');
-      const context = vm.runInNewContext(
-        `${corridorDeclarations('sky/mount.mjs', ['joinSkyData'])}\njoinSkyData(sky, sem)`,
+  test('the pools add up to the live design files (SKY_LIVE_DIR), the 289 rows left out aside', () => {
+    const live = (name) => JSON.parse(originalSkyBytes(name));
+    const data = adaptSkyReference({
+      dataBytes: originalSkyBytes('sky-data.json'),
+      contextBytes: originalSkyBytes('sky-context.json'),
+      sidecarBytes: readFileSync(new URL('./fixtures/sky-reference-19.json', import.meta.url)),
+    });
+    const context = vm.runInNewContext(
+      `${corridorDeclarations('sky/mount.mjs', ['joinSkyData'])}\njoinSkyData(sky, sem)`,
+      { sky: SKY, sem: SEM },
+    );
+    const mine = JSON.parse(JSON.stringify(context));
+    for (const key of Object.keys(data))
+      if (key !== 'built')
+        expect(isDeepStrictEqual(mine[key], data[key]), `sky data ${key}`).toBe(true);
+    const ctx = live('sky-context.json');
+    const keep = ctx.grammarSource
+      .map((s, i) => (s === 'shared-study' ? -1 : i))
+      .filter((i) => i >= 0);
+    expect(keep.every((g, i) => g === i)).toBe(true);
+    const expected = {
+      ...ctx,
+      counts: { ...ctx.counts, grammar: keep.length },
+      grammar: keep.map((i) => ctx.grammar[i]),
+      grammarSource: keep.map((i) => ctx.grammarSource[i]),
+      grammarTwin: keep.map((i) => ctx.grammarTwin[i]),
+    };
+    expect(ctx.grammarSource.length - keep.length).toBe(289);
+    for (const key of Object.keys(ctx))
+      if (key !== 'built' && key !== 'notes')
+        expect(isDeepStrictEqual(joined[key], expected[key]), `context ${key}`).toBe(true);
+  });
+});
+
+// Frozen independent literal-reference controls; original whole sky/context tests above retained.
+const MIGRATION_CELLS = [
+  {
+    skyRowIndexZeroBased: 178,
+    pointer: '/words/178/2',
+    word: '下さい',
+    reading: 'ください',
+    old: 'please, please',
+    new: 'please',
+  },
+  {
+    skyRowIndexZeroBased: 360,
+    pointer: '/words/360/2',
+    word: '撮る',
+    reading: 'とる',
+    old: 'to take, to record',
+    new: 'to take (a photograph)',
+  },
+  {
+    skyRowIndexZeroBased: 869,
+    pointer: '/words/869/2',
+    word: '空く',
+    reading: 'あく',
+    old: 'to open, to open',
+    new: 'to open, to become empty',
+  },
+  {
+    skyRowIndexZeroBased: 1320,
+    pointer: '/words/1320/2',
+    word: '正確',
+    reading: 'せいかく',
+    old: 'accurate, punctuality',
+    new: 'accurate, correct, precise',
+  },
+  {
+    skyRowIndexZeroBased: 1529,
+    pointer: '/words/1529/2',
+    word: '納める',
+    reading: 'おさめる',
+    old: 'to store to pay, to supply',
+    new: 'to pay (fees, taxes), to supply',
+  },
+  {
+    skyRowIndexZeroBased: 1850,
+    pointer: '/words/1850/2',
+    word: '現在',
+    reading: 'げんざい',
+    old: 'now), present',
+    new: 'the present, now',
+  },
+  {
+    skyRowIndexZeroBased: 2041,
+    pointer: '/words/2041/2',
+    word: '者',
+    reading: 'もの',
+    old: 'person)',
+    new: 'person',
+  },
+  {
+    skyRowIndexZeroBased: 2314,
+    pointer: '/words/2314/2',
+    word: '多少',
+    reading: 'たしょう',
+    old: 'a little)',
+    new: 'a little, some',
+  },
+  {
+    skyRowIndexZeroBased: 2382,
+    pointer: '/words/2382/2',
+    word: '昼食',
+    reading: 'ちゅうしょく',
+    old: 'lunch)',
+    new: 'lunch',
+  },
+  {
+    skyRowIndexZeroBased: 3000,
+    pointer: '/words/3000/2',
+    word: '～等',
+    reading: '～とう',
+    old: 'level, place',
+    new: 'class, rank',
+  },
+  {
+    skyRowIndexZeroBased: 3152,
+    pointer: '/words/3152/2',
+    word: '伯父さん',
+    reading: 'おじさん',
+    old: 'middle-aged gentleman',
+    new: 'uncle',
+  },
+  {
+    skyRowIndexZeroBased: 3272,
+    pointer: '/words/3272/2',
+    word: '関西',
+    reading: 'かんさい',
+    old: 'Kansai, Kansai',
+    new: 'Kansai region',
+  },
+  {
+    skyRowIndexZeroBased: 3283,
+    pointer: '/words/3283/2',
+    word: '関東',
+    reading: 'かんとう',
+    old: 'Kantō, Kantō',
+    new: 'Kantō region',
+  },
+  {
+    skyRowIndexZeroBased: 3666,
+    pointer: '/words/3666/2',
+    word: '親類',
+    reading: 'しんるい',
+    old: 'relative)',
+    new: 'relative, relation',
+  },
+  {
+    skyRowIndexZeroBased: 5694,
+    pointer: '/words/5694/2',
+    word: '繊維',
+    reading: 'せんい',
+    old: 'fiber, fiber',
+    new: 'fiber',
+  },
+  {
+    skyRowIndexZeroBased: 5867,
+    pointer: '/words/5867/2',
+    word: '着色',
+    reading: 'ちゃくしょく',
+    old: 'coloring, coloring',
+    new: 'coloring',
+  },
+  {
+    skyRowIndexZeroBased: 6671,
+    pointer: '/words/6671/2',
+    word: '人目',
+    reading: 'ひとめ',
+    old: 'glimpse, public gaze',
+    new: 'public gaze, notice',
+  },
+  {
+    skyRowIndexZeroBased: 6707,
+    pointer: '/words/6707/2',
+    word: '凍結',
+    reading: 'とうけつ',
+    old: 'freezing, freezing',
+    new: 'freezing',
+  },
+  {
+    skyRowIndexZeroBased: 7552,
+    pointer: '/words/7552/2',
+    word: '重み',
+    reading: 'おもみ',
+    old: 'weight, weight',
+    new: 'weight',
+  },
+];
+function migrationInputs() {
+  return {
+    dataBytes: originalSkyBytes('sky-data.json'),
+    contextBytes: originalSkyBytes('sky-context.json'),
+    sidecarBytes: readFileSync(new URL('./fixtures/sky-reference-19.json', import.meta.url)),
+  };
+}
+function migrationExpected() {
+  const expected = JSON.parse(migrationInputs().dataBytes);
+  for (const c of MIGRATION_CELLS) {
+    expect(expected.words[c.skyRowIndexZeroBased].slice(0, 3)).toEqual([c.word, c.reading, c.old]);
+    expected.words[c.skyRowIndexZeroBased][2] = c.new;
+  }
+  return expected;
+}
+function originalWholeComparison(expected) {
+  const actual = JSON.parse(
+    JSON.stringify(
+      vm.runInNewContext(
+        `${corridorDeclarations('sky/mount.mjs', ['joinSkyData'])}\njoinSkyData(sky,sem)`,
         { sky: SKY, sem: SEM },
-      );
-      const mine = JSON.parse(JSON.stringify(context));
-      for (const key of Object.keys(data))
-        if (key !== 'built')
-          expect(isDeepStrictEqual(mine[key], data[key]), `sky data ${key}`).toBe(true);
-      const ctx = live('sky-context.json');
-      const keep = ctx.grammarSource
-        .map((s, i) => (s === 'shared-study' ? -1 : i))
-        .filter((i) => i >= 0);
-      expect(keep.every((g, i) => g === i)).toBe(true);
-      const expected = {
-        ...ctx,
-        counts: { ...ctx.counts, grammar: keep.length },
-        grammar: keep.map((i) => ctx.grammar[i]),
-        grammarSource: keep.map((i) => ctx.grammarSource[i]),
-        grammarTwin: keep.map((i) => ctx.grammarTwin[i]),
-      };
-      expect(ctx.grammarSource.length - keep.length).toBe(289);
-      for (const key of Object.keys(ctx))
-        if (key !== 'built' && key !== 'notes')
-          expect(isDeepStrictEqual(joined[key], expected[key]), `context ${key}`).toBe(true);
-    },
+      ),
+    ),
   );
+  for (const key of Object.keys(expected))
+    if (key !== 'built')
+      expect(isDeepStrictEqual(actual[key], expected[key]), `sky data ${key}`).toBe(true);
+}
+const malformedInputs = [
+  [
+    'raw-data-whitespace',
+    (a) => {
+      a.dataBytes = Buffer.concat([a.dataBytes, Buffer.from(' ')]);
+    },
+  ],
+  [
+    'raw-context-whitespace',
+    (a) => {
+      a.contextBytes = Buffer.concat([a.contextBytes, Buffer.from(' ')]);
+    },
+  ],
+  [
+    'sidecar-whitespace',
+    (a) => {
+      a.sidecarBytes = Buffer.concat([a.sidecarBytes, Buffer.from(' ')]);
+    },
+  ],
+  ...[
+    'word',
+    'reading',
+    'old-gloss',
+    'reorder',
+    'truncated-row',
+    'unlisted-cell',
+    'nonword-field',
+  ].map((kind) => [
+    kind,
+    (a) => {
+      const d = JSON.parse(a.dataBytes);
+      const c = MIGRATION_CELLS[0],
+        row = d.words[c.skyRowIndexZeroBased];
+      if (kind === 'word') row[0] += 'wrong';
+      if (kind === 'reading') row[1] += 'wrong';
+      if (kind === 'old-gloss') row[2] += 'wrong';
+      if (kind === 'reorder') [d.words[0], d.words[1]] = [d.words[1], d.words[0]];
+      if (kind === 'truncated-row') d.words[c.skyRowIndexZeroBased] = row.slice(0, 2);
+      if (kind === 'unlisted-cell') d.words[0][2] += 'wrong';
+      if (kind === 'nonword-field') d.__unexpected = true;
+      a.dataBytes = Buffer.from(JSON.stringify(d));
+    },
+  ]),
+  [
+    'context-field',
+    (a) => {
+      const d = JSON.parse(a.contextBytes);
+      d.__unexpected = true;
+      a.contextBytes = Buffer.from(JSON.stringify(d));
+    },
+  ],
+  ...[
+    'missing',
+    'extra',
+    'duplicate-replaces-missing',
+    'wrong-index',
+    'wrong-word',
+    'wrong-reading',
+    'wrong-old',
+    'wrong-new',
+  ].map((kind) => [
+    kind,
+    (a) => {
+      const d = JSON.parse(a.sidecarBytes);
+      if (kind === 'missing') d.cells.pop();
+      if (kind === 'extra') d.cells.push({ ...d.cells[0] });
+      if (kind === 'duplicate-replaces-missing') d.cells[d.cells.length - 1] = { ...d.cells[0] };
+      if (kind === 'wrong-index') d.cells[0].skyRowIndexZeroBased++;
+      if (kind === 'wrong-word') d.cells[0].word += 'wrong';
+      if (kind === 'wrong-reading') d.cells[0].reading += 'wrong';
+      if (kind === 'wrong-old') d.cells[0].old += 'wrong';
+      if (kind === 'wrong-new') d.cells[0].new += 'wrong';
+      a.sidecarBytes = Buffer.from(JSON.stringify(d));
+    },
+  ]),
+];
+describe('strict reviewed sky reference migration', () => {
+  test('exact independent19 cells only; input buffers unchanged and original object detached', () => {
+    const a = migrationInputs(),
+      before = Object.fromEntries(Object.entries(a).map(([k, v]) => [k, Buffer.from(v)]));
+    const result = adaptSkyReference(a);
+    expect(result).toEqual(migrationExpected());
+    for (const [k, v] of Object.entries(a)) expect(v.equals(before[k])).toBe(true);
+    const raw = JSON.parse(a.dataBytes);
+    result.words[0][2] = 'mutated output';
+    expect(JSON.parse(a.dataBytes)).toEqual(raw);
+    // Explicit empty/bad overrides must never silently use the portable fallback.
+    const hadOverride = Object.hasOwn(process.env, 'SKY_LIVE_DIR');
+    const savedOverride = process.env.SKY_LIVE_DIR;
+    try {
+      process.env.SKY_LIVE_DIR = '';
+      expect(() => originalSkyBytes('sky-data.json')).toThrow(
+        /Explicit SKY_LIVE_DIR must be nonempty/,
+      );
+      process.env.SKY_LIVE_DIR = new URL(
+        './fixtures/sky-reference-original/missing-directory',
+        import.meta.url,
+      ).pathname;
+      expect(() => originalSkyBytes('sky-data.json')).toThrow(/ENOENT/);
+    } finally {
+      if (hadOverride) process.env.SKY_LIVE_DIR = savedOverride;
+      else delete process.env.SKY_LIVE_DIR;
+    }
+  });
+  for (const [name, fault] of malformedInputs)
+    test('rejects malformed ' + name, () => {
+      const valid = migrationInputs();
+      expect(adaptSkyReference(valid)).toEqual(migrationExpected());
+      const a = Object.fromEntries(Object.entries(valid).map(([k, v]) => [k, Buffer.from(v)]));
+      fault(a);
+      const before = Object.fromEntries(Object.entries(a).map(([k, v]) => [k, Buffer.from(v)]));
+      expect(() => adaptSkyReference(a)).toThrow();
+      for (const [k, v] of Object.entries(a)) expect(v.equals(before[k])).toBe(true);
+    });
+  test('valid adapted reference passes retained whole-join predicate', () =>
+    originalWholeComparison(adaptSkyReference(migrationInputs())));
+  for (const dimension of [
+    'approved-gloss',
+    'unrelated-word',
+    'nonword-top-level',
+    'one-replacement-disabled',
+  ])
+    test('retained whole-join rejects mutated output ' + dimension, () => {
+      const d = adaptSkyReference(migrationInputs());
+      if (dimension === 'approved-gloss')
+        d.words[MIGRATION_CELLS[0].skyRowIndexZeroBased][2] += 'wrong';
+      if (dimension === 'unrelated-word') d.words[0][2] += 'wrong';
+      if (dimension === 'nonword-top-level') d.kanji = [];
+      if (dimension === 'one-replacement-disabled')
+        d.words[MIGRATION_CELLS[0].skyRowIndexZeroBased][2] = MIGRATION_CELLS[0].old;
+      expect(() => originalWholeComparison(d)).toThrow();
+    });
+  test('old corrected product literal still fails retained reviewed-gloss predicate', () => {
+    const c = MIGRATION_CELLS.find((c) => c.word === '撮る');
+    const actual = SKY.words.find((row) => row[0] === c.word && row[1] === c.reading);
+    expect(actual).toBeDefined();
+    expect(actual[2]).toBe(c.new);
+    const unchanged = JSON.parse(JSON.stringify(actual));
+    const originalReviewedGlossPredicate = ([word, reading, gloss]) => {
+      const reviewed = REVIEWED_GLOSSES.get(`${word}\t${reading}`);
+      if (reviewed !== undefined) {
+        expect(gloss, `${word}: reviewed gloss`).toBe(reviewed);
+      }
+    };
+    originalReviewedGlossPredicate(actual);
+    const corrupted = JSON.parse(JSON.stringify(actual));
+    corrupted[2] = c.old;
+    let caught;
+    try {
+      originalReviewedGlossPredicate(corrupted);
+    } catch (error) {
+      caught = error;
+    }
+    expect(caught?.name).toBe('AssertionError');
+    expect(caught?.message).toContain(`${c.word}: reviewed gloss`);
+    expect(actual).toEqual(unchanged);
+  });
 });

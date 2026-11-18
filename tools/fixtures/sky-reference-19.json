@@ -1,0 +1,172 @@
+{
+  "schema": 1,
+  "status": "SOURCE_ONLY_PROPOSAL_NOT_BOUND",
+  "authority": "Literal concise selected-sense labels independently approved in retained review; not exhaustive senses or candidate-generated expectations.",
+  "originalData": {
+    "path": "~/.dharma/bunki/PROGRAM/design/sky/sky-data.json",
+    "sha256": "85c0db0477885b7b34dbc24543cdb25671d638d0e5498ac1aa0539684d40c3e0"
+  },
+  "originalContext": {
+    "path": "~/.dharma/bunki/PROGRAM/design/sky/sky-context.json",
+    "sha256": "5cc8e2f7643fa6b27e6eec2b6c905bacc82dd01de98ca2dd4f5b8ba882633c48"
+  },
+  "semanticReview": {
+    "path": "reviews/sol01-sky-gloss-independent-review.md",
+    "sha256": "84268e77ea250650cc34d4139523b05327d577e7aa85fd8823770d5c7eff3f60"
+  },
+  "identity": "Zero-based words array index is the sky identity; word and reading additionally guard it. No invented dictionary ID.",
+  "cells": [
+    {
+      "skyRowIndexZeroBased": 178,
+      "pointer": "/words/178/2",
+      "word": "下さい",
+      "reading": "ください",
+      "old": "please, please",
+      "new": "please"
+    },
+    {
+      "skyRowIndexZeroBased": 360,
+      "pointer": "/words/360/2",
+      "word": "撮る",
+      "reading": "とる",
+      "old": "to take, to record",
+      "new": "to take (a photograph)"
+    },
+    {
+      "skyRowIndexZeroBased": 869,
+      "pointer": "/words/869/2",
+      "word": "空く",
+      "reading": "あく",
+      "old": "to open, to open",
+      "new": "to open, to become empty"
+    },
+    {
+      "skyRowIndexZeroBased": 1320,
+      "pointer": "/words/1320/2",
+      "word": "正確",
+      "reading": "せいかく",
+      "old": "accurate, punctuality",
+      "new": "accurate, correct, precise"
+    },
+    {
+      "skyRowIndexZeroBased": 1529,
+      "pointer": "/words/1529/2",
+      "word": "納める",
+      "reading": "おさめる",
+      "old": "to store to pay, to supply",
+      "new": "to pay (fees, taxes), to supply"
+    },
+    {
+      "skyRowIndexZeroBased": 1850,
+      "pointer": "/words/1850/2",
+      "word": "現在",
+      "reading": "げんざい",
+      "old": "now), present",
+      "new": "the present, now"
+    },
+    {
+      "skyRowIndexZeroBased": 2041,
+      "pointer": "/words/2041/2",
+      "word": "者",
+      "reading": "もの",
+      "old": "person)",
+      "new": "person"
+    },
+    {
+      "skyRowIndexZeroBased": 2314,
+      "pointer": "/words/2314/2",
+      "word": "多少",
+      "reading": "たしょう",
+      "old": "a little)",
+      "new": "a little, some"
+    },
+    {
+      "skyRowIndexZeroBased": 2382,
+      "pointer": "/words/2382/2",
+      "word": "昼食",
+      "reading": "ちゅうしょく",
+      "old": "lunch)",
+      "new": "lunch"
+    },
+    {
+      "skyRowIndexZeroBased": 3000,
+      "pointer": "/words/3000/2",
+      "word": "～等",
+      "reading": "～とう",
+      "old": "level, place",
+      "new": "class, rank"
+    },
+    {
+      "skyRowIndexZeroBased": 3152,
+      "pointer": "/words/3152/2",
+      "word": "伯父さん",
+      "reading": "おじさん",
+      "old": "middle-aged gentleman",
+      "new": "uncle"
+    },
+    {
+      "skyRowIndexZeroBased": 3272,
+      "pointer": "/words/3272/2",
+      "word": "関西",
+      "reading": "かんさい",
+      "old": "Kansai, Kansai",
+      "new": "Kansai region"
+    },
+    {
+      "skyRowIndexZeroBased": 3283,
+      "pointer": "/words/3283/2",
+      "word": "関東",
+      "reading": "かんとう",
+      "old": "Kantō, Kantō",
+      "new": "Kantō region"
+    },
+    {
+      "skyRowIndexZeroBased": 3666,
+      "pointer": "/words/3666/2",
+      "word": "親類",
+      "reading": "しんるい",
+      "old": "relative)",
+      "new": "relative, relation"
+    },
+    {
+      "skyRowIndexZeroBased": 5694,
+      "pointer": "/words/5694/2",
+      "word": "繊維",
+      "reading": "せんい",
+      "old": "fiber, fiber",
+      "new": "fiber"
+    },
+    {
+      "skyRowIndexZeroBased": 5867,
+      "pointer": "/words/5867/2",
+      "word": "着色",
+      "reading": "ちゃくしょく",
+      "old": "coloring, coloring",
+      "new": "coloring"
+    },
+    {
+      "skyRowIndexZeroBased": 6671,
+      "pointer": "/words/6671/2",
+      "word": "人目",
+      "reading": "ひとめ",
+      "old": "glimpse, public gaze",
+      "new": "public gaze, notice"
+    },
+    {
+      "skyRowIndexZeroBased": 6707,
+      "pointer": "/words/6707/2",
+      "word": "凍結",
+      "reading": "とうけつ",
+      "old": "freezing, freezing",
+      "new": "freezing"
+    },
+    {
+      "skyRowIndexZeroBased": 7552,
+      "pointer": "/words/7552/2",
+      "word": "重み",
+      "reading": "おもみ",
+      "old": "weight, weight",
+      "new": "weight"
+    }
+  ]
+}

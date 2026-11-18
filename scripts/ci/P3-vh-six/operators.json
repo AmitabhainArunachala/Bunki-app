@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 1,
+  "sourceOnly": true,
+  "sourceHead": "275779c331d15f4479fe5c39621a53e4f4b92a3a",
+  "sourceSha256": "e1d03073af8034cf1fd6b6d6675f2d211ab2e2383fa525af975ea6ae695e2a7d",
+  "sourcePins": {
+    "prototypes/corridor/corridor.js": "e1d03073af8034cf1fd6b6d6675f2d211ab2e2383fa525af975ea6ae695e2a7d",
+    "prototypes/corridor/modules/voice.mjs": "0f23f72c745899f9e2f85a3b27bf7d497d13668911731f4a89da23676e75cb57",
+    "prototypes/corridor/modules/word-entry.mjs": "0786bdac67fe7c924030f5a6dcb6bc00493fff01c3eabaf72d209f8728c20746",
+    "prototypes/corridor/device-voice.mjs": "1ec444fbd02b45498ecbfd13dce244bb193895e438f9a52a06881a2b1599d436",
+    "prototypes/corridor/modules/voice-lines.mjs": "367c8d3327491770814eb58371f2f48b3dd374ffe5106d033d4f4c93e21ddee2",
+    "prototypes/corridor/modules/card-audio.mjs": "87a3f4d1857f3ca24075d1bbd7063c4e54da2095fec3d5eecddc71c5ee130ed4",
+    "prototypes/corridor/tools/voice-lock.mjs": "78616a4d51de657feb3d5639baddb6c502c6b7c8f751e2ba6e6c8732e40dc5a8",
+    "prototypes/corridor/audio/voice-lock.json": "16c2ea339ad6bbe6dd19fe1266bae9b6686a8cac92fe713a67b3245a039e074e",
+    "prototypes/corridor/tools/test-approved-voice.mjs": "cc5567a8cc71f2942a37981608c5678f41c3dd10a505b1435050d95b85db439f",
+    "scripts/ci/vh-voice-report-contracts.mjs": "22aa65f9dc1b6924c51e54f4c51971f06fb29d8cf7bc380bd59e1514169aef3a",
+    "scripts/ci/vh-voice-rosters.mjs": "3c2d6d1521730924fb80a27da428c80867b042141741c0cd36d0cdb4d74fef7b",
+    "scripts/ci/verification-admission.mjs": "0172d5328d47ffefaa3f562066521ba620c743c387dc2b101bb090919c60d590"
+  },
+  "controls": [
+    {
+      "id": "no-manifest-copy-empty",
+      "test": "VH CURRENT SIX · no-manifest-copy-empty",
+      "witness": "current-source-required unavailable visible copy is empty or wrong",
+      "function": "speakCardReading",
+      "from": "cardVoiceStatus(btn, tx(...voiceLineOf(globalThis.__CORRIDOR_BUNDLE__ ? 'current-source-required' : 'failed')), 'current-source-required');",
+      "to": "cardVoiceStatus(btn, '', 'current-source-required');",
+      "originalOperatorRetained": false,
+      "semantics": "Explicit currentC18 cause supersession",
+      "expectedMutationSha256": "d1b67d6e7b276812b11398068f8117a387bb1595584294cbc89a866636249776"
+    },
+    {
+      "id": "missing-word-copy-loses-locked-voice",
+      "test": "VH CURRENT SIX · missing-word-copy-loses-locked-voice",
+      "witness": "current-source-required unavailable reason lost its approved cause",
+      "function": "speakCardReading",
+      "from": "cardVoiceStatus(btn, tx(...voiceLineOf(globalThis.__CORRIDOR_BUNDLE__ ? 'current-source-required' : 'failed')), 'current-source-required');",
+      "to": "cardVoiceStatus(btn, tx(...voiceLineOf('failed')), 'current-source-required');",
+      "originalOperatorRetained": false,
+      "semantics": "Explicit currentC18 cause supersession",
+      "expectedMutationSha256": "177ca602ce2d1741b08254d0c3c5626b652dcfe418bdb450edd3a5a71e7cb7c2"
+    },
+    {
+      "id": "card-unavailable-title-omitted",
+      "test": "VH CURRENT SIX · card-unavailable-title-omitted",
+      "witness": "current unavailable title is missing or wrong",
+      "function": "cardVoiceStatus",
+      "from": "  btn.title = reason;",
+      "to": "  void reason;",
+      "originalOperatorRetained": true,
+      "semantics": "Original behavior/operator retained",
+      "expectedMutationSha256": "264bc48c16afbfabc176b0fbafefd8a6dd438f10f7f3afc1681cc2c3c62b3d26"
+    },
+    {
+      "id": "card-retry-retains-error-title",
+      "test": "VH CURRENT SIX · card-retry-retains-error-title",
+      "witness": "retry title clears the old failure",
+      "function": "cardVoiceStatus",
+      "from": "  btn.title = reason;\n  // the line is the control's title while it stands; then the word box's 音 is called by its name again\n  if (!reason) btn.title = btn.id === 'mini-voice' ? btn.getAttribute('aria-label') || '' : '';",
+      "to": "  if (reason) btn.title = reason;",
+      "originalOperatorRetained": false,
+      "semantics": "Current live title behavior; redundant old operator superseded",
+      "expectedMutationSha256": "c03384c6330aa9b2b3a16dd7367f2e053e0bfae81307a15c2d4599ac1cadbe47"
+    },
+    {
+      "id": "card-subsequent-error-title-stale",
+      "test": "VH CURRENT SIX · card-subsequent-error-title-stale",
+      "witness": "subsequent failure updates its title",
+      "function": "cardVoiceStatus",
+      "from": "  btn.title = reason;",
+      "to": "  if (btn.title !== 'stale failure sentinel') btn.title = reason;",
+      "originalOperatorRetained": true,
+      "semantics": "Original behavior/operator retained",
+      "expectedMutationSha256": "37b5797f98c592c39743af463e668bc8451a074176cf932305aaed88bed5eb14"
+    },
+    {
+      "id": "pending-quote-creates-listen-control",
+      "test": "VH COPY-VOICE · absent narration adds no dead excerpt Listen control",
+      "witness": "pending quote must not create a Listen control",
+      "function": "enhanceJapaneseProse",
+      "from": "for (const quote of articleNarration ? root.querySelectorAll('blockquote.sentence-original') : [])",
+      "to": "for (const quote of root.querySelectorAll('blockquote.sentence-original'))",
+      "originalOperatorRetained": true,
+      "semantics": "Original behavior/operator retained",
+      "expectedMutationSha256": "503f1ea49221f7f3a94993e0b2ae28c331474d60b0597136b6d04f77b7ac69ac"
+    }
+  ],
+  "fixture": "prototypes/corridor/tools/test-vh-voice-current-controls.mjs",
+  "childReceiptEnvironment": "VH_SIX_PHASE_RECEIPT",
+  "childInputDigestEnvironment": "VH_SIX_EXPECT_INPUT_SHA256",
+  "childControlEnvironment": "VH_SIX_CONTROL_ID",
+  "expectedC18": [
+    "このバージョンでは声を使えません。",
+    "The voice isn't available in this version of the app."
+  ],
+  "expectedFixtureBundleTruthy": true,
+  "nativeInputExecuted": false,
+  "phaseTimeoutMs": 60000,
+  "sourceAdmissionPolicy": "No device fallback; bundled no-layer isC18, unbundled no-layer deliberatelyC17",
+  "consumerSourceOnly": "scripts/ci/vh-voice-report-contracts.mjs",
+  "expectedC17UnbundledPositive": [
+    "読み上げられませんでした。もう一度タップしてください。",
+    "This couldn't be read aloud. Tap to try again."
+  ],
+  "positiveObservationCounts": {
+    "no-manifest-copy-empty": 30,
+    "missing-word-copy-loses-locked-voice": 30,
+    "card-unavailable-title-omitted": 2,
+    "card-retry-retains-error-title": 2,
+    "card-subsequent-error-title-stale": 1,
+    "pending-quote-creates-listen-control": 0
+  },
+  "intendedAssertionContract": {
+    "schemaVersion": 1,
+    "fixture": "prototypes/corridor/tools/test-vh-voice-current-controls.mjs",
+    "fixtureSha256": "82df9484b40e492169237f6b382aabe14b6aa93c827758c174049f30e6522d24",
+    "failureType": "testCodeFailure",
+    "name": "AssertionError",
+    "code": "ERR_ASSERTION",
+    "columnRule": "Node22 first assertion stack frame; assert.equal property token one-based, derived from actual frozen AST",
+    "byControl": {
+      "no-manifest-copy-empty": {
+        "test": "VH CURRENT SIX · no-manifest-copy-empty",
+        "message": "current-source-required unavailable visible copy is empty or wrong",
+        "operator": "strictEqual",
+        "actual": "",
+        "expected": "The voice isn't available in this version of the app.",
+        "line": 35,
+        "column": 11,
+        "assertionSpan": {
+          "start": 3743,
+          "end": 3790,
+          "source": "assert.equal(note.textContent,expected,witness)",
+          "sha256": "966c339afa6ea8a5aaf36252d9d454598bc46aa89da5d8b60f525e66f4989952"
+        }
+      },
+      "missing-word-copy-loses-locked-voice": {
+        "test": "VH CURRENT SIX · missing-word-copy-loses-locked-voice",
+        "message": "current-source-required unavailable reason lost its approved cause",
+        "operator": "strictEqual",
+        "actual": "This couldn't be read aloud. Tap to try again.",
+        "expected": "The voice isn't available in this version of the app.",
+        "line": 35,
+        "column": 11,
+        "assertionSpan": {
+          "start": 3743,
+          "end": 3790,
+          "source": "assert.equal(note.textContent,expected,witness)",
+          "sha256": "966c339afa6ea8a5aaf36252d9d454598bc46aa89da5d8b60f525e66f4989952"
+        }
+      },
+      "card-unavailable-title-omitted": {
+        "test": "VH CURRENT SIX · card-unavailable-title-omitted",
+        "message": "current unavailable title is missing or wrong",
+        "operator": "strictEqual",
+        "actual": "",
+        "expected": "The voice isn't available in this version of the app.",
+        "line": 48,
+        "column": 382,
+        "assertionSpan": {
+          "start": 6115,
+          "end": 6198,
+          "source": "assert.equal(button.title,expected,'current unavailable title is missing or wrong')",
+          "sha256": "8da4a9b77729cdc5c4eaab707fd72f881868266d0d7deef103c033008513d80a"
+        }
+      },
+      "card-retry-retains-error-title": {
+        "test": "VH CURRENT SIX · card-retry-retains-error-title",
+        "message": "retry title clears the old failure",
+        "operator": "strictEqual",
+        "actual": "stale failure sentinel",
+        "expected": "",
+        "line": 54,
+        "column": 10,
+        "assertionSpan": {
+          "start": 7963,
+          "end": 8041,
+          "source": "assert.equal(latest.titleAtCall,expected,'retry title clears the old failure')",
+          "sha256": "7e50611b93c30dae7115c116267fe8d3c2e3b33f040e4cbf27a4bb85c243ca1c"
+        }
+      },
+      "card-subsequent-error-title-stale": {
+        "test": "VH CURRENT SIX · card-subsequent-error-title-stale",
+        "message": "subsequent failure updates its title",
+        "operator": "strictEqual",
+        "actual": "stale failure sentinel",
+        "expected": "new failure sentinel",
+        "line": 59,
+        "column": 317,
+        "assertionSpan": {
+          "start": 9689,
+          "end": 9777,
+          "source": "assert.equal(button.title,'new failure sentinel','subsequent failure updates its title')",
+          "sha256": "fe9bc97114391d34c6e22e14543794997313f5f9bd8059e21af5d806615ef252"
+        }
+      },
+      "pending-quote-creates-listen-control": {
+        "test": "VH COPY-VOICE · absent narration adds no dead excerpt Listen control",
+        "message": "pending quote must not create a Listen control",
+        "operator": "strictEqual",
+        "actual": 1,
+        "expected": 0,
+        "line": 68,
+        "column": 12,
+        "assertionSpan": {
+          "start": 10524,
+          "end": 10606,
+          "source": "assert.equal(inserted.length, 0, 'pending quote must not create a Listen control')",
+          "sha256": "040420414a4e23c36cc577403ce1a4940d0f1b1dbbf340a10306bd90d3f6f03b"
+        }
+      }
+    }
+  }
+}
