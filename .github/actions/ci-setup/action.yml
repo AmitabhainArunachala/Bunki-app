@@ -42,7 +42,9 @@ runs:
       if: inputs.browsers != ''
       shell: bash
       run: |
-        for source in /etc/apt/sources.list /etc/apt/sources.list.d/*.sources; do
+        # ubuntu-24.04 runners list their mirrors in apt-mirrors.txt, with the Azure mirror first.
+        # Left alone, every package index is tried there before the archive answers.
+        for source in /etc/apt/sources.list /etc/apt/sources.list.d/*.sources /etc/apt/apt-mirrors.txt; do
           [ -f "$source" ] || continue
           sudo sed -i 's|azure.archive.ubuntu.com|archive.ubuntu.com|g' "$source"
         done
@@ -50,6 +52,7 @@ runs:
     - run: npx playwright install --with-deps ${{ inputs.browsers }}
       if: inputs.browsers != ''
       shell: bash
-    - run: sudo apt-get update && sudo apt-get install --no-install-recommends -y ffmpeg
+    # Playwright's --with-deps has just refreshed the package lists; a second update only repeats the wait.
+    - run: sudo apt-get install --no-install-recommends -y ffmpeg
       if: inputs.browsers != ''
       shell: bash

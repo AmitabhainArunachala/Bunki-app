@@ -8,6 +8,7 @@ Run:  python -m pytest prototypes/corridor/tools/test_gloss_heal.py -q
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 import sys
 from pathlib import Path
 
@@ -118,3 +119,71 @@ def test_short_glosses_stay_and_a_second_heal_changes_nothing(share: Path):
     healed = json.dumps(words, ensure_ascii=False)
     assert gloss_heal.heal_words(words, share) == 0
     assert json.dumps(words, ensure_ascii=False) == healed
+
+
+def test_reviewed_short_and_empty_glosses_use_the_exact_reading(share: Path):
+    words = {
+        "拍子": {"r": "ひょうし", "g": "", "fromText": True, "rd": True},
+        "初耳": {"r": "はつみみ", "g": "something heard for the first…", "jlpt": "n1"},
+        "金": {"r": "かね", "g": "gold, metal; money", "k": ["金"]},
+    }
+    before = deepcopy(words)
+    assert gloss_heal.heal_words(words, share) == 3
+    assert {key: row["g"] for key, row in words.items()} == {
+        "拍子": "time; meter; rhythm",
+        "初耳": "something heard for the first time",
+        "金": "money; metal",
+    }
+    for key, row in words.items():
+        assert {k: v for k, v in row.items() if k != "g"} == {
+            k: v for k, v in before[key].items() if k != "g"
+        }
+    assert gloss_heal.heal_words(words, share) == 0
+
+
+def test_reviewed_glosses_leave_other_readings_and_empty_words_untouched(share: Path):
+    words = {"金": {"r": "きん", "g": "gold"}, "別語": {"r": "べつご", "g": ""},
+             "拍子": {"r": "ひょうし以外", "g": "keep this"}}
+    before = deepcopy(words)
+    assert gloss_heal.heal_words(words, share) == 0
+    assert gloss_heal.apply_reviewed_glosses(words) == 0
+    assert words == before
+
+
+def test_reviewed_final_pass_covers_words_added_after_the_dictionary_pass(share: Path):
+    words = {"金": {"r": "かね", "g": "gold, metal; money"}}
+    assert gloss_heal.heal_words(words, share) == 1
+    # The generator adds shelf/semantic words after its full dictionary pass,
+    # then derives any missing reading. Finalization must cover those late rows.
+    words["拍子"] = {"r": "ひょうし", "g": "", "fromText": True}
+    words["初耳"] = {"r": "はつみみ", "g": "something heard for the first…"}
+    words["光沢"] = {"r": "こうたく", "g": cut("luster, glossy finish (of photographs)")}
+    other = deepcopy(words["光沢"])
+    assert gloss_heal.apply_reviewed_glosses(words) == 2
+    assert words["拍子"]["g"] == "time; meter; rhythm"
+    assert words["初耳"]["g"] == "something heard for the first time"
+    assert words["光沢"] == other, "final pass must not broaden dictionary healing"
+    assert gloss_heal.apply_reviewed_glosses(words) == 0
+
+
+@pytest.mark.parametrize(
+    ("source", "expected"),
+    [
+        (None, ""),
+        ("to take; to pick up; to grab", "to take, to pick up"),
+        ("now (same as 今 (いま)), present", "now, present"),
+        ("person (same as 人 (ひと))", "person"),
+        ("clear (sunny) weather", "clear weather"),
+        ("fiber, fiber", "fiber"),
+        ("coloring, coloring, pigment", "coloring, pigment"),
+    ],
+)
+def test_sky_short_glosses_are_balanced_and_deduplicated(source, expected):
+    assert gloss_heal.short(source) == expected
+
+
+def test_reviewed_sky_glosses_keep_the_exact_word_and_reading():
+    assert gloss_heal.sky_gloss("撮る", "とる", "to take; to record") == "to take (a photograph)"
+    assert gloss_heal.sky_gloss("納める", "おさめる", "to store") == "to pay (fees, taxes), to supply"
+    assert gloss_heal.sky_gloss("空く", "あく", "to open") == "to open, to become empty"
+    assert gloss_heal.sky_gloss("空く", "すく", "to be hungry") == "to be hungry"

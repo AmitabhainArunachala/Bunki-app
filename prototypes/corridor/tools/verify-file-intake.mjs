@@ -13,6 +13,7 @@ import { createRequire } from 'node:module';
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+import { setUpDeviceTutor } from './tutor-fixture-support.mjs';
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
@@ -250,11 +251,15 @@ for (const engine of engines) for (const width of sizes) {
     await screenshot('exact-original-page-return', '#source-context-return');
     await selectWord(page); assert((await page.locator('#source-selection-time').textContent()).includes('Page 1'));
     await page.locator('#source-selection-lookup').click(); await page.locator('.nav-search-row').first().click(); await page.locator('#sheet-take').click();
+    // SAVE (2026-11-11): Save asks where the word goes first (a drawer under the bar); Review, the study queue, is picked
+    await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
     await waitForAppRecord(page, record => record.taken.length === 1);
     const learned = await readAppRecordSnapshot(page), item = learned.record.taken[0], topic = learned.record.teacherContexts.entries.find(entry => entry.id === item.sourceContextRef);
     assert.equal(item.id, '町'); assert.equal(topic.sourceId, id); assert.equal(topic.sourceDigest, link.document.bodySha256); assert.equal(BODY.slice(topic.start, topic.end), topic.quote);
     await page.locator('#sheet .learning-source summary').click(); await page.locator('#learning-source-return').click(); await page.locator('#source-context-return').waitFor();
     assert.equal(await page.locator('#file-original-pages').textContent(), 'Page 1');
+    // precondition now (Hfix-1B, item 11): a tutor set up, so the word's page offers Ask the tutor (drawn on Back)
+    await setUpDeviceTutor(page);
     await page.locator('#source-reader-back').click(); await page.locator('#sheet .teacher-discuss').click();
     await page.locator('#chat-input').fill(QUESTION); await waitForAppRecord(page, record => record.teacherDrafts?.entries.some(entry => entry.text === QUESTION && !entry.consumed));
     assert.equal(await page.locator('#chat-send').isDisabled(), true); await page.locator('#teacher-source-return').click(); await page.locator('#source-context-return').waitFor();

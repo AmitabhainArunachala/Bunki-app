@@ -131,6 +131,8 @@ try {
   });
   const firstId = replies[active[0].id].entries[0].id;
   await page.locator(`[data-feed-save="${firstId}"]`).click();
+  // SAVE (2026-11-11): the link's Save asks for its one place (Saved articles) and keeps it only on that pick
+  await page.locator('#save-chooser-home').click();
   await waitForAppRecord(page, (record) => record.feedLibrary?.savedReferences.length === 1);
   await check('saved-link-retains-no-publisher-headline-or-body-and-creates-no-learning-debt', async () => {
     const value = await record();

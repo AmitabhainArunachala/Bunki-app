@@ -1,8 +1,9 @@
 /**
  * D23 · bounded control admission for the saved-word-answer tests.
  *
- * A control is a set of literal edits to corridor.js. Each edit must match exactly once; the
- * edited source is then lifted by the test it is run against. This module declares:
+ * A control applies literal edits to the declaration source returned by readAuthoredCorridor.
+ * Each edit must match exactly once before the test lifts it. Raw contributing files are pinned
+ * separately. This module declares:
  *   - the exact test inventory;
  *   - every control, with its witnesses and the collateral it may cause: 34 WORD_CONTROLS and 2
  *     LEARNING_RECORD_CONTROLS, 36 controls, run as 38 children with the two baselines;
@@ -40,6 +41,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, statSync
 import { isAbsolute, join, relative } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { fileURLToPath } from 'node:url';
+import { readAuthoredCorridor } from './authored-corridor-source.mjs';
 
 export const CHILD_TIMEOUT_MS = 300_000;
 export const CHILD_MAX_BUFFER = 16 * 1024 * 1024;
@@ -53,20 +55,22 @@ export const WORD_CASES = Object.freeze(['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7
 /** The exact rows test-word-saved-answer.mjs must report: F0, then a setup row and a behaviour row per case. */
 export const INVENTORY = Object.freeze(['F0', ...WORD_CASES.flatMap((id) => [`${id}.setup`, id])]);
 
-/* Controls on test-word-saved-answer.mjs. `edits` are [from, to] literal pairs on corridor.js;
+/* Controls on test-word-saved-answer.mjs. `edits` are [from, to] pairs in that declaration source;
  * `witnesses` must fail; `collateral` may fail (declared by reading the code, never inferred). */
 export const WORD_CONTROLS = Object.freeze({
   C1: { note: 'resolver bypassed: the review back is lookup()’s (reviewCardBack → reviewBack)', witnesses: ['T1'], collateral: [], edits: [
     ["  if (item.t !== 'word') return reviewBack(item);\n", '  return reviewBack(item);\n']] },
   C2: { note: 'capture guard reverted: an explicit selection on a core spelling saves nothing', witnesses: ['T2'],
     // the search stand-in rows built on a 1353320 or うわて capture on the core spelling 上手 then hold a core card,
-    // and the history fixtures then keep no うわて snapshot
+    // and the history fixtures then keep no うわて snapshot; K1 (b) captures 生 read せい, an explicit selection on the
+    // core spelling 生 whose entry 1378450 reads only なま: with the guard reverted it no longer throws (L, 2026-10-16)
     collateral: ['T7r.setup', 'T7r', 'T7s.setup', 'T7s', 'T11.setup', 'T11', 'T13.setup', 'T13', 'T15',
-      'X1', 'X2', 'X3.setup', 'X3', 'X4.setup', 'X4', 'X5.setup', 'X5', 'V1', 'V2', 'V3', 'V4', 'V5', 'P3', 'P3b', 'P3r'], edits: [
+      'X1', 'X2', 'X3.setup', 'X3', 'X4.setup', 'X4', 'X5.setup', 'X5', 'V1', 'V2', 'V3', 'V4', 'V5', 'P3', 'P3b', 'P3r', 'K1'], edits: [
       ["  if (node.seq != null && node.seq !== '') {\n    snapshot = explicitWordSnapshot(node, latest);",
         "  if (node.seq != null && node.seq !== '' && !D.dict[id]) {\n    snapshot = explicitWordSnapshot(node, latest);"]] },
   C3: { note: 'fail-closed removed: an explicit selection with no validated answer captures a row without identity', witnesses: ['T3'],
-    collateral: ['T4'], edits: [
+    // K1 (b): 生 read せい (entry 1378450 reads only なま) is such a selection; its capture no longer throws (L, 2026-10-16)
+    collateral: ['T4', 'K1'], edits: [
       ["    if (!snapshot) throw Object.assign(new Error('word-answer-unavailable'), { code: 'word-answer-unavailable' });\n    identity = { kind: 'seq', seq: snapshot.seq, reading: snapshot.r };",
         "    identity = snapshot ? { kind: 'seq', seq: snapshot.seq, reading: snapshot.r } : { kind: 'unknown' };"]] },
   C4: { note: 'identity by reading only: a shared reading passes for a shared entry', witnesses: ['T5'],
@@ -88,11 +92,13 @@ export const WORD_CONTROLS = Object.freeze({
   C9r: { note: 'removal guard removed from the ordinary remove producer', witnesses: ['T7r'],
     // a core door (V3), the 1353320 door on a core card (V4) and every other-identity door (V5) then remove the card
     collateral: ['V3', 'V4', 'V5'], edits: [
-    ['      holds(latest);\n', '']] },
+    ['      holds(latest);\n      return { taken: latest.taken.filter((entry) => entry.t !== node.t || entry.id !== node.id) };',
+      '      return { taken: latest.taken.filter((entry) => entry.t !== node.t || entry.id !== node.id) };']] },
   C9s: { note: 'suppression guard removed from the assessment suppression producer', witnesses: ['T7s'],
     // the core door then suppresses the route-captured 1353320 card
     collateral: ['V3'], edits: [
-    ["suppressAssessmentCards({ kind: 'remove', key }, expected ? holds : null)", "suppressAssessmentCards({ kind: 'remove', key }, null)"]] },
+    ["      return await suppressAssessmentCards({ kind: 'remove', key }, expected ? holds : null);",
+      "      return await suppressAssessmentCards({ kind: 'remove', key }, null);"]] },
   C10: { note: 'shown-answer binding removed: availability alone authorizes a grade', witnesses: ['T8'], collateral: [], edits: [
     ['  if (!bound || bound.item !== item || bound.ix !== rv.ix || bound.key !== wordPresentationKey(item, answer)) {', '  if (false) {']] },
   // the reading match is kana-insensitive since the glance pass (entryKanaIndex); this mutant passes over an exact form
@@ -143,7 +149,8 @@ export const WORD_CONTROLS = Object.freeze({
       ['  const enabledOnCore = !!D.dict?.[form];', '  const enabledOnCore = false;']] },
   KS4b: { note: 'the resolved-seq active rule restored on the core sheet only (B2 and the dedup kept): the resolved entry’s door is inert, a failed click',
     witnesses: ['N1'], collateral: ['S8'], edits: [
-      ['    const active = !(seqless && enabledOnCore) && String(seq) === currentSeq &&', '    const active = String(seq) === currentSeq &&']] },
+      ['  const isActive = ({ row, summary, enabledOnCore }) => !(seqless && enabledOnCore) && String(row[0]) === currentSeq &&',
+        '  const isActive = ({ row, summary, enabledOnCore }) => String(row[0]) === currentSeq &&']] },
   KS5: { note: 'fold by skipping: the numbered row is dropped and the core row keeps its own later rank, so words fall out of the first 40',
     witnesses: ['S1', 'S8', 'S11'], collateral: [], edits: [
       ['    const row = e.seq && searchRowShownByCore(e, coreRows.get(e.id)) ? coreRows.get(e.id) : e;',
@@ -397,18 +404,23 @@ export async function runControls({ root, testFile, learningRecordFile, evidence
   const stage = await stageAssessmentAuthority(root, join(evidence, 'assessment-stage'));
   const childrenDir = join(evidence, 'children');
   mkdirSync(childrenDir, { recursive: true });
-  const corridorFile = join(root, 'prototypes/corridor/corridor.js');
-  const pinned = { 'corridor.js': corridorFile, 'test-word-saved-answer.mjs': testFile,
-    'word-saved-answer-controls.mjs': fileURLToPath(import.meta.url), 'verify-learning-record.mjs': learningRecordFile,
+  const corridorRoot = join(root, 'prototypes/corridor');
+  const pinned = { 'test-word-saved-answer.mjs': testFile,
+    'word-saved-answer-controls.mjs': fileURLToPath(import.meta.url),
+    'authored-corridor-source.mjs': fileURLToPath(new URL('./authored-corridor-source.mjs', import.meta.url)),
+    'verify-learning-record.mjs': learningRecordFile,
     'dict-v2/index.json': join(root, 'prototypes/corridor/data/share_alike/dict-v2/index.json'),
     'dict.json': join(root, 'prototypes/corridor/data/share_alike/dict.json'),
     'words.json': join(root, 'prototypes/corridor/data/share_alike/words.json') };
-  const pinsNow = () => Object.fromEntries(Object.entries(pinned).map(([name, file]) =>
-    [name, { path: relative(root, file), sha256: sha256(readFileSync(file)) }]));
+  // the closure is recomputed on every read, so an added or removed contributor changes the pin set
+  const pinsNow = () => Object.fromEntries([
+    ...Object.entries(pinned).map(([name, file]) => [name, { path: relative(root, file), sha256: sha256(readFileSync(file)) }]),
+    ...readAuthoredCorridor(corridorRoot).files.map((file) => [file.path,
+      { path: relative(root, join(corridorRoot, file.path)), sha256: file.sha256 }])]);
   const pins = pinsNow();
   const stagePins = Object.fromEntries(readdirSync(stage, { recursive: true }).map(String).sort()
     .filter((name) => statSync(join(stage, name)).isFile()).map((name) => [name, sha256(readFileSync(join(stage, name)))]));
-  const authored = readFileSync(corridorFile, 'utf8');
+  const authored = readAuthoredCorridor(corridorRoot).source;
   const authoredSha256 = sha256(authored);
   const bounds = { timeoutMs, killSignal: 'SIGKILL', maxBufferBytesPerStream: CHILD_MAX_BUFFER };
   // a control child writes no gate report: it runs without the gate's evidence directory

@@ -12,7 +12,7 @@ import {
 } from './modules/feed-core.mjs';
 
 export { SOURCE_REGISTRY, getFeedSource };
-export const EMPTY_FEED_LIBRARY = deepFreeze({ v: 1, mutedSourceIds: [], savedReferences: [] });
+const EMPTY_FEED_LIBRARY = deepFreeze({ v: 1, mutedSourceIds: [], savedReferences: [] });
 
 export function parseFeedLibrary(raw) {
   if (raw == null) return EMPTY_FEED_LIBRARY;

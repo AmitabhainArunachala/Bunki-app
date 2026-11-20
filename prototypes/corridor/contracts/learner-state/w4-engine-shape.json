@@ -1,0 +1,237 @@
+{
+  "generatedBy": "prototypes/corridor/contracts/learner-state/build-engine-shape.mjs",
+  "engine": {
+    "sourceCommit": "8b9c80a7338009f16fe44068080446bbce51f7ea",
+    "sourceRepository": "nihongo-srs",
+    "api": "nihongo-study-engine/v1",
+    "eventVersion": 4,
+    "policyId": "nsrs-policy-v1",
+    "reducerPin": "642ca6b",
+    "reducerSha256": "642ca6b6759de4cb137b3041670dab5457ad7d600603c58136bd923d14008686",
+    "closureSha256": "ca0832fd8916f6df169cbf609956abef3d8fd3c87657939a8c25b260fd57f714",
+    "sharedFiles": 336
+  },
+  "scheduler": {
+    "parameterSetId": "bunki-fsrs6-r090-defaults-v1",
+    "algorithm": "FSRS-6",
+    "package": "ts-fsrs",
+    "pinnedVersion": "5.4.1",
+    "requestRetention": 0.9,
+    "engineParameterSetId": "bunki-fsrs6-r090-defaults-v1",
+    "pinPayloadHash": "56099b155f4928fbee57d66e7aaadfc52975698f47bc13f349eda07a75df21c1"
+  },
+  "eventFields": [
+    "v",
+    "id",
+    "learner",
+    "install",
+    "dseq",
+    "base",
+    "ts",
+    "epoch",
+    "policy",
+    "type",
+    "data"
+  ],
+  "deviceTypes": [
+    "review",
+    "capture",
+    "boost",
+    "capture-boost",
+    "hesitation-override",
+    "undo",
+    "suspend",
+    "known",
+    "repair",
+    "settings",
+    "baseline",
+    "manual-card"
+  ],
+  "serverTypes": [
+    "permit-grant",
+    "content-activate",
+    "learner-settings-baseline"
+  ],
+  "fieldsByType": {
+    "review": [
+      "taskKey",
+      "parent",
+      "contentRevision",
+      "rawRating",
+      "attempt",
+      "hesitation",
+      "permitId",
+      "learnAhead",
+      "boost",
+      "session",
+      "ratingPolicy"
+    ],
+    "capture": [
+      "surface",
+      "lemma",
+      "reading",
+      "senseRef",
+      "resolution",
+      "kind",
+      "location",
+      "contextTaskKey",
+      "contentRevision",
+      "revealed",
+      "span",
+      "attemptId",
+      "targetTaskKey",
+      "depth",
+      "uncertaintyReason",
+      "source"
+    ],
+    "boost": [
+      "taskKey",
+      "parent",
+      "observationId"
+    ],
+    "capture-boost": [
+      "taskKey",
+      "parent",
+      "capture"
+    ],
+    "hesitation-override": [
+      "taskKey",
+      "parent",
+      "target"
+    ],
+    "undo": [
+      "taskKey",
+      "parent",
+      "target"
+    ],
+    "suspend": [
+      "taskKey",
+      "parent",
+      "on"
+    ],
+    "known": [
+      "taskKey",
+      "parent",
+      "on"
+    ],
+    "repair": [
+      "taskKey",
+      "parent",
+      "action",
+      "hint",
+      "replacementTaskKey",
+      "replacementParent"
+    ],
+    "settings": [
+      "key",
+      "value"
+    ],
+    "manual-card": [
+      "version",
+      "word",
+      "reading",
+      "meaning",
+      "example",
+      "note"
+    ],
+    "baseline": [
+      "taskKey",
+      "parent",
+      "contract",
+      "card",
+      "repair",
+      "suspended",
+      "known",
+      "sourceHash",
+      "snapshotHash",
+      "cutoff",
+      "missingHistory"
+    ],
+    "permit-grant": [
+      "install",
+      "permitIds",
+      "timezone",
+      "day",
+      "startsAt",
+      "endsAt"
+    ],
+    "content-activate": [
+      "revisions"
+    ],
+    "learner-settings-baseline": [
+      "sourceHash",
+      "snapshotHash",
+      "settings"
+    ]
+  },
+  "scheduledContracts": [
+    "vocabulary.read.v1",
+    "grammar.meaning.v1",
+    "grammar.cloze.v1"
+  ],
+  "replay": {
+    "config": [
+      "registry",
+      "taskMetadata",
+      "learner",
+      "epoch",
+      "timezone",
+      "pin"
+    ],
+    "registry": [
+      "tasks",
+      "notes",
+      "passages",
+      "examples"
+    ],
+    "task": [
+      "taskKey",
+      "noteGuid",
+      "contractId",
+      "passageId",
+      "group",
+      "lexemeId",
+      "player"
+    ],
+    "player": [
+      "deckId"
+    ]
+  },
+  "answerUnion": {
+    "source": "function validAnswer(answer) {\n  if (answer == null) return true;\n  if (!plainObject(answer)) return false;\n  const keys = Object.keys(answer);\n  if (keys.length !== 1) return false;\n  if (keys[0] === 'rating') return [1, 2, 3, 4].includes(answer.rating);\n  if (keys[0] === 'selfCheck') return answer.selfCheck === 'knew' || answer.selfCheck === 'missed';\n  return keys[0] === 'claim' && answer.claim === true;\n}",
+    "sha256": "9052f71d4f79baf18255497ee7429a8e11de9639877187b68171c693f4e462b7",
+    "forms": [
+      {
+        "key": "rating",
+        "values": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "key": "selfCheck",
+        "values": [
+          "knew",
+          "missed"
+        ]
+      },
+      {
+        "key": "claim",
+        "values": [
+          true
+        ]
+      }
+    ],
+    "exactlyOneKey": true
+  },
+  "sources": {
+    "client/schema/event.mjs": "cc0204a7f93ae29312b77e13bab68719b14f489f5d4c2e78f84162659ec4928e",
+    "client/replay.mjs": "642ca6b6759de4cb137b3041670dab5457ad7d600603c58136bd923d14008686",
+    "client/engine.mjs": "5253648cf520052ffd76feacdcf6e9d3ee60d34914a003e167362d6fe5d025fc",
+    "engine-manifest.json": "d919e79af93897ceb27213dbffecb5a17dd5608865d12bcd9d3302be2d0c3fc7",
+    "data/fsrs-pin.json": "550f96c24b706b834938f772dc8ac28d93a4d8a578a8cd62f72cbf61c847bda0",
+    "srs-core.mjs": "b4bb8f6080b209c1d8c8052a09ae00fd7e8a7f00f253d2a39da4b8b09040be45"
+  }
+}

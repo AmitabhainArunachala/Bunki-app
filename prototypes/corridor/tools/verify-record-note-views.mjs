@@ -164,7 +164,19 @@ async function rendered(page) {
         segments: [...version.querySelectorAll('.record-note-segment')].map((segment) => ({
           // elements the note's own bytes could have made; the app's lookup doors on Japanese words are chrome
           kind: segment.dataset.segmentKind, text: segment.textContent,
-          childElements: [...segment.querySelectorAll('*')].filter((child) => !(child.matches('span.japanese-lookup-text') && child.parentElement === segment) && !(child.matches('button.japanese-lookup-word') && child.parentElement?.matches('span.japanese-lookup-text') && !child.childElementCount)).length,
+          // Q (the comb): and the app's one word rule around them — a <wbr> between words and a word's no-break .ja-unit,
+          // directly in the segment or in its lookup text — is chrome too. G3: a lookup word is a span, retired to
+          // role="presentation" until the keyboard selects it, holding only its text. Any other element still counts
+          childElements: [...segment.querySelectorAll('*')].filter((child) => {
+            const unit = (n) => !!n?.matches?.('span.ja-unit') && (n.parentElement === segment || !!n.parentElement?.matches('span.japanese-lookup-text'));
+            const wrap = (n) => !!n?.matches?.('span.japanese-lookup-text') && (n.parentElement === segment || unit(n.parentElement));
+            const p = child.parentElement;
+            if (child.matches('wbr')) return !(p === segment || wrap(p) || unit(p));
+            if (child.matches('span.ja-unit')) return !unit(child);
+            if (child.matches('span.japanese-lookup-text')) return !wrap(child);
+            if (child.matches('span.japanese-lookup-word[role="presentation"][data-lookup-text]')) return !(!child.childElementCount && (wrap(p) || (unit(p) && wrap(p.parentElement))));
+            return true;
+          }).length,
         })),
       })),
     })) };
@@ -578,7 +590,7 @@ try {
         // Open the real cat entry sheet. The rendered tray remains mounted
         // behind it and inert; revocation must scrub that DOM immediately too.
         await page.locator('.tray-line').filter({ has: page.locator('.w', { hasText: '猫' }) }).first().click();
-        await page.locator('#sheet #take').waitFor();
+        await page.locator('#sheet #sheet-take').waitFor(); // S · the page's one Save (it pinned the foot's #take)
         await page.waitForFunction(() => !document.querySelector('#sheet .dictionary-opening'));
         await page.evaluate(() => {
           const notes = document.getElementById('record-notes');

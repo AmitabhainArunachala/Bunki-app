@@ -6,7 +6,7 @@ import { parseFormVersion, parseItemVersion, parsePassageVersion, parseMediaVers
   createAiReviewPresentation } from './modules/assessment-core.mjs';
 import { encodeLocalJson } from './modules/record-core.mjs';
 
-export const ASSESSMENT_QUESTION_POLICY = 'assessment-question/1';
+const ASSESSMENT_QUESTION_POLICY = 'assessment-question/1';
 const FORMAT = 'kairo-assessment-question-practice';
 const PLAN_FORMAT = 'kairo-assessment-question-plan';
 const MAX_PLANS = 2000, MAX_RESPONSES = 20000;

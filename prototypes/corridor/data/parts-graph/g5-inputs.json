@@ -1,0 +1,28 @@
+{
+  "schema": "bunki.g5.inputs/1",
+  "upstream": {
+    "dataset": "KanjiVG",
+    "version": "70a0b7ae0c18ceb5cb358274b029cce0234a43bc",
+    "licence": "CC BY-SA 3.0",
+    "bytes": 24094874,
+    "sha256": "d6a17d77902b863d7524e24d11c44ae628c5d5ba4f09cb3af90c1190bf78bcca",
+    "url": "https://codeload.github.com/KanjiVG/kanjivg/zip/70a0b7ae0c18ceb5cb358274b029cce0234a43bc",
+    "default_path": "prototypes/corridor/data/kanjivg/upstream.zip",
+    "environment_override": "BUNKI_G5_UPSTREAM_ZIP",
+    "delivery_status": "Owner must supply exact archive separately; archive excluded from judge512KiB transport"
+  },
+  "pins": {
+    "component-selection.json": "b9a528437188ff2d091ea8ab8e30a3e717dd2a4424032f53179c19ec279bfcf5",
+    "g5-coverage.json": "d257d8d25a0e7e07962082a4a95c023208438b01d22d5dfca3fbb7c9a2de82f0",
+    "README-G5-INPUTS.md": "59c4bd9aef66705667ff9218ab125d9b844251ae16a12617b8d1be5014c65a13",
+    "bricks.json": "0353bb29d949261c0da9e6c647c4c9dd767687382b190626949cc2b84c22516d",
+    "SHA256SUMS": "1768ac7fc23c19516ad48b9047187e297f8a0e82b4dba2d46bfecec3daf81cfd",
+    "worlds-300.json": "33267e4d4af9e6686a6eadb5fa2bfdccdfa05748ef502194a9714be99726be2f"
+  },
+  "counts": {
+    "joyo": 2136,
+    "kanken_rows": 6787,
+    "upper_unique": 3806,
+    "upper_source_gaps": 371
+  }
+}

@@ -6,7 +6,8 @@
  * (KAIRO_EVIDENCE_DIR) the run writes a 'checks' report of exactly CASES plus `inventory-exact`.
  */
 import assert from 'node:assert/strict';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { createHash, randomUUID } from 'node:crypto';
 import { join } from 'node:path';
 import { after, test } from 'node:test';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
@@ -23,6 +24,8 @@ function row(id, title, body) {
 }
 after(() => {
   const { exact, report } = inventoryReport('word-saved-answer-controls', CASES, observed);
+  Object.assign(report, { schemaVersion: 1, runId: process.env.KAIRO_GATE_RUN_ID || randomUUID(),
+    verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'), sourceOnly: true });
   if (process.env.KAIRO_EVIDENCE_DIR) {
     writeFileSync(join(resolveCorridorEvidence(), 'verification-report.json'), JSON.stringify(report, null, 2) + '\n');
   }

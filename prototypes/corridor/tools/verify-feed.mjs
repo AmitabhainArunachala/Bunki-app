@@ -21,19 +21,116 @@
  *     wears its authored English title, and stays 検収前 until decided;
  *   · every N3 adaptation (id "adapt-n3:<source>") is exactly the authored text
  *     in docs/content/feed-fresh-adaptations.json, says 書き換え in its label and
- *     attribution, and keeps its source's licence, pool, URL and date.
+ *     attribution, and keeps its source's licence, pool, URL and date;
+ *   · (N, 2026-10-17) every article written or chosen for the shelf by hand (queue
+ *     kind "original") stands on the shelf in the full schema, its title checked,
+ *     its review state in the row's authoring block and never on the learner's
+ *     page (no review value, no 検収前); every cull that acted on the shelf
+ *     (where "shelf", decided) took the row off the shelf, out of the archive and
+ *     its body with it — and the shelf census counts both.
+ *   · (N2, 2026-10-17) a real text chosen for the shelf by hand takes its source family's own queue kind — "aozora",
+ *     "gv" (Global Voices, CC BY 3.0), "mext" or "govonline" (PDL1.0) — and is held to the original's checks plus its
+ *     family's credit and licence: the publisher and the licence with its URL in the attribution the reader shows (the
+ *     footer links it to the page), the PDL's 加工して作成 statement, and for Global Voices the page URL in the
+ *     attribution and the changes made to the text (CC BY
+ *     requires it), every declared spelling swap ("X → Y") applied to the body and never left undone.
  *
  * Usage:
  *   node tools/verify-feed.mjs [--report FILE]
  */
 
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import { isDeepStrictEqual } from 'node:util';
 
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
+
+/** Separate unadmitted import contract. It cannot turn the existing deletion-cull
+ * disposition into hiding or authorize a share-alike row on the live shelf. */
+function libraryCandidateProblems(row, body, sourceRow, { activate = false } = {}) {
+  const problems = [];
+  const sha = text => createHash('sha256').update(text).digest('hex');
+  if (activate) problems.push('activation-held');
+  if (row?.libraryCandidate?.schema !== 1 || row.libraryCandidate.admission !== 'pending' ||
+      row.libraryCandidate.installable !== false || body?.libraryCandidate?.installable !== false) problems.push('candidate-scope');
+  if (!sourceRow || row?.id !== sourceRow.id || body?.id !== row?.id) return [...problems, 'source-identity'];
+  if (body.text !== sourceRow.admittedText.text || sha(body.text || '') !== sourceRow.admittedText.sha256 ||
+      sourceRow.admittedText.sha256 !== sourceRow.sourceText.sha256 || sourceRow.admittedText.editMap.length !== 0) problems.push('held-text-changed');
+  if (row.libraryCandidate?.sourceTextSha256 !== sourceRow.sourceText.sha256 ||
+      row.libraryCandidate?.admittedTextSha256 !== sourceRow.admittedText.sha256) problems.push('text-pins');
+  if (row.chars !== [...(body.text || '')].length || body.chars !== row.chars ||
+      row.textMetrics?.charsUnit !== 'unicode-codepoint' || row.textMetrics?.utf16Length !== body.text?.length ||
+      row.textMetrics?.readingAnchorUnit !== 'utf16' || row.textMetrics?.tokenPositionUnit !== 'token-index') problems.push('text-count-domain');
+  if (!isDeepStrictEqual(row.textMetrics, body.textMetrics)) problems.push('body-metrics');
+  if (row.authorLevel !== sourceRow.level.authorLevel || row.originalAuthorLevel !== sourceRow.level.originalLabel ||
+      !isDeepStrictEqual(row.authorLevelProvenance, sourceRow.level)) problems.push('ear-level-provenance');
+  for (const key of ['title', 'titleEn', 'author', 'url', 'licence', 'attribution', 'date']) {
+    if (row[key] !== sourceRow.candidate[key] || body[key] !== row[key]) problems.push('metadata-' + key);
+  }
+  const expectedPool = sourceRow.candidate.source === 'ja.wikipedia' ? 'share_alike' :
+    sourceRow.candidate.source === 'bunki-original' ? 'original' : 'proprietary_safe';
+  if (row.pool !== expectedPool || body.pool !== expectedPool || /(?:\bNC\b|\bND\b)/.test(row.licence || '')) problems.push('licence-pool');
+  if (!isDeepStrictEqual(body.provenance, sourceRow.candidate)) problems.push('lost-source-provenance');
+  if (!Array.isArray(body.tokens) || !body.tokens.length || !Array.isArray(body.paras) ||
+      body.paras.some(n => !Number.isInteger(n) || n <= 0 || n >= body.tokens.length)) problems.push('tokens-paragraphs');
+  const signals = body.grading?.signals;
+  if (!Number.isFinite(signals?.jreadability?.score) || !signals?.jlpt_lexicon ||
+      !isDeepStrictEqual(row.grading, body.grading) || !body.grading?.unavailable?.tmr) problems.push('computed-signals');
+  if (sourceRow.admission?.humanApproval !== null || sourceRow.admission?.status !== 'pending' ||
+      sourceRow.admission?.contentReviews?.length || sourceRow.admission?.titleReceipts?.length ||
+      !isDeepStrictEqual(body.admission, sourceRow.admission)) problems.push('unkeyed-admission');
+  return problems;
+}
+
+function verifyInactiveLibraryCandidate(root, repo) {
+  const insist = (ok, why) => { if (!ok) throw new Error(why); };
+  const sha = bytes => createHash('sha256').update(bytes).digest('hex');
+  const read = path => JSON.parse(readFileSync(path, 'utf8'));
+  insist(realpathSync(root) === resolve(root), 'candidate root is not canonical');
+  const manifest = read(resolve(root, 'MANIFEST.json'));
+  const seen = new Set();
+  for (const row of manifest.files) {
+    insist(typeof row.relativePath === 'string' && !row.relativePath.startsWith('/') &&
+      row.relativePath.split('/').every(p => p && p !== '.' && p !== '..') && !seen.has(row.relativePath), 'unsafe candidate path');
+    seen.add(row.relativePath);
+    const path = resolve(root, row.relativePath);
+    insist(realpathSync(path) === path && !lstatSync(path).isSymbolicLink(), 'candidate symlink');
+    const bytes = readFileSync(path); insist(bytes.length === row.bytes && sha(bytes) === row.sha256, 'candidate hash mismatch');
+  }
+  const diskFiles = readdirSync(root, { recursive: true }).filter(path => lstatSync(resolve(root, path)).isFile());
+  insist(diskFiles.length === seen.size + 1 && diskFiles.every(path => path === 'MANIFEST.json' || seen.has(path)), 'candidate extra/missing file');
+  const candidate = read(resolve(root, 'candidate-index.json'));
+  insist(candidate.kind === 'bunki-unadmitted-library-candidate' && candidate.installable === false &&
+    candidate.johnSelection === null && candidate.proposedVisibility?.active === false && candidate.missingInputs.length > 0, 'candidate activation or omissions');
+  const accepted = readFileSync(resolve(repo, 'prototypes/corridor/data/articles/index.json'));
+  insist(readFileSync(resolve(root, 'inactive-index.json')).equals(accepted), 'inactive shelf differs');
+  const original = JSON.parse(accepted);
+  insist(isDeepStrictEqual(candidate.existingRows, original.articles), 'existing shelf rows changed');
+  const rows = new Map(readFileSync(resolve(repo, 'docs/content/library-20261003.jsonl'), 'utf8').trim().split('\n').map(line => {
+    const row = JSON.parse(line); return [row.id, row];
+  }));
+  insist(rows.size === 110 && new Set(candidate.sampleIds).size === candidate.sampleIds.length &&
+    JSON.stringify(candidate.sampleIds) === JSON.stringify(candidate.candidateRows.map(row => row.id)), 'sample identity differs');
+  for (const row of candidate.candidateRows) {
+    insist(typeof row.file === 'string' && /^[A-Za-z0-9_-]+\.json$/.test(row.file), 'candidate body filename');
+    insist(seen.has('candidate-bodies/' + row.file), 'unbound body');
+    const problems = libraryCandidateProblems(row, read(resolve(root, 'candidate-bodies', row.file)), rows.get(row.id));
+    insist(!problems.length, row.id + ': ' + problems.join(','));
+  }
+  insist(seen.size === candidate.candidateRows.length + 3, 'unexpected candidate output set');
+  return { status: 'INACTIVE_CANDIDATE_CHECKED', rows: candidate.candidateRows.length, activation: false };
+}
+
+const libraryCandidateArg = process.argv.indexOf('--library-candidate');
+if (libraryCandidateArg !== -1) {
+  const root = process.argv[libraryCandidateArg + 1];
+  if (!root) throw new Error('--library-candidate requires an external candidate directory');
+  console.log(JSON.stringify(verifyInactiveLibraryCandidate(resolve(root), resolve(dirname(fileURLToPath(import.meta.url)), '../../..'))));
+  process.exit(0);
+}
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const CORRIDOR = resolveCorridorSite();
@@ -52,7 +149,10 @@ const EVIDENCE_DIR = resolve(REPO, 'docs/build-evidence/renkan/feed');
 
 const PRE_FEED_SHELF = 70; // the curated shelf the feed inherited (40 + recovered 30)
 const TITLE_EN_SOURCE = 'renkan-ai-2026-08';
-const KINDS = new Set(['mint', 'cull', 'legacy', 'rights', 'fresh']);
+// N2 · the real texts chosen by hand take their source family's kind; each is counted beside the originals
+const REAL_KINDS = ['aozora', 'gv', 'mext', 'govonline'];
+const HAND_KINDS = new Set(['original', ...REAL_KINDS]);
+const KINDS = new Set(['mint', 'cull', 'legacy', 'rights', 'fresh', ...HAND_KINDS]);
 const DECISIONS = new Set(['pending', 'approved', 'rejected']);
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const FORBIDDEN_LICENCE = /\bNC\b|\bND\b|Non-?Commercial|No-?Deriv/i;
@@ -123,7 +223,7 @@ for (const row of queue) {
   if (!KINDS.has(row.kind)) problems.push('kind');
   if (!DECISIONS.has(row.decision)) problems.push('decision');
   if (typeof row.title !== 'string' || !row.title) problems.push('title');
-  if ((row.kind === 'mint' || row.kind === 'legacy' || row.kind === 'fresh') && (typeof row.titleEn !== 'string' || !row.titleEn.trim()))
+  if ((row.kind === 'mint' || row.kind === 'legacy' || row.kind === 'fresh' || HAND_KINDS.has(row.kind)) && (typeof row.titleEn !== 'string' || !row.titleEn.trim()))
     problems.push('titleEn');
   if (typeof row.lane !== 'string') problems.push('lane');
   if (typeof row.licence !== 'string') problems.push('licence');
@@ -142,6 +242,11 @@ const liveMints = mintRows.filter((row) => row.decision !== 'rejected');
 const freshRows = queue.filter((row) => row.kind === 'fresh');
 const liveFresh = freshRows.filter((row) => row.decision !== 'rejected');
 const freshIds = new Set(freshRows.map((row) => row.id));
+const originalRows = queue.filter((row) => HAND_KINDS.has(row.kind));
+const liveOriginals = originalRows.filter((row) => row.decision !== 'rejected');
+const handTally = [...HAND_KINDS].map((kind) => `${kind} ${liveOriginals.filter((row) => row.kind === kind).length}`).join(', ');
+// a cull that acted on the shelf: decided, and naming the shelf as where it acted (the curation report's word)
+const shelfCulls = cullRows.filter((row) => row.decision === 'approved' && row.where === 'shelf');
 
 // ------------------------------------------------------------ pool separation
 const licenceBreach = [
@@ -176,10 +281,21 @@ check(
   strayDeckRows.length === 0,
   strayDeckRows.map((row) => row.id).slice(0, 4).join(', ') || `${deckRows.length} deck passages`,
 );
+// N (2026-10-17) rewrites the census pin "the inherited 70 plus the queue's live mints and fresh readings": the ten glossary
+// definitions of the inherited 70 left through the cull queue, and the hand-made articles joined as queue kind "original".
+// N2 (2026-10-17) rewrites it again, strictly: the real texts chosen by hand join under their own kinds, counted here too
 check(
-  `the curated shelf is exactly the inherited ${PRE_FEED_SHELF} plus the queue's live mints and fresh readings (deck passages aside)`,
-  feedShelf.length === PRE_FEED_SHELF + liveMints.length + liveFresh.length,
-  `${feedShelf.length} = ${PRE_FEED_SHELF} + ${liveMints.length} + ${liveFresh.length} fresh · ${deckRows.length} deck passages`,
+  `the curated shelf is exactly the inherited ${PRE_FEED_SHELF} less the queue's shelf culls, plus its live mints, fresh readings and hand-chosen articles (deck passages aside)`,
+  feedShelf.length === PRE_FEED_SHELF - shelfCulls.length + liveMints.length + liveFresh.length + liveOriginals.length,
+  `${feedShelf.length} = ${PRE_FEED_SHELF} − ${shelfCulls.length} culled + ${liveMints.length} + ${liveFresh.length} fresh + ${liveOriginals.length} hand-chosen (${handTally}) · ${deckRows.length} deck passages`,
+);
+// and what stands of the inherited shelf is exactly that remainder: every row neither a mint, a fresh reading nor an original
+const queuedOnShelf = new Set([...liveMints, ...liveFresh, ...liveOriginals].map((row) => row.id));
+const inheritedStanding = feedShelf.filter((row) => !queuedOnShelf.has(row.id));
+check(
+  `the inherited shelf that stands is the ${PRE_FEED_SHELF} less its culls, and no culled row is among it`,
+  inheritedStanding.length === PRE_FEED_SHELF - shelfCulls.length && !inheritedStanding.some((row) => shelfCulls.some((cull) => cull.id === row.id)),
+  `${inheritedStanding.length} standing = ${PRE_FEED_SHELF} − ${shelfCulls.length}`,
 );
 const orphanFeedRows = curated.filter(
   (row) => feedAuthored(row) && !queue.some((entry) => entry.id === row.id),
@@ -474,6 +590,109 @@ if (freshRows.length) {
     unevidenced.join(', ') || `${usedSources.size} sources · ${freshRunLogs.length} run logs`);
 }
 
+// ------------------------------------------------------------- originals
+// N (2026-10-17): an article written or chosen for the shelf by hand (queue kind "original") — a Bunki original, or a
+// verbatim excerpt of a public-domain Aozora text. Each was reviewed by two model families; that state, and John's own
+// read, live in the row's authoring block. By his ruling (2026-10-16) the learner sees none of it: no review value, no
+// 検収前. Index row and body tell the same story (the reader shows the body).
+const CHECKED_TITLE_SOURCE = /^(translation, cross-checked|(publisher|publisher, shortened|publisher, adapted|established English title|established English title, adapted): https:\/\/\S+)$/;
+const SAME_KEYS = ['title', 'titleEn', 'titleEnSource', 'sourceLabel', 'licence', 'pool', 'url', 'date', 'attribution', 'authorLevel', 'lane', 'topic', 'addedAt', 'source', 'rubySource'];
+for (const original of originalRows) {
+  const row = curatedById.get(original.id);
+  if (original.decision === 'rejected') {
+    check(`${original.id} · rejected original — off the shelf`, !row);
+    continue;
+  }
+  if (!row) {
+    check(`${original.id} · original queue row has its shelf row`, false, 'missing from index.json');
+    continue;
+  }
+  const bodyPath = resolve(ARTICLES, row.file);
+  if (!existsSync(bodyPath) || String(row.file).startsWith('archive/')) {
+    check(`${original.id} · body file at the shelf level`, false, row.file);
+    continue;
+  }
+  const body = readJson(bodyPath);
+  const problems = [];
+  const tokensOk = Array.isArray(body.tokens) && body.tokens.length > 0 && body.tokens.every(
+    (token) => typeof token.s === 'string' && typeof token.b === 'string' && typeof token.p === 'string' &&
+      typeof token.r === 'string' && Array.isArray(token.f) && typeof token.c === 'boolean',
+  );
+  if (!tokensOk) problems.push('tokens');
+  const fold = (value) => value.replace(/\s+/g, '');
+  if (fold(body.tokens.map((token) => token.s).join('')) !== fold(body.text)) problems.push('token-join≠text');
+  if (!(Array.isArray(body.paras) && body.paras.every((start, i) => Number.isInteger(start) && start > 0 && start < body.tokens.length && (i === 0 || start > body.paras[i - 1]))))
+    problems.push('paras');
+  const jread = body.grading?.signals?.jreadability;
+  const jlpt = body.grading?.signals?.jlpt_lexicon;
+  if (!(typeof jread?.score === 'number' && jread.band && jread.substrate)) problems.push('jreadability');
+  if (!(typeof jlpt?.coverage === 'number' && jlpt.substrate && jlpt.band_vector)) problems.push('jlpt_lexicon');
+  else if (Math.abs(Object.values(jlpt.band_vector).reduce((sum, v) => sum + v, 0) - 1) > 1e-6) problems.push('band_vector-mass');
+  if (!(body.grading?.signals?.lexical_coverage !== undefined || typeof body.grading?.unavailable?.lexical_coverage === 'string'))
+    problems.push('ninjal-absence-unrecorded');
+  const real = row.pool !== 'original';
+  const aozoraOk = () => row.pool === 'proprietary_safe' && /^PD\b/.test(row.licence ?? '') && /^https:\/\/www\.aozora\.gr\.jp\//.test(row.url ?? '') &&
+    String(row.attribution ?? '').startsWith('青空文庫 ') && String(row.sourceLabel ?? '').startsWith('青空文庫 · ');
+  // N2 · a real source family's credit and licence, in the attribution the reader's footer shows
+  const attribution = String(row.attribution ?? '');
+  const PDL = 'PDL1.0（https://www.digital.go.jp/resources/open_data/public_data_license_v1.0）';
+  const pdlOk = (source, host, credit) => row.pool === 'proprietary_safe' && row.source === source && row.licence === 'PDL1.0 (CC BY 4.0 互換)' &&
+    // the page is the link the footer sets on the attribution (row.url); the attribution names the source, the licence with
+    // its URL, and that the text was processed (加工して作成)
+    new RegExp(`^https://${host.replace(/\./g, '\\.')}/`).test(row.url ?? '') && attribution.startsWith(`出典：${credit}`) &&
+    attribution.includes(PDL) && attribution.includes('を加工して作成');
+  // Global Voices (CC BY 3.0): the credit and the page, the licence with its deed, and the changes made — layout left
+  // out, the rest of the text copied — every declared spelling swap applied to the body, none left undone
+  const swaps = [...attribution.matchAll(/([^\s(（,、]+) → ([^\s)）,、;]+)/gu)].map((m) => [m[1], m[2]]);
+  const gvOk = () => row.pool === 'proprietary_safe' && row.source === 'jp.globalvoices.org' && row.licence === 'CC BY 3.0' &&
+    /^https:\/\/jp\.globalvoices\.org\//.test(row.url ?? '') && attribution.startsWith('Global Voices 日本語 — 原文: ') &&
+    attribution.includes(row.url) && attribution.includes('CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/)') &&
+    /omitted/.test(attribution) && /otherwise copied/.test(attribution) &&
+    (!/made consistent/.test(attribution) || swaps.length > 0) && swaps.every(([from, to]) => body.text.includes(to) && !body.text.includes(from));
+  const provenanceOk = original.kind === 'aozora' ? aozoraOk() && row.source === 'aozorabunko-clean'
+    : original.kind === 'gv' ? gvOk()
+    : original.kind === 'mext' ? pdlOk('mext.go.jp', 'www.mext.go.jp', '「')
+    : original.kind === 'govonline' ? pdlOk('gov-online.go.jp', 'www.gov-online.go.jp', '政府広報オンライン')
+    : real ? aozoraOk()
+    : row.licence === 'Bunki original' && row.attribution === 'Bunki original text' && row.url === '';
+  if (!provenanceOk) problems.push(original.kind === 'gv' ? 'licence/pool/attribution/changes' : 'licence/pool/attribution');
+  if (row.title !== original.title || row.licence !== original.licence || row.lane !== original.lane) problems.push('queue≠row');
+  if (row.titleEn !== original.titleEn || !CHECKED_TITLE_SOURCE.test(row.titleEnSource ?? '')) problems.push('titleEn');
+  if (!ISO_DATE.test(String(row.addedAt)) || row.addedAt !== original.addedAt) problems.push('addedAt');
+  if (!(row.date === '' || ISO_DATE.test(String(row.date)))) problems.push('date');
+  // no learner label: not the review value the app turns into a chip, not 検収前, not a verification hold
+  if ('review' in row || 'review' in body || row.pendingVerification || body.pendingVerification || /検収前/.test(`${row.sourceLabel} ${body.sourceLabel}`))
+    problems.push('learner-label');
+  const reviewers = new Set((row.authoring?.reviews ?? []).map((review) => review.by));
+  if (reviewers.size < 2 || typeof row.authoring?.humanApproval !== 'string' || !row.authoring.humanApproval) problems.push('authoring');
+  if ((original.decision === 'pending') !== /^pending\b/.test(row.authoring?.humanApproval ?? '')) problems.push('decision≠humanApproval');
+  for (const key of SAME_KEYS) if (row[key] !== body[key]) problems.push(`index≠body:${key}`);
+  if (JSON.stringify(row.context ?? null) !== JSON.stringify(body.context ?? null)) problems.push('index≠body:context');
+  if (JSON.stringify(row.grading) !== JSON.stringify(body.grading)) problems.push('index≠body:grading');
+  if (row.chars !== body.text.length || row.snippet !== body.text.replace(/\n/g, ' ').slice(0, 64)) problems.push('index-chars/snippet');
+  if (RESIDUAL_MARKERS.some((marker) => body.text.includes(marker))) problems.push('residual-markup');
+  if (DROPPED_TEXT.some((pattern) => pattern.test(body.text))) problems.push('dropped-link-text');
+  if (archiveIds.has(original.id)) problems.push('still-listed-in-archive');
+  const what = { aozora: 'Aozora excerpt', gv: `Global Voices excerpt, CC BY 3.0, changes stated${swaps.length ? ` (${swaps.map(([a, b]) => `${a} → ${b}`).join(', ')})` : ''}`,
+    mext: 'MEXT column, PDL1.0', govonline: '政府広報オンライン column, PDL1.0' }[original.kind] || (real ? 'Aozora excerpt' : 'Bunki original');
+  check(
+    `${original.id} · ${original.kind}: full schema, its pool and credit, a checked title, its review in the data and no learner label`,
+    problems.length === 0,
+    problems.join(',') || `${what} · ${row.authorLevel} · ${jread.band} · ${row.chars}字`,
+  );
+}
+// a cull that acted on the shelf took the row off the shelf for good: not on the shelf, not moved to the archive, its
+// body gone — the way the approved cull of wikinews:5991 left the archive — and it says why and who decided
+for (const cull of shelfCulls) {
+  const slug = `${cull.id.replace(/[^a-zA-Z0-9_-]/g, '-')}.json`;
+  check(
+    `${cull.id} · culled from the shelf — off it, not in the archive, its body gone, the decision named`,
+    !curatedById.has(cull.id) && !archiveIds.has(cull.id) && !existsSync(resolve(ARTICLES, slug)) &&
+      !existsSync(resolve(ARTICLES, 'archive', slug)) && !!cull.reason && !!cull.decidedBy,
+    `${cull.decidedBy ?? '?'}: ${cull.reason ?? '?'}`,
+  );
+}
+
 // ---------------------------------------------------------- curation report
 check(
   'the curation report is present, typed, and counts the real artifacts',
@@ -507,14 +726,14 @@ const matchesPackage = (path) => {
   const bytes = readFileSync(resolve(CORRIDOR, path));
   return file.bytes === bytes.length && file.sha256 === createHash('sha256').update(bytes).digest('hex');
 };
-const missingFromPackage = liveMints.filter((mint) => {
+const missingFromPackage = [...liveMints, ...liveOriginals].filter((mint) => {
   const row = curatedById.get(mint.id);
   const path = row?.file && `data/articles/${row.file}`;
   return !path || !matchesPackage(path) || readJson(resolve(CORRIDOR, path)).id !== mint.id;
 });
-check('the published site manifest pins the index and body bytes of every live feed candidate',
+check('the published site manifest pins the index and body bytes of every live feed candidate and original',
   manifest.schemaVersion === 1 && liveMints.length > 0 && matchesPackage('data/articles/index.json') && missingFromPackage.length === 0,
-  missingFromPackage.map((mint) => mint.id).join(', ') || `${liveMints.length} live candidates`);
+  missingFromPackage.map((mint) => mint.id).join(', ') || `${liveMints.length} live candidates · ${liveOriginals.length} originals`);
 
 // ------------------------------------------------------------------ evidence
 const runLogs = existsSync(EVIDENCE_DIR)
@@ -548,6 +767,10 @@ writeFileSync(
         pendingMints: pendingFeed,
         approvedMints: mintRows.filter((row) => row.decision === 'approved').length,
         cullProposals: cullRows.length,
+        shelfCulls: shelfCulls.length,
+        originals: originalRows.length,
+        liveOriginals: liveOriginals.length,
+        handChosenByKind: Object.fromEntries([...HAND_KINDS].map((kind) => [kind, liveOriginals.filter((row) => row.kind === kind).length])),
       },
       results,
       failures: failures.map((row) => row.name),

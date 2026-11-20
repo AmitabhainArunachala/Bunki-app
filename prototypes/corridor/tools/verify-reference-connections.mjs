@@ -9,7 +9,8 @@ import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { extname, resolve, sep } from 'node:path';
-import { chromium } from 'playwright-core';
+import { chromium, webkit } from 'playwright-core';
+import { requireHitGrid, registerSheetControls, measurements, CASE_NAMES } from './sheet-controls-oracle.mjs';
 import { createRequire } from 'node:module';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
@@ -19,6 +20,12 @@ const shotsIndex = process.argv.indexOf('--shots');
 const shots = shotsIndex < 0 ? resolveCorridorEvidence() : resolve(process.argv[shotsIndex + 1]);
 const caseIndex = process.argv.indexOf('--case');
 const selectedCase = caseIndex < 0 ? null : process.argv[caseIndex + 1];
+const sheetOnly = process.argv.includes('--sheet-controls-only');
+assert(!(sheetOnly && selectedCase), 'sheet-only is an explicit separate scope, never a source-return claim');
+const cssUnderTest = process.env.P3_SHEET_CSS_UNDER_TEST || null;
+assert(!cssUnderTest || sheetOnly, 'CSS source substitution is narrow targeted testing only, never full admission');
+if (cssUnderTest) assert.equal(resolve(cssUnderTest), resolve(process.cwd(), 'prototypes/corridor/editorial.css'));
+const cssWitness = cssUnderTest ? { artifact: createHash('sha256').update(readFileSync(resolve(root, 'editorial.css'))).digest('hex'), served: createHash('sha256').update(readFileSync(cssUnderTest)).digest('hex'), path: resolve(cssUnderTest), acceptanceEligible: false } : null;
 assert.ok(caseIndex < 0 || selectedCase === 'source-return', '--case must be source-return');
 if (shots) mkdirSync(shots, { recursive: true });
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.css': 'text/css' };
@@ -34,8 +41,11 @@ const server = createServer((request, response) => {
 });
 await new Promise((done) => server.listen(0, '127.0.0.1', done));
 const base = `http://127.0.0.1:${server.address().port}`;
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
+const runtimeEngine = process.env.KAIRO_BROWSER || 'chromium';
+assert(['chromium','webkit'].includes(runtimeEngine));
+const browser = runtimeEngine === 'webkit' ? await webkit.launch() : await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
+await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1')); // Returning device fixture.
 await silenceBrowserAudio(context);
 const externalRequests = [];
 await context.route('**/*', route => {
@@ -44,6 +54,7 @@ await context.route('**/*', route => {
   externalRequests.push({ origin: url.origin, pathname: url.pathname });
   return route.abort();
 });
+if (cssUnderTest) await context.route(/\/editorial\.css(?:\?.*)?$/, async route => { const response = await route.fetch(); await route.fulfill({ response, body: readFileSync(cssUnderTest, 'utf8') }); });
 const page = await context.newPage();
 page.setDefaultTimeout(12000);
 const errors = [];
@@ -51,6 +62,7 @@ page.on('pageerror', (error) => errors.push(String(error)));
 const results = [];
 const excludedChecks = [];
 const check = async (name, run, caseId = null) => {
+  if (sheetOnly && caseId !== 'sheet-controls') { excludedChecks.push(name); return; }
   if (selectedCase && selectedCase !== caseId) { excludedChecks.push(name); return; }
   try { await run(); results.push({ name, pass: true }); console.log(`PASS ${name}`); }
   catch (error) {
@@ -84,12 +96,27 @@ const stable = async () => {
   await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
 };
 const capture = async (name) => { await stable(); if (shots) await page.screenshot({ path: resolve(shots, `${name}.png`) }); };
+// A word page takes its complete entry by drawing itself again when the bank's examples and the dictionary's senses
+// arrive (refreshWordSheet; the levels room re-renders whole), so a .sheet a locator found can be detached before it
+// is measured: boundingBox() then returns null and an evaluate reads a detached node's zero widths. Wait for the senses,
+// then read the one live page in a single turn, where no redraw can come between finding it and measuring it.
+const completeEntry = () => page.waitForFunction(() => {
+  const sheets = document.querySelectorAll('.sheet');
+  return sheets.length === 1 && !sheets[0].querySelector('.dictionary-opening');
+});
+const livePage = async () => (await page.waitForFunction(() => {
+  const sheets = document.querySelectorAll('.sheet');
+  if (sheets.length !== 1 || !sheets[0].getClientRects().length) return null;
+  const [sheet] = sheets; const rect = sheet.getBoundingClientRect();
+  return { x: rect.x, width: rect.width, scrollWidth: sheet.scrollWidth, clientWidth: sheet.clientWidth,
+    disclosureOpen: sheet.querySelector('.reference-entry-provenance')?.open === true };
+})).jsonValue();
+const noEvidence = () => ({ taken: [], srs: {}, revlog: [], obslog: [], lessonsDone: {}, mockDone: {}, mockRun: null });
 const evidence = async () => {
   const s = await readAppRecord(page);
-  const defaults = { taken: [], srs: {}, revlog: [], obslog: [], lessonsDone: {}, mockDone: {}, mockRun: null };
   // A first reader bookmark materializes the envelope; empty fields still
   // mean zero evidence, whether absent on disk or normalized by the store.
-  return Object.fromEntries(Object.entries(defaults).map(([key, empty]) => [key, s[key] ?? empty]));
+  return Object.fromEntries(Object.entries(noEvidence()).map(([key, empty]) => [key, s[key] ?? empty]));
 };
 const json = (path) => JSON.parse(readFileSync(resolve(root, path), 'utf8'));
 const fixtures = {
@@ -102,9 +129,13 @@ let initial;
 try {
   await check('library names the current room, exposes dictionary search, and starts without study debt', async () => {
     await boot(); initial = await evidence(); await openShelfDoor(page, '#levels-link');
-    assert.equal(await page.locator('.crumb b').innerText(), 'reference library');
-    assert.match(await page.locator('.crumb').getAttribute('aria-label'), /bookshelf.*reference library/);
+    // the one room-name table (one-hand E, 778f52b8) names this room in its title, sign and way back
+    assert.equal(await page.locator('.crumb b').innerText(), 'JLPT & Kanken lists');
+    assert.equal(await page.locator('.crumb').getAttribute('aria-label'), 'Bookshelf › JLPT & Kanken lists');
     assert.ok(await page.locator('#reference-global-search').isVisible());
+    // no study debt: a fresh learner reaches the library with nothing enrolled, scheduled or reviewed, and looking adds none
+    assert.deepEqual(initial, noEvidence());
+    assert.deepEqual(await evidence(), initial);
     await capture('after-mobile-overview');
   });
   await check('paged/sorted collection → canonical sheet → row restores page, sort, scroll and focus', async () => {
@@ -150,7 +181,7 @@ try {
     await entry(); await page.click('[data-kanjirow="学"]');
     for (const prefix of ['kanken:', 'jlpt-kanji:']) {
       const chip = page.locator(`[data-reference-door^="${prefix}"]`); const label = await chip.textContent();
-      const box = await chip.boundingBox(); assert.ok(box.height >= 44, 'interactive metadata needs a 44px target');
+      const box = await requireHitGrid(page, chip, 'original metadata44px assertion'); assert.ok(box.height >= 44, 'interactive metadata needs a 44px target');
       await chip.click(); await page.waitForSelector('#reference-library[data-view="collection"]'); await page.click('#reference-back');
       await nodeIs('kanji:学'); assert.equal(await focusedText(), label);
     }
@@ -229,11 +260,17 @@ try {
     assert.deepEqual(await evidence(), initial); assert.deepEqual(errors, []);
   });
   await check('explicit Memorize updates shared My Study once, with no retrieval credit', async () => {
-    await entry(); await page.click('#sheet-take'); await page.waitForFunction(() => document.querySelector('#sheet-take')?.getAttribute('aria-pressed') === 'true');
+    // SAVE (2026-11-11): Save asks where the word goes first (a drawer under the bar); Review, the study queue, is picked
+    await entry(); await page.click('#sheet-take'); await page.click('#vocabulary-list-popover.is-drawer #mini-review');
+    await page.waitForFunction(() => document.querySelector('#sheet-take')?.getAttribute('aria-pressed') === 'true');
     await page.click('#sheet-reference-return'); assert.ok(await page.locator('[data-entry-id="学校"] .reference-entry-saved').isVisible());
     const after = await evidence(); assert.equal(after.taken.length, (initial.taken?.length || 0) + 1); assert.deepEqual(after.revlog, initial.revlog);
     await page.click('#reference-study'); assert.ok((await page.locator('main').innerText()).includes('学校')); await page.click('#back');
+    // S · on Saved ✓ the page's one Save opens its menu (a drawer under the bar) — this pinned a second press on the page's
+    // seal as the removal. SAVE (2026-11-11): the menu is the chooser in move mode, and its Remove takes the card out (its
+    // Review checkbox is gone)
     await page.click('[data-entry-id="学校"]'); await page.click('#sheet-take');
+    await page.click('#vocabulary-list-popover.is-drawer #save-chooser-remove');
     const removed = await waitForAppRecord(page, record => !record.taken.some(item => item.t === 'word' && item.id === '学校'));
     assert.equal(removed.taken.length, initial.taken?.length || 0);
   });
@@ -243,10 +280,12 @@ try {
       await capture(`after-overview-${width}`);
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
       await page.click('[data-reference-collection="jlpt:N5"]'); await page.fill('#reference-search', '学校'); await page.click('[data-entry-id="学校"]');
-      await page.waitForSelector('[data-kanjirow="学"]'); await capture(`after-word-${width}`);
-      await page.locator('.reference-entry-provenance summary').click(); await capture(`after-provenance-${width}`);
-      assert.ok(await page.locator('.sheet').evaluate((n) => n.scrollWidth <= n.clientWidth + 1));
-      const rect = await page.locator('.sheet').boundingBox(); assert.ok(rect.x >= 0 && rect.x + rect.width <= width + 1);
+      await page.waitForSelector('[data-kanjirow="学"]'); await completeEntry(); await capture(`after-word-${width}`);
+      await page.locator('.reference-entry-provenance summary').click();
+      const sheet = await livePage(); await capture(`after-provenance-${width}`);
+      assert.ok(sheet.disclosureOpen, 'the source-tag disclosure is open on the page measured');
+      assert.ok(sheet.scrollWidth <= sheet.clientWidth + 1);
+      assert.ok(sheet.width > 0 && sheet.x >= 0 && sheet.x + sheet.width <= width + 1);
     });
   }
   await check('nested article detour restores the exact live review, taken item and source identity', async () => {
@@ -259,7 +298,7 @@ try {
     assert.ok(index >= 0);
     await page.locator(`[data-passage="${article.id}"]`).first().click();
     const token = page.locator(`#reader .tok[data-index="${index}"][data-word="${word}"]`);
-    await token.click();
+    await openReaderWordStage(page, token);
     await page.click('#mini-sentence-open'); await page.click('#reader-sentence-practice');
     await page.locator('#sentence-choose-cloze').check();
     await page.click('#sentence-practice-confirm');
@@ -329,13 +368,47 @@ try {
     assert.deepEqual(errors, []);
     if (shots) writeFileSync(resolve(shots, 'source-return-one-explicit-grade.json'), `${JSON.stringify(graded, null, 2)}\n`);
   }, 'source-return');
+  await registerSheetControls({page,context,check,entry,nodeIs,stable,catalog});
   await check('no uncaught application exceptions', async () => assert.deepEqual(errors, []));
 } finally {
   await browser.close(); await new Promise((done) => server.close(done));
   if (shots) writeFileSync(resolve(shots, 'connections-results.json'), `${JSON.stringify(results, null, 2)}\n`);
-  if (shots) writeFileSync(resolve(shots, 'execution.json'), `${JSON.stringify({ selectedCase, excludedChecks, externalRequests,
-    browser: { engine: 'Chromium', version: browser.version(), headless: true, maximumContexts: 1 } }, null, 2)}\n`);
+  if (shots) writeFileSync(resolve(shots, 'execution.json'), `${JSON.stringify({ selectedCase, excludedChecks, externalRequests, site: root, runId: process.env.KAIRO_GATE_RUN_ID ?? null,
+    sheetControlsOnly: sheetOnly, cssWitness, acceptanceEligible: !sheetOnly && !cssUnderTest,
+    browser: { engine: runtimeEngine === 'webkit' ? 'WebKit' : 'Chromium', version: browser.version(), headless: true, maximumContexts: 1 } }, null, 2)}\n`);
 }
+if (shots) writeFileSync(resolve(shots, 'sheet-controls-results.json'), JSON.stringify({ schemaVersion: 1, scope: sheetOnly ? 'sheet-controls-only' : selectedCase || 'full-reference-connections', cssWitness, measurements, originalAssertionsPreserved: true }, null, 2));
+if (sheetOnly) { assert.deepEqual(results.map(row => row.name), CASE_NAMES); assert(results.every(row => row.pass), 'all13 sheet-control behavioral and detector-control cases required'); assert.deepEqual(errors, [], 'no application exceptions in targeted sheet journey'); }
 const failures = results.filter((r) => !r.pass);
 console.log(`\n${results.length - failures.length}/${results.length} recursive connection checks passed.`);
 process.exitCode = failures.length ? 1 : 0;
+
+// These source-context checks enter through the G3 ladder; the grammar itself is
+// checked separately. A second activation is allowed only after a real reading rung.
+async function openReaderWordStage(page, word) {
+  await word.click();
+  await page.waitForFunction(node => ['reading', 'gloss', 'stage'].includes(node?.dataset.ladderRung), await word.elementHandle());
+  if (await word.getAttribute('data-ladder-rung') === 'reading') {
+    assert.equal(await page.locator('#mini').count(), 0, 'First activation reveals reading without meaning');
+    // On-touch reader ruby paints through ::before; the native rt stays hidden
+    // to preserve the word's width. Require actual paint from either renderer.
+    await page.waitForFunction(node => [...node.querySelectorAll('ruby')].some(ruby => {
+      const rt = ruby.querySelector('rt');
+      if (!rt?.textContent.trim() || rt.classList.contains('hidden-rt')) return false;
+      const native = getComputedStyle(rt), floating = getComputedStyle(ruby, '::before');
+      return (rt.getClientRects().length > 0 && native.visibility !== 'hidden' && native.display !== 'none' && Number(native.opacity) > 0) ||
+        (ruby.getClientRects().length > 0 && ruby.dataset.r === rt.textContent && floating.content === JSON.stringify(rt.textContent) &&
+          floating.visibility !== 'hidden' && floating.display !== 'none' && Number(floating.opacity) > 0);
+    }), await word.elementHandle(), { timeout: 5000 });
+    await word.click();
+  }
+  // Ladder (John, 10-19): the English under the word comes before the stage; one more activation, only once it is seen
+  await page.waitForFunction(node => node?.dataset.ladderRung === 'gloss' || !!document.getElementById('mini'), await word.elementHandle());
+  if (await word.getAttribute('data-ladder-rung') === 'gloss') {
+    assert.equal(await page.locator('#mini').count(), 0, 'The English rung shows the meaning under the word, before the stage');
+    assert(await word.evaluate(node => !!node.querySelector(':scope > .tok-en .tok-en-text')), 'The English rung draws the English under the word');
+    await word.click();
+  }
+  await page.locator('#mini').waitFor();
+  assert.equal(await word.getAttribute('data-ladder-rung'), 'stage', 'The exact source word reaches its stage');
+}

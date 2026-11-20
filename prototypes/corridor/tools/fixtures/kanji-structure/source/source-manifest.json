@@ -1,0 +1,52 @@
+{
+  "repository": "https://github.com/KanjiVG/kanjivg",
+  "commit": "61e39cfc29724132a6f8823b166296932985a0ff",
+  "license": "CC BY-SA 3.0",
+  "attribution": "KanjiVG — Ulrich Apel",
+  "modificationStatus": "unmodified SVG copies",
+  "acquisitionManifestSha256": "66f6cc9959678660c8cb787f328b6fabd783bb470b3870907a2f7e9d2eb0099b",
+  "files": [
+    {
+      "literal": "森",
+      "file": "068ee.svg",
+      "url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/068ee.svg",
+      "sha256": "a6a066aa5824d08f01a00f86c996fe22cc499abcb41ba6fc32628b3785ea8e51",
+      "bytes": 4180
+    },
+    {
+      "literal": "品",
+      "file": "054c1.svg",
+      "url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/054c1.svg",
+      "sha256": "cff55162576da9e9c76cf9abd2eaba5b5313421d7a27c99a421dfb6e7b182f15",
+      "bytes": 3748
+    },
+    {
+      "literal": "晶",
+      "file": "06676.svg",
+      "url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/06676.svg",
+      "sha256": "83d97dd8c14bbe606a564409157237617777de36b8c99fbe9cd0c170240785e5",
+      "bytes": 4175
+    },
+    {
+      "literal": "織",
+      "file": "07e54.svg",
+      "url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/07e54.svg",
+      "sha256": "464a97cde3a8cba2aff6c5eeefa99a377526bde24ce8d53cbbd9d1e1350233d1",
+      "bytes": 5815
+    },
+    {
+      "literal": "識",
+      "file": "08b58.svg",
+      "url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/08b58.svg",
+      "sha256": "4fb80f7684e1299ddea6e056cc65fed76599e584ac06330d29bf6ecf22f90abd",
+      "bytes": 6093
+    },
+    {
+      "literal": "職",
+      "file": "08077.svg",
+      "url": "https://raw.githubusercontent.com/KanjiVG/kanjivg/61e39cfc29724132a6f8823b166296932985a0ff/kanji/08077.svg",
+      "sha256": "c004baafee3021780fa772c6da927bc30cf40c379da96e8ae5b41e927337f1ee",
+      "bytes": 5709
+    }
+  ]
+}

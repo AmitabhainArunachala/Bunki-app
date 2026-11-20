@@ -1,0 +1,1641 @@
+/**
+ * Bunki's voice: one seam with the voice server in front of the device voice (John, 2026-11-10 21:07:
+ * "complete all surfaces from articles to cards to grammar points to words, end to end").
+ *
+ * The law these tests hold:
+ *  - source order per sentence: an approved recorded clip, then the voice server, then silence;
+ *  - the device voice never speaks (John, 2026-11-10: "real voices or silence"): unpaired, offline, out of
+ *    budget or the server refusing, a read ends in silence and names the reason;
+ *  - the request the browser sends is the one the speech team's contract v1 describes, built with their own
+ *    modules, which are carried here unchanged from their commit;
+ *  - every error code of the contract has one behaviour, and a 401 drops the token;
+ *  - one sound at a time.
+ *
+ * No test calls the real server or makes a sound: the server is tools/fake-voice-server.mjs on a loopback port.
+ */
+/* global AbortController, fetch, setTimeout */
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+
+import { createDeviceVoice, REASONS } from '../prototypes/corridor/device-voice.mjs';
+import { createSpeechInput } from '../prototypes/corridor/modules/nihongo-speech/audio/speech-input.mjs';
+import { SPEAK_PROFILE } from '../prototypes/corridor/modules/nihongo-speech/audio/speak-keys.mjs';
+import {
+  VoiceError,
+  createMemoryTokenStore,
+  createVoiceClient,
+  parsePairing,
+  isVoiceServer,
+} from '../prototypes/corridor/modules/voice-client.mjs';
+import {
+  daySpend,
+  japaneseSentences,
+  shownText,
+} from '../prototypes/corridor/modules/voice-layer.mjs';
+import { voiceLineOf } from '../prototypes/corridor/modules/voice-lines.mjs';
+import { createVoiceSeam, voiceKeyOf } from '../prototypes/corridor/modules/voice-seam.mjs';
+import { startFakeVoiceServer } from '../prototypes/corridor/tools/fake-voice-server.mjs';
+
+const CORRIDOR = resolve(dirname(fileURLToPath(import.meta.url)), '../prototypes/corridor');
+const PAGE = 'http://127.0.0.1:18841';
+const TOKEN = /^nsrs_prod_[A-Za-z0-9_-]{4,512}\.[a-f0-9]{64}$/;
+
+/** fetch as a page at PAGE would send it: the Origin header a browser adds by itself */
+const pageFetch = (input, init = {}) =>
+  fetch(input, { ...init, headers: { ...(init.headers || {}), Origin: PAGE } });
+
+describe('the speech modules are the speech team’s own, unchanged', () => {
+  const source = JSON.parse(
+    readFileSync(resolve(CORRIDOR, 'modules/nihongo-speech/SOURCE.json'), 'utf8'),
+  );
+  it('names the contract’s commit', () => {
+    expect(source.repository).toBe('nihongo-srs');
+    expect(source.commit).toBe('b77078781aeb307e8ac3a33786c4ac2756536b03');
+    expect(source.files.map((file) => file.path).sort()).toEqual([
+      'audio/speak-keys.mjs',
+      'audio/speech-highlight.mjs',
+      'audio/speech-input.mjs',
+      'audio/speech-player.mjs',
+      'audio/speech-queue.mjs',
+      'audio/speech-text.mjs',
+      'schema/event.mjs',
+    ]);
+  });
+  it.each(source.files.map((file) => [file.path, file.sha256]))(
+    '%s still has its recorded bytes',
+    (path, sha) => {
+      const bytes = readFileSync(resolve(CORRIDOR, 'modules/nihongo-speech', path));
+      expect(createHash('sha256').update(bytes).digest('hex')).toBe(sha);
+    },
+  );
+});
+
+describe('the device voice never speaks (John, 2026-11-10: "real voices or silence")', () => {
+  const env = () => {
+    const spoken = [];
+    return {
+      spoken,
+      speechSynthesis: {
+        getVoices: () => [
+          { lang: 'ja-JP', localService: true, name: 'fixture', voiceURI: 'fixture' },
+        ],
+        speak: (u) => spoken.push(u),
+        cancel: () => {},
+      },
+      SpeechSynthesisUtterance: class {
+        constructor(text) {
+          this.text = text;
+        }
+      },
+    };
+  };
+  it('has no way to utter: no fallback, and the one call there is refuses', () => {
+    const e = env(),
+      voice = createDeviceVoice(e);
+    expect(voice.fallback).toBeUndefined();
+    expect(Object.keys(voice).sort()).toEqual(['cancel', 'speak', 'support']);
+    for (const text of ['日本語。', 'English only', '']) {
+      expect(voice.speak(text)).toMatchObject({
+        spoken: false,
+        source: 'none',
+        reason: REASONS.DISABLED,
+      });
+    }
+    expect(e.spoken).toHaveLength(0);
+  });
+});
+
+describe('the voice server address', () => {
+  it('is nowhere in the code this public repository ships', () => {
+    for (const path of ['voice-client.mjs', 'voice-seam.mjs', 'voice-layer.mjs']) {
+      const text = readFileSync(resolve(CORRIDOR, 'modules', path), 'utf8');
+      expect(text.match(/https?:\/\/[a-z0-9.-]+\.workers\.dev/gi) || []).toEqual([]);
+    }
+  });
+  it('is a Worker’s own https origin, or a stand-in on this machine', () => {
+    for (const good of [
+      'https://nihongo-srs.example.workers.dev',
+      'https://a.workers.dev',
+      'http://127.0.0.1:19472',
+      'http://localhost:9',
+    ])
+      expect(isVoiceServer(good)).toBe(true);
+    for (const bad of [
+      'https://evil.example',
+      'https://workers.dev',
+      'https://x.workers.dev.evil.example',
+      'http://x.workers.dev',
+      'https://x.workers.dev/path',
+      'https://user@x.workers.dev',
+      'https://x.workers.dev:8443',
+      'http://127.0.0.1.evil.example',
+      'http://127.0.0.1:1/path',
+      'http://127.0.0.1',
+      'javascript:alert(1)',
+      7,
+      null,
+    ])
+      expect(isVoiceServer(bad)).toBe(false);
+  });
+});
+
+describe('pairing input', () => {
+  it('takes the code as typed and the learner id, or one pasted line', () => {
+    expect(parsePairing({ code: ' ab12 cd34-ef56 ', learner: ' john.learner ' })).toEqual({
+      code: 'AB12CD34EF56',
+      learner: 'john.learner',
+    });
+    expect(parsePairing({ code: '', learner: 'john.learner AB12CD34EF56' })).toEqual({
+      code: 'AB12CD34EF56',
+      learner: 'john.learner',
+    });
+  });
+  it('takes the server’s address from the pasted line, and refuses a line that names any other kind of host', () => {
+    const line = (server) =>
+      `Bunki voice code: AB12CD34EF56 (10 minutes) · learner: John.Learner-1 · server: ${server}`;
+    expect(
+      parsePairing({ code: '', learner: line('https://nihongo-srs.example.workers.dev') }),
+    ).toEqual({
+      code: 'AB12CD34EF56',
+      learner: 'John.Learner-1',
+      server: 'https://nihongo-srs.example.workers.dev',
+    });
+    expect(
+      parsePairing({ code: '', learner: line('https://nihongo-srs.example.workers.dev/') }).server,
+    ).toBe('https://nihongo-srs.example.workers.dev');
+    expect(
+      parsePairing({ code: 'ab12cd34ef56', learner: 'john server: http://127.0.0.1:19472' }),
+    ).toEqual({ code: 'AB12CD34EF56', learner: 'john', server: 'http://127.0.0.1:19472' });
+    for (const bad of ['https://evil.example', 'http://x.workers.dev', 'https://x.workers.dev/v1'])
+      expect(parsePairing({ code: '', learner: line(bad) })).toEqual({ error: 'invalid-pairing' });
+  });
+  it('takes the release seat’s exact line shape: a learner id that itself holds 32 hex characters is not the code', () => {
+    // the shape release confirmed at 22:25 (" · " separators, no trailing space), with stand-ins for the three values
+    const line =
+      'Bunki voice code: 0123456789AB (10 minutes) · learner: local-0123456789abcdef0123456789abcdef · server: https://nihongo-srs.example-account.workers.dev';
+    const expected = {
+      code: '0123456789AB',
+      learner: 'local-0123456789abcdef0123456789abcdef',
+      server: 'https://nihongo-srs.example-account.workers.dev',
+    };
+    expect(parsePairing({ code: '', learner: line })).toEqual(expected);
+    expect(parsePairing({ code: line, learner: '' })).toEqual(expected);
+    expect(parsePairing({ code: '', learner: `  ${line}  \n` })).toEqual(expected);
+  });
+  it('takes the line the speech team’s pairing command prints, pasted into either box', () => {
+    const printed = 'Bunki voice code: AB12CD34EF56 (10 minutes) · learner: John.Learner-1';
+    expect(parsePairing({ code: '', learner: printed })).toEqual({
+      code: 'AB12CD34EF56',
+      learner: 'John.Learner-1',
+    });
+    expect(parsePairing({ code: printed, learner: '' })).toEqual({
+      code: 'AB12CD34EF56',
+      learner: 'John.Learner-1',
+    });
+    expect(
+      parsePairing({ code: '', learner: 'Bunki voice code: (10 minutes) · learner: john' }),
+    ).toEqual({ error: 'invalid-pairing' });
+  });
+  it.each([
+    [{ code: 'AB12CD34EF5', learner: 'john' }],
+    [{ code: 'AB12CD34EF5G', learner: 'john' }],
+    [{ code: 'AB12CD34EF56', learner: '' }],
+    [{ code: 'AB12CD34EF56', learner: 'nsrs_prod_x' }],
+    [{ code: 'AB12CD34EF56', learner: 'two words' }],
+    [{}],
+  ])('refuses %j before any request', (input) => {
+    expect(parsePairing(input)).toEqual({ error: 'invalid-pairing' });
+  });
+});
+
+describe('the client speaks the contract', () => {
+  let fake;
+  // every pairing here carries the stand-in's address, as the real pairing line carries the Worker's
+  const client = (store = createMemoryTokenStore()) => {
+    const c = createVoiceClient({ fetch: pageFetch, store });
+    const pair = c.pair.bind(c);
+    c.pair = (input) => pair({ ...input, learner: `${input.learner} server: ${fake.origin}` });
+    return c;
+  };
+  const paired = async (store = createMemoryTokenStore()) => {
+    const c = client(store);
+    const answer = await c.pair({
+      code: fake.issue({ learner: 'test-learner' }),
+      learner: 'test-learner',
+    });
+    expect(answer.ok).toBe(true);
+    return c;
+  };
+  beforeAll(async () => {
+    fake = await startFakeVoiceServer({ origins: [PAGE] });
+  });
+  afterAll(async () => {
+    await fake.close();
+  });
+
+  it('asks nothing of the server while unpaired', async () => {
+    const before = fake.log.length;
+    const c = client();
+    await c.ready();
+    expect(c.paired()).toBe(false);
+    await expect(
+      c.speak({ text: '雨の日は本を読む。', voiceKey: 'article:a1' }),
+    ).rejects.toMatchObject({ code: 'not-paired' });
+    await expect(c.budget()).rejects.toMatchObject({ code: 'not-paired' });
+    expect(fake.log.length).toBe(before);
+  });
+  it('a malformed code never leaves the page', async () => {
+    const before = fake.log.length;
+    expect(await client().pair({ code: 'nope', learner: 'test-learner' })).toEqual({
+      ok: false,
+      code: 'invalid-pairing',
+    });
+    expect(fake.log.length).toBe(before);
+  });
+  it('pairs once: the exact body, no bearer, and the token kept only in the store', async () => {
+    const store = createMemoryTokenStore();
+    const c = client(store);
+    const code = fake.issue({ learner: 'test-learner' });
+    const answer = await c.pair({ code: code.toLowerCase(), learner: 'test-learner' });
+    const row = fake.log.at(-1);
+    expect(row).toMatchObject({
+      method: 'POST',
+      path: '/v1/pair/redeem-speak',
+      status: 200,
+      origin: PAGE,
+      sentAuthorization: false,
+    });
+    expect(row.bodyKeys).toEqual(['code', 'environment', 'learner']);
+    expect(answer).toEqual({ ok: true, installation: row.installation });
+    expect(answer.installation).toMatch(/^bunki-[a-f0-9]{32}$/);
+    expect(c.paired()).toBe(true);
+    const kept = await store.read();
+    expect(kept.server).toBe(fake.origin);
+    expect(kept.token).toMatch(TOKEN);
+    expect(kept.scope).toEqual({
+      environment: 'prod',
+      learner: 'test-learner',
+      installation: row.installation,
+    });
+    // nothing the client hands out carries the token
+    expect(JSON.stringify([answer, c.scope(), c])).not.toContain(kept.token);
+    // a second client on the same store is paired without asking again
+    const again = client(store);
+    await again.ready();
+    expect(again.paired()).toBe(true);
+  });
+  it.each([
+    ['a wrong code', (f) => f.issue({ learner: 'someone-else' }), {}, 'authentication-required'],
+    ['pairing switched off', (f) => f.issue(), { pairingOff: true }, 'pairing-unavailable'],
+    ['too many tries', (f) => f.issue(), { pairLimited: true }, 'authentication-rate-limit'],
+  ])('answers %s with its code', async (_name, issue, set, code) => {
+    fake.set(set);
+    try {
+      expect(await client().pair({ code: issue(fake), learner: 'test-learner' })).toEqual({
+        ok: false,
+        code,
+      });
+    } finally {
+      fake.set({ pairingOff: false, pairLimited: false });
+    }
+  });
+  it('an install that is already paired answers installation-exists', async () => {
+    const installation = `bunki-${'a'.repeat(32)}`;
+    expect(
+      (await client().pair({ code: fake.issue({ installation }), learner: 'test-learner' })).ok,
+    ).toBe(true);
+    expect(
+      await client().pair({ code: fake.issue({ installation }), learner: 'test-learner' }),
+    ).toEqual({ ok: false, code: 'installation-exists' });
+  });
+  it('a server that cannot be reached answers network-failed', async () => {
+    const c = createVoiceClient({ fetch: pageFetch, store: createMemoryTokenStore() });
+    expect(
+      await c.pair({ code: 'AB12CD34EF56', learner: 'test-learner server: http://127.0.0.1:9' }),
+    ).toEqual({ ok: false, code: 'network-failed' });
+  });
+  it('a device that was never given an address asks nobody: a code alone is not enough', async () => {
+    const before = fake.log.length;
+    const c = createVoiceClient({ fetch: pageFetch, store: createMemoryTokenStore() });
+    await c.ready();
+    expect(c.configured()).toBe(false);
+    expect(await c.pair({ code: fake.issue(), learner: 'test-learner' })).toEqual({
+      ok: false,
+      code: 'server-missing',
+    });
+    expect(fake.log.length).toBe(before);
+  });
+  it('the address is kept on the device: pairing again needs only the learner id and a new code', async () => {
+    const store = createMemoryTokenStore();
+    const c = createVoiceClient({ fetch: pageFetch, store });
+    const line = `Bunki voice code: ${fake.issue()} (10 minutes) · learner: test-learner · server: ${fake.origin}`;
+    expect((await c.pair({ code: '', learner: line })).ok).toBe(true);
+    await c.forget();
+    expect(c.paired()).toBe(false);
+    expect(c.configured()).toBe(true);
+    const later = createVoiceClient({ fetch: pageFetch, store });
+    await later.ready();
+    expect(later.configured()).toBe(true);
+    expect(later.paired()).toBe(false);
+    expect((await later.pair({ code: fake.issue(), learner: 'test-learner' })).ok).toBe(true);
+    expect(later.paired()).toBe(true);
+  });
+
+  it('speaks one sentence: the contract’s body, built by the speech team’s own function', async () => {
+    const c = await paired();
+    const text = '雨の日は本を読む。';
+    const clip = await c.speak({ text, voiceKey: 'article:a1' });
+    const row = fake.speaks().at(-1);
+    expect(row).toMatchObject({
+      status: 200,
+      origin: PAGE,
+      authorized: true,
+      voiceKey: 'article:a1',
+      text,
+      inputKeyMatches: true,
+    });
+    expect(row.bodyKeys).toEqual([
+      'format',
+      'inputKey',
+      'profile',
+      'segments',
+      'version',
+      'voiceKey',
+    ]);
+    expect(clip.bytes).toBeInstanceOf(Uint8Array);
+    expect(clip.bytes.length).toBeGreaterThan(44);
+    expect(clip.contentType).toMatch(/^audio\//);
+    expect(clip.voiceId).toBe(row.voice);
+    // the same key as the speech team computes for the same text and profile
+    const expected = createSpeechInput({
+      segments: [{ language: 'ja', text, pronunciationDirectives: [] }],
+      profile: SPEAK_PROFILE,
+    });
+    expect(clip.inputKey).toBe(expected.inputKey);
+  });
+  it('keeps one voice for one voice key', async () => {
+    const c = await paired();
+    const a = await c.speak({ text: '猫が窓の外を見ている。', voiceKey: 'article:a9' });
+    const b = await c.speak({ text: '駅の前で友達を待った。', voiceKey: 'article:a9' });
+    expect(a.voiceId).toBe(b.voiceId);
+  });
+  it.each([
+    ['English', 'This is English only.', 'article:a1'],
+    ['mostly Latin', 'JR東日本のSuica', 'article:a1'],
+    ['a sentence over 400 code points', 'あ'.repeat(401), 'article:a1'],
+    ['a voice key with a space', '日本語。', 'word:two words'],
+    ['an unknown voice kind', '日本語。', 'grammar:x'],
+  ])('refuses %s on the page, before any request', async (_name, text, voiceKey) => {
+    const c = await paired();
+    const before = fake.speaks().length;
+    await expect(c.speak({ text, voiceKey })).rejects.toMatchObject({ code: 'not-speakable' });
+    expect(fake.speaks().length).toBe(before);
+  });
+  it.each([
+    [400, 'speech-input-invalid'],
+    [400, 'japanese-only'],
+    [400, 'profile-not-approved'],
+    [402, 'budget-exhausted'],
+    [404, 'not-in-release'],
+    [413, 'speech-input-too-large'],
+    [429, 'day-budget'],
+    [429, 'request-rate-limit'],
+    [500, 'server-failed'],
+    [503, 'voice-unavailable'],
+  ])('a %i %s is that code, and the token stays', async (status, error) => {
+    const c = await paired();
+    fake.failNext({ status, error });
+    const failure = await c
+      .speak({ text: '雨の日は本を読む。', voiceKey: 'article:a1' })
+      .catch((e) => e);
+    expect(failure).toBeInstanceOf(VoiceError);
+    expect(failure).toMatchObject({ code: error, status });
+    expect(c.paired()).toBe(true);
+  });
+  it('a 401 drops the token: pair again', async () => {
+    const store = createMemoryTokenStore();
+    const c = await paired(store);
+    fake.revokeAll();
+    await expect(
+      c.speak({ text: '雨の日は本を読む。', voiceKey: 'article:a1' }),
+    ).rejects.toMatchObject({ code: 'authentication-required', status: 401 });
+    expect(c.paired()).toBe(false);
+    expect(await store.read()).toMatchObject({ server: fake.origin, token: null, scope: null });
+  });
+
+  /* A pairing the server ended reads "ended" after a reload (the first review's C1). The device keeps a plain marker of
+   * it beside where the pairing was kept, under a key of its own; a fresh page reads it. The stand-in below keeps rows by
+   * key as the device store keeps them in IndexedDB (`speak`, `server`, and now `ended`). */
+  const durableStore = () => {
+    const rows = new Map();
+    return {
+      rows,
+      durable: true,
+      async read() {
+        const speak = rows.get('speak');
+        return {
+          server: rows.get('server') ?? null,
+          token: speak?.token ?? null,
+          scope: speak ? { ...speak.scope } : null,
+          ended: rows.get('ended') ?? null,
+        };
+      },
+      async write(value) {
+        rows.set('speak', { token: value.token, scope: { ...value.scope } });
+        rows.set('server', value.server);
+        rows.delete('ended');
+      },
+      async clear() {
+        rows.delete('speak');
+        rows.delete('ended');
+      },
+      async end(marker) {
+        rows.delete('speak');
+        rows.set('ended', marker);
+      },
+    };
+  };
+  const revoked = async (c) => {
+    fake.revokeAll();
+    await expect(
+      c.speak({ text: '雨の日は本を読む。', voiceKey: 'article:a1' }),
+    ).rejects.toMatchObject({ code: 'authentication-required', status: 401 });
+  };
+  const quiet = { play: async () => 'ended', pause() {}, resume() {}, stop() {}, setRate() {} };
+  it('a 401 keeps a plain marker and drops the token; a new page over the same store reads the pairing as ended', async () => {
+    const store = durableStore();
+    const c = await paired(store);
+    const token = store.rows.get('speak').token;
+    const { learner, installation } = c.scope();
+    await revoked(c);
+    expect(c.ended()).toBe(true);
+    expect(store.rows.has('speak')).toBe(false);
+    const marker = store.rows.get('ended');
+    // that the pairing ended, and when: never the token, the learner, the installation or the server's address
+    expect(Object.keys(marker).sort()).toEqual(['at', 'ended']);
+    expect(marker.ended).toBe(true);
+    expect(Number.isFinite(marker.at)).toBe(true);
+    const text = JSON.stringify(marker);
+    for (const secret of [token, learner, installation, fake.origin])
+      expect(text).not.toContain(secret);
+    const reloaded = client(store);
+    await reloaded.ready();
+    expect(reloaded.paired()).toBe(false);
+    expect(reloaded.ended()).toBe(true);
+    // Settings, every tap and the bar read the seam's status: "pair again", not "not paired"
+    expect(createVoiceSeam({ client: reloaded, player: quiet }).status().pairAgain).toBe(true);
+  });
+  it('pairing again clears the marker: paired, and paired after a reload', async () => {
+    const store = durableStore();
+    await revoked(await paired(store));
+    const reloaded = client(store);
+    await reloaded.ready();
+    expect(reloaded.ended()).toBe(true);
+    const answer = await reloaded.pair({
+      code: fake.issue({ learner: 'test-learner' }),
+      learner: 'test-learner',
+    });
+    expect(answer.ok).toBe(true);
+    expect(reloaded.ended()).toBe(false);
+    expect(store.rows.has('ended')).toBe(false);
+    const again = client(store);
+    await again.ready();
+    expect(again.paired()).toBe(true);
+    expect(again.ended()).toBe(false);
+  });
+  it('a pairing he removed himself, and a device never paired, read not paired (C1)', async () => {
+    const store = durableStore();
+    const c = await paired(store);
+    await c.forget();
+    const reloaded = client(store);
+    await reloaded.ready();
+    expect(reloaded.ended()).toBe(false);
+    expect(createVoiceSeam({ client: reloaded, player: quiet }).status().pairAgain).toBe(false);
+    const never = client(durableStore());
+    await never.ready();
+    expect(never.ended()).toBe(false);
+  });
+  it('a device that cannot keep its pairing (durable false) keeps no marker either', async () => {
+    const store = createMemoryTokenStore();
+    const c = await paired(store);
+    await revoked(c);
+    expect(c.ended()).toBe(true); // this page knows
+    expect((await store.read()).ended ?? null).toBe(null);
+    const reloaded = client(store);
+    await reloaded.ready();
+    expect(reloaded.ended()).toBe(false);
+  });
+  it('a store that throws costs nothing: the page works, pairs for itself, and a fresh page reads not paired', async () => {
+    const broken = () => Promise.reject(new Error('storage refused'));
+    const store = { durable: true, read: broken, write: broken, clear: broken, end: broken };
+    const c = await paired(store);
+    expect(c.paired()).toBe(true);
+    await revoked(c);
+    expect(c.ended()).toBe(true);
+    const reloaded = client(store);
+    await reloaded.ready();
+    expect(reloaded.paired()).toBe(false);
+    expect(reloaded.ended()).toBe(false);
+    expect(createVoiceSeam({ client: reloaded, player: quiet }).status().pairAgain).toBe(false);
+  });
+  it('a stop aborts the request and is not an error code', async () => {
+    const c = await paired();
+    const controller = new AbortController();
+    const pending = c.speak({
+      text: '新しい靴を買いました。',
+      voiceKey: 'article:a1',
+      signal: controller.signal,
+    });
+    controller.abort();
+    await expect(pending).rejects.toMatchObject({ name: 'AbortError' });
+  });
+  it('passes on the day’s own figures when the server sends them, and only then', async () => {
+    const c = await paired();
+    expect('daySpentCents' in (await c.budget())).toBe(false);
+    fake.set({ dayFields: true, daySpent: 42 });
+    try {
+      expect(await c.budget()).toMatchObject({
+        capCents: 2500,
+        dayCapCents: 300,
+        daySpentCents: 42,
+      });
+    } finally {
+      fake.set({ dayFields: false, daySpent: 0 });
+    }
+  });
+  it('reads the budget', async () => {
+    const c = await paired();
+    const budget = await c.budget();
+    expect(Object.keys(budget).sort()).toEqual([
+      'capCents',
+      'remainingCents',
+      'reservedCents',
+      'spentCents',
+    ]);
+    expect(budget.capCents).toBe(2500);
+  });
+});
+
+/* ------------------------------------------------------------------ the seam */
+function rig({ paired = true, online = true } = {}) {
+  const calls = {
+    speak: [],
+    played: [],
+    deviceSaid: [],
+    recorded: [],
+    sleeps: [],
+    quiet: 0,
+    stops: 0,
+    rates: [],
+    status: [],
+  };
+  let clock = Date.parse('2026-11-10T12:00:00Z');
+  const scripted = [];
+  let isPaired = paired,
+    held = null;
+  const client = {
+    configured: () => true,
+    ready: async () => {},
+    paired: () => isPaired,
+    scope: () => (isPaired ? { installation: 'bunki-' + 'b'.repeat(32) } : null),
+    async speak({ text, voiceKey }) {
+      calls.speak.push({ text, voiceKey });
+      const next = scripted.shift();
+      if (next) {
+        if (next.code === 'authentication-required') isPaired = false;
+        throw new VoiceError(next.code, next.status);
+      }
+      return {
+        bytes: new Uint8Array([1, 2, 3]),
+        contentType: 'audio/wav',
+        voiceId: 'v',
+        inputKey: `${voiceKey}|${text}`,
+      };
+    },
+    async budget() {
+      return { capCents: 2500, spentCents: 10, reservedCents: 0, remainingCents: 2490 };
+    },
+  };
+  const player = {
+    play(clip, rate) {
+      calls.played.push({ source: 'server', key: clip.inputKey, rate });
+      return new Promise((done) => {
+        held = done;
+        if (!rigged.hold) done('ended');
+      });
+    },
+    pause() {
+      calls.pauses = (calls.pauses || 0) + 1;
+    },
+    resume() {
+      calls.resumes = (calls.resumes || 0) + 1;
+    },
+    stop() {
+      calls.stops += 1;
+      held?.('stopped');
+    },
+    setRate(rate) {
+      calls.rates.push(rate);
+    },
+  };
+  // A Japanese device voice stands ready in every test, so its silence is the seam's own choice: any call is counted.
+  const said = (text) => {
+    calls.deviceSaid.push({ text });
+    return { spoken: true, source: 'device' };
+  };
+  const deviceVoice = {
+    support: () => ({ ok: true, voice: { name: 'fixture' } }),
+    fallback: said,
+    speak: said,
+    cancel() {},
+  };
+  const rigged = {
+    hold: false,
+    calls,
+    advance: (ms) => {
+      clock += ms;
+    },
+    fail: (...answers) => scripted.push(...answers),
+    release: (outcome = 'ended') => held?.(outcome),
+    seam: createVoiceSeam({
+      client,
+      device: deviceVoice,
+      player,
+      recorded: (src, rate) => {
+        calls.recorded.push({ src, rate });
+        return rigged.holdRecorded
+          ? new Promise((done) => (rigged.releaseRecorded = done))
+          : Promise.resolve(true);
+      },
+      quiet: () => {
+        calls.quiet += 1;
+      },
+      sleep: async (ms) => {
+        calls.sleeps.push(ms);
+      },
+      now: () => clock,
+      online: () => online,
+      onStatus: (status) => calls.status.push(status),
+    }),
+  };
+  return rigged;
+}
+/** Read to the end and say how it ended. */
+const run = (seam, options) =>
+  new Promise((done) => {
+    const states = [];
+    const session = seam.read({
+      ...options,
+      onState: (state, code) => {
+        states.push(code ? `${state}:${code}` : state);
+        if (['done', 'stopped', 'error'].includes(state)) done({ states, session });
+      },
+    });
+  });
+const S3 = [
+  { text: '雨の日は本を読む。' },
+  { text: '猫が窓の外を見ている。' },
+  { text: '駅の前で友達を待った。' },
+];
+
+describe('the seam: a recorded clip, then the voice server, then silence', () => {
+  it('a recorded clip wins and the server is not asked for it', async () => {
+    const r = rig();
+    const { states } = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: [
+        { text: S3[0].text, recorded: { src: 'audio/narration/sakura/x-000.m4a' } },
+        S3[1],
+      ],
+    });
+    expect(states.at(-1)).toBe('done');
+    expect(r.calls.recorded).toEqual([{ src: 'audio/narration/sakura/x-000.m4a', rate: 1 }]);
+    expect(r.calls.speak).toEqual([{ text: S3[1].text, voiceKey: 'article:a1' }]);
+    expect(r.calls.deviceSaid).toHaveLength(0);
+    expect(r.seam.status().last.source).toBe('server');
+  });
+  it('a recorded clip plays for a device that was never paired', async () => {
+    const r = rig({ paired: false });
+    const { states } = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: [{ text: S3[0].text, recorded: { src: 'audio/narration/sakura/x-000.m4a' } }],
+    });
+    expect(states.at(-1)).toBe('done');
+    expect(r.calls.recorded).toHaveLength(1);
+    expect(r.calls.speak).toHaveLength(0);
+  });
+  it('paired and online: every sentence comes from the server, in order, two fetched ahead', async () => {
+    const r = rig();
+    await run(r.seam, { voiceKey: 'article:a1', sentences: S3 });
+    expect(r.calls.speak.map((c) => c.text)).toEqual(S3.map((s) => s.text));
+    expect(r.calls.played.map((p) => p.source)).toEqual(['server', 'server', 'server']);
+    expect(r.calls.deviceSaid).toHaveLength(0);
+    expect(r.calls.sleeps.filter((ms) => ms === 260)).toHaveLength(2);
+  });
+  it('the read is told where each sentence comes from as it starts, after being told which sentence it is', async () => {
+    const told = [];
+    await run(rig().seam, {
+      onSentence: (index) => told.push(`sentence ${index}`),
+      onSource: (source, reason) => told.push(reason ? `${source} (${reason})` : source),
+      voiceKey: 'article:a1',
+      sentences: [
+        { text: S3[0].text, recorded: { src: 'audio/narration/sakura/x-000.m4a' } },
+        S3[1],
+      ],
+    });
+    expect(told).toEqual(['sentence 0', 'recorded', 'sentence 1', 'server', 'sentence -1']);
+  });
+  it('unpaired: silence and the reason; the server is not asked and no other voice stands in', async () => {
+    const r = rig({ paired: false });
+    const { states } = await run(r.seam, { voiceKey: 'article:a1', sentences: S3 });
+    expect(states.at(-1)).toBe('error:not-paired');
+    expect(r.calls.speak).toHaveLength(0);
+    expect(r.calls.played).toHaveLength(0);
+    expect(r.calls.deviceSaid).toHaveLength(0);
+    expect(r.seam.status()).toMatchObject({
+      paired: false,
+      last: { source: 'none' },
+      silent: { reason: 'not-paired' },
+    });
+  });
+  it('offline: silence and the reason; the server is not asked', async () => {
+    const r = rig({ online: false });
+    const { states } = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+    expect(states.at(-1)).toBe('error:offline');
+    expect(r.calls.speak).toHaveLength(0);
+    expect(r.calls.deviceSaid).toHaveLength(0);
+    expect(r.seam.status().silent).toMatchObject({ reason: 'offline' });
+  });
+  it('a sentence the server would refuse as not Japanese is passed over in silence, and the read goes on', async () => {
+    const r = rig();
+    const seen = [];
+    const { states } = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: [S3[0], { text: 'JR東日本のSuica' }, S3[1]],
+      onSentence: (index) => seen.push(index),
+    });
+    expect(states.at(-1)).toBe('done');
+    expect(r.calls.speak.map((c) => c.text)).toEqual([S3[0].text, S3[1].text]);
+    expect(r.calls.played).toHaveLength(2);
+    expect(r.calls.deviceSaid).toHaveLength(0);
+    expect(seen).toEqual([0, 1, 2, -1]);
+  });
+  it('a spoken sentence clears the reason for the last silence', async () => {
+    const r = rig({ online: false });
+    await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+    expect(r.seam.status().silent).toMatchObject({ reason: 'offline' });
+    const paired = rig();
+    paired.fail({ code: 'server-failed', status: 500 });
+    await run(paired.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+    expect(paired.seam.status().silent).toMatchObject({ reason: 'server-failed' });
+    await run(paired.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+    expect(paired.seam.status()).toMatchObject({ last: { source: 'server' }, silent: null });
+  });
+  it('says beforehand why it could not voice a sentence, so a read by itself can stay out of the way', async () => {
+    expect(rig().seam.cannot('word:猫')).toBe(null);
+    expect(rig({ paired: false }).seam.cannot('word:猫')).toBe('not-paired');
+    expect(rig({ online: false }).seam.cannot('word:猫')).toBe('offline');
+    expect(rig().seam.cannot()).toBe(null);
+    const r = rig();
+    r.fail({ code: 'day-budget', status: 429 });
+    await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+    expect(r.seam.cannot('word:猫')).toBe('day-budget');
+    // asking is free: it sends nothing, plays nothing and stops nothing
+    expect(r.calls.speak).toHaveLength(1);
+    expect(r.calls.played).toHaveLength(0);
+  });
+});
+
+describe('the seam: one behaviour per error code, and never a stand-in voice', () => {
+  it('503 voice-unavailable: once more after 2 s, then silence with that reason', async () => {
+    const r = rig();
+    r.fail({ code: 'voice-unavailable', status: 503 }, { code: 'voice-unavailable', status: 503 });
+    const { states } = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: S3.slice(0, 2),
+      prefetch: 0,
+    });
+    expect(states.at(-1)).toBe('error:voice-unavailable');
+    expect(r.calls.sleeps).toContain(2000);
+    expect(r.calls.speak.map((c) => c.text)).toEqual([S3[0].text, S3[0].text]);
+    expect(r.calls.played).toHaveLength(0);
+    expect(r.calls.deviceSaid).toHaveLength(0);
+  });
+  it('503 then a good answer: the server’s clip plays', async () => {
+    const r = rig();
+    r.fail({ code: 'voice-unavailable', status: 503 });
+    const { states } = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+    expect(states.at(-1)).toBe('done');
+    expect(r.calls.speak).toHaveLength(2);
+    expect(r.calls.played).toHaveLength(1);
+  });
+  it('429 day-budget: silence until 00:00 UTC without asking again, then the server', async () => {
+    const r = rig();
+    r.fail({ code: 'day-budget', status: 429 });
+    const first = await run(r.seam, { voiceKey: 'article:a1', sentences: S3, prefetch: 0 });
+    expect(first.states.at(-1)).toBe('error:day-budget');
+    expect(r.calls.speak).toHaveLength(1);
+    expect(r.seam.status().blocked).toBe('day-budget');
+    r.advance(11 * 3600 * 1000); // 23:00 UTC the same day
+    const second = await run(r.seam, { voiceKey: 'article:a2', sentences: S3.slice(0, 1) });
+    expect(second.states.at(-1)).toBe('error:day-budget');
+    expect(r.calls.speak).toHaveLength(1);
+    r.advance(2 * 3600 * 1000); // past 00:00 UTC
+    const third = await run(r.seam, { voiceKey: 'article:a3', sentences: S3.slice(0, 1) });
+    expect(third.states.at(-1)).toBe('done');
+    expect(r.calls.speak).toHaveLength(2);
+    expect(r.seam.status().blocked).toBe(null);
+    expect(r.calls.deviceSaid).toHaveLength(0);
+  });
+  it('429 request-rate-limit: silence, and no request for 60 s', async () => {
+    const r = rig();
+    r.fail({ code: 'request-rate-limit', status: 429 });
+    const first = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: S3.slice(0, 2),
+      prefetch: 0,
+    });
+    expect(first.states.at(-1)).toBe('error:request-rate-limit');
+    expect(r.calls.speak).toHaveLength(1);
+    r.advance(59_000);
+    const second = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(2) });
+    expect(second.states.at(-1)).toBe('error:request-rate-limit');
+    expect(r.calls.speak).toHaveLength(1);
+    r.advance(2_000);
+    const third = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(2) });
+    expect(third.states.at(-1)).toBe('done');
+    expect(r.calls.speak).toHaveLength(2);
+    expect(r.calls.deviceSaid).toHaveLength(0);
+  });
+  it('a clip this page already holds is served while the server is blocked; a new one is not asked (the review’s B3)', async () => {
+    const r = rig();
+    const first = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: S3.slice(0, 1),
+      prefetch: 0,
+    });
+    expect(first.states.at(-1)).toBe('done');
+    expect(r.calls.speak).toHaveLength(1);
+    r.fail({ code: 'request-rate-limit', status: 429 });
+    const refused = await run(r.seam, {
+      voiceKey: 'word:ear',
+      sentences: S3.slice(1, 2),
+      prefetch: 0,
+    });
+    expect(refused.states.at(-1)).toBe('error:request-rate-limit');
+    expect(r.calls.speak).toHaveLength(2);
+    const again = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: S3.slice(0, 1),
+      prefetch: 0,
+    });
+    expect(again.states.at(-1)).toBe('done');
+    expect(r.calls.speak).toHaveLength(2);
+    const fresh = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: S3.slice(2),
+      prefetch: 0,
+    });
+    expect(fresh.states.at(-1)).toBe('error:request-rate-limit');
+    expect(r.calls.speak).toHaveLength(2);
+  });
+  it.each([
+    ['404 not-in-release', { code: 'not-in-release', status: 404 }, 'not-in-release'],
+    ['402 budget-exhausted', { code: 'budget-exhausted', status: 402 }, 'budget-exhausted'],
+  ])(
+    '%s: silence from then on, and the server is not asked again',
+    async (_name, failure, blocked) => {
+      const r = rig();
+      r.fail(failure);
+      const first = await run(r.seam, { voiceKey: 'article:a1', sentences: S3, prefetch: 0 });
+      expect(first.states.at(-1)).toBe(`error:${blocked}`);
+      expect(r.calls.speak).toHaveLength(1);
+      expect(r.seam.status().blocked).toBe(blocked);
+      r.advance(48 * 3600 * 1000);
+      const second = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+      expect(second.states.at(-1)).toBe(`error:${blocked}`);
+      expect(r.calls.speak).toHaveLength(1);
+      expect(r.calls.deviceSaid).toHaveLength(0);
+    },
+  );
+  it('401: unpaired from then on; silence, and the status says pair again', async () => {
+    const r = rig();
+    r.fail({ code: 'authentication-required', status: 401 });
+    const first = await run(r.seam, { voiceKey: 'article:a1', sentences: S3, prefetch: 0 });
+    expect(first.states.at(-1)).toBe('error:authentication-required');
+    expect(r.calls.speak).toHaveLength(1);
+    expect(r.seam.status()).toMatchObject({ paired: false, pairAgain: true });
+    const second = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+    expect(second.states.at(-1)).toBe('error:not-paired');
+    expect(r.calls.speak).toHaveLength(1);
+    expect(r.calls.deviceSaid).toHaveLength(0);
+    // the tap is recorded with the cause as it was when it happened: a pairing the server ended, "pair again" on every
+    // surface that names the last tap (Settings' row: the review's B1, the amendment of 2026-11-14)
+    expect(r.seam.status().silent).toMatchObject({ reason: 'authentication-required' });
+  });
+  it('a device never paired: its tap is recorded "not paired", not "pair again"', async () => {
+    const r = rig({ paired: false });
+    const first = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: S3.slice(0, 1),
+      press: true,
+    });
+    expect(first.states.at(-1)).toBe('error:not-paired');
+    expect(r.seam.status()).toMatchObject({ pairAgain: false, silent: { reason: 'not-paired' } });
+  });
+  it.each([
+    ['speech-input-invalid', 400],
+    ['speech-input-not-normal', 400],
+    ['japanese-only', 400],
+    ['profile-not-approved', 400],
+    ['server-failed', 500],
+  ])(
+    '%s: silence with that reason; the same sentence is not asked twice in that read, and a new read asks',
+    async (code, status) => {
+      const r = rig();
+      r.fail({ code, status });
+      const first = await run(r.seam, {
+        voiceKey: 'article:a1',
+        sentences: S3.slice(0, 2),
+        prefetch: 0,
+      });
+      expect(first.states.at(-1)).toBe(`error:${code}`);
+      expect(r.calls.speak.map((c) => c.text)).toEqual([S3[0].text]);
+      const second = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(0, 1) });
+      expect(second.states.at(-1)).toBe('done');
+      expect(r.calls.speak).toHaveLength(2);
+      expect(r.calls.deviceSaid).toHaveLength(0);
+    },
+  );
+  it('the server out of reach: silence; for 15 s a read by itself sends no request, and his press asks (rule 8)', async () => {
+    const r = rig();
+    r.fail({ code: 'network-failed', status: 0 });
+    const first = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: S3.slice(0, 2),
+      prefetch: 0,
+      press: true,
+    });
+    expect(first.states.at(-1)).toBe('error:network-failed');
+    const second = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(1, 2) });
+    expect(second.states.at(-1)).toBe('error:network-failed');
+    expect(r.calls.speak).toHaveLength(1);
+    // his press inside the wait asks, and speaks when the voice answers
+    const pressed = await run(r.seam, {
+      voiceKey: 'article:a1',
+      sentences: S3.slice(1, 2),
+      press: true,
+    });
+    expect(pressed.states.at(-1)).toBe('done');
+    expect(r.calls.speak).toHaveLength(2);
+    r.advance(16_000);
+    const third = await run(r.seam, { voiceKey: 'article:a1', sentences: S3.slice(2, 3) });
+    expect(third.states.at(-1)).toBe('done');
+    expect(r.calls.speak).toHaveLength(3);
+    expect(r.calls.deviceSaid).toHaveLength(0);
+  });
+  it('413 speech-input-too-large: the sentence is split further and its parts are spoken in order', async () => {
+    const r = rig();
+    const long =
+      'これは長い文で、' + 'とても'.repeat(20) + '長いので、' + 'さらに'.repeat(20) + '続きます。';
+    r.fail({ code: 'speech-input-too-large', status: 413 });
+    const { states } = await run(r.seam, { voiceKey: 'article:a1', sentences: [{ text: long }] });
+    expect(states.at(-1)).toBe('done');
+    const parts = r.calls.speak.slice(1).map((c) => c.text);
+    expect(parts.length).toBeGreaterThan(1);
+    expect(parts.join('')).toBe(long);
+    expect(r.calls.played).toHaveLength(parts.length);
+    expect(r.calls.deviceSaid).toHaveLength(0);
+  });
+});
+
+describe('the seam: one sound at a time, and the controls', () => {
+  it('a new read stops the one before it and quiets the other lanes', async () => {
+    const r = rig();
+    r.hold = true;
+    const first = [];
+    const a = r.seam.read({ voiceKey: 'article:a1', sentences: S3, onState: (s) => first.push(s) });
+    await new Promise((done) => setTimeout(done, 5));
+    expect(a.state).toBe('playing');
+    r.hold = false;
+    const { states } = await run(r.seam, { voiceKey: 'word:猫', sentences: [{ text: 'ねこ' }] });
+    expect(first.at(-1)).toBe('stopped');
+    expect(states.at(-1)).toBe('done');
+    expect(r.calls.quiet).toBeGreaterThanOrEqual(2);
+    expect(r.seam.active()).toBe(null);
+  });
+  it('stop() ends the read and nothing plays after it', async () => {
+    const r = rig();
+    r.hold = true;
+    const states = [];
+    r.seam.read({ voiceKey: 'article:a1', sentences: S3, onState: (s) => states.push(s) });
+    await new Promise((done) => setTimeout(done, 5));
+    r.seam.stop();
+    r.hold = false;
+    await new Promise((done) => setTimeout(done, 5));
+    expect(states.at(-1)).toBe('stopped');
+    expect(r.calls.played).toHaveLength(1);
+  });
+  it('pause holds the sentence and resume carries on; a jump starts another sentence', async () => {
+    const r = rig();
+    r.hold = true;
+    const seen = [];
+    const session = r.seam.read({
+      voiceKey: 'article:a1',
+      sentences: S3,
+      onSentence: (i) => seen.push(i),
+    });
+    await new Promise((done) => setTimeout(done, 5));
+    session.pause();
+    expect(session.state).toBe('paused');
+    expect(r.calls.pauses).toBe(1);
+    session.resume();
+    expect(session.state).toBe('playing');
+    expect(r.calls.resumes).toBe(1);
+    session.jump(2);
+    await new Promise((done) => setTimeout(done, 5));
+    expect(session.index).toBe(2);
+    expect(seen).toContain(2);
+    session.stop();
+  });
+  it('the speeds are 0.75, 1 and 1.25 and reach the player', async () => {
+    const r = rig();
+    r.hold = true;
+    const session = r.seam.read({ voiceKey: 'article:a1', sentences: S3, rate: 0.75 });
+    await new Promise((done) => setTimeout(done, 5));
+    expect(r.calls.played[0].rate).toBe(0.75);
+    session.setRate(1.25);
+    expect(r.calls.rates.at(-1)).toBe(1.25);
+    expect(() => session.setRate(0.8)).toThrow();
+    session.stop();
+  });
+  it('a recorded clip another lane stops ends the read; the seam’s own pause only holds it', async () => {
+    const r = rig();
+    r.holdRecorded = true;
+    const states = [];
+    const clip = { text: S3[0].text, recorded: { src: 'audio/narration/sakura/x-000.m4a' } };
+    let stops = 0;
+    const session = r.seam.read({
+      voiceKey: 'article:a1',
+      sentences: [clip, S3[1]],
+      onState: (s) => states.push(s),
+      stopRecorded: () => {
+        stops += 1;
+        r.releaseRecorded(null);
+      },
+    });
+    await new Promise((done) => setTimeout(done, 5));
+    session.pause(); // the seam stops the clip itself: the read is paused, not over
+    await new Promise((done) => setTimeout(done, 5));
+    expect(stops).toBe(1);
+    expect(states.at(-1)).toBe('paused');
+    session.resume(); // the sentence is said again from its start
+    await new Promise((done) => setTimeout(done, 5));
+    expect(r.calls.recorded).toHaveLength(2);
+    expect(states.at(-1)).toBe('playing');
+    r.releaseRecorded(null); // stopped from outside (the app's stopRecAudio)
+    await new Promise((done) => setTimeout(done, 5));
+    expect(states.at(-1)).toBe('stopped');
+  });
+  it('a sentence heard again is not asked of the server again', async () => {
+    const r = rig();
+    await run(r.seam, { voiceKey: 'word:猫', sentences: [{ text: 'ねこ' }] });
+    await run(r.seam, { voiceKey: 'word:猫', sentences: [{ text: 'ねこ' }] });
+    expect(r.calls.speak).toHaveLength(1);
+    expect(r.calls.played).toHaveLength(2);
+  });
+});
+
+describe('the ear’s own time limit cuts a read, and a sentence on its way is kept (the review’s K3)', () => {
+  /** A server that answers only when told to, and a client that gives up its request when the read aborts it. */
+  function slowRig() {
+    const asked = [];
+    const played = [];
+    const client = {
+      configured: () => true,
+      ready: async () => {},
+      paired: () => true,
+      scope: () => ({ installation: 'bunki-' + 'b'.repeat(32) }),
+      speak({ text, voiceKey, signal }) {
+        return new Promise((resolve, reject) => {
+          const row = { text, voiceKey, aborted: false };
+          asked.push(row);
+          row.answer = () =>
+            resolve({
+              bytes: new Uint8Array([1]),
+              contentType: 'audio/wav',
+              voiceId: 'v',
+              inputKey: `${voiceKey}|${text}`,
+            });
+          signal?.addEventListener('abort', () => {
+            row.aborted = true;
+            reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
+          });
+        });
+      },
+      async budget() {
+        return { capCents: 2500, spentCents: 0, reservedCents: 0, remainingCents: 2500 };
+      },
+    };
+    const player = {
+      play: (clip) => (played.push(clip.inputKey), Promise.resolve('ended')),
+      stop() {},
+    };
+    const seam = createVoiceSeam({ client, player, sleep: async () => {} });
+    return { seam, asked, played };
+  }
+  const tick = () => new Promise((done) => setTimeout(done, 5));
+  it('cut: the read ends at once; the sentence arrives later and the next read plays it without asking again', async () => {
+    const { seam, asked, played } = slowRig();
+    const states = [];
+    const first = seam.read({
+      voiceKey: 'word:猫',
+      sentences: [{ text: 'ねこ' }],
+      onState: (s) => states.push(s),
+    });
+    await tick();
+    expect(asked).toHaveLength(1);
+    expect(typeof first.cut).toBe('function');
+    first.cut();
+    await tick();
+    expect(states.at(-1)).toBe('stopped');
+    expect(asked[0].aborted).toBe(false);
+    asked[0].answer();
+    await tick();
+    expect(played).toEqual([]);
+    const { states: again } = await run(seam, {
+      voiceKey: 'word:猫',
+      sentences: [{ text: 'ねこ' }],
+    });
+    expect(again.at(-1)).toBe('done');
+    expect(asked).toHaveLength(1);
+    expect(played).toEqual(['word:猫|ねこ']);
+  });
+  it('stop (any other end): the request is given up and nothing is kept, as before', async () => {
+    const { seam, asked } = slowRig();
+    const first = seam.read({ voiceKey: 'word:猫', sentences: [{ text: 'ねこ' }] });
+    await tick();
+    first.stop();
+    await tick();
+    expect(asked[0].aborted).toBe(true);
+    const second = seam.read({ voiceKey: 'word:猫', sentences: [{ text: 'ねこ' }] });
+    await tick();
+    expect(asked).toHaveLength(2);
+    second.stop();
+  });
+});
+
+describe('a request its only asker gave up on belongs to nobody (the re-check’s R1, fr2)', () => {
+  /** A server that answers or refuses each request only when told to; time the test moves; every status told. */
+  function heldRig() {
+    const asked = [];
+    const played = [];
+    const told = [];
+    let clock = Date.parse('2026-11-10T12:00:00Z');
+    const client = {
+      configured: () => true,
+      ready: async () => {},
+      paired: () => true,
+      scope: () => ({ installation: 'bunki-' + 'b'.repeat(32) }),
+      speak({ text, voiceKey, signal }) {
+        return new Promise((resolve, reject) => {
+          const row = { text, voiceKey, aborted: false, over: false };
+          asked.push(row);
+          row.answer = () => {
+            row.over = true;
+            resolve({
+              bytes: new Uint8Array([1]),
+              contentType: 'audio/wav',
+              voiceId: 'v',
+              inputKey: `${voiceKey}|${text}`,
+            });
+          };
+          row.fail = (code, status = 0) => {
+            row.over = true;
+            reject(new VoiceError(code, status));
+          };
+          signal?.addEventListener('abort', () => {
+            row.aborted = true;
+            row.over = true;
+            reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
+          });
+        });
+      },
+      async budget() {
+        return { capCents: 2500, spentCents: 0, reservedCents: 0, remainingCents: 2500 };
+      },
+    };
+    const player = {
+      play: (clip) => (played.push(clip.inputKey), Promise.resolve('ended')),
+      stop() {},
+    };
+    const seam = createVoiceSeam({
+      client,
+      player,
+      sleep: async () => {},
+      now: () => clock,
+      onStatus: (status) => told.push(status),
+    });
+    return { seam, asked, played, told, advance: (ms) => (clock += ms) };
+  }
+  const tick = () => new Promise((done) => setTimeout(done, 5));
+  const KEY = 'article:a1';
+  const [X, Y] = S3;
+  /** A read and how it ends, as 'state' or 'state:code'. */
+  function reading(seam, options) {
+    const states = [];
+    const session = seam.read({
+      voiceKey: KEY,
+      prefetch: 0,
+      ...options,
+      onState: (state, code) => states.push(code ? `${state}:${code}` : state),
+    });
+    return { states, session };
+  }
+  /** The ear's read of X, cut by its own time limit while X is on its way. */
+  async function givenUp(r) {
+    const { session } = reading(r.seam, { sentences: [X] });
+    await tick();
+    expect(r.asked).toHaveLength(1);
+    session.cut();
+    await tick();
+    expect(r.asked[0].aborted).toBe(false);
+    return r.asked[0];
+  }
+  /** Every request still open ends with `code` (a 503 is asked once more after 2 s, and that one ends too). */
+  async function failOpen(r, code) {
+    for (let round = 0; round < 3; round += 1) {
+      for (const row of r.asked.filter((one) => !one.over)) row.fail(code);
+      await tick();
+    }
+  }
+  const STATUS = {
+    'voice-timeout': 0,
+    'network-failed': 0,
+    'day-budget': 429,
+    'request-rate-limit': 429,
+    'budget-exhausted': 402,
+    'not-in-release': 404,
+    'authentication-required': 401,
+    'voice-unavailable': 503,
+    'speak-failed': 500,
+  };
+
+  it.each(Object.keys(STATUS))(
+    'given up, then %s: nothing recorded against the server, nothing told, the next sentence is asked as before',
+    async (code) => {
+      const r = heldRig();
+      await givenUp(r);
+      const told = r.told.length;
+      await failOpen(r, code);
+      expect(r.told.length).toBe(told);
+      expect(r.seam.cannot(KEY)).toBe(null);
+      expect(r.seam.status()).toMatchObject({ blocked: null, pairAgain: false, silent: null });
+      const next = reading(r.seam, { sentences: [Y] });
+      await tick();
+      expect(r.asked.at(-1).text).toBe(Y.text);
+      r.asked.at(-1).answer();
+      await tick();
+      expect(next.states.at(-1)).toBe('done');
+      expect(r.played).toEqual([`${KEY}|${Y.text}`]);
+    },
+  );
+  it('given up, then answered: the clip is kept, and asking for it again plays at once', async () => {
+    const r = heldRig();
+    const row = await givenUp(r);
+    row.answer();
+    await tick();
+    expect(r.played).toEqual([]);
+    const again = reading(r.seam, { sentences: [X] });
+    await tick();
+    expect(again.states.at(-1)).toBe('done');
+    expect(r.asked).toHaveLength(1);
+    expect(r.played).toEqual([`${KEY}|${X.text}`]);
+  });
+  it('a request someone still waits for keeps today’s behaviour: a timeout is told and holds the server for 15 s', async () => {
+    const r = heldRig();
+    const read = reading(r.seam, { sentences: [X] });
+    await tick();
+    const told = r.told.length;
+    r.asked[0].fail('voice-timeout');
+    await tick();
+    expect(read.states.at(-1)).toBe('error:voice-timeout');
+    expect(r.told.length).toBeGreaterThan(told);
+    // the wait is named by its cause, a slow server, not a lost connection (L1 fix round 2, the re-check's F3)
+    expect(r.seam.cannot(KEY)).toBe('voice-timeout');
+    r.advance(15_001);
+    expect(r.seam.cannot(KEY)).toBe(null);
+  });
+  it('tapped again while it is on its way: no second request, and it plays when it arrives', async () => {
+    const r = heldRig();
+    const row = await givenUp(r);
+    const again = reading(r.seam, { sentences: [X] });
+    await tick();
+    expect(r.asked).toHaveLength(1);
+    row.answer();
+    await tick();
+    expect(again.states.at(-1)).toBe('done');
+    expect(r.played).toEqual([`${KEY}|${X.text}`]);
+  });
+  it('joined after the give-up and then refused: the refusal is the joiner’s, recorded once and shown', async () => {
+    const r = heldRig();
+    const row = await givenUp(r);
+    const again = reading(r.seam, { sentences: [X] });
+    await tick();
+    const told = r.told.length;
+    row.fail('day-budget', 429);
+    await tick();
+    expect(r.asked).toHaveLength(1);
+    expect(again.states.at(-1)).toBe('error:day-budget');
+    expect(r.seam.cannot(KEY)).toBe('day-budget');
+    // one status for the refusal, and the read's own end, which names it. Since the offline clips (B3, merged in the
+    // combine) a day-budget refusal also reads the server's budget (free) so that its line names the server's own
+    // ceiling; that read tells once more, carrying the budget: it is not a second telling of the refusal.
+    const after = r.told.slice(told);
+    expect(after.filter((status) => !status.silent && !status.budget)).toHaveLength(1);
+    expect(after.filter((status) => status.silent?.reason === 'day-budget')).toHaveLength(1);
+    expect(after.filter((status) => !status.silent && status.budget)).toHaveLength(1);
+  });
+  it('joined after the give-up, and the first asker’s request runs out of time on the way: not the joiner’s; it asks once on its own', async () => {
+    const r = heldRig();
+    const row = await givenUp(r);
+    const again = reading(r.seam, { sentences: [X] });
+    await tick();
+    const told = r.told.length;
+    row.fail('voice-timeout');
+    await tick();
+    expect(r.asked).toHaveLength(2);
+    expect(r.told.length).toBe(told);
+    expect(r.seam.cannot(KEY)).toBe(null);
+    r.asked[1].answer();
+    await tick();
+    expect(again.states.at(-1)).toBe('done');
+    expect(r.played).toEqual([`${KEY}|${X.text}`]);
+  });
+  it('…and when its own request runs out of time too, that one is its own: recorded once, told, and the read ends', async () => {
+    const r = heldRig();
+    const row = await givenUp(r);
+    const again = reading(r.seam, { sentences: [X] });
+    await tick();
+    row.fail('voice-timeout');
+    await tick();
+    const told = r.told.length;
+    r.asked[1].fail('voice-timeout');
+    await tick();
+    expect(again.states.at(-1)).toBe('error:voice-timeout');
+    expect(r.seam.cannot(KEY)).toBe('voice-timeout');
+    expect(r.told.slice(told).filter((status) => !status.silent)).toHaveLength(1);
+    expect(r.asked).toHaveLength(2);
+  });
+  it('the read reaches the sentence the ear gave up on (fr2-k3-late-block): it joins, and the lost request never ends the read', async () => {
+    const r = heldRig();
+    const ear = reading(r.seam, { sentences: [S3[2]] });
+    await tick();
+    ear.session.cut();
+    await tick();
+    const article = reading(r.seam, { sentences: S3, prefetch: 2 });
+    await tick();
+    expect(r.asked.map((row) => row.text)).toEqual([S3[2].text, S3[0].text, S3[1].text]);
+    r.asked[1].answer();
+    r.asked[2].answer();
+    await tick();
+    expect(article.states).not.toContain('done');
+    r.asked[0].fail('voice-timeout');
+    await tick();
+    expect(r.seam.cannot(KEY)).toBe(null);
+    expect(r.asked).toHaveLength(4);
+    r.asked[3].answer();
+    await tick();
+    expect(article.states.at(-1)).toBe('done');
+    expect(r.played).toEqual(S3.map((s) => `${KEY}|${s.text}`));
+    expect(r.seam.status().blocked).toBe(null);
+  });
+  it('a joiner that stops leaves the kept request on its way, and its answer is kept', async () => {
+    const r = heldRig();
+    const row = await givenUp(r);
+    const again = reading(r.seam, { sentences: [X] });
+    await tick();
+    again.session.stop();
+    await tick();
+    expect(row.aborted).toBe(false);
+    row.answer();
+    await tick();
+    const third = reading(r.seam, { sentences: [X] });
+    await tick();
+    expect(third.states.at(-1)).toBe('done');
+    expect(r.asked).toHaveLength(1);
+  });
+  it('the only asker stops: the request is aborted and a new ask sends a new one (nobody joins an aborted request)', async () => {
+    const r = heldRig();
+    const first = reading(r.seam, { sentences: [X] });
+    await tick();
+    first.session.stop();
+    const second = reading(r.seam, { sentences: [X] });
+    await tick();
+    expect(r.asked[0].aborted).toBe(true);
+    expect(r.asked).toHaveLength(2);
+    r.asked[1].answer();
+    await tick();
+    expect(second.states.at(-1)).toBe('done');
+  });
+
+  /* Rule 8 (the ruling's amendment, 2026-11-14; the review's B2): a line that says to tap is true while it is shown. His
+   * press ends the 15 s wait after a lost connection or a slow answer and asks; a read that starts by itself stays held
+   * back; a press that fails again starts the wait again from that failure; the minute's wait is not his to end. */
+  const pressing = (seam, options) => reading(seam, { ...options, press: true });
+  /** A press ended by `code` with someone waiting for it: the 15 s wait begins now. */
+  async function waitAfter(r, code) {
+    const first = pressing(r.seam, { sentences: [X] });
+    await tick();
+    r.asked[0].fail(code);
+    await tick();
+    expect(first.states.at(-1)).toBe(`error:${code}`);
+    expect(r.seam.cannot(KEY)).toBe(code);
+  }
+  it.each(['network-failed', 'voice-timeout'])(
+    'rule 8: after %s, a press at +1 s sends one request and speaks when the voice answers',
+    async (code) => {
+      const r = heldRig();
+      await waitAfter(r, code);
+      r.advance(1000);
+      const press = pressing(r.seam, { sentences: [X] });
+      await tick();
+      expect(r.asked).toHaveLength(2);
+      r.asked[1].answer();
+      await tick();
+      expect(press.states.at(-1)).toBe('done');
+      expect(r.played).toEqual([`${KEY}|${X.text}`]);
+      // it spoke: the wait is over for what follows, a read by itself included
+      expect(r.seam.cannot(KEY)).toBe(null);
+    },
+  );
+  it.each(['network-failed', 'voice-timeout'])(
+    'rule 8: after %s, a read that starts by itself at +1 s sends nothing, and cannot() still names the code',
+    async (code) => {
+      const r = heldRig();
+      await waitAfter(r, code);
+      r.advance(1000);
+      expect(r.seam.cannot(KEY)).toBe(code);
+      expect(r.seam.cannot(KEY, Y.text)).toBe(code);
+      // what the ear asks for a resting pointer (no press) is held back too; for his press it is not
+      expect(r.seam.cannot(KEY, Y.text, { press: false })).toBe(code);
+      expect(r.seam.cannot(KEY, Y.text, { press: true })).toBe(null);
+      const bySelf = reading(r.seam, { sentences: [Y] });
+      await tick();
+      expect(bySelf.states.at(-1)).toBe(`error:${code}`);
+      expect(r.asked).toHaveLength(1);
+    },
+  );
+  it.each(['network-failed', 'voice-timeout'])(
+    'rule 8: after %s, a press at +1 s that fails again ends with the same code, and the wait runs 15 s from that second failure',
+    async (code) => {
+      const r = heldRig();
+      await waitAfter(r, code);
+      r.advance(1000);
+      const press = pressing(r.seam, { sentences: [X] });
+      await tick();
+      expect(r.asked).toHaveLength(2);
+      r.advance(2000);
+      r.asked[1].fail(code);
+      await tick();
+      expect(press.states.at(-1)).toBe(`error:${code}`);
+      expect(r.seam.status().silent).toMatchObject({ reason: code });
+      // 14.9 s after the second failure (17.9 s after the first): a read by itself is still held back; at 15.1 s it is not
+      r.advance(14_900);
+      expect(r.seam.cannot(KEY)).toBe(code);
+      r.advance(200);
+      expect(r.seam.cannot(KEY)).toBe(null);
+    },
+  );
+  it('rule 8: a press does not end the minute’s wait (C7): refused at once, asking nothing', async () => {
+    const r = heldRig();
+    const first = pressing(r.seam, { sentences: [X] });
+    await tick();
+    r.asked[0].fail('request-rate-limit', 429);
+    await tick();
+    expect(first.states.at(-1)).toBe('error:request-rate-limit');
+    r.advance(1000);
+    expect(r.seam.cannot(KEY, null, { press: true })).toBe('request-rate-limit');
+    const press = pressing(r.seam, { sentences: [X] });
+    await tick();
+    expect(press.states.at(-1)).toBe('error:request-rate-limit');
+    expect(r.asked).toHaveLength(1);
+  });
+  it('rule 8: inside the wait, a second ask for a sentence still on its way joins it: no second request, and it plays when it arrives', async () => {
+    const r = heldRig();
+    await waitAfter(r, 'network-failed');
+    r.advance(1000);
+    // the ear's press, cut by its own time limit while the sentence is on its way (the request runs on, kept)
+    const ear = pressing(r.seam, { sentences: [X] });
+    await tick();
+    expect(r.asked).toHaveLength(2);
+    ear.session.cut();
+    await tick();
+    const again = pressing(r.seam, { sentences: [X] });
+    await tick();
+    expect(r.asked).toHaveLength(2);
+    r.asked[1].answer();
+    await tick();
+    expect(again.states.at(-1)).toBe('done');
+    expect(r.played).toEqual([`${KEY}|${X.text}`]);
+  });
+});
+
+describe('only the Japanese is read', () => {
+  const texts = (text) => japaneseSentences(text).map((sentence) => sentence.text);
+  it('Japanese text is read as it stands, sentence by sentence', () => {
+    expect(texts('雨の日は本を読む。猫が窓の外を見ている。')).toEqual([
+      '雨の日は本を読む。',
+      '猫が窓の外を見ている。',
+    ]);
+    expect(texts('きかい')).toEqual(['きかい']);
+  });
+  it('from a tutor’s mixed reply only the Japanese is read; the English never reaches the server', () => {
+    expect(
+      texts(
+        'Use it like this: 雨が降っているのに、出かけました。 The clause before のに is the surprise.',
+      ),
+    ).toEqual(['雨が降っているのに、出かけました。', 'のに']);
+    expect(texts('Good session. 「機械」は「きかい」と読みます。 Review it tomorrow.')).toEqual([
+      '「機械」は「きかい」と読みます。',
+    ]);
+  });
+  it('English alone, a lone character and nothing at all give nothing to read', () => {
+    expect(texts('Good session. Review it tomorrow.')).toEqual([]);
+    expect(texts('The particle は marks the topic.')).toEqual([]);
+    expect(texts('')).toEqual([]);
+    expect(texts(null)).toEqual([]);
+  });
+  it('the text a learner sees leaves out readings, controls and the line that says why there is no voice', () => {
+    const text = (value) => ({ nodeType: 3, nodeValue: value });
+    const element = (tagName, classes, ...childNodes) => ({
+      nodeType: 1,
+      tagName,
+      hidden: false,
+      childNodes,
+      classList: { contains: (name) => classes.includes(name) },
+      getAttribute: () => null,
+    });
+    const sentence = element(
+      'P',
+      ['review-example'],
+      text('雨の日は'),
+      element('RUBY', [], text('本'), element('RT', [], text('ほん'))),
+      text('を読む。'),
+      element('BUTTON', ['voice-say'], text('聞く')),
+      element('SPAN', ['say-note', 'voice-note'], text(voiceLineOf('not-paired')[0])),
+    );
+    expect(shownText(sentence)).toBe('雨の日は本を読む。');
+  });
+});
+
+describe('today’s spend, for the status line', () => {
+  const NOW = Date.parse('2026-11-10T14:30:00Z');
+  const total = (spentCents) => ({
+    capCents: 2500,
+    spentCents,
+    reservedCents: 0,
+    remainingCents: 2500 - spentCents,
+  });
+  it('counts from this device’s first look of the day until the server sends the day’s own figure', () => {
+    const first = daySpend(total(120), null, NOW);
+    expect(first).toMatchObject({ day: '2026-11-10', spentCents: 0, capCents: null, since: NOW });
+    expect(first.keep).toEqual({ day: '2026-11-10', spentCents: 120, at: NOW });
+    const later = daySpend(total(163), first.keep, NOW + 3600_000);
+    expect(later).toMatchObject({ spentCents: 43, since: NOW });
+    expect(later.keep).toEqual(first.keep);
+  });
+  it('starts again at 00:00 UTC, and after a kept figure that can no longer be right', () => {
+    const kept = { day: '2026-11-10', spentCents: 120, at: NOW };
+    const nextDay = daySpend(total(400), kept, Date.parse('2026-11-11T00:00:05Z'));
+    expect(nextDay).toMatchObject({ day: '2026-11-11', spentCents: 0 });
+    expect(nextDay.keep.spentCents).toBe(400);
+    expect(daySpend(total(100), kept, NOW + 1000).spentCents).toBe(0); // the total fell: a reset on the server
+    expect(
+      daySpend(total(150), { day: '2026-11-10', spentCents: 'x', at: NOW }, NOW).spentCents,
+    ).toBe(0);
+  });
+  it('shows the server’s own day figure as it is', () => {
+    const own = daySpend(
+      { ...total(900), dayCapCents: 300, daySpentCents: 57 },
+      { day: '2026-11-10', spentCents: 0, at: NOW },
+      NOW,
+    );
+    expect(own).toMatchObject({ spentCents: 57, capCents: 300, since: null, keep: null });
+  });
+});
+
+describe('voice keys', () => {
+  it('are a kind and an id the server accepts', () => {
+    expect(voiceKeyOf('article', 'jawiki:5294446')).toBe('article:jawiki:5294446');
+    expect(voiceKeyOf('word', '食べ る')).toBe('word:食べる');
+    expect(voiceKeyOf('conv', 'mwanukq8-zv3k')).toBe('conv:mwanukq8-zv3k');
+    expect([...voiceKeyOf('word', 'あ'.repeat(200)).slice('word:'.length)]).toHaveLength(120);
+    expect(voiceKeyOf('word', '   ')).toBe('word:bunki');
+    expect(voiceKeyOf('grammar', 'x')).toBe('word:x');
+  });
+});

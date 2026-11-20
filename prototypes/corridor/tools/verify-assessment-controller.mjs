@@ -6,7 +6,15 @@ import { mkdirSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } fro
 import { homedir } from 'node:os';
 import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { buildCorridorModules } from '../../../scripts/build-reading-module.mjs';
+import {
+  ASSESSMENT_MODULE_PATH,
+  buildCorridorModules,
+  FEED_MODULE_PATH,
+  LEARNING_MODULE_PATH,
+  READING_MODULE_PATH,
+  RECORD_MODULE_PATH,
+} from '../../../scripts/build-reading-module.mjs';
+import { readCompiledModuleInventory } from './compiled-module-inventory.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const sha256 = (value) => createHash('sha256').update(value).digest('hex');
@@ -17,6 +25,24 @@ const inside = (parent, child) => {
   const part = relative(parent, child);
   return !isAbsolute(part) && part !== '..' && !part.startsWith(`..${sep}`);
 };
+const COMPILED_CORE_PATHS = Object.freeze([
+  READING_MODULE_PATH,
+  FEED_MODULE_PATH,
+  ASSESSMENT_MODULE_PATH,
+  RECORD_MODULE_PATH,
+  LEARNING_MODULE_PATH,
+]);
+const artifactModulePath = (site, path) => {
+  const siteRoot = resolve(site);
+  assert.equal(typeof path, 'string', 'Artifact module path must be a string');
+  assert(!isAbsolute(path), `Artifact module path must stay relative: ${path}`);
+  const resolved = resolve(siteRoot, path);
+  assert(
+    inside(siteRoot, resolved) && resolved !== siteRoot,
+    `Artifact module path escapes the staged site: ${path}`,
+  );
+  return resolved;
+};
 assert(!inside(root, out), 'Runtime evidence must be outside the checkout');
 mkdirSync(out, { recursive: true });
 assert(
@@ -26,6 +52,7 @@ assert(
 const stage = mkdtempSync(resolve(out, 'runtime-'));
 mkdirSync(resolve(stage, 'modules'));
 let modules;
+let stagedModules;
 let sourceArtifact = null;
 if (process.env.KAIRO_ASSESSMENT_SITE_DIR) {
   const sourceSite = resolve(process.env.KAIRO_ASSESSMENT_SITE_DIR);
@@ -42,20 +69,34 @@ if (process.env.KAIRO_ASSESSMENT_SITE_DIR) {
     expectedArtifact,
     'Staged manifest must match the supplied artifact identity',
   );
-  modules = identity.files.filter((file) => file.path.startsWith('modules/') && file.path.endsWith('.mjs')).map((file) => {
-    const metadata = identity.modules.find((entry) => entry.path === file.path);
-    assert(metadata, `The staged module needs compiler metadata: ${file.path}`);
-    const bytes = readFileSync(resolve(sourceSite, file.path));
-    assert.equal(bytes.length, file.bytes);
-    assert.equal(sha256(bytes), file.sha256);
-    return { ...metadata, bytes };
-  });
+  modules = readCompiledModuleInventory(sourceSite, identity, COMPILED_CORE_PATHS);
+  const compiledByPath = new Map(modules.map((module) => [module.path, module]));
+  stagedModules = [];
+  for (const file of identity.files) {
+    if (!file.path.startsWith('modules/') || !file.path.endsWith('.mjs')) continue;
+    const compiled = compiledByPath.get(file.path);
+    if (compiled) {
+      stagedModules.push(compiled);
+      continue;
+    }
+    // Authored seams have no compiler record, but their staged bytes are still
+    // pinned by the artifact manifest and must not change under verification.
+    const bytes = readFileSync(artifactModulePath(sourceSite, file.path));
+    assert.equal(bytes.length, file.bytes, `Authored module byte count changed: ${file.path}`);
+    assert.equal(sha256(bytes), file.sha256, `Authored module digest changed: ${file.path}`);
+    stagedModules.push({ path: file.path, bytes });
+  }
   sourceArtifact = { path: sourceSite, artifactSha256: expectedArtifact };
-} else
+} else {
   modules = buildCorridorModules(root);
-const core = modules.find((module) => module.path === 'modules/assessment-core.mjs');
+  stagedModules = modules;
+}
+const core = modules.find((module) => module.path === ASSESSMENT_MODULE_PATH);
 assert(core, 'The canonical production builder must stage modules/assessment-core.mjs');
-assert(modules.some((module) => module.path === 'modules/record-core.mjs'), 'The controller requires its shared record module');
+assert(
+  modules.some((module) => module.path === RECORD_MODULE_PATH),
+  'The controller requires its shared record module',
+);
 const controllerPath = sourceArtifact ? resolve(sourceArtifact.path, 'assessment-controller.mjs')
   : resolve(root, 'prototypes/corridor/assessment-controller.mjs');
 const controllerBytes = readFileSync(controllerPath);
@@ -67,7 +108,8 @@ if (sourceArtifact) {
   assert.equal(sha256(controllerBytes), file.sha256);
 }
 writeFileSync(resolve(stage, 'assessment-controller.mjs'), controllerBytes);
-for (const module of modules) writeFileSync(resolve(stage, module.path), module.bytes);
+for (const module of stagedModules)
+  writeFileSync(artifactModulePath(stage, module.path), module.bytes);
 const api = await import(pathToFileURL(resolve(stage, 'assessment-controller.mjs')).href);
 const shared = await import(pathToFileURL(resolve(stage, core.path)).href);
 const clone = (value) => JSON.parse(JSON.stringify(value));
@@ -623,9 +665,18 @@ assert.equal(
   sha256(controllerBytes),
   'Controller source must stay unchanged through this verification',
 );
-for (const module of modules) {
-  assert.equal(sha256(readFileSync(resolve(stage, module.path))), sha256(module.bytes), 'Tested staged module stays unchanged');
-  if (sourceArtifact) assert.equal(sha256(readFileSync(resolve(sourceArtifact.path, module.path))), sha256(module.bytes), 'Pinned source module stays unchanged');
+for (const module of stagedModules) {
+  assert.equal(
+    sha256(readFileSync(artifactModulePath(stage, module.path))),
+    sha256(module.bytes),
+    'Tested staged module stays unchanged',
+  );
+  if (sourceArtifact)
+    assert.equal(
+      sha256(readFileSync(artifactModulePath(sourceArtifact.path, module.path))),
+      sha256(module.bytes),
+      'Pinned source module stays unchanged',
+    );
 }
 const currentInputDifferences = [...new Set(modules.flatMap((module) => module.inputs
   .filter((input) => sha256(readFileSync(resolve(root, input.path))) !== input.sha256)
@@ -636,6 +687,11 @@ if (!sourceArtifact)
     [],
     'Core inputs must stay unchanged through verification',
   );
+const moduleReceipt = ({ bytes, ...metadata }) => ({
+  ...metadata,
+  sha256: sha256(bytes),
+  bytes: bytes.length,
+});
 const receipt = {
   format: 'kairo-assessment-controller-verification',
   v: 1,
@@ -644,15 +700,8 @@ const receipt = {
   sourceArtifact,
   currentInputDifferences,
   source: { path: relative(root, controllerPath), sha256: sha256(controllerBytes) },
-  core: {
-    path: core.path,
-    sha256: sha256(core.bytes),
-    bytes: core.bytes.length,
-    compiler: core.compiler,
-    inputs: core.inputs,
-  },
-  modules: modules.map((module) => ({ path: module.path, sha256: sha256(module.bytes),
-    bytes: module.bytes.length, compiler: module.compiler, inputs: module.inputs })),
+  core: moduleReceipt(core),
+  modules: modules.map(moduleReceipt),
   fixture: {
     path: relative(root, sourcePath),
     sha256: sha256(sourceBytes),

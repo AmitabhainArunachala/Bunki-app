@@ -5,8 +5,13 @@ usage: python3 decks/n2n1/tools/build_n2n1.py [--only DECK] [--cards DIR]
 
 Input: decks/n2n1/source/cards/*.json, each {"cards": [...]} of writer cards (prompts/writer.md)
 that passed tools/check_cards.py and the judge, each carrying the target's `deck` and `field`
-(from source/targets.json). Output: prototypes/corridor/decks/<deck>/deck.json + tokens.json in
-the bunki-cloze-deck format the player already plays.
+(from source/targets.json); then decks/n2n1/source/imported/<deck>.json, the writer cards
+nihongo-srs exports from its master/vocab.jsonl (tools/export_bunki_cards.py there; the
+cross-repo contract is the W4 lane's BUILDER-PARITY-SIZE-REPORT.md, lead's ruling 1250), loaded
+AFTER the judged cards so a judged card always wins over an imported twin. Output:
+prototypes/corridor/decks/<deck>/deck.json + tokens.json in the bunki-cloze-deck format the
+player already plays; the order of the input is the order of the words, so the committed packs
+are reproduced byte for byte (CI: scripts/ci/deck-frozen.mjs).
 
 The leaf tools are kotoba-mine's own: furigana and the target marker (_ordered_for), the
 target sentence's English (target_sentence_en), kanji anatomy, level labels and the tokens
@@ -30,6 +35,7 @@ import build as km  # noqa: E402
 import build_corridor as bc  # noqa: E402
 
 SRC = REPO / "decks/n2n1/source"
+IMPORTED = SRC / "imported"
 OUT = REPO / "prototypes/corridor/decks"
 TOPICS = {
     "mind": ("心と学び", "The mind and learning"),
@@ -43,6 +49,7 @@ DECKS = {
     "n2": ("N2の語・短い文章で", "N2 words · in short passages", "ai"),
     "n1": ("N1の語・短い文章で", "N1 words · in short passages", "ai"),
     "senmon": ("専門・あなたの分野", "Your fields · master's level", "washi"),
+    "kotoba-master": ("わたしの言葉", "My own words", "sumi"),
     "n2n1-sample": ("N2・N1 見本（20枚）", "N2/N1 sample · 20 cards", "ai"),
 }
 POS = {"noun": "noun", "verb": "verb", "i-adj": "い-adjective", "na-adj": "な-adjective",
@@ -67,6 +74,41 @@ def load_cards(folder: Path) -> list[dict]:
     for f in sorted(folder.glob("*.json")):
         data = json.loads(f.read_text("utf-8"))
         out.extend(data["cards"] if isinstance(data, dict) else data)
+    return out
+
+
+def card_id(c: dict) -> str:
+    wid = "nn-" + sha(f"{c['term']}|{c['reading']}", 10)
+    return c.get("cardId", f"{wid}-{sha(c['passage']['ja'], 8)}")
+
+
+def load_imported(folder: Path, judged: list[dict]) -> list[dict]:
+    """The imported writer cards, in file order, after the judged ones: <deck>.json carries cards of
+    that deck only, in build_n2n1's own pos vocabulary, and never a cardId (identity is content-keyed
+    here); a card whose id a judged card already holds is skipped — the judged card wins."""
+    taken = {card_id(c) for c in judged}
+    out: list[dict] = []
+    for f in sorted(folder.glob("*.json")) if folder.is_dir() else []:
+        deck_id = f.stem
+        if deck_id not in DECKS:
+            raise SystemExit(f"{f.name}: imported file is not named after a deck in DECKS")
+        data = json.loads(f.read_text("utf-8"))
+        cards = data["cards"] if isinstance(data, dict) else data
+        skipped = 0
+        for c in cards:
+            if c.get("deck") != deck_id:
+                raise SystemExit(f"{f.name}: {c.get('term')} carries deck {c.get('deck')!r}, not {deck_id!r}")
+            if c.get("pos") not in POS:
+                raise SystemExit(f"{f.name}: {c.get('term')} has pos {c.get('pos')!r}; imported cards use {sorted(POS)}")
+            if "cardId" in c:
+                raise SystemExit(f"{f.name}: {c.get('term')} carries a cardId; imported cards are content-keyed")
+            if card_id(c) in taken:
+                skipped += 1
+                continue
+            taken.add(card_id(c))
+            out.append(c)
+        print(f"· imported {deck_id}: {len(cards) - skipped} cards from {f.relative_to(REPO)}"
+              + (f" ({skipped} twins of judged cards skipped)" if skipped else ""))
     return out
 
 
@@ -123,8 +165,9 @@ def main() -> int:
     import fugashi
     tagger = fugashi.Tagger()
     table = km.gloss_ja()
+    judged = load_cards(folder)
     by_deck: dict[str, list[dict]] = {}
-    for c in load_cards(folder):
+    for c in judged + (load_imported(IMPORTED, judged) if folder == SRC / "cards" else []):
         by_deck.setdefault(c.get("deck", "n1"), []).append(c)
     for deck_id, cards in sorted(by_deck.items()):
         if only and deck_id != only:

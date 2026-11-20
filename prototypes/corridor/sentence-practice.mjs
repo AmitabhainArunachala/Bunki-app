@@ -335,7 +335,7 @@ export function validateSentencePracticeRecord(record) {
  * enrolment or ability estimate. Exact token form, dictionary form and reading
  * must agree; matching surface text alone does not join two homographs. */
 export function recommendSentenceReadings(record, passages, { startingLevel = null, challenge = 'comfortable',
-  entryId = null, limit = 1 } = {}) {
+  entryId = null, limit = 1, candidateIds = null } = {}) {
   insist(validateSentencePracticeRecord(record), 'invalid-reading-history');
   insist(Array.isArray(passages) && Number.isInteger(limit) && limit >= 1 && limit <= 6);
   const levels = ['N5', 'N4', 'N3', 'N2', 'N1'];
@@ -344,6 +344,10 @@ export function recommendSentenceReadings(record, passages, { startingLevel = nu
   const root = parseSentencePractice(record.sentencePractice);
   const byPassage = new Map(passages.map(p => [p.id, p]));
   insist(byPassage.size === passages.length, 'duplicate-reading-source');
+  insist(candidateIds === null || (Array.isArray(candidateIds) &&
+    candidateIds.every(id => typeof id === 'string' && byPassage.has(id)) &&
+    new Set(candidateIds).size === candidateIds.length), 'invalid-reading-candidate-ids');
+  const eligible = candidateIds === null ? null : new Set(candidateIds);
   const lexicalKey = token => token?.c === true && typeof token.s === 'string' && token.s.trim() &&
     typeof token.b === 'string' && token.b.trim() && typeof token.r === 'string' && token.r.trim()
     ? JSON.stringify([token.s, token.b, token.r]) : null;
@@ -402,6 +406,7 @@ export function recommendSentenceReadings(record, passages, { startingLevel = nu
       const usedQuotes = new Set(group.entries.map(entry => normalized(entry.context.quote)));
       const candidates = [];
       for (const p of passages) {
+        if (eligible && !eligible.has(p.id)) continue;
         const level = levels.indexOf(p.authorLevel);
         if (!Array.isArray(p.tokens) || level < 0 || level > maximum || usedSources.has(p.id) ||
             Object.hasOwn(record.readDone || {}, p.id) || String(p.file || '').startsWith('archive/')) continue;

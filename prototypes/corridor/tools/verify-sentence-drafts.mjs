@@ -15,9 +15,28 @@ import { extname, isAbsolute, join, resolve } from 'node:path';
 import process from 'node:process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { chromium, webkit } from 'playwright-core';
+import { contextBrowserVersion } from './browser-version-support.mjs';
 import { silenceBrowserAudio, TEST_AUDIO_OUTPUT } from './browser-audio-silence.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+
+/** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
+ * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable, already built KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
@@ -93,7 +112,8 @@ async function launch(fixture, { offline = false, protectedState = false } = {})
     serviceWorkers: 'allow', acceptDownloads: true, ignoreHTTPSErrors: true,
     ...(fixture.engine === 'chromium' ? { args: ['--ignore-certificate-errors'] } : {}),
   });
-  fixture.browserVersion = fixture.context.browser()?.version();
+  await fixture.context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1')); // Returning device fixture.
+  fixture.browserVersion = await contextBrowserVersion(fixture.context, { chromium, webkit }[fixture.engine]);
   await silenceBrowserAudio(fixture.context);
   await fixture.context.tracing.start({ screenshots: true, snapshots: true, sources: true });
   fixture.traceActive = true;
@@ -183,7 +203,10 @@ async function shelf(fixture) {
     if (view === 'drift') {
       await page.locator('#ginga-symbol').focus(); await page.keyboard.press('Enter'); await page.locator('.bubble-shelf').click();
     } else await page.locator('#back').click();
-    await page.waitForFunction(previous => document.body.dataset.view !== previous, view);
+    // Ladder (the lead's W2 ruling, 10-19, a spec change): with a word's reading, English or box up, the bar's Back folds the
+    // word bare and stays; the next Back leaves. Each Back is observed: the room changes, or the word stands bare
+    await page.waitForFunction(previous => document.body.dataset.view !== previous ||
+      (previous === 'reader' && !document.getElementById('mini') && !document.querySelector('#reader [data-ladder-rung]')), view);
   }
   assert.fail('Ordinary Back controls did not reach the bookshelf');
 }
@@ -227,16 +250,16 @@ async function practiceFromSource(fixture, source = SOURCE, { savePlace = false 
   assert.equal(await sourceDoor.count(), 1, 'Source has one canonical bookshelf entry');
   await sourceDoor.click();
   const word = page.locator(`#reader .tok[data-index="${source.index}"][data-word="${source.word}"]`);
-  await word.click();
+  await openReaderWordStage(page, word);
   if (savePlace) {
-    // the word's popup floats over the page (reader lane 2026-10-02): a second tap on the word puts it away first
-    await word.click(); await page.waitForFunction(() => !document.getElementById('mini'));
+    // Fold the stage before the separate reading-place action; no new lookup.
+    await page.keyboard.press('Escape'); await page.waitForFunction(() => !document.getElementById('mini'));
+    assert.equal(await word.getAttribute('data-ladder-rung'), null);
     await page.locator('#reader-place-save').click();
     await page.waitForFunction(() => document.getElementById('reader-place-note')?.textContent.includes('is saved'));
     const saved = await readAppRecordSnapshot(page);
     assert.equal(saved.rows.filter(row => row.kind === 'operation').length, 1, 'One ordinary reading-place save supplies the existing actor sequence for local restore');
-    // one tap opens the word's popup again
-    await word.click();
+    await openReaderWordStage(page, word);
   }
   await page.locator('#mini-sentence-open').click(); await page.locator('#reader-sentence-practice').click(); await page.locator('#sentence-practice-confirm').waitFor();
   await page.locator('#sentence-choose-cloze').uncheck(); await page.locator('#sentence-choose-production').check();
@@ -400,8 +423,8 @@ async function exportUi(fixture, label) {
 async function importUi(fixture, file) {
   await tray(fixture);
   const timeOrigin = await fixture.page.evaluate(() => performance.timeOrigin), start = fixture.assetLoads.length;
-  await fixture.page.locator('#import-file').setInputFiles(file);
-  await fixture.page.waitForFunction(prior => performance.timeOrigin !== prior && document.body.dataset.ready === '1', timeOrigin, { timeout: 30000 });
+  await answeringRestore(fixture.page, async () => { await fixture.page.locator('#import-file').setInputFiles(file);
+    await fixture.page.waitForFunction(prior => performance.timeOrigin !== prior && document.body.dataset.ready === '1', timeOrigin, { timeout: 30000 }); });
   await ready(fixture.page); await attestRuntime(fixture, start, 'actual-ui-import-reload');
 }
 
@@ -475,11 +498,19 @@ define('ordinary-drafts-restart-export-restore-offline', async fixture => {
   assert(exported.backup.journal);
   await close(fixture); await launch(fixture);
   assert.deepEqual((await readAppRecordSnapshot(fixture.page)).record, exported.after.record, 'Export metadata and exact drafts survive full browser close');
-  await close(fixture); fixture.profile = 'profile-foreign'; await launch(fixture); await tray(fixture);
+  // A browser with its own learner refuses a different learner's backup. An empty browser would adopt it after a
+  // confirmation (Hfix-2a, the accepted product), so this profile first does real learner work: it chooses a sentence
+  // to practise from a reading, as the journey above did. The refusal comes before any restore confirmation.
+  await close(fixture); fixture.profile = 'profile-foreign'; await launch(fixture); await practiceFromSource(fixture); await tray(fixture);
   const foreignBefore = await readAppRecordSnapshot(fixture.page);
   assert.notEqual(foreignBefore.installation.binding.learnerId, recoveryBaseline.installation.binding.learnerId);
-  await fixture.page.locator('#import-file').setInputFiles(exported.file);
-  await fixture.page.waitForFunction(() => document.getElementById('record-portability-status')?.textContent.includes('belongs to a different learner'));
+  let foreignDialogs = 0; const foreignDialog = (dialog) => { foreignDialogs += 1; void dialog.dismiss().catch(() => {}); };
+  fixture.page.on('dialog', foreignDialog);
+  try {
+    await fixture.page.locator('#import-file').setInputFiles(exported.file);
+    await fixture.page.waitForFunction(() => document.getElementById('record-portability-status')?.textContent.includes('belongs to a different learner'));
+  } finally { fixture.page.off('dialog', foreignDialog); }
+  assert.equal(foreignDialogs, 0, 'A different learner\'s backup is refused before any restore confirmation');
   assert.deepEqual(await readAppRecordSnapshot(fixture.page), foreignBefore, 'Ownership refusal leaves every native row and authority field unchanged');
   await fixture.page.locator('#record-portability-status').scrollIntoViewIfNeeded(); await shot(fixture, 'foreign-learner-backup-refused');
   fixture.observations.push({ name: 'ordinary-foreign-learner-refusal', nativeRowsAndAuthorityUnchanged: true });
@@ -878,4 +909,34 @@ try {
   writeFileSync(join(OUT, 'receipt.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(JSON.stringify({ passed: receipt.passed, failed: receipt.failed, pass: receipt.pass, receipt: join(OUT, 'receipt.json') }));
   if (!receipt.pass) process.exitCode = 1;
+}
+
+// These source-context checks enter through the G3 ladder; the grammar itself is
+// checked separately. A second activation is allowed only after a real reading rung.
+async function openReaderWordStage(page, word) {
+  await word.click();
+  await page.waitForFunction(node => ['reading', 'gloss', 'stage'].includes(node?.dataset.ladderRung), await word.elementHandle());
+  if (await word.getAttribute('data-ladder-rung') === 'reading') {
+    assert.equal(await page.locator('#mini').count(), 0, 'First activation reveals reading without meaning');
+    // On-touch reader ruby paints through ::before; the native rt stays hidden
+    // to preserve the word's width. Require actual paint from either renderer.
+    await page.waitForFunction(node => [...node.querySelectorAll('ruby')].some(ruby => {
+      const rt = ruby.querySelector('rt');
+      if (!rt?.textContent.trim() || rt.classList.contains('hidden-rt')) return false;
+      const native = getComputedStyle(rt), floating = getComputedStyle(ruby, '::before');
+      return (rt.getClientRects().length > 0 && native.visibility !== 'hidden' && native.display !== 'none' && Number(native.opacity) > 0) ||
+        (ruby.getClientRects().length > 0 && ruby.dataset.r === rt.textContent && floating.content === JSON.stringify(rt.textContent) &&
+          floating.visibility !== 'hidden' && floating.display !== 'none' && Number(floating.opacity) > 0);
+    }), await word.elementHandle(), { timeout: 5000 });
+    await word.click();
+  }
+  // Ladder (John, 10-19): the English under the word comes before the stage; one more activation, only once it is seen
+  await page.waitForFunction(node => node?.dataset.ladderRung === 'gloss' || !!document.getElementById('mini'), await word.elementHandle());
+  if (await word.getAttribute('data-ladder-rung') === 'gloss') {
+    assert.equal(await page.locator('#mini').count(), 0, 'The English rung shows the meaning under the word, before the stage');
+    assert(await word.evaluate(node => !!node.querySelector(':scope > .tok-en .tok-en-text')), 'The English rung draws the English under the word');
+    await word.click();
+  }
+  await page.locator('#mini').waitFor();
+  assert.equal(await word.getAttribute('data-ladder-rung'), 'stage', 'The exact source word reaches its stage');
 }

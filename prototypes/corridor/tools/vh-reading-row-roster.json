@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "basis": "Reviewed assertion IDs at 384d4a70 plus VH-1 additions; independent of observed runtime rows. Capture R2 rows are required whenever r2 is selected.",
+  "cases": {
+    "reader": [
+      "A1.年 ねん (令和8年: a counter)",
+      "A1.年 とし (twin)",
+      "A1.月 がつ",
+      "A1.月 つき (twin)",
+      "A1.時 じ",
+      "A1.時 とき (twin)",
+      "A1.一日 ついたち",
+      "A2.entry",
+      "reader.page-errors"
+    ],
+    "stable": [
+      "A4.words",
+      "A4.reads-like-core",
+      "A8.startup",
+      "A8.no-entry",
+      "G3.phonetic-annotation",
+      "G3.partial-annotation",
+      "G3.semantic-parenthetical",
+      "stable.page-errors"
+    ],
+    "sentence": [
+      "A5.found",
+      "A5.sentence",
+      "sentence.page-errors"
+    ],
+    "deck": [
+      "A6.deck",
+      "A6.deck-entry",
+      "deck.page-errors"
+    ],
+    "guided": [
+      "A7.guided",
+      "guided.page-errors"
+    ],
+    "r2": [
+      "R2.おい → おく · 置く",
+      "R2.云っ → 云う いう",
+      "R2.解せ → 解す げす",
+      "R2.来 read き → 来る くる",
+      "R2.来 read こ → 来る くる",
+      "R2.unfit.かえり → かえる · 帰る (not 蛙)",
+      "R2.unfit.かえっ → かえる · 帰る (not 蛙)",
+      "R2.unfit.なさ → なす · 為す (not 茄子)",
+      "R2.stem.い (ている) → いる · 居る (not 要る)",
+      "R2.stem.い (いました) → いる · 居る (not 要る)",
+      "R2.V.一 いっ (一本)",
+      "R2.V.本 ぽん (一本)",
+      "R2.V.八 はっ (八本)",
+      "R2.V.歩 ぽ (一歩)",
+      "R2.V.金持ち がねもち",
+      "R2.K.寺 じ",
+      "R2.K.国 こく",
+      "R2.K.仏 ぶつ (never ふつ, France)",
+      "R2.C3.私",
+      "R2.remaining.行 ゆき",
+      "R2.remaining.行 ゆき (2)",
+      "R2.remaining.足 たし",
+      "R2.remaining.他 ひと",
+      "R2.remaining.行う おこのう",
+      "R2.remaining.源 みなもとの",
+      "R2.remaining.章 あきら",
+      "r2.page-errors"
+    ],
+    "aux": [
+      "N2.te.いる (残っている, Grok 0036)",
+      "N2.te.いる (予定している, Grok 0036)",
+      "N2.te.い (なっていた)",
+      "N2.te.おく (暗記しておく)",
+      "N2.te.くる (廻り合せてくる)",
+      "N2.te.ください (いてください)",
+      "N2.te.entry.いる (残っている, Grok 0036)",
+      "N2.te.entry.いる (予定している, Grok 0036)",
+      "N2.alone.いる (ここにいる)",
+      "N2.alone.entry.いる (ここにいる)",
+      "aux.page-errors"
+    ],
+    "auxsweep": [
+      "AUX.taps",
+      "AUX.entries",
+      "AUX.iru",
+      "AUX.page-errors"
+    ],
+    "capture": [
+      "A3.ready",
+      "A3.capture",
+      "capture.page-errors",
+      "A3.round-trip"
+    ],
+    "cold": [
+      "A9.cold.held",
+      "A9.cold.still",
+      "A9.cold.settled",
+      "A9.cold.never-borrowed",
+      "A9.cold.page-errors",
+      "A9.unanswered.held",
+      "A9.unanswered.still",
+      "A9.unanswered.settled",
+      "A9.unanswered.never-borrowed",
+      "A9.unanswered.page-errors"
+    ],
+    "unread": [
+      "A10.held",
+      "A10.settled",
+      "A10.never-borrowed",
+      "A10.page",
+      "A10.page-errors"
+    ],
+    "sweep": [
+      "SWEEP.annotations",
+      "SWEEP.no-save-or-grade",
+      "SWEEP.articles",
+      "SWEEP.taps",
+      "SWEEP.readings",
+      "SWEEP.class-evidence",
+      "SWEEP.special-classification",
+      "SWEEP.meanings",
+      "SWEEP.no-quick-miss",
+      "SWEEP.answered",
+      "SWEEP.held",
+      "SWEEP.page-errors"
+    ],
+    "special": [
+      "SPECIAL.aozora:000628#76.classification",
+      "SPECIAL.aozora:000628#76.held",
+      "SPECIAL.aozora:000628#76.record",
+      "SPECIAL.bunki-graded-n3-hashira-counter#242.classification",
+      "SPECIAL.bunki-graded-n3-hashira-counter#242.held",
+      "SPECIAL.bunki-graded-n3-hashira-counter#242.record",
+      "SPECIAL.control.aozora:000628#76.special-label-save-enabled",
+      "SPECIAL.control.aozora:000628#76.special-label-save-reason-empty",
+      "SPECIAL.control.bunki-graded-n3-hashira-counter#242.special-label-save-enabled",
+      "SPECIAL.control.bunki-graded-n3-hashira-counter#242.special-label-save-reason-empty",
+      "SPECIAL.class-proof.fixture",
+      "SPECIAL.control.class-proof-missing",
+      "SPECIAL.control.class-proof-noun-substitution",
+      "SPECIAL.control.ordinary-verb-labeled-name",
+      "SPECIAL.control.ordinary-verb-labeled-reading",
+      "special.page-errors"
+    ]
+  },
+  "captureWithR2": [
+    "R2.capture.ready",
+    "R2.capture",
+    "R2.capture.stem.ready",
+    "R2.capture.stem",
+    "R2.round-trip",
+    "R2.round-trip.stem"
+  ]
+}

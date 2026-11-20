@@ -1092,8 +1092,9 @@ try {
   if (context) await context.close();
   if (server) await new Promise((ok) => server.close(ok));
   check('no unexpected page errors', browserErrors.length === 0, browserErrors.join(' | '));
-  rmSync(join(RUN_DIR, 'browser-profile'), { recursive: true, force: true });
-  rmSync(join(RUN_DIR, 'legacy-browser-profile'), { recursive: true, force: true });
+  // Keep both owned profiles until the outer gate has validated and written its evidence.
+  // FULL retention removes them only after a final pass and independent process closure.
+  // Failed or standalone runs preserve them for diagnosis.
   writeFileSync(
     join(RUN_DIR, 'receipt.json'),
     JSON.stringify(

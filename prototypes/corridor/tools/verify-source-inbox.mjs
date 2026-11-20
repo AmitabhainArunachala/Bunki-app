@@ -1,3 +1,4 @@
+import { openToday as navOpenToday } from './navigation-runtime-support.mjs';
 /** Ordinary source intake in fresh persistent browser profiles. All saved
  * records arise through visible controls. Native records are read as output;
  * the separate storage-failure phase is explicitly synthetic. */
@@ -11,8 +12,28 @@ import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } 
 import { extname, isAbsolute, join, resolve } from 'node:path';
 import process from 'node:process';
 import { chromium, webkit } from 'playwright-core';
+import { contextBrowserVersion } from './browser-version-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+
+/** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
+ * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
+import { setUpDeviceTutor } from './tutor-fixture-support.mjs';
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
@@ -94,6 +115,8 @@ async function frontDoor(page) {
   await inbox(page);
   await page.locator('#source-capture-text').waitFor();
 }
+// A click or tap on a reader word walks the tap ladder and opens the word (the accepted product); a desktop learner
+// selects text with a mouse drag (lead's ruling 10-20). Press just before 町, drag across it, release just after it.
 async function selectWord(page) {
   const body = page.locator('#source-reader-body'); await page.evaluate(() => document.fonts.ready); await body.scrollIntoViewIfNeeded();
   const point = await body.evaluate((node) => {
@@ -102,14 +125,16 @@ async function selectWord(page) {
     while ((text = walker.nextNode())) {
       if (position < offset + text.length) {
         const range = document.createRange(); range.setStart(text, position - offset); range.setEnd(text, position - offset + 1);
-        const rect = range.getBoundingClientRect(), box = node.getBoundingClientRect();
-        return { x: rect.x - box.x + rect.width / 4, y: rect.y - box.y + rect.height / 2, start: position };
+        let rect = range.getBoundingClientRect();
+        if (rect.top < 0 || rect.bottom > innerHeight) { text.parentElement.scrollIntoView({ block: 'center' }); rect = range.getBoundingClientRect(); }
+        return { left: rect.left, right: rect.right, width: rect.width, y: rect.top + rect.height / 2, start: position };
       }
       offset += text.length;
     }
     throw new Error('Word not present');
   });
-  await body.dblclick({ position: { x: point.x, y: point.y } });
+  await page.mouse.move(point.left - point.width / 4, point.y); await page.mouse.down();
+  await page.mouse.move(point.right + point.width / 4, point.y, { steps: 8 }); await page.mouse.up();
   await page.waitForFunction(() => window.getSelection()?.toString() === '町');
   await page.waitForFunction(() => document.querySelector('#source-context-save')?.disabled === false);
   return point.start;
@@ -125,7 +150,7 @@ for (const engine of engines) for (const width of sizes) {
       serviceWorkers: 'allow', acceptDownloads: true, ignoreHTTPSErrors: true,
       ...(engine === 'chromium' ? { args: ['--ignore-certificate-errors'] } : {}), recordVideo: { dir: videos, size: { width, height: width === 390 ? 844 : 1050 } },
     });
-    result.browserVersion = context.browser()?.version();
+    result.browserVersion = await contextBrowserVersion(context, { chromium, webkit }[engine]);
     await context.route('**/*', (route) => {
       const url = new URL(route.request().url());
       if (url.origin === ORIGIN) return route.continue();
@@ -175,7 +200,8 @@ for (const engine of engines) for (const width of sizes) {
     assert.equal(source.candidate.article.body.text, TEXT);
     assert.equal(source.candidate.article.lineage.kind, 'user-supplied');
     assert.equal(source.candidate.article.capabilities['ai-transform'].status, 'unknown');
-    const start = await selectWord(page); await page.locator('#source-context-save').click();
+    // SAVE (2026-11-11): the selection's Save asks for its one place, the tutor page, and keeps it only on that pick
+    const start = await selectWord(page); await page.locator('#source-context-save').click(); await page.locator('#save-chooser-home').click();
     await waitForAppRecord(page, (record) => record.teacherContexts?.entries.length === 1);
     const neutral = await readAppRecordSnapshot(page), topic = neutral.record.teacherContexts.entries[0];
     assert.equal(neutral.record.teacherContexts.activeRef, null); noReviewChange(before, neutral);
@@ -196,6 +222,9 @@ for (const engine of engines) for (const width of sizes) {
     await screenshot('exact-source-return');
     await selectWord(page); await page.locator('#source-selection-lookup').click();
     assert.equal(await page.locator('#nav-search-input').inputValue(), '町');
+    // precondition now (Hfix-1B, item 11): a tutor set up, so the word's page offers Ask the tutor (the case's own synthetic
+    // provider replaces it below)
+    await setUpDeviceTutor(page);
     await page.locator('.nav-search-row').first().click(); await page.locator('#sheet').waitFor();
     await page.waitForFunction(() => !document.querySelector('#sheet')?.textContent.includes('Opening complete senses and usage'));
     await screenshot('dictionary-from-capture');
@@ -222,8 +251,12 @@ for (const engine of engines) for (const width of sizes) {
     await page.locator('#source-reader-back').click();
     await page.waitForFunction(() => document.body.dataset.view === 'source-inbox');
     const saved = await readAppRecordSnapshot(page); assert.equal(saved.record.sourceInbox.entries.length, 2); noReviewChange(before, saved);
-    await shelf(page); await page.locator('#tray').click();
-    const downloadWork = page.waitForEvent('download'); await page.locator('#export-store').click();
+    await shelf(page); await navOpenToday(page, { via: 'gate' });
+    const closedToday = page.locator('#today-record:not([open]) > summary'); if (await closedToday.count()) await closedToday.click();
+    const exportStore = page.locator('#today-record[open] #export-store'), importFile = page.locator('#today-record[open] #import-file');
+    await exportStore.waitFor({ state: 'visible' }); await importFile.waitFor({ state: 'attached' });
+    const downloadWork = page.waitForEvent('download'); downloadWork.catch(() => {});
+    await exportStore.click();
     const download = await downloadWork, backupFile = join(out, 'ordinary-ui-backup.json'); await download.saveAs(backupFile);
     const backup = JSON.parse(readFileSync(backupFile));
     assert.deepEqual(backup.record.sourceInbox, saved.record.sourceInbox);
@@ -231,8 +264,8 @@ for (const engine of engines) for (const width of sizes) {
     result.observations.push({ source, topic, backupFile, backupSha256: hash(readFileSync(backupFile)), captureCreatesReviews: false });
     // Restore the unchanged app-generated backup using the normal import control.
     const timeOrigin = await page.evaluate(() => performance.timeOrigin);
-    await page.locator('#import-file').setInputFiles(backupFile);
-    await page.waitForFunction((old) => performance.timeOrigin !== old && document.body.dataset.ready === '1', timeOrigin, { timeout: 30000 });
+    await answeringRestore(page, async () => { await page.locator('#import-file').setInputFiles(backupFile);
+      await page.waitForFunction((old) => performance.timeOrigin !== old && document.body.dataset.ready === '1', timeOrigin, { timeout: 30000 }); });
     await frontDoor(page);
     const restored = await readAppRecordSnapshot(page); assert.deepEqual(restored.record.sourceInbox, saved.record.sourceInbox);
     await page.locator(`[data-source-capture="${source.id}"]`).click(); await page.locator('#source-reader-body').waitFor();
@@ -259,6 +292,7 @@ for (const engine of engines) for (const width of sizes) {
     // ensure the refusal is enforced beyond the absent-key/disabled-UI state.
     await page.locator(`[data-source-capture="${source.id}"]`).click(); await selectWord(page);
     await page.locator('#source-context-open').click(); await page.locator('#chat-input').waitFor();
+    await page.evaluate(() => { const d = document.getElementById('ai-connection'); if (d) d.open = true; }); // Q · the address and model fold under the tutor's Details
     await page.locator('#ai-base-url').fill('https://source-capture.synthetic.invalid');
     await page.locator('#ai-model-input').fill('synthetic-capture-policy-check');
     await page.locator('#ai-key-input').fill('synthetic-fixture-not-a-real-credential');

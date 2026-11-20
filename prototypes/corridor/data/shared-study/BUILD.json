@@ -1,0 +1,49 @@
+{
+  "format": "nihongo-mnow-content",
+  "version": 1,
+  "release3FullCorpus": true,
+  "qaOnly": false,
+  "catalogCount": 8508,
+  "vocabularyCount": 7930,
+  "grammarTasks": 578,
+  "personalVocabularyCount": 301,
+  "personalIncludedInVocabulary": true,
+  "modules": {
+    "n2": 2079,
+    "n1": 3586,
+    "senmon": 1964,
+    "kotoba": 301,
+    "grammar": 578
+  },
+  "translationEvidenceIsNotContentPresence": true,
+  "files": {
+    "catalog.json": "1491528c8503cff43e391e9ba0075ef394825d839f8d493576eef9156b979f9a",
+    "registry.json": "5b0f4a7685cb5abc8f2c26a0fb0c672e38554a6f23a456798750fe1608129013",
+    "reviews.json": "db50c4ae88dc4770605edf3c38f8dc3c280dd8d4c2a79cc58decc82484a23ef3",
+    "grammar.json": "a3b576d32bdc08f9424eb96cf40c352cc422a5ef22cfaf78a665bb488de1993f",
+    "grammar-reviews.json": "47f47e81e54bb5c348d7c0182803b01e7bbe4672a8014cd345661fdb1f17288a",
+    "dictionary.json.gz": "7f0fcbd2b6cc038b44ed64d1463c673fbad3890ac19f5528bcbde73692faf2db"
+  },
+  "sourceMasterSha256": "86814c0801e3c77bc34c4be47e4a1c5f6da926b6bc3df90692f77e258136e021",
+  "sourcePassageReadingsSha256": "b90a8fe5290163b28258e2d5c84b87795e8a95d59288663aa4bfb085a61fd446",
+  "dictionarySha256": "7f0fcbd2b6cc038b44ed64d1463c673fbad3890ac19f5528bcbde73692faf2db",
+  "dictionaryJSONSha256": "4188f66881ecd727bfbf50c478f9c968b0482ac524c1c9fe92162eb96064bda5",
+  "dictionaryJSONBytes": 163451315,
+  "dictionaryCoverage": {
+    "passage": {
+      "content": 371792,
+      "resolved": 365833,
+      "ratio": 0.983972
+    },
+    "definition": {
+      "content": 52987,
+      "resolved": 52611,
+      "ratio": 0.992904
+    },
+    "collocation": {
+      "content": 29499,
+      "resolved": 28050,
+      "ratio": 0.95088
+    }
+  }
+}

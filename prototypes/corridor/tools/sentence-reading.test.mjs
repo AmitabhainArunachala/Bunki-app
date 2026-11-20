@@ -2,8 +2,9 @@
  * tests establish recommendation boundaries, not learner/editorial acceptance. */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
 import process from 'node:process';
 import { test } from 'node:test';
 import { pathToFileURL } from 'node:url';
@@ -17,6 +18,32 @@ const { createTeacherContext } = await import(pathToFileURL(resolve(site, 'teach
 const passages = JSON.parse(readFileSync(resolve(site, 'data/articles/index.json'))).articles.map(row =>
   ({ ...row, ...JSON.parse(readFileSync(resolve(site, 'data/articles', row.file))) }));
 const morning = passages.find(p => p.id === 'bunki-graded-n5-morning');
+/** The listening catalog this case needs. The shipped one names no cue until the locked clips are
+ * rendered (V, 2026-10-17), so without a shipped morning cue this takes exactly what
+ * build-listening-cues emits once they exist — staged from the site's own data with placeholder
+ * clips — and runs it through the real selector and the real domain contract below. The assertion
+ * is kept, not removed: it now proves a cue in the locked voice is selectable at all. */
+async function listeningCatalog() {
+  const shipped = JSON.parse(readFileSync(resolve(site, 'audio/sentence-cues.json')));
+  if (shipped.passages?.[morning.id]) return shipped;
+  const { buildListeningCues, listeningSentences } = await import('./build-listening-cues.mjs');
+  const { runtimeLock, voiceForRole } = await import('./voice-lock.mjs');
+  const dir = mkdtempSync(join(tmpdir(), 'later-encounters-cues-'));
+  try {
+    mkdirSync(join(dir, 'audio'), { recursive: true });
+    symlinkSync(resolve(site, 'data'), join(dir, 'data'));
+    copyFileSync(resolve(site, 'audio/manifest.json'), join(dir, 'audio/manifest.json'));
+    const lock = runtimeLock(), voice = voiceForRole('example', lock);
+    const passage = listeningSentences(dir).find(row => row.row.id === morning.id && row.eligible);
+    assert(passage, 'the morning passage is a listening passage');
+    mkdirSync(join(dir, 'audio/s', voice), { recursive: true });
+    passage.ranges.forEach((_, i) => writeFileSync(join(dir, 'audio/s', voice,
+      `${morning.id.replaceAll(':', '_')}-${String(i).padStart(3, '0')}.m4a`), `placeholder ${i}`));
+    const catalog = buildListeningCues(dir, lock);
+    assert.equal(catalog.passages[morning.id]?.sentences[0]?.cue.voice, voice);
+    return catalog;
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+}
 const station = passages.find(p => p.id === 'bunki-graded-n5-station');
 const clone = value => JSON.parse(JSON.stringify(value));
 let serial = 0;
@@ -67,7 +94,7 @@ test('only acknowledged eligible recall informs the explanation; later unchecked
   record.sentencePractice = api.appendSentenceResponse(record.sentencePractice, { entryId: prior.fromEntryId,
     mode: 'production', at: at(), id: uuid(), text: '私は全部できると思います。' });
   assert.deepEqual(recommend(record), [prior]); assert.equal(prior.evidence.grade, 'easy'); assert.equal(prior.evidence.modality, 'text');
-  const catalog = JSON.parse(readFileSync(resolve(site, 'audio/sentence-cues.json')));
+  const catalog = await listeningCatalog();
   const entry = record.sentencePractice.entries[0], surfaces = morning.tokens.map(t => t.s);
   const cue = api.selectBundledListeningCue(entry.context, surfaces, catalog);
   record.sentencePractice = api.acceptSentencePractice(record.sentencePractice, api.createSentencePractice({

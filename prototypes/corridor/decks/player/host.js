@@ -13,8 +13,9 @@
  *   host.take(entry)          → Promise<boolean> the corridor's one-tap save into 覚えるの札 (no chooser;
  *                                                the corridor shows its Saved toast with 元に戻す); false
  *                                                when not saved
- *   host.addToList(entry, invoker) → void       the corridor's optional リストに追加… popover, for a
- *                                                word already saved
+ *   host.addToList(entry, invoker, { menu, onChange }?) → void   the corridor's list popover for a word
+ *                                                already saved; with menu, Save ▾'s whole menu (its lists,
+ *                                                copy, remove from review), onChange after a removal
  *
  * An entry is { t: 'word' | 'kanji' | 'grammar', id, label, reading, gloss, ja, en, level?, seq?, token }:
  * t and id are the corridor's node, so open() and take() address the same row its reader does.
@@ -32,7 +33,7 @@
  *   taken()               the 覚えるの札 rows
  *   capture(node, label)  the corridor's one-tap save (toggleWordSave, bound to the dictionary
  *                         visit and the shared review pool); resolves true when the row is written
- *   addToList(node, label, invoker)  open the corridor's list popover for a saved item
+ *   addToList(node, label, invoker, options)  open the corridor's list popover (or Save ▾ menu) for a saved item
  *
  * A tap here is capture, never evidence: nothing in this adapter writes the observation log or
  * any schedule, and take() never enrols the word in the deck the card belongs to.
@@ -42,21 +43,27 @@ const KANA_ONLY = /^[぀-ヿー]+$/;
 const kataToHira = (s) => String(s || '').replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
 
 function wordEntry(deps, token) {
+  // R · reading truth: the reading this card's text gives the word for its dictionary form (an uninflected token's
+  // own; an inflected surface's says nothing about it). The host's lookup answers with the entry read that way
+  const own = !token.b || token.b === token.s ? token.r || '' : '';
   // the build's ref is a boot-core head; the lemma and the surface are the reader's own keys
   for (const id of [...new Set([token.ref, token.b, token.s].filter(Boolean))]) {
     if (token.k !== '語' && id === token.s && KANA_ONLY.test(id)) continue; // a bare particle is not a word entry
-    const rec = deps.word(id, token.r || '');
+    const rec = deps.word(id, own);
     if (rec) {
+      // an entry read otherwise (none read the text's way is at hand yet) lends the card neither its reading, its
+      // English nor its number: the card shows the text's reading, and the corridor holds Save until it is known
+      const readsAsText = !own || kataToHira(rec.r) === kataToHira(own);
       return {
         t: 'word',
         id,
         label: rec.head || id,
-        reading: rec.r || '',
-        gloss: rec.m?.[0] || '',
+        reading: readsAsText ? rec.r || '' : own,
+        gloss: readsAsText ? rec.m?.[0] || '' : '',
         ja: '',
-        en: (rec.m || []).slice(0, 3).join('; '),
+        en: readsAsText ? (rec.m || []).slice(0, 3).join('; ') : '',
         ...(rec.jlpt ? { level: `N${String(rec.jlpt).replace(/^N/i, '')}` } : {}),
-        ...(rec.seq ? { seq: rec.seq } : {}),
+        ...(readsAsText && rec.seq ? { seq: rec.seq } : {}),
         token,
       };
     }
@@ -94,8 +101,10 @@ function nodeOf(entry, deps) {
 
 export function createHost(deps) {
   const taken = (entry) => (deps.taken() || []).some((row) => row.t === entry?.t && row.id === entry?.id);
+  let closedAs = null; // why the corridor last closed a slip this host opened: 'dive' | 'dismiss' | 'entry'
   return {
     name: 'corridor',
+    installProseWords(block, selector) { deps.installProseWords?.(block, selector); },
     lookup(token) {
       if (!token?.s) return null;
       if (token.k === '部品') {
@@ -105,7 +114,13 @@ export function createHost(deps) {
       if (token.k === '文法') return grammarEntry(deps, token) || wordEntry(deps, token);
       if (token.k === '字') return kanjiEntry(deps, token);
       if (token.k === '語') return wordEntry(deps, token) || (token.s.length === 1 ? kanjiEntry(deps, { ...token, ref: token.s }) : null);
-      return null; // particles, endings, punctuation: nothing to open
+      // G3: particles and endings are Japanese doors too. A dictionary miss keeps the
+      // player's contextual frame; punctuation and non-Japanese text remain plain.
+      if (token.k === 'other' && /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(token.s)) {
+        return wordEntry(deps, { ...token, k: '語' }) ||
+          (/^\p{Script=Han}$/u.test(token.s) ? kanjiEntry(deps, { ...token, ref: token.s }) : null);
+      }
+      return null;
     },
     open(entry) {
       if (entry?.t && entry.id) deps.open(nodeOf(entry, deps));
@@ -116,9 +131,50 @@ export function createHost(deps) {
       if (taken(entry)) return true;
       return !!(await deps.capture(nodeOf(entry, deps), entry.label || entry.id));
     },
-    addToList(entry, invoker) {
+    addToList(entry, invoker, options = {}) {
       if (!entry?.t || !entry.id || !taken(entry) || typeof deps.addToList !== 'function') return;
-      deps.addToList(nodeOf(entry, deps), entry.label || entry.id, invoker);
+      deps.addToList(nodeOf(entry, deps), entry.label || entry.id, invoker, options);
+    },
+    /** The card back's tap (the one-hand pass, contract §1): the corridor's one slip beside the tapped word.
+     * frame is what the player shows for the tap (frameOf): a word of this deck (frame.word), a host entry
+     * (frame.entry), or neither (a spelling the dictionary lacks: the deck's own sense, no door, no Save).
+     * The deck's own word says it is already in the deck where Save would stand, and its band opens the
+     * dictionary's entry when the dictionary has it. Save goes through the corridor's one path on the node,
+     * the path take() wraps. english: show the English sense under the Japanese one.
+     * 'reading' | 'opened' | 'dived' | 'dismissed' | false: a second tap on a stage with no entry only puts the
+     * stage away, as the corridor's close says. Rung ownership stays with the corridor;
+     * the player's callbacks only show or clear its existing in-place ruby. */
+    openSlip(frame, anchor, { english = false, onClose = null, reveal, clearReveal, readingVisible } = {}) {
+      if (typeof deps.openSlip !== 'function' || !frame || !anchor) return false;
+      const entry = frame.entry || (frame.word
+        ? wordEntry(deps, { s: frame.word.term, ref: frame.word.term, r: frame.word.reading || '', k: '語' })
+        : null);
+      const node = entry ? nodeOf(entry, deps) : null;
+      const look = {
+        label: frame.label, reading: frame.reading || '', surface: frame.surface || frame.label,
+        ...(frame.ja ? { gloss: frame.ja, glossLang: 'ja', ...(english && frame.en ? { gloss2: frame.en } : {}) }
+          : frame.en ? { gloss: frame.en, glossLang: 'en' } : {}),
+      };
+      const before = !!deps.slipOpen?.();
+      closedAs = null;
+      const slip = deps.openSlip(node, {
+        anchor, from: 'deck', look, key: frame.key || '', reveal, clearReveal, readingVisible,
+        onClose: (reason) => {
+          closedAs = reason;
+          onClose?.(reason);
+        },
+        ...(frame.word ? { note: deps.inDeckNote?.() || 'このデッキにあります' } : {}),
+      });
+      if (slip === 'reading') return 'reading';
+      if (slip) return 'opened';
+      if (!before || deps.slipOpen?.()) return false;
+      return closedAs === 'dive' ? 'dived' : closedAs === 'dismiss' ? 'dismissed' : false;
+    },
+    slipOpen() {
+      return !!deps.slipOpen?.();
+    },
+    closeSlip() {
+      deps.closeSlip?.();
     },
   };
 }

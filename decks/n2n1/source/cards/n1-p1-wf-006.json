@@ -727,13 +727,14 @@
    "judge": "deepseek-v4-pro:cloud"
   },
   {
+   "cardId": "nn-5659e0e01a-ffe4b61c",
    "term": "同意",
    "reading": "どうい",
    "pos": "noun",
    "meaning": "consent, agreement",
    "defJa": "相手の考えや行為を認めて承知すること。",
    "passage": {
-    "ja": "利用者の同意を得ないまま、顧客との会話の記録を人工知能の学習に回していたことが報道され、ある企業が批判を浴びている。同社は規約に明記してあったと主張するが、小さな文字の奥に埋もれた一文を読んだ人は、ほとんどいなかったに違いない。専門家は、チェック欄に印をつけさせるだけの形だけの手続きでは信頼に足る運用とは言えないと指摘する。問われているのは、データの量ではなく、納得のあり方にほかならない。",
+    "ja": "利用者の同意を得ないまま、顧客との会話の記録を人工知能の学習に回していたことが報道され、ある企業が批判を浴びている。同社は規約に明記してあったと主張するが、小さな文字の奥に埋もれた一文を読んだ人は、ほとんどいなかったに違いない。専門家は、チェック欄に印をつけさせるだけの形だけの手続きでは信頼に足る運用とは言えないと指摘する。問われているのは、データの量ではなく、納得のあり方である。",
     "form": "同意",
     "en": "A company is drawing criticism for having fed customers' conversation logs into AI training without obtaining users' consent, according to news reports. The firm insists it was stated in the terms of service, but almost no one can have read a single sentence buried deep in fine print. Experts point out that a merely formal procedure of having people tick a box cannot be called a trustworthy way of operating. What is at stake is not the volume of data but the nature of people's acceptance.",
     "register": "報",

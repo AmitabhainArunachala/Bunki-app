@@ -29,6 +29,10 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[2]
+sys.path.insert(0, str(ROOT / "scripts" / "ci"))
+from vh_python_receipts import CheckReceipt  # noqa: E402
+REPORT = CheckReceipt("deck-export-mcd", __file__, ROOT)
 sys.argv = sys.argv[:1]  # build.py reads its flags at import
 sys.path.insert(0, str(HERE))
 import build  # noqa: E402
@@ -38,6 +42,7 @@ FAILS: list[str] = []
 
 
 def ok(name: str, cond: bool, detail: str = "") -> None:
+    REPORT.record(name, cond, detail)
     print(f"{'✓' if cond else '✗'} {name}{'' if cond else '  — ' + detail}")
     if not cond:
         FAILS.append(name)
@@ -151,7 +156,8 @@ def main() -> int:
     ok("an allow the passage does not use is refused", "does not use" in refused(ex.written_record, "64", {**v2, "allow": ["性能"], "allowReason": "x"}))
 
     print("all export_mcd checks pass" if not FAILS else f"{len(FAILS)} check(s) failed")
-    return 1 if FAILS else 0
+    receipt_ok = REPORT.complete()
+    return 1 if FAILS or not receipt_ok else 0
 
 
 if __name__ == "__main__":

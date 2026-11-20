@@ -269,8 +269,9 @@ try {
       await page.waitForTimeout(400);
     }
     if (!stable) throw new Error('Reader tokens did not settle before the gesture');
-    // the click grammar (reader lane 2026-10-02): a press and hold on a word opens its menu, and
-    // "Save word" there makes its review card — the reader's own capture, no sheet in between
+    // the click grammar (reader lane 2026-10-02; G5 hold = seal, 2026-10-18): a press and hold on a word opens its strip,
+    // no sheet in between. SAVE (2026-11-11): the strip asks where the word goes; the pick of Review keeps it (its review
+    // card, the reader's own capture)
     const tok = await page.$('.reader .tok.content');
     await tok.scrollIntoViewIfNeeded();
     await page.waitForTimeout(150);
@@ -281,12 +282,14 @@ try {
     await page.waitForTimeout(900);
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     await cdp.detach();
-    await page.waitForSelector('#reader-word-menu [data-menu-action="save-word"]', { timeout: 8000 });
+    await page.waitForSelector('#seal-strip', { timeout: 8000 });
     await page.waitForTimeout(400);
-    if (await page.$('#sheet')) throw new Error('the hold opened a sheet, not the word menu');
-    await page.click('#reader-word-menu [data-menu-action="save-word"]');
+    if (await page.$('#sheet')) throw new Error('the hold opened a sheet, not the strip');
+    if ((await readAppRecord(page)).taken.length !== 0) throw new Error('the hold kept the word before a place was picked');
+    await page.tap('#seal-strip[data-mode="choose"] #seal-strip-review');
     const taken = (await waitForAppRecord(page, record => record.taken.length > 0)).taken.length;
-    if (taken !== 1) throw new Error(`the menu's Save word made ${taken} cards`);
+    if (taken !== 1) throw new Error(`the hold made ${taken} cards`);
+    await page.keyboard.press('Escape');
     await page.waitForTimeout(400);
     await page.waitForTimeout(500);
     await page.mouse.wheel(0, 900);
@@ -326,6 +329,8 @@ try {
     const takenBefore = (await readAppRecord(page)).taken.length;
     if (takenBefore !== 1) throw new Error('lesson completion minted deck rows: ' + takenBefore);
     await page.click('#lesson-enroll-all');
+    // SAVE (2026-11-11): Save all asks for its one place (Review) and keeps the run only on that pick
+    await page.click('#save-chooser-home');
     await page.waitForTimeout(300);
     const takenAfter = (await waitForAppRecord(page, record => record.taken.length >= 10)).taken.length;
     if (takenAfter < 10) throw new Error('the enroll door did not mint the run: ' + takenAfter);
@@ -444,7 +449,7 @@ try {
     await page.click('[data-kdx-part="木"]');
     await page.waitForSelector('.kdx-glyph', { timeout: 5000 });
     await page.locator('.kdx-glyph').first().click();
-    await page.waitForSelector('#sheet #kanji-kkld', { timeout: 8000 });
+    await page.waitForSelector('#sheet #kanji-kkld', { state: 'attached', timeout: 8000 }); // in the closed Sources disclosure (tighten pass, 2026-11-10)
     const chip = await page.locator('#sheet #kanji-kkld').textContent();
     assert.match(chip, /Kodansha/, 'The kanji sheet names its Kodansha entry while offline');
     await shot('13-kodansha-offline');

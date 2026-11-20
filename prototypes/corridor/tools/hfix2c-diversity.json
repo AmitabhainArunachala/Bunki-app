@@ -1,0 +1,366 @@
+[
+  {
+    "term": "見本",
+    "deck": "n2",
+    "id": "nn-d0c5b0cc26-8f46f0cc",
+    "source": "decks/n2n1/source/cards/n2-p1-div-001.json",
+    "sha256": "3e23b5acfaf18bd59a03432d6bc875441e94c4439b1b8386f772c371fb7003cc"
+  },
+  {
+    "term": "破片",
+    "deck": "n2",
+    "id": "nn-6f503eb7c2-b197873b",
+    "source": "decks/n2n1/source/cards/n2-p1-div-001.json",
+    "sha256": "1269d84b3a32b44f41b70d522091896723091a86ea9fa1615f499720361ea65c"
+  },
+  {
+    "term": "コピー",
+    "deck": "n2",
+    "id": "nn-285ca94642-50d87f0d",
+    "source": "decks/n2n1/source/cards/n2-p1-div-001.json",
+    "sha256": "dcee7a791c957ae6b7c7f786b0c636565b17278d8a62b763aa9df204d39754c3"
+  },
+  {
+    "term": "何となく",
+    "deck": "n2",
+    "id": "nn-662578206a-08a9af6e",
+    "source": "decks/n2n1/source/cards/n2-p1-div-002.json",
+    "sha256": "42a55c3b44dabf0c9d0e945e78b42dc791d20811c5331722dc33a39e3e9bd0c7"
+  },
+  {
+    "term": "甥",
+    "deck": "n2",
+    "id": "nn-cee77962bc-0bc5df3c",
+    "source": "decks/n2n1/source/cards/n2-p1-div-004.json",
+    "sha256": "30d97659c6a47e743427d84f61951e27b0d078cc68b663b9fa862ced3ffe3d76"
+  },
+  {
+    "term": "名場面",
+    "deck": "n2",
+    "id": "nn-7796bf38ee-cd375412",
+    "source": "decks/n2n1/source/cards/n2-p1-div-004.json",
+    "sha256": "2ef5a0f03ecf52c9d4b65bb2aeefab39e10b518468fa6d3492ef4c9d130e8e89"
+  },
+  {
+    "term": "引き受ける",
+    "deck": "n2",
+    "id": "nn-b9fbbf77d1-5f9dd21a",
+    "source": "decks/n2n1/source/cards/n2-p1-div-004.json",
+    "sha256": "921ebf8748a2ede254f5e06a47170c1394f3cd8ecc0cf40ad7e1d54b86ed4f75"
+  },
+  {
+    "term": "占領",
+    "deck": "senmon",
+    "id": "nn-4afb29e244-6b9fb176",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-001.json",
+    "sha256": "62bbdfd2b88268dca22bc9901aa2840bbe482112decbd1689c30715565a9cff8"
+  },
+  {
+    "term": "句読点",
+    "deck": "senmon",
+    "id": "nn-f2d11d6723-0e6be865",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-001.json",
+    "sha256": "0854f8ab3dd09480775acc519b4e256153d7fbdb402037d038a8513f469e6bcf"
+  },
+  {
+    "term": "和製英語",
+    "deck": "senmon",
+    "id": "nn-78bf22cb3b-36407833",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-001.json",
+    "sha256": "314fca4a25cab802b9f62cfa016ed7b9e31144bf776042e1feabbca63e6654c7"
+  },
+  {
+    "term": "悪文",
+    "deck": "senmon",
+    "id": "nn-c27d6f5a52-9ee4cb14",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-001.json",
+    "sha256": "2b67b021ad14e4892f770bb962cb9ac09ac1a536828fe96d1307393d08e99451"
+  },
+  {
+    "term": "七五調",
+    "deck": "senmon",
+    "id": "nn-6fea77c3c2-aadcad34",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-001.json",
+    "sha256": "ca666b43ebed5328041d48ad7cd21338711f3d8005effb6af18bbda8fa48788c"
+  },
+  {
+    "term": "口調",
+    "deck": "senmon",
+    "id": "nn-e044025be4-4aa15c1a",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-001.json",
+    "sha256": "3d89d2a19e0b5dd99f587776acfe9f99a86dc7d9c5c9b24da24a4b85de2e4c82"
+  },
+  {
+    "term": "偉業",
+    "deck": "senmon",
+    "id": "nn-c180bcf180-38f8e0a6",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-001.json",
+    "sha256": "d66058984a7f3e54d94c7766946799fbdc3c0b09dd29bff93bbe5d8581c16cf4"
+  },
+  {
+    "term": "目標設定",
+    "deck": "senmon",
+    "id": "nn-f940885bb6-7a111ef4",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-002-r.json",
+    "sha256": "38f6a0ec96360a10c3461694661254a858603b871a6689d90d80d9b4da3d8b93"
+  },
+  {
+    "term": "環境設計",
+    "deck": "senmon",
+    "id": "nn-79a5ceff94-e0f45995",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-002-r.json",
+    "sha256": "f04cb57555de0ee0bc9bb3457d844a2d4d20dc4cc28c70a9ee9bc8116c1fb200"
+  },
+  {
+    "term": "王道",
+    "deck": "senmon",
+    "id": "nn-6803ee9c35-4c5e3a54",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-002.json",
+    "sha256": "e480bf1113c2d07038e8c32105bdbfefad98b81fa5f86ceca8f5e5d49d5d5a8a"
+  },
+  {
+    "term": "治外法権",
+    "deck": "senmon",
+    "id": "nn-8630e57b9d-9d2a8285",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-002.json",
+    "sha256": "65eb13f153c395cc8e06e39fdd134dfcd656cd8bd0e3959b413316ade7df9e87"
+  },
+  {
+    "term": "熟達者",
+    "deck": "senmon",
+    "id": "nn-9bbe4f2fba-0f266b99",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-002.json",
+    "sha256": "18489bea9b408bb6547238a0690e11f6fb9f0429a28566265f2d47cec409644e"
+  },
+  {
+    "term": "知能",
+    "deck": "senmon",
+    "id": "nn-de7c96fe2c-5d4f1557",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-002.json",
+    "sha256": "571d7b12c381869868f9a27902a02358369870dc21d8e8cd505b5eb8d58b99cd"
+  },
+  {
+    "term": "人工知能",
+    "deck": "senmon",
+    "id": "nn-7215637653-174b46ca",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-002.json",
+    "sha256": "b9e1c569a8c62ed1b2ff1c5cd6c26ac59f73456ef2fa4fe2d670fc3a37aedb1d"
+  },
+  {
+    "term": "本論",
+    "deck": "senmon",
+    "id": "nn-b19d96f3cd-3f64ea77",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-002.json",
+    "sha256": "4c2e7da259bdab7f30bc9c71242dadea10f93f76569f41384e2526bc9478fb7e"
+  },
+  {
+    "term": "流動性知能",
+    "deck": "senmon",
+    "id": "nn-bc423cf6ac-919689ff",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-002.json",
+    "sha256": "4d73c4aecd864350c661b34f92d2a3c17d049784f19c397fcedefbc01180365b"
+  },
+  {
+    "term": "歴史は繰り返す",
+    "deck": "senmon",
+    "id": "nn-275a915912-f04e8fc8",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-003.json",
+    "sha256": "1dafecee5c0137d91e809c81f6915006b6fba32e5055e35ef3b19d45591d1241"
+  },
+  {
+    "term": "アウトプット",
+    "deck": "senmon",
+    "id": "nn-30c9606bfe-6c0863c9",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-003.json",
+    "sha256": "18dff70b342fc74386d5279c066dbf1a3672d471bf6a39a17e034b58db30b356"
+  },
+  {
+    "term": "内発的動機づけ",
+    "deck": "senmon",
+    "id": "nn-b88e7b2fea-170ea1a6",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-003.json",
+    "sha256": "0326c16317850fa601c3ab298134eea06e7861b18dc8cb99fef9e526621ee6c4"
+  },
+  {
+    "term": "筆致",
+    "deck": "senmon",
+    "id": "nn-f656b173d4-19b28054",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-003.json",
+    "sha256": "436fba9c7b7c9204754088b02917a1f9444fd0b075f8c96514c36b07d9f37af9"
+  },
+  {
+    "term": "再興",
+    "deck": "senmon",
+    "id": "nn-85306038d8-9e73340a",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-003.json",
+    "sha256": "e0702bb2d4650d2ee7056fcd31e723c25d6920fd4d83eeebb430543bd099208a"
+  },
+  {
+    "term": "不可欠",
+    "deck": "senmon",
+    "id": "nn-b3225df3a7-219dfcbc",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-003.json",
+    "sha256": "e0895a4a65a979c56b47bc2466f81de12949893f12b5136163026795983f03a6"
+  },
+  {
+    "term": "瞑想",
+    "deck": "senmon",
+    "id": "nn-079f82453d-6afd3a46",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-003.json",
+    "sha256": "eb17cc0c6128398b80bb0d37bb5d66dbb9ef99a16191d4f6e2ce389a40963291"
+  },
+  {
+    "term": "漢語",
+    "deck": "senmon",
+    "id": "nn-cecbaecc75-f2f4c4dd",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-003.json",
+    "sha256": "c2efc98ef53f1b94ca525e839c893582903c29c2a47440a3ca702a3506040f59"
+  },
+  {
+    "term": "浮世",
+    "deck": "senmon",
+    "id": "nn-2708ac4d4f-7f47fcc6",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-003.json",
+    "sha256": "5552c0e34699bf2e50bd6e0b0eaae26605ef76af6f3e9af081df3c0493cce853"
+  },
+  {
+    "term": "文語体",
+    "deck": "senmon",
+    "id": "nn-96b0444cca-4d9623d7",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-003.json",
+    "sha256": "a3a29ad9dd63f6199eb2ab403abb2d2f5cda3556826805b8d83fe8d0c84c0873"
+  },
+  {
+    "term": "未曾有",
+    "deck": "senmon",
+    "id": "nn-94d23ff592-0ec3b2a7",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-004.json",
+    "sha256": "f8c3e4c06f1ae45585c6d2013213b95725fbdd1a732db99a79130eff6e6ff08e"
+  },
+  {
+    "term": "不透明",
+    "deck": "senmon",
+    "id": "nn-1235313103-5589acf6",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-004.json",
+    "sha256": "28c805f12c36894715fce33106588f25bd3513216b5781d7da8f9018ca2fec1b"
+  },
+  {
+    "term": "不滅",
+    "deck": "senmon",
+    "id": "nn-802128621e-b416f72d",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-004.json",
+    "sha256": "63c1d1e586ab940115f4913d309ffc1db6bd53575ddb3c1fefc1d5c9d7249fb7"
+  },
+  {
+    "term": "掌握",
+    "deck": "senmon",
+    "id": "nn-073f3b2dc2-4f76c6be",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-004.json",
+    "sha256": "fba19b0a5f4f88c1cead78fd39074708982fed49d2301941516f717bfa9a0667"
+  },
+  {
+    "term": "急務",
+    "deck": "senmon",
+    "id": "nn-aebd55214a-e74faa40",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-004.json",
+    "sha256": "af33216760876faf6eeccf384b68d7e16ea4d0d97454196dacf22dbfef041fb1"
+  },
+  {
+    "term": "出遅れ",
+    "deck": "senmon",
+    "id": "nn-340c639e3c-cc83f2df",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-004.json",
+    "sha256": "78c33f4b271c2b1e20fbd6d6c95e92666f542640c11cb62f011af18616662740"
+  },
+  {
+    "term": "文才",
+    "deck": "senmon",
+    "id": "nn-9fd70189d0-feacedbf",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-005-r.json",
+    "sha256": "02674ef2c8cf1add3ed40e2ae266063c593a13b9a40425418f4535724b4f4aa7"
+  },
+  {
+    "term": "異端",
+    "deck": "senmon",
+    "id": "nn-553c56fc52-83c9ea69",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-005.json",
+    "sha256": "280027e81e880e9050174843d29431f3afa692056db44ba995cfce1e6c035dd7"
+  },
+  {
+    "term": "海洋国家",
+    "deck": "senmon",
+    "id": "nn-0ae0dd4a1e-61ca3a99",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-005.json",
+    "sha256": "1323a65642be61ad1d8328eead7ccf5e7a11bf0a225b56e20854c4f4f7f0eb1c"
+  },
+  {
+    "term": "口語",
+    "deck": "senmon",
+    "id": "nn-c7274f5510-1839b942",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-005.json",
+    "sha256": "827bc03351d30538e5ba759e1cce73a420d94998fb33d625ee00a67f1d265d71"
+  },
+  {
+    "term": "相関関係",
+    "deck": "senmon",
+    "id": "nn-111840e549-dce15575",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-005.json",
+    "sha256": "2dea89dd3fbef78d38c7ccf5db635aa05b2b83027aafef031f6b634fbb362a06"
+  },
+  {
+    "term": "人名用漢字",
+    "deck": "senmon",
+    "id": "nn-53414ecf7f-563c777a",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-005.json",
+    "sha256": "0dc82b5c6e5d26fbf82cacf8b1f4cf019c88883c948dcc294fe8954dd5a2efc2"
+  },
+  {
+    "term": "献身",
+    "deck": "senmon",
+    "id": "nn-528f938a5a-a66d12b4",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-005.json",
+    "sha256": "3264758a6dd8a0b6fc52f75367d660cf5f5e9db51a7e275cf421e6211cf8e575"
+  },
+  {
+    "term": "です・ます調",
+    "deck": "senmon",
+    "id": "nn-19d4e5081b-60784961",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-005.json",
+    "sha256": "3b87962f51ecf7bbb4a663f6f85141baa4da18a6326ac5c0d198fa67b3a13386"
+  },
+  {
+    "term": "熟字訓",
+    "deck": "senmon",
+    "id": "nn-d8a5cdc371-f6421df6",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-005.json",
+    "sha256": "1eb43fbbc10af094a74eaa03894fca1b6e6aacfd5a469996aace8b49c25dbb71"
+  },
+  {
+    "term": "圧縮",
+    "deck": "senmon",
+    "id": "nn-51ff854978-69e34a0c",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-006-r.json",
+    "sha256": "d9da059e5d136cd4ba3fc97e728ba5f1a266e5b389c1ef216ce2da9a8402ab44"
+  },
+  {
+    "term": "探究心",
+    "deck": "senmon",
+    "id": "nn-2789dd42de-8d179710",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-006.json",
+    "sha256": "a5eec2aeedaaf8fa0e9eb0ed699fc8005c303bd6502ed7a38b4e043dec2411e4"
+  },
+  {
+    "term": "日清戦争",
+    "deck": "senmon",
+    "id": "nn-10a56446c7-8eeb677d",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-006.json",
+    "sha256": "c0b53355cf71e7ac5de2a65aee3a85bdab733619362e2e56832478c4e3b73091"
+  },
+  {
+    "term": "単刀直入",
+    "deck": "senmon",
+    "id": "nn-3b9cfe759d-51f94801",
+    "source": "decks/n2n1/source/cards/senmon-p1-div-006.json",
+    "sha256": "b7df44b2b3a452b6451fa784611d419a27d8a21b4d64790f57ef4fbc96af35a7"
+  }
+]

@@ -3,7 +3,6 @@
  * reads are observations; the one negative write test uses the existing host
  * transaction fault. This does not establish provider quality or JLPT ability.
  */
-import { entryCloseSelector } from './sheet-navigation-support.mjs';
 import { closeShelfTools, openShelfDoor, openShelfTools } from './shelf-tools-support.mjs';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -122,13 +121,37 @@ const openShelf = async () => {
   // the study tools open from the shelf's one 学習ツール button (shared helper)
   await openShelfTools(page);
 };
+/** Hfix-2a (71907eb2) made every backup restore ask first. Answer exactly that
+ * question around the caller's original operation and wait; any other dialog
+ * fails the case without adding selectBackupFile's separate 20 s wait. */
+async function answeringRestore(run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
 async function importFixture(name, record, { navigate = true } = {}) {
   write(`${name}-import.json`, record);
   if (navigate) await openShelf();
   await page.locator('#tray').click();
   await page.evaluate(() => { window.__PI_ADAPT_BEFORE_IMPORT = true; });
-  await page.locator('#import-file').setInputFiles({ name: `${name}.json`, mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(record)) });
-  await page.waitForFunction(() => !window.__PI_ADAPT_BEFORE_IMPORT && document.body.dataset.ready === '1', null, { timeout: 30000 });
+  // INTFIX · answer the one restore confirmation inline, then keep the original
+  // 30 s sentinel as the only import-completion wait. No row or assertion moves.
+  await answeringRestore(async () => {
+    await page.locator('#import-file').setInputFiles({
+      name: `${name}.json`, mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(record)),
+    });
+    await page.waitForFunction(() => !window.__PI_ADAPT_BEFORE_IMPORT && document.body.dataset.ready === '1', null, { timeout: 30000 });
+  });
   const snapshot = await readAppRecordSnapshot(page);
   write(`${name}-imported.json`, snapshot);
   assert.deepEqual(snapshot.record.obslog, record.obslog);
@@ -136,6 +159,7 @@ async function importFixture(name, record, { navigate = true } = {}) {
 }
 async function configure(model = modelName) {
   if (!await page.locator('#ai-base-url').count()) await openShelfDoor(page, '#ai-link');
+  await page.evaluate(() => { const d = document.getElementById('ai-connection'); if (d) d.open = true; }); // Q · the address and model fold under the tutor's Details
   await page.locator('#ai-base-url').fill(endpoint);
   await page.locator('#ai-model-input').fill(model);
   await page.locator('#ai-key-input').fill('SYNTHETIC_TEST_KEY');
@@ -207,6 +231,7 @@ try {
   browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, headless: true });
   handles.browserVersion = browser.version(); handles.executablePath = process.env.CHROMIUM_PATH || chromium.executablePath();
   context = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+  await context.addInitScript(() => localStorage.setItem('kairo-word-ladder-demo-v1', '1')); // Returning device fixture.
   handles.browserContextsCreated++;
   handles.audio = await silenceBrowserAudio(context);
   timer = setTimeout(() => { timedOut = true; void browser.close(); }, 420000);
@@ -411,8 +436,7 @@ try {
   await runCase('source-context', async () => {
     await importFixture('source-conversation', fixture()); await openShelf();
     await page.locator('[data-passage="wikinews:1403"]').first().click();
-    await page.locator('#reader .tok[data-index="18"]').click();
-    if (await page.locator('#sheet').isVisible()) await page.locator(await entryCloseSelector(page)).click();
+    await openReaderWordStage(page, page.locator('#reader .tok[data-index="18"]'));
     await page.locator('#mini-sentence-open').click(); await page.locator('#reader-teacher').click(); await page.locator('#chat-input').waitFor();
     const deniedQuestion = 'この文の「世界」の意味を教えてください。', deniedCount = requests.length;
     await page.locator('#chat-input').fill(deniedQuestion); await page.locator('#chat-send').click();
@@ -425,8 +449,7 @@ try {
     write('source-policy-denied.json', denied);
     await openShelf();
     await page.locator('[data-passage="bunki-graded-n5-morning"]').first().click();
-    await page.locator('#reader .tok[data-index="0"]').click();
-    if (await page.locator('#sheet').isVisible()) await page.locator(await entryCloseSelector(page)).click();
+    await openReaderWordStage(page, page.locator('#reader .tok[data-index="0"]'));
     await page.locator('#mini-sentence-open').click(); await page.locator('#reader-teacher').click(); await page.locator('#chat-input').waitFor();
     const before = await readAppRecord(page), source = before.teacherContexts.entries.find((entry) => entry.id === before.teacherContexts.activeRef);
     assert.ok(source?.quote && source.sourceKind === 'bundled-passage');
@@ -467,4 +490,34 @@ finally {
       'Bundled source conversation only; personal-source approval lifecycle and multi-context ownership remain separate gates.'] });
   console.log(JSON.stringify({ pass, cases: results.filter((row) => row.pass).length, total: results.length, checks: checks.length, requests: requests.length, out, handles }));
   if (!pass) process.exitCode = 1;
+}
+
+// These source-context checks enter through the G3 ladder; the grammar itself is
+// checked separately. A second activation is allowed only after a real reading rung.
+async function openReaderWordStage(page, word) {
+  await word.click();
+  await page.waitForFunction(node => ['reading', 'gloss', 'stage'].includes(node?.dataset.ladderRung), await word.elementHandle());
+  if (await word.getAttribute('data-ladder-rung') === 'reading') {
+    assert.equal(await page.locator('#mini').count(), 0, 'First activation reveals reading without meaning');
+    // On-touch reader ruby paints through ::before; the native rt stays hidden
+    // to preserve the word's width. Require actual paint from either renderer.
+    await page.waitForFunction(node => [...node.querySelectorAll('ruby')].some(ruby => {
+      const rt = ruby.querySelector('rt');
+      if (!rt?.textContent.trim() || rt.classList.contains('hidden-rt')) return false;
+      const native = getComputedStyle(rt), floating = getComputedStyle(ruby, '::before');
+      return (rt.getClientRects().length > 0 && native.visibility !== 'hidden' && native.display !== 'none' && Number(native.opacity) > 0) ||
+        (ruby.getClientRects().length > 0 && ruby.dataset.r === rt.textContent && floating.content === JSON.stringify(rt.textContent) &&
+          floating.visibility !== 'hidden' && floating.display !== 'none' && Number(floating.opacity) > 0);
+    }), await word.elementHandle(), { timeout: 5000 });
+    await word.click();
+  }
+  // Ladder (John, 10-19): the English under the word comes before the stage; one more activation, only once it is seen
+  await page.waitForFunction(node => node?.dataset.ladderRung === 'gloss' || !!document.getElementById('mini'), await word.elementHandle());
+  if (await word.getAttribute('data-ladder-rung') === 'gloss') {
+    assert.equal(await page.locator('#mini').count(), 0, 'The English rung shows the meaning under the word, before the stage');
+    assert(await word.evaluate(node => !!node.querySelector(':scope > .tok-en .tok-en-text')), 'The English rung draws the English under the word');
+    await word.click();
+  }
+  await page.locator('#mini').waitFor();
+  assert.equal(await word.getAttribute('data-ladder-rung'), 'stage', 'The exact source word reaches its stage');
 }

@@ -1,0 +1,45 @@
+{
+  "format": "bunki-vendored-source/v1",
+  "repository": "nihongo-srs",
+  "commit": "b77078781aeb307e8ac3a33786c4ac2756536b03",
+  "sourceRoot": "client",
+  "copied": "unchanged, byte for byte (git show <commit>:client/<path>)",
+  "contract": "Bunki speech on the Nihongo Worker: client contract v1 (2026-11-10)",
+  "files": [
+    {
+      "path": "audio/speech-text.mjs",
+      "bytes": 6336,
+      "sha256": "9708fa25eb4fdec98b0b2fd80b36f6c84fa6fbc1558bb3714858cb3bdab24f59"
+    },
+    {
+      "path": "audio/speech-queue.mjs",
+      "bytes": 7593,
+      "sha256": "3ad6a893c01502c7a5e8b6c4c114582395f8f00c25521c0af23bcfdab9e8e934"
+    },
+    {
+      "path": "audio/speech-player.mjs",
+      "bytes": 2706,
+      "sha256": "56d5a54bb4864106f25034b62e88ee29939575abe37cba53ed3ae4b4b0526887"
+    },
+    {
+      "path": "audio/speech-highlight.mjs",
+      "bytes": 4807,
+      "sha256": "66076aab5f9930dbaa17d236600527d20be379f4cde543771b0f6448c5838cad"
+    },
+    {
+      "path": "audio/speech-input.mjs",
+      "bytes": 16128,
+      "sha256": "640a36affd598d8161a631d0e5cb274963afbde26f1eca4a9af905ffd6624e92"
+    },
+    {
+      "path": "audio/speak-keys.mjs",
+      "bytes": 3433,
+      "sha256": "0275c4759607ae72818ebf30b9250f70c75d847a808c6283397ed5dde23d185e"
+    },
+    {
+      "path": "schema/event.mjs",
+      "bytes": 14944,
+      "sha256": "cc0204a7f93ae29312b77e13bab68719b14f489f5d4c2e78f84162659ec4928e"
+    }
+  ]
+}

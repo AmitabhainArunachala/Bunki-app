@@ -1,7 +1,8 @@
 /**
  * Browser acceptance for every one of the 30 added native 本棚 readings.
  *
- * This drives the real served corridor at 390×844 with touch input, on a
+ * This drives the real served corridor at 390×844 with touch actions and a
+ * native wheel gesture for reading onward, on a
  * pinned shelf day. Each article is opened from its one `.shelf-item` card
  * (in the grid or today's six), then exercises its own
  * JSON load, reader/ruby/paragraphs, text settings, quick look, full entry,
@@ -11,9 +12,9 @@
  * B3 (bilingual titles as schema data): every primary index row must carry a
  * non-empty titleEn with a titleEnSource provenance marker, the code-side
  * TITLES_EN map must be gone from corridor.js, the bilingual (?ui=bi) shelf
- * must render each English title from the record itself, and every
- * human-review-pending story must be counted in the masthead's 未確認 note
- * and wear 未確認 in its reader meta line.
+ * must render each English title from the record itself, and (S, 2026-10-16)
+ * no human-review-pending story is marked anywhere on the shelf or in its
+ * reader meta: the review state stays in the record.
  *
  * R3-A (furigana truth): the reading-override lexicon
  * (docs/content/reading-overrides.json) must be minted into every curated
@@ -39,6 +40,9 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
 import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import { readAppRecord, waitForAppRecord } from './record-test-support.mjs';
+import { englishExpectation, englishSourcePins, assertEnglishSource, observeReaderEnglishRung } from './reader-english-rung.mjs';
+import { runPureEnglishControls, runBrowserEnglishControls } from './reader-english-rung-controls.mjs';
+const readerEnglishRung = { schemaVersion: 1, sources: englishSourcePins(), observations: [], pureControls: [], browserControls: null };
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const CORRIDOR = resolveCorridorSite();
@@ -120,8 +124,8 @@ function startServer(rootDir) {
 
 const touchAttempts = [];
 
-async function touchAt(page, locator, holdMs = 0) {
-  await locator.scrollIntoViewIfNeeded();
+async function touchAt(page, locator, holdMs = 0, budget = null) {
+  await locator.scrollIntoViewIfNeeded(budget ? { timeout: budget.remaining() } : undefined);
   await page.waitForTimeout(35);
   const box = await locator.evaluate((node) => {
     const rect = node.getClientRects()[0] ?? node.getBoundingClientRect();
@@ -150,6 +154,7 @@ async function touchAt(page, locator, holdMs = 0) {
     force: 1,
   };
   const session = await page.context().newCDPSession(page);
+  budget?.remaining();
   await session.send('Input.dispatchTouchEvent', {
     type: 'touchStart',
     touchPoints: [point],
@@ -159,7 +164,7 @@ async function touchAt(page, locator, holdMs = 0) {
   await session.detach();
   if (!holdMs) {
     try {
-      await page.waitForFunction((count) => (window.__nativeTargetClicks ?? 0) > count, before, { timeout: 5000 });
+      await page.waitForFunction((count) => (window.__nativeTargetClicks ?? 0) > count, before, { timeout: budget ? budget.remaining() : 5000 });
     } finally {
       attempt.events = await page.evaluate(() => window.__nativeTouchTrace?.slice(-6) ?? []);
     }
@@ -188,6 +193,57 @@ async function settleReader(page) {
   );
 }
 
+// Reading onward requires real reading input: a layout/fixture scroll must not
+// replace the exact source line retained by the word ladder. Use one native
+// wheel gesture to the original 620px target, and retain its passive witness.
+async function scrollToBookmark(page) {
+  const trace = await page.evaluateHandle(() => {
+    const reader = document.querySelector('#reader');
+    const from = window.scrollY;
+    const target = Math.min(620, document.body.scrollHeight - innerHeight);
+    const wheels = [], scrolls = [];
+    const onWheel = (event) => wheels.push({
+      trusted: event.isTrusted, deltaY: event.deltaY, deltaMode: event.deltaMode,
+      at: performance.now(),
+    });
+    const onScroll = () => scrolls.push({ y: window.scrollY, at: performance.now() });
+    window.addEventListener('wheel', onWheel, { capture: true, passive: true });
+    window.addEventListener('scroll', onScroll, { capture: true, passive: true });
+    return {
+      from, target,
+      snapshot: () => ({ from, target, requestedDeltaY: target - from,
+        position: Math.round(window.scrollY), wheels, scrolls,
+        devicePixelRatio: window.devicePixelRatio, viewportScale: window.visualViewport?.scale,
+        sameReader: reader?.isConnected && reader === document.querySelector('#reader') }),
+      close: () => {
+        window.removeEventListener('wheel', onWheel, true);
+        window.removeEventListener('scroll', onScroll, true);
+      },
+    };
+  });
+  try {
+    const { from, target } = await trace.evaluate((value) => ({ from: value.from, target: value.target }));
+    if (!(target > 0) || from === target) throw new Error('bookmark fixture needs a nonzero native scroll');
+    await page.mouse.move(VIEWPORT.width / 2, VIEWPORT.height / 2);
+    await page.mouse.wheel(0, target - from);
+    await page.waitForFunction((expected) => Math.round(window.scrollY) === expected, target, { timeout: 5000 });
+    await page.waitForTimeout(80);
+    const witness = await trace.evaluate((value) => value.snapshot());
+    if (!witness.sameReader || witness.position !== target || !witness.scrolls.length ||
+        !witness.wheels.some((event) => event.trusted && event.deltaMode === 0 &&
+          Number.isFinite(event.deltaY) && Math.sign(event.deltaY) === Math.sign(target - from))) {
+      throw new Error('native bookmark scroll did not preserve the reader and exact target');
+    }
+    return witness;
+  } catch (error) {
+    const witness = await trace.evaluate((value) => value.snapshot());
+    throw new Error(`${error.message}: ${JSON.stringify(witness)}`, { cause: error });
+  } finally {
+    await trace.evaluate((value) => value.close());
+    await trace.dispose();
+  }
+}
+
 async function setReaderDial(page, key, index) {
   const selector = `[data-dial="${key}:${index}"]`;
   const clicked = await page.locator(selector).elementHandle();
@@ -214,18 +270,36 @@ async function setReaderDial(page, key, index) {
   }
 }
 
-async function openQuickLook(page, preferredIndex = 0) {
+async function openQuickLook(page, articleId, body, preferredIndex = 0) {
   const tokens = page.locator('#reader .tok.content');
   const count = await tokens.count();
   const candidates = [preferredIndex, 0, 1, 2].filter(
     (value, index, values) => value < count && values.indexOf(value) === index,
   );
-  for (const index of candidates) {
-    // one tap is the quick look (reader lane 2026-10-02); a press and hold opens the word menu instead
-    await touchAt(page, tokens.nth(index));
+  const expected = englishExpectation(articleId, 'native');
+  assertEnglishSource(body, expected);
+  if (JSON.stringify(candidates) !== JSON.stringify(expected.candidateOrder) || candidates[0] !== expected.contentIndex)
+    throw new Error(`Original quick-look candidate ordering changed: ${articleId}`);
+  // Retain the first chosen object. No oracle failure may advance to an easier token.
+  const token = await tokens.nth(candidates[0]).elementHandle();
+  if (!token) throw new Error(`Quick-look occurrence missing: ${articleId}`);
+  try {
+    const observation = await observeReaderEnglishRung({ origin: token, expected,
+      trigger: async budget => {
+        await budget.call(() => touchAt(page, token, 0, budget));
+        const rung = await budget.waitUntil(() => token.evaluate(node =>
+          ['reading', 'gloss', 'stage'].includes(node.dataset.ladderRung) && node.dataset.ladderRung));
+        if (rung === 'reading') await budget.call(() => touchAt(page, token, 0, budget));
+      } });
+    readerEnglishRung.observations.push(observation);
+    await touchAt(page, token);
     if (await page.locator('#sheet').count()) {
       throw new Error(`a quick-lookup tap must not open a full entry: ${JSON.stringify(touchAttempts.at(-1))}`);
     }
+    await page.locator('#mini').waitFor({ timeout: 5_000 });
+    // R3 (Grok 2029) · a slip drawn before its word's sense is at hand shows a quiet "…" (aria-busy, R2's contract) until it
+    // is: the card is read once answered, up to 5 s, then asserted exactly as before (M-3)
+    await page.waitForFunction(() => document.getElementById('mini')?.getAttribute('aria-busy') !== 'true', null, { timeout: 5_000 }).catch(() => {});
     const quick = await page.evaluate(() => {
       const mini = document.getElementById('mini');
       if (!mini) return null;
@@ -235,13 +309,48 @@ async function openQuickLook(page, preferredIndex = 0) {
         gloss: mini.querySelector('.mini-gloss')?.textContent ?? '',
       };
     });
-    if (quick?.word && quick.gloss && !/語釈なし|no gloss|No dictionary entry for this spelling\.|この表記の辞書項目はありません。/.test(quick.gloss)) {
-      return quick;
-    }
-    await page.evaluate(() => document.getElementById('mini')?.remove());
-  }
-  return null;
+    if (!quick?.word || !quick.gloss || /語釈なし|no gloss|No dictionary entry for this spelling\.|この表記の辞書項目はありません。/.test(quick.gloss))
+      throw new Error(`The selected quick look has no dictionary answer: ${articleId}`);
+    return quick;
+  } catch (error) {
+    readerEnglishRung.failure = { articleId, code: error.code || error.message, observation: error.detail ?? null, elapsedMs: error.elapsedMs ?? null };
+    throw error;
+  } finally { await token.dispose(); }
 }
+
+// G3: furigana=2 keeps native ruby at rest; only the temporary word visit folds.
+// Keep the actual origin handle across page/Back, not merely another equal-looking word.
+const quickStageState = (page, origin) => page.evaluate((node) => {
+  const reader = document.getElementById('reader'), mini = document.getElementById('mini');
+  const index = node?.dataset.index;
+  return {
+    connected: !!node?.isConnected,
+    sameOccurrence: !!node && reader?.querySelector(`.tok[data-index="${index}"]`) === node,
+    passage: document.querySelector('.listen-row[data-passage]')?.dataset.passage ?? null,
+    index: index === undefined ? null : Number(index),
+    surface: node?.dataset.proseLabel ?? null,
+    rung: node?.dataset.ladderRung ?? null,
+    focused: document.activeElement === node,
+    always: !!reader?.classList.contains('fg-always'),
+    lit: !!node?.classList.contains('lit'),
+    inlineGloss: !!node?.querySelector('.tok-en'),
+    activeRungs: reader?.querySelectorAll('[data-ladder-rung]').length ?? 0,
+    sheet: !!document.getElementById('sheet'),
+    ruby: [...(node?.querySelectorAll('rt') ?? [])].map((rt) => {
+      const style = getComputedStyle(rt);
+      return { text: rt.textContent, visible: !rt.classList.contains('hidden-rt') &&
+        style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0 &&
+        [...rt.getClientRects()].some((rect) => rect.width > 0 && rect.height > 0) };
+    }),
+    mini: mini ? {
+      kind: mini.dataset.kind ?? null, key: mini.dataset.key ?? null,
+      word: mini.querySelector('.mini-word')?.textContent ?? '',
+      reading: mini.querySelector('.mini-reading')?.textContent ?? '',
+      gloss: mini.querySelector('.mini-gloss')?.textContent ?? '',
+      glosses: [...mini.querySelectorAll('.mini-gloss')].map((node) => node.textContent),
+    } : null,
+  };
+}, origin);
 
 function expectedBaseText(record) {
   return record.tokens.map((token) => token.s).join('');
@@ -336,8 +445,13 @@ function titleReceiptProblem(record) {
   let home, there;
   try { home = new URL(record.url).host; there = new URL(url).host; } catch { return `${record.id}: unreadable URL`; }
   if (!(ENGLISH_EDITIONS[home] ?? []).includes(there)) return `${record.id}: ${there} is not ${home}'s English edition`;
-  const same = sameHeadline(receipt.pageHeadline, record.titleEn);
-  const shorter = normalHeadline(record.titleEn).length < normalHeadline(receipt.pageHeadline).length;
+  // N2 (2026-10-17) · the house marks an excerpt in both its titles: a Japanese title ending （抄） carries " (excerpt)"
+  // after the English one. Only that mark, only on such a row, is set aside before the headline is compared; the rest
+  // must still be the publisher's own headline, character for character (as normalHeadline reads it)
+  const excerpt = /（抄）$/u.test(record.title ?? '') && / \(excerpt\)$/u.test(record.titleEn ?? '');
+  const titleEn = excerpt ? record.titleEn.replace(/ \(excerpt\)$/u, '') : record.titleEn;
+  const same = sameHeadline(receipt.pageHeadline, titleEn);
+  const shorter = normalHeadline(titleEn).length < normalHeadline(receipt.pageHeadline).length;
   if (label === 'publisher' && !same) return `${record.id}: labelled the publisher's headline, but the page says "${receipt.pageHeadline}"`;
   if (label === 'publisher, shortened' && !shorter) return `${record.id}: labelled shortened, but the title is no shorter than the page headline on file`;
   if (label === 'publisher, adapted' && (!receipt.pageHeadline || same || shorter))
@@ -723,6 +837,11 @@ let failureEvidence = null;
 try {
   browser = await chromium.launch({ executablePath, args: ['--no-sandbox'] });
   browserVersion = await browser.version();
+  readerEnglishRung.pureControls = await runPureEnglishControls();
+  readerEnglishRung.browserControls = await runBrowserEnglishControls({ browser, base, engine: 'chromium',
+    artifactSha256: JSON.parse(readFileSync(resolve(CORRIDOR, 'build-identity.json'), 'utf8')).artifactSha256 });
+  if (!readerEnglishRung.pureControls.every(row => row.passed) || !readerEnglishRung.browserControls.results.every(row => row.passed))
+    throw new Error('English oracle controls failed');
   const context = await browser.newContext({
     viewport: VIEWPORT,
     screen: VIEWPORT,
@@ -859,7 +978,9 @@ try {
       };
     });
     const teaser = storyVariant(shelfState.className) === 'teaser';
-    const expectedLevel = row.readingFacets?.jlpt ?? null;
+    // N (2026-10-17) rewrites the pin "the chip is readingFacets.jlpt": a card shows ONE level, the level its text was written
+    // for where the row carries it (authorLevel), else the JLPT vocabulary estimate — on the card and in the reader alike
+    const expectedLevel = (/^N[1-5]\+?$/u.test(row.authorLevel ?? '') ? row.authorLevel : null) ?? row.readingFacets?.jlpt ?? null;
     const learnerSource = row.sourceLabel.replace(/\s*·\s*検収前/gu, '').trim();
     const nativeStyle = [
       'className',
@@ -952,10 +1073,24 @@ try {
       );
     }
 
-    const quick = await openQuickLook(page, quickTokenIndex.get(id));
-    let fullEntry = null;
+    const quick = await openQuickLook(page, id, body, quickTokenIndex.get(id));
+    let fullEntry = null, ladderReturn = null;
     if (quick) {
-      await touchAt(page, page.locator('#mini .mini-entry'));
+      const quickOrigin = await page.locator('#reader .tok[data-ladder-rung="stage"]').elementHandle();
+      if (!quickOrigin) throw new Error(`G3 quick look has no stage occurrence: ${id}`);
+      const before = await quickStageState(page, quickOrigin);
+      const token = body.tokens[before.index];
+      const expectedRuby = (token?.f ?? []).filter((pair) => pair.r).map((pair) => pair.r);
+      const sameRuby = (state) => JSON.stringify(state.ruby.map((row) => row.text)) === JSON.stringify(expectedRuby) &&
+        state.ruby.every((row) => row.visible);
+      if (!before.connected || !before.sameOccurrence || before.passage !== id || before.surface !== token?.s ||
+          before.rung !== 'stage' || before.activeRungs !== 1 || before.sheet || !before.always || !sameRuby(before) ||
+          !before.mini?.key || before.mini.word !== quick.word || before.mini.reading !== quick.reading || before.mini.gloss !== quick.gloss) {
+        throw new Error(`G3 pre-page stage identity/readings differ: ${JSON.stringify({ id, before, quick, expectedRuby })}`);
+      }
+      // Ladder (John, 10-19): the English the climb set under the word stays under it at the stage
+      if (!before.inlineGloss) throw new Error(`G3 stage lost the English under its word: ${JSON.stringify({ id, before })}`);
+      await touchAt(page, page.locator('#mini button.mini-word'));
       await page.waitForSelector('#sheet .headword', { timeout: 6_000 });
       fullEntry = await page.evaluate(() => ({
         headword: document.querySelector('#sheet .headword')?.textContent ?? '',
@@ -970,6 +1105,25 @@ try {
       await page.waitForSelector('#sheet', { state: 'detached', timeout: 5000 });
       await page.waitForFunction(() => document.querySelector('#reader .tok') &&
         !document.querySelector('#reader')?.closest('[inert]'), null, { timeout: 5000 });
+      const returned = await quickStageState(page, quickOrigin);
+      if (!returned.connected || !returned.sameOccurrence || returned.passage !== id || returned.index !== before.index ||
+          returned.surface !== before.surface || returned.rung !== 'stage' || returned.activeRungs !== 1 || returned.sheet ||
+          !returned.focused || !returned.always || !sameRuby(returned) || JSON.stringify(returned.mini) !== JSON.stringify(before.mini)) {
+        throw new Error(`G3 Back did not restore the same occurrence/stage/meaning: ${JSON.stringify({ id, before, returned })}`);
+      }
+      // Ladder (John, 10-19): Back restores the stage with the English still under its word
+      if (!returned.inlineGloss) throw new Error(`G3 Back restored the stage without the English under its word: ${JSON.stringify({ id, before, returned })}`);
+      // Back returns to the stage. One native Escape folds that final rung;
+      // always-visible ruby must survive, while temporary reading/meaning does not.
+      await page.keyboard.press('Escape');
+      const folded = await quickStageState(page, quickOrigin);
+      if (!folded.connected || !folded.sameOccurrence || folded.passage !== id || folded.index !== before.index ||
+          folded.surface !== before.surface || folded.rung !== null || folded.activeRungs !== 0 || folded.mini || folded.sheet ||
+          !folded.focused || !folded.always || !sameRuby(folded) || folded.lit || folded.inlineGloss) {
+        throw new Error(`G3 final fold did not leave the same always-reading occurrence at rest: ${JSON.stringify({ id, before, returned, folded })}`);
+      }
+      ladderReturn = { before, returned, folded };
+      await quickOrigin.dispose();
     }
 
     // Completion and exact per-article bookmark are both persisted. Back must
@@ -982,11 +1136,8 @@ try {
     await waitForAppRecord(page, (record) => !!record.readDone?.[id],
       { description: `one acknowledged completion write for ${id}` });
     await page.waitForSelector('#read-fin.finished');
-    await page.evaluate(() =>
-      window.scrollTo(0, Math.min(620, document.body.scrollHeight - innerHeight)),
-    );
-    await page.waitForTimeout(80);
-    const intendedPosition = await page.evaluate(() => Math.round(window.scrollY));
+    const bookmarkScroll = await scrollToBookmark(page);
+    const intendedPosition = bookmarkScroll.position;
     await touchAt(page, page.locator('#back'));
     await page.waitForSelector(storyCard(id));
     const returnedShelfY = await page.evaluate(() => window.scrollY);
@@ -1027,7 +1178,8 @@ try {
       readerShape.facts['出典'] === learnerSource &&
       readerShape.facts['利用条件']?.includes('Bunki original') &&
       readerShape.level === expectedLevel &&
-      readerShape.unreviewed === (/-pending$/.test(row.review ?? '') ? '未確認' : null) &&
+      // S · no provenance in the reader's meta for any story, pending or approved (it pinned AI作成 on the pending ones)
+      readerShape.unreviewed === null &&
       readerShape.tokens === body.tokens.length &&
       readerShape.ruby > 0 &&
       readerShape.paragraphs === body.paras.length &&
@@ -1059,8 +1211,10 @@ try {
       dialCommit,
       quick,
       fullEntry,
+      ladderReturn,
       ownFileLoaded,
       intendedPosition,
+      bookmarkScroll,
       persistedPosition: persisted.position,
       restoredPosition,
       shelfY,
@@ -1088,8 +1242,10 @@ try {
     IDS.every((id) => savedRecord.readDone?.[id] && Number.isFinite(savedRecord.readerPos?.[id])),
   );
 
-  // B3 — the shelf's English titles come from the record itself, and 未確認 is said once in the
-  // masthead and worn in each unreviewed article's reader meta, in both chrome languages
+  // B3 — the shelf's English titles come from the record itself. S (John, 2026-10-16: "and made by AI!! do not write
+  // that!!!!"): it pinned 未確認 said once in the masthead and worn in each unreviewed article's reader meta; the new truth
+  // is no provenance note on the shelf and no mark in any reader meta, in both chrome languages — the pending stories'
+  // review state stays in their records (row.review)
   check(
     'the 日本語のみ chrome renders no English titles',
     (await page.locator('.shelf-title-en').count()) === 0,
@@ -1111,14 +1267,15 @@ try {
     if (!notes) return { notes, text: '', count: 0, total: null };
     const text = (await page.locator('.shelf-review-note').first().textContent()) ?? '';
     // the bilingual note is one short line since the glance pass: “Unreviewed · 54 of 120 not yet checked by a person”
-    const [, jaCount, biCount, total] = text.match(/このうち ([0-9]+) 本は未確認|Unreviewed · ([0-9]+) of (?:these )?([0-9]+)/u) ?? [];
+    const [, jaCount, biCount, total] = text.match(/このうち ([0-9]+) 本はAI作成|Made by AI · ([0-9]+) of (?:these )?([0-9]+)/u) ?? [];
     return { notes, text, count: Number(jaCount ?? biCount), total: total === undefined ? null : Number(total) };
   };
   const jaNote = await reviewNote();
+  const jaMasthead = (await page.locator('.shelf-masthead').innerText().catch(() => '')) || '';
   check(
-    'the 日本語のみ masthead says 未確認 once, counting every human-review-pending story',
-    pendingStories.length === 0 ? jaNote.notes === 0 : jaNote.notes === 1 && jaNote.count === pendingStories.length,
-    jaNote.text || `no review note for ${pendingStories.length} pending stories`,
+    'the 日本語のみ shelf says nothing of how its stories were made (no note, no AI作成 / 未確認), pending stories or not',
+    pendingStories.length > 0 && jaNote.notes === 0 && !/AI作成|未確認|人の確認|Made by AI/u.test(jaMasthead),
+    jaNote.text || `${pendingStories.length} pending stories, no note`,
   );
   const pendingNoiseBefore = noise.length;
   const unmarkedInReader = [];
@@ -1126,17 +1283,18 @@ try {
     activeArticleId = record.id;
     await page.locator(`${storyCard(record.id)} .shelf-open`).click();
     await page.waitForSelector('main .reader-meta .reader-source', { state: 'attached' });
-    const chip = await page.locator('main .reader-meta .status-chip').textContent().catch(() => null);
-    if (chip !== '未確認') unmarkedInReader.push(record.id);
+    const marks = await page.locator('main .reader-meta .status-chip, main .article-facts .review-reason').count();
+    const meta = (await page.locator('main .reader-meta').innerText().catch(() => '')) || '';
+    if (marks || /AI作成|未確認|Made by AI|人の確認/u.test(meta)) unmarkedInReader.push(record.id);
     await page.locator('#back').click();
     await page.waitForSelector(storyCard(record.id));
   }
   activeArticleId = null;
   check(
-    'every human-review-pending story wears 未確認 in its reader meta line',
+    'no human-review-pending story wears a provenance mark in its reader meta or facts',
     unmarkedInReader.length === 0 && noise.length === pendingNoiseBefore,
     unmarkedInReader.slice(0, 4).join(', ') ||
-      `${pendingStories.length} pending stories marked` +
+      `${pendingStories.length} pending stories, none marked` +
         (noise.length === pendingNoiseBefore ? '' : ` · ${noise.length - pendingNoiseBefore} errors`),
   );
   const biNoiseBefore = noise.length;
@@ -1164,11 +1322,11 @@ try {
     wrongEn.map((record) => record.id).slice(0, 4).join(', ') || `${storyRows.length} titles`,
   );
   const biNote = await reviewNote();
+  const biMasthead = (await page.locator('.shelf-masthead').innerText().catch(() => '')) || '';
   check(
-    'the bilingual masthead says 未確認 once, counting every human-review-pending story of the shelf',
-    pendingStories.length === 0 ? biNote.notes === 0
-      : biNote.notes === 1 && biNote.count === pendingStories.length && biNote.total === STORY_COUNT,
-    biNote.text || `no review note for ${pendingStories.length} pending stories`,
+    'the bilingual shelf says nothing of how its stories were made (no note, no Made by AI), pending stories or not',
+    pendingStories.length > 0 && biNote.notes === 0 && !/Made by AI|not yet checked|AI作成|unreviewed/iu.test(biMasthead),
+    biNote.text || `${pendingStories.length} pending stories, no note`,
   );
   await page.locator(storyCard(IDS[0])).scrollIntoViewIfNeeded();
   await page.screenshot({ path: join(shotsDir, 'shelf-bilingual-titles.png') });
@@ -1229,6 +1387,7 @@ writeFileSync(
       browser: browserVersion,
       completed: journeyCompleted,
       failureEvidence,
+      readerEnglishRung,
       touchAttempts,
       pass: journeyCompleted && failures.length === 0,
       completedAt: new Date().toISOString(),

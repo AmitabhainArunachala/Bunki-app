@@ -11,8 +11,28 @@ import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } 
 import { extname, isAbsolute, join, resolve } from 'node:path';
 import process from 'node:process';
 import { chromium, webkit } from 'playwright-core';
+import { contextBrowserVersion } from './browser-version-support.mjs';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
+
+/** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
+ * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
+import { setUpDeviceTutor } from './tutor-fixture-support.mjs';
 
 assert(isAbsolute(process.env.KAIRO_SITE_DIR || ''), 'Supply an immutable staged KAIRO_SITE_DIR');
 const SITE = resolveCorridorSite(), OUT = resolveCorridorEvidence();
@@ -107,6 +127,8 @@ async function openLists(page) {
   }
   await page.locator('#tray').click();
 }
+// A click or tap on a reader word walks the tap ladder and opens the word (the accepted product); a desktop learner
+// selects text with a mouse drag (lead's ruling 10-20). Press just before 町, drag across it, release just after it.
 async function selectWord(page) {
   const body = page.locator('#source-reader-body'); await page.evaluate(() => document.fonts.ready); await body.scrollIntoViewIfNeeded();
   const point = await body.evaluate((node) => {
@@ -115,14 +137,16 @@ async function selectWord(page) {
     while ((text = walker.nextNode())) {
       if (position < offset + text.length) {
         const range = document.createRange(); range.setStart(text, position - offset); range.setEnd(text, position - offset + 1);
-        const rect = range.getBoundingClientRect(), box = node.getBoundingClientRect();
-        return { x: rect.x - box.x + rect.width / 4, y: rect.y - box.y + rect.height / 2, start: position };
+        let rect = range.getBoundingClientRect();
+        if (rect.top < 0 || rect.bottom > innerHeight) { text.parentElement.scrollIntoView({ block: 'center' }); rect = range.getBoundingClientRect(); }
+        return { left: rect.left, right: rect.right, width: rect.width, y: rect.top + rect.height / 2, start: position };
       }
       offset += text.length;
     }
     throw new Error('Word not present');
   });
-  await body.dblclick({ position: { x: point.x, y: point.y } });
+  await page.mouse.move(point.left - point.width / 4, point.y); await page.mouse.down();
+  await page.mouse.move(point.right + point.width / 4, point.y, { steps: 8 }); await page.mouse.up();
   await page.waitForFunction(() => window.getSelection()?.toString() === '町');
   await page.waitForFunction(() => document.querySelector('#source-context-save')?.disabled === false);
   return point.start;
@@ -138,7 +162,7 @@ for (const engine of engines) for (const width of sizes) {
       serviceWorkers: 'allow', acceptDownloads: true, ignoreHTTPSErrors: true,
       ...(engine === 'chromium' ? { args: ['--ignore-certificate-errors'] } : {}), recordVideo: { dir: videos, size: { width, height: width === 390 ? 844 : 1050 } },
     });
-    result.browserVersion = context.browser()?.version();
+    result.browserVersion = await contextBrowserVersion(context, { chromium, webkit }[engine]);
     await context.route('**/*', (route) => {
       const url = new URL(route.request().url());
       if (url.origin === ORIGIN) return route.continue();
@@ -177,6 +201,8 @@ for (const engine of engines) for (const width of sizes) {
     await page.locator('.nav-search-row').first().click();
     await page.locator('#sheet-take').waitFor();
     await page.locator('#sheet-take').click();
+    // SAVE (2026-11-11): Save asks where the word goes first (a drawer under the bar); Review, the study queue, is picked
+    await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
     await waitForAppRecord(page, (record) => record.taken.length === 1);
     const learned = await readAppRecordSnapshot(page), item = learned.record.taken[0];
     assert(Number.isFinite(item.started));
@@ -203,9 +229,14 @@ for (const engine of engines) for (const width of sizes) {
       assert(controls.every((control) => control.height >= 44 && control.width >= 44));
       result.observations.push({ sourceControls: controls });
       await screenshot('learned-source');
-      await page.locator('#new-list').click();
-      await page.locator('.list-maker-field').fill('図書館で出会った言葉');
-      await page.locator('.list-maker-make').click();
+      // S · the page's lists live in its one Save's menu (a drawer under the bar), one tap each, a new list asking its name
+      // once — this pinned the foot's "saved to" drawer and its list maker (#new-list, .list-maker-field, .list-maker-make).
+      // SAVE (2026-11-11): on the saved word the menu is the chooser in move mode; New list… makes the list and moves the
+      // word onto it in one act
+      await page.locator('#sheet-take').click();
+      await page.locator('#vocabulary-list-popover.is-drawer #vocabulary-list-new').click();
+      await page.locator('#vocabulary-list-popover #vocabulary-list-name').fill('図書館で出会った言葉');
+      await page.locator('#vocabulary-list-popover #vocabulary-list-create').click();
       await waitForAppRecord(page, (record) => record.lists['図書館で出会った言葉']?.length === 1);
       const listed = await readAppRecordSnapshot(page);
       assert.equal(listed.record.lists['図書館で出会った言葉'][0].sourceContextRef, item.sourceContextRef);
@@ -280,8 +311,8 @@ for (const engine of engines) for (const width of sizes) {
       for (const key of ['taken', 'srs', 'revlog', 'sourceInbox', 'teacherContexts', 'lists'])
         assert.deepEqual(backup.record[key], reviewed.record[key]);
       const timeOrigin = await page.evaluate(() => performance.timeOrigin);
-      await page.locator('#import-file').setInputFiles(backupFile);
-      await page.waitForFunction((old) => performance.timeOrigin !== old && document.body.dataset.ready === '1', timeOrigin, { timeout: 30000 });
+      await answeringRestore(page, async () => { await page.locator('#import-file').setInputFiles(backupFile);
+        await page.waitForFunction((old) => performance.timeOrigin !== old && document.body.dataset.ready === '1', timeOrigin, { timeout: 30000 }); });
       await close(); await open(); await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page);
       await page.waitForFunction(() => !!navigator.serviceWorker.controller, null, { timeout: 30000 });
       if (engine === 'webkit') disconnected = true; else await context.setOffline(true);
@@ -296,6 +327,8 @@ for (const engine of engines) for (const width of sizes) {
       for (const key of ['taken', 'srs', 'revlog', 'sourceInbox', 'teacherContexts', 'lists'])
         assert.deepEqual(reused.record[key], reviewed.record[key]);
       await screenshot('later-offline-reuse');
+      // precondition now (Hfix-1B, item 11): a tutor set up, so the word's page offers Ask the tutor (drawn on Back)
+      await setUpDeviceTutor(page);
       await page.locator('#source-reader-back').click();
       await page.locator('#sheet .teacher-discuss').click();
       await page.locator('#chat-input').fill(QUESTION);
@@ -315,13 +348,20 @@ for (const engine of engines) for (const width of sizes) {
       await page.locator('#source-capture-save').click(); await page.locator('#source-reader-body').waitFor();
       await selectWord(page); await page.locator('#source-selection-lookup').click();
       await page.locator('.nav-search-row').first().click();
+      // S · on Saved ✓ the page's one Save opens its menu; its Review row was the way out (it pinned a second press on the
+      // seal). SAVE (2026-11-11): the menu is the chooser in move mode and its Remove is the way out; Remove takes the word
+      // out of Review and off every list (the lead's ruling of 2026-10-18), its encounter kept in the record
       await page.locator('#sheet-take').click();
+      await page.locator('#vocabulary-list-popover.is-drawer #save-chooser-remove').click();
       await waitForAppRecord(page, (record) => record.taken.length === 0);
       const stopped = await readAppRecordSnapshot(page);
-      assert.equal(stopped.record.lists['図書館で出会った言葉'][0].sourceContextRef, encounter.id);
+      assert.deepEqual(stopped.record.lists['図書館で出会った言葉'], [], 'Remove takes the word off its list too');
+      assert(stopped.record.teacherContexts.entries.some((entry) => entry.id === encounter.id), 'Remove keeps the old encounter');
       assert.deepEqual(stopped.record.srs, reviewed.record.srs);
       await armRecordWriteFailure(page, 'quota', { roots: ['taken', 'teacherContexts'] });
+      // the faulted enrollment is the pick of Review in the chooser
       await page.locator('#sheet-take').click();
+      await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
       await page.locator('#store-alert').waitFor({ state: 'visible' });
       const failed = await readAppRecordSnapshot(page);
       for (const key of ['taken', 'teacherContexts', 'srs', 'revlog', 'lists'])
@@ -336,22 +376,23 @@ for (const engine of engines) for (const width of sizes) {
       await selectWord(page); await page.locator('#source-selection-lookup').click();
       await page.locator('.nav-search-row').first().click();
       await page.locator('#sheet-take').click();
+      await page.locator('#vocabulary-list-popover.is-drawer #mini-review').click();
       await waitForAppRecord(page, (record) => record.taken.length === 1);
       const retried = await readAppRecordSnapshot(page), newRef = retried.record.taken[0].sourceContextRef;
       assert.notEqual(newRef, encounter.id);
       assert.equal(retried.record.teacherContexts.entries.find((entry) => entry.id === newRef).quote, nextText);
       assert(retried.record.teacherContexts.entries.some((entry) => entry.id === encounter.id));
-      assert.equal(retried.record.lists['図書館で出会った言葉'][0].sourceContextRef, encounter.id);
+      // SAVE (2026-11-11): Review re-enrolls the word on no list (Remove took it off the named list, which stays, empty)
+      assert.deepEqual(retried.record.lists['図書館で出会った言葉'], [], 'Review re-enrolls the word without putting it on a list');
       assert.deepEqual(retried.record.srs, reviewed.record.srs);
       assert.equal(retried.record.teacherDrafts.entries.find((draft) => draft.contextRef === encounter.id).text, QUESTION);
-      await page.locator(await entryCloseSelector(page)).click(); await openLists(page);
-      await page.getByRole('button', { name: 'open the 図書館で出会った言葉 list page', exact: true }).click();
-      await page.locator('.tray-line').click(); await page.locator('#sheet .learning-source summary').click();
+      // the re-enrolled word's page returns to its own new encounter (the old one stays in the record, above)
+      await page.locator('#sheet .learning-source summary').click();
       await page.locator('#learning-source-return').click(); await page.locator('#source-context-return').waitFor();
-      assert.equal(await page.locator('#source-reader-body').textContent(), TEXT, 'The original named list keeps its own encounter after re-enrollment elsewhere');
-      await screenshot('original-list-encounter-retained');
+      assert.equal(await page.locator('#source-reader-body').textContent(), nextText, 'The re-enrolled word returns to its new encounter');
+      await screenshot('re-enrolled-encounter');
       result.observations.push({ syntheticFault: 'Native enrollment transaction quota failure', enrollmentAndContextAtomic: true,
-        retryRetainsOldEncounterAndSchedule: true, oldRef: encounter.id, newRef });
+        retryRetainsOldEncounterAndSchedule: true, removeTakesWordOffLists: true, oldRef: encounter.id, newRef });
     }
     assert.deepEqual(result.errors, []); assert.deepEqual(result.externalRequests, []);
     result.passed = true;

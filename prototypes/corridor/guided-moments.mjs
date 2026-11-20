@@ -9,7 +9,7 @@
  * The sprite sheet and its provenance live in guided/ (SAMURAI-PROVENANCE.md).
  */
 
-export const MOMENT_MODES = ['quiet', 'playful', 'dramatic'];
+const MOMENT_MODES = ['quiet', 'playful', 'dramatic'];
 const PREFERENCE_KEY = 'kairo-moments-v1';
 const DEFAULTS = { on: true, mode: 'playful', sound: false };
 /* A sibling's address, or the one the single-file handoff supplies: there this module runs from
@@ -58,7 +58,7 @@ const esc = (value) =>
     (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
   );
 
-export function createMoments(options = {}) {
+function createMoments(options = {}) {
   const storage = options.storage || null;
   const english = options.english || (() => true);
   const openReport = typeof options.openReport === 'function' ? options.openReport : null;

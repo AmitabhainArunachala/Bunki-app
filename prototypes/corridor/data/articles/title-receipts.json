@@ -96,6 +96,36 @@
       "url": "https://globalvoices.org/2026/05/21/solidarity-fields-in-syria-reviving-local-seed-production/",
       "pageHeadline": "Solidarity fields in Syria: Reviving local seed production",
       "checkedOn": "2026-10-03"
+    },
+    "aozora:000772-1": {
+      "label": "established English title, adapted",
+      "url": "https://en.wikipedia.org/wiki/Natsume_S%C5%8Dseki",
+      "pageHeadline": "Natsume Sōseki",
+      "checkedOn": "2026-10-16"
+    },
+    "aozora:049966-1": {
+      "label": "established English title, adapted",
+      "url": "https://www.gutenberg.org/ebooks/52594",
+      "pageHeadline": "Three Years in Tibet by Ekai Kawaguchi",
+      "checkedOn": "2026-10-16"
+    },
+    "global-voices:2026-08-03-65560": {
+      "label": "publisher",
+      "url": "https://globalvoices.org/2025/11/03/women-guards-of-kaziranga-brave-all-challenges-to-protect-wildlife-in-india/",
+      "pageHeadline": "Women guards of Kaziranga brave all challenges to protect wildlife in India",
+      "checkedOn": "2026-10-17"
+    },
+    "global-voices:2026-07-28-65374": {
+      "label": "publisher",
+      "url": "https://globalvoices.org/2026/04/08/lost-in-translation-how-ai-models-impact-low-resource-language-communities/",
+      "pageHeadline": "Lost in translation: How AI models impact low-resource language communities",
+      "checkedOn": "2026-10-17"
+    },
+    "aozora:049966-2": {
+      "label": "established English title, adapted",
+      "url": "https://www.gutenberg.org/ebooks/52594",
+      "pageHeadline": "Three Years in Tibet by Ekai Kawaguchi",
+      "checkedOn": "2026-10-17"
     }
   },
   "translations": {
@@ -1637,6 +1667,635 @@
         "provider": "ollama.com cloud",
         "verdict": "ok",
         "proposedEn": "Landlord"
+      }
+    ],
+    "bunki-read-n1-soai-nobel": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "A tiny imbalance that multiplies itself: Kenso Soai wins the Nobel Prize in Chemistry",
+        "verdict": "ok",
+        "proposedEn": "A tiny imbalance that multiplies itself: Kenso Soai wins the Nobel Prize in Chemistry"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "A tiny imbalance that multiplies itself: Kenso Soai wins the Nobel Prize in Chemistry",
+        "verdict": "ok",
+        "proposedEn": "A tiny imbalance that multiplies itself: Kenso Soai wins the Nobel Prize in Chemistry"
+      }
+    ],
+    "bunki-read-n2-kokugo-survey": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "Does \"himotoku\" mean reading books? Only 13.1% chose the original meaning",
+        "verdict": "ok",
+        "proposedEn": "Does \"himotoku\" mean reading books? Only 13.1% chose the original meaning"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "Does \"himotoku\" mean reading books? Only 13.1% chose the original meaning",
+        "verdict": "ok",
+        "proposedEn": "Does \"himotoku\" mean reading books? Only 13.1% chose the original meaning"
+      }
+    ],
+    "bunki-read-n2-bodhisena": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "The monk who opened the Great Buddha's eyes came from India",
+        "verdict": "ok",
+        "proposedEn": "The monk who opened the Great Buddha's eyes came from India"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "The monk who opened the Great Buddha's eyes came from India",
+        "verdict": "ok",
+        "proposedEn": "The monk who opened the Great Buddha's eyes came from India"
+      }
+    ],
+    "bunki-read-n3-gojuon-sanskrit": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "\"A-ka-sa-ta-na\" was a map of the mouth",
+        "verdict": "ok",
+        "proposedEn": "\"A-ka-sa-ta-na\" was a map of the mouth"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "\"A-ka-sa-ta-na\" was a map of the mouth",
+        "verdict": "ok",
+        "proposedEn": "\"A-ka-sa-ta-na\" was a map of the mouth"
+      }
+    ],
+    "bunki-read-n1-zazen-brainwaves": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "The twentieth sound, heard as if for the first time",
+        "verdict": "ok",
+        "proposedEn": "The twentieth sound, heard as if for the first time"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "The twentieth sound, heard as if for the first time",
+        "verdict": "ok",
+        "proposedEn": "The twentieth sound, heard as if for the first time"
+      }
+    ],
+    "bunki-read-n2-forgetting-curve": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "What did the forgetting curve really measure?",
+        "verdict": "ok",
+        "proposedEn": "What did the forgetting curve really measure?"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "What did the forgetting curve really measure?",
+        "verdict": "ok",
+        "proposedEn": "What did the forgetting curve really measure?"
+      }
+    ],
+    "bunki-read-n3-honda-quarter": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "\"Set aside a quarter of your pay first\": Seiroku Honda's way of saving",
+        "verdict": "ok",
+        "proposedEn": "\"Set aside a quarter of your pay first\": Seiroku Honda's way of saving"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "\"Set aside a quarter of your pay first\": Seiroku Honda's way of saving",
+        "verdict": "ok",
+        "proposedEn": "\"Set aside a quarter of your pay first\": Seiroku Honda's way of saving"
+      }
+    ],
+    "bunki-read-n2-shima-4004": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "The world's first general-purpose microprocessor was born from a Japanese calculator",
+        "verdict": "ok",
+        "proposedEn": "The world's first general-purpose microprocessor was born from a Japanese calculator"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "The world's first general-purpose microprocessor was born from a Japanese calculator",
+        "verdict": "ok",
+        "proposedEn": "The world's first general-purpose microprocessor was born from a Japanese calculator"
+      }
+    ],
+    "bunki-read-n1-strange-loop": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "A sentence that points at itself: Hofstadter's \"strange loop\"",
+        "verdict": "ok",
+        "proposedEn": "A sentence that points at itself: Hofstadter's \"strange loop\""
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "A sentence that points at itself: Hofstadter's \"strange loop\"",
+        "verdict": "ok",
+        "proposedEn": "A sentence that points at itself: Hofstadter's \"strange loop\""
+      }
+    ],
+    "bunki-read-n2-kobe-jain": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "Why there is a Jain temple in Kobe",
+        "verdict": "ok",
+        "proposedEn": "Why there is a Jain temple in Kobe"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "Why there is a Jain temple in Kobe",
+        "verdict": "ok",
+        "proposedEn": "Why there is a Jain temple in Kobe"
+      }
+    ],
+    "bunki-read-n1-optogenetics-nobel": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "From a light-seeking alga to a switch for the brain: the medicine Nobel goes to optogenetics",
+        "verdict": "ok",
+        "proposedEn": "From a light-seeking alga to a switch for the brain: the medicine Nobel goes to optogenetics"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "From a light-seeking alga to a switch for the brain: the medicine Nobel goes to optogenetics",
+        "verdict": "ok",
+        "proposedEn": "From a light-seeking alga to a switch for the brain: the medicine Nobel goes to optogenetics"
+      }
+    ],
+    "bunki-read-n2-shosoin-names": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "Western lands hidden in the treasures' names: the 78th Shōsōin Exhibition",
+        "verdict": "ok",
+        "proposedEn": "Western lands hidden in the treasures' names: the 78th Shōsōin Exhibition"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "Western lands hidden in the treasures' names: the 78th Shōsōin Exhibition",
+        "verdict": "ok",
+        "proposedEn": "Western lands hidden in the treasures' names: the 78th Shōsōin Exhibition"
+      }
+    ],
+    "bunki-read-n1-nobel-economics": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "Moving today's economy with a promise about tomorrow: the economics Nobel and the Bank of Japan in 1999",
+        "verdict": "ok",
+        "proposedEn": "Moving today's economy with a promise about tomorrow: the economics Nobel and the Bank of Japan in 1999"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "Moving today's economy with a promise about tomorrow: the economics Nobel and the Bank of Japan in 1999",
+        "verdict": "ok",
+        "proposedEn": "Moving today's economy with a promise about tomorrow: the economics Nobel and the Bank of Japan in 1999"
+      }
+    ],
+    "aozora:002359-1": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "Scientists and Brains (excerpt) — Terada Torahiko",
+        "verdict": "issue",
+        "proposedEn": "Scientists and Intelligence (excerpt) — Terada Torahiko",
+        "note": "'Scientists and Brains' is a reasonable translation, but I could not verify it as an established title; 'Scientists and Intelligence' is the published rendering used by [Nippon.com](https://www.nippon.com/en/currents/d00282/)."
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "Scientists and Brains (excerpt) — Terada Torahiko",
+        "verdict": "issue",
+        "proposedEn": "Scientists and the Head (excerpt) — Torahiko Terada",
+        "note": "あたま is the head, and the established English name order is Torahiko Terada."
+      }
+    ],
+    "bunki-read-n2-benzaiten": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "The goddess who washes money in Kamakura came from a river in India: Benzaiten's long journey",
+        "verdict": "ok",
+        "proposedEn": "The goddess who washes money in Kamakura came from a river in India: Benzaiten's long journey"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "The goddess who washes money in Kamakura came from a river in India: Benzaiten's long journey",
+        "verdict": "ok",
+        "proposedEn": "The goddess who washes money in Kamakura came from a river in India: Benzaiten's long journey"
+      }
+    ],
+    "aozora:000772-1": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "My Individualism (excerpt) — Natsume Sōseki",
+        "verdict": "ok",
+        "proposedEn": "My Individualism (excerpt) — Natsume Sōseki"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "My Individualism (excerpt) — Natsume Sōseki",
+        "verdict": "ok",
+        "proposedEn": "My Individualism (excerpt) — Natsume Sōseki"
+      }
+    ],
+    "bunki-read-n1-neocognitron": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "A neural network that took on 'shifts in position': Kunihiko Fukushima and the neocognitron",
+        "verdict": "ok",
+        "proposedEn": "A neural network that took on 'shifts in position': Kunihiko Fukushima and the neocognitron"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "A neural network that took on 'shifts in position': Kunihiko Fukushima and the neocognitron",
+        "verdict": "ok",
+        "proposedEn": "A neural network that took on 'shifts in position': Kunihiko Fukushima and the neocognitron"
+      }
+    ],
+    "bunki-read-n2-sleep-memory": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "Learn before bed, or in the morning? A hundred years of sleep and memory",
+        "verdict": "ok",
+        "proposedEn": "Learn before bed, or in the morning? A hundred years of sleep and memory"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "Learn before bed, or in the morning? A hundred years of sleep and memory",
+        "verdict": "ok",
+        "proposedEn": "Learn before bed, or in the morning? A hundred years of sleep and memory"
+      }
+    ],
+    "aozora:049966-1": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "Three Years in Tibet: The Decision to Enter Tibet (excerpt) — Kawaguchi Ekai",
+        "verdict": "ok",
+        "proposedEn": "Three Years in Tibet: The Decision to Enter Tibet (excerpt) — Kawaguchi Ekai"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "Three Years in Tibet: The Decision to Enter Tibet (excerpt) — Kawaguchi Ekai",
+        "verdict": "issue",
+        "proposedEn": "Three Years in Tibet: The Decision to Enter Tibet (excerpt) — Ekai Kawaguchi",
+        "note": "Three Years in Tibet is the established title; Gutenberg's byline is Ekai Kawaguchi."
+      }
+    ],
+    "bunki-read-n3-transistor-class": [
+      {
+        "model": "GPT-6",
+        "provider": "OpenAI",
+        "checkedEn": "Where 208 billion switches began: a lesson on the transistor",
+        "verdict": "ok",
+        "proposedEn": "Where 208 billion switches began: a lesson on the transistor"
+      },
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "checkedEn": "Where 208 billion switches began: a lesson on the transistor",
+        "verdict": "ok",
+        "proposedEn": "Where 208 billion switches began: a lesson on the transistor"
+      }
+    ],
+    "bunki-read-n2-icecube-nobel": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "Watching the universe through Antarctic ice: the physics Nobel goes to Francis Halzen",
+        "checkedEn": "Watching the universe through Antarctic ice: the physics Nobel goes to Francis Halzen",
+        "receipt": "review-grok/title-checks-batch-3.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "Watching the universe through Antarctic ice: the physics Nobel goes to Francis Halzen",
+        "checkedEn": "Watching the universe through Antarctic ice: the physics Nobel goes to Francis Halzen",
+        "receipt": "review-kimi/title-checks-batch-3.json"
+      }
+    ],
+    "bunki-read-n1-kukai-sanskrit": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "Passed on untranslated: the Sanskrit letters Kūkai brought back from Tang China",
+        "checkedEn": "Passed on untranslated: the Sanskrit letters Kūkai brought back from Tang China",
+        "receipt": "review-grok/title-checks-batch-3.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "Passed on untranslated: the Sanskrit letters Kūkai brought back from Tang China",
+        "checkedEn": "Passed on untranslated: the Sanskrit letters Kūkai brought back from Tang China",
+        "receipt": "review-kimi/title-checks-batch-3.json"
+      }
+    ],
+    "bunki-read-n3-rule-of-72": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "When does money double? Testing the rule of 72 on a stock index",
+        "checkedEn": "When does money double? Testing the rule of 72 on a stock index",
+        "receipt": "review-grok/title-checks-batch-3.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "When does money double? Testing the rule of 72 on a stock index",
+        "checkedEn": "When does money double? Testing the rule of 72 on a stock index",
+        "receipt": "review-kimi/title-checks-batch-3.json"
+      }
+    ],
+    "bunki-read-n2-pillay-peace-nobel": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "Peace needs justice: the Peace Prize goes to Navi Pillay",
+        "checkedEn": "Peace needs justice: the Peace Prize goes to Navi Pillay",
+        "receipt": "review-grok/title-checks-batch-3.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "Peace needs justice: the Peace Prize goes to Navi Pillay",
+        "checkedEn": "Peace needs justice: the Peace Prize goes to Navi Pillay",
+        "receipt": "review-kimi/title-checks-batch-3.json"
+      }
+    ],
+    "aozora:053224-1": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "issue",
+        "proposedEn": "Professor Terada as a Mentor (excerpt) — Ukichirō Nakaya",
+        "checkedEn": "Professor Terada as a Mentor (excerpt) — Nakaya Ukichirō",
+        "receipt": "review-grok/title-checks-batch-3.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "Professor Terada as a Mentor (excerpt) — Nakaya Ukichirō",
+        "checkedEn": "Professor Terada as a Mentor (excerpt) — Nakaya Ukichirō",
+        "receipt": "review-kimi/title-checks-batch-3.json"
+      }
+    ],
+    "bunki-read-n2-grit-checked": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "Did grit hold up? What later studies found",
+        "checkedEn": "Did grit hold up? What later studies found",
+        "receipt": "review-grok/title-checks-batch-3.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "Did grit hold up? What later studies found",
+        "checkedEn": "Did grit hold up? What later studies found",
+        "receipt": "review-kimi/title-checks-batch-3.json"
+      }
+    ],
+    "bunki-read-n2-imf-outlook": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "What is inside 0.7 percent: reading the IMF's World Economic Outlook",
+        "checkedEn": "What is inside 0.7 percent: reading the IMF's World Economic Outlook",
+        "receipt": "review-grok/title-checks-batch-3.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "What is inside 0.7 percent: reading the IMF's World Economic Outlook",
+        "checkedEn": "What is inside 0.7 percent: reading the IMF's World Economic Outlook",
+        "receipt": "review-kimi/title-checks-batch-3.json"
+      }
+    ],
+    "bunki-read-n1-suzuki-zen": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "The man who spoke of Zen in English: D. T. Suzuki and the forewords to his books",
+        "checkedEn": "The man who spoke of Zen in English: D. T. Suzuki and the forewords to his books",
+        "receipt": "review-grok/title-checks-batch-3.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "The man who spoke of Zen in English: D. T. Suzuki and the forewords to his books",
+        "checkedEn": "The man who spoke of Zen in English: D. T. Suzuki and the forewords to his books",
+        "receipt": "review-kimi/title-checks-batch-3.json"
+      }
+    ],
+    "mext:b_menu-hakusho-html-hpaa202601-1421221_00020-column2-3": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "The front line of Japan's national AI strategy",
+        "checkedEn": "The front line of Japan's national AI strategy",
+        "receipt": "review-grok/title-checks-batch-3.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "The front line of Japan's national AI strategy",
+        "checkedEn": "The front line of Japan's national AI strategy",
+        "receipt": "review-kimi/title-checks-batch-3.json"
+      }
+    ],
+    "bunki-read-n2-japan-us-chip-fab": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "Japanese money for a chip plant in New York: 'mature nodes' and '2 nanometres'",
+        "checkedEn": "Japanese money for a chip plant in New York: 'mature nodes' and '2 nanometres'",
+        "receipt": "review-grok/title-checks-batch-4.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "Japanese money for a chip plant in New York: 'mature nodes' and '2 nanometres'",
+        "checkedEn": "Japanese money for a chip plant in New York: 'mature nodes' and '2 nanometres'",
+        "receipt": "review-kimi/title-checks-batch-4.json"
+      }
+    ],
+    "bunki-read-n2-hofstadter-law": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "It always takes longer than you expect: Hofstadter's law and the planning fallacy",
+        "checkedEn": "It always takes longer than you expect: Hofstadter's law and the planning fallacy",
+        "receipt": "review-grok/title-checks-batch-4.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "It always takes longer than you expect: Hofstadter's law and the planning fallacy",
+        "checkedEn": "It always takes longer than you expect: Hofstadter's law and the planning fallacy",
+        "receipt": "review-kimi/title-checks-batch-4.json"
+      }
+    ],
+    "bunki-read-n2-shoten-ganesha": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "Radishes for an elephant god: Ganesha and Japan's Shōten",
+        "checkedEn": "Radishes for an elephant god: Ganesha and Japan's Shōten",
+        "receipt": "review-grok/title-checks-batch-4.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "Radishes for an elephant god: Ganesha and Japan's Shōten",
+        "checkedEn": "Radishes for an elephant god: Ganesha and Japan's Shōten",
+        "receipt": "review-kimi/title-checks-batch-4.json"
+      }
+    ],
+    "aozora:004668-1": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "Tsunamis and People (excerpt) — Terada Torahiko",
+        "checkedEn": "Tsunamis and People (excerpt) — Terada Torahiko",
+        "receipt": "review-grok/title-checks-batch-4.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "Tsunamis and People (excerpt) — Terada Torahiko",
+        "checkedEn": "Tsunamis and People (excerpt) — Terada Torahiko",
+        "receipt": "review-kimi/title-checks-batch-4.json"
+      }
+    ],
+    "bunki-read-n3-felt-prices": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "How much have prices risen? The felt number and the measured one",
+        "checkedEn": "How much have prices risen? The felt number and the measured one",
+        "receipt": "review-grok/title-checks-batch-4.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "How much have prices risen? The felt number and the measured one",
+        "checkedEn": "How much have prices risen? The felt number and the measured one",
+        "receipt": "review-kimi/title-checks-batch-4.json"
+      }
+    ],
+    "govonline:202403-entry-5920-column": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "Is it the mind, or new technology like AI, that leads us to believe false information?",
+        "checkedEn": "Is it the mind, or new technology like AI, that leads us to believe false information?",
+        "receipt": "review-grok/title-checks-batch-4.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "Is it the mind, or new technology like AI, that leads us to believe false information?",
+        "checkedEn": "Is it the mind, or new technology like AI, that leads us to believe false information?",
+        "receipt": "review-kimi/title-checks-batch-4.json"
+      }
+    ],
+    "bunki-read-n2-carson-nobel": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "The poet who made the monster the hero: the literature Nobel goes to Anne Carson",
+        "checkedEn": "The poet who made the monster the hero: the literature Nobel goes to Anne Carson",
+        "receipt": "review-grok/title-checks-batch-4.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "The poet who made the monster the hero: the literature Nobel goes to Anne Carson",
+        "checkedEn": "The poet who made the monster the hero: the literature Nobel goes to Anne Carson",
+        "receipt": "review-kimi/title-checks-batch-4.json"
+      }
+    ],
+    "aozora:058059-1": [
+      {
+        "model": "Grok 4.7",
+        "provider": "xAI",
+        "verdict": "ok",
+        "proposedEn": "On Education in the Zen Monastery (excerpt) — Suzuki Daisetsu",
+        "checkedEn": "On Education in the Zen Monastery (excerpt) — Suzuki Daisetsu",
+        "receipt": "review-grok/title-checks-batch-4.json"
+      },
+      {
+        "model": "Kimi (Moonshot AI)",
+        "provider": "Moonshot AI, via Kimi Code CLI",
+        "verdict": "ok",
+        "proposedEn": "On Education in the Zen Monastery (excerpt) — Suzuki Daisetsu",
+        "checkedEn": "On Education in the Zen Monastery (excerpt) — Suzuki Daisetsu",
+        "receipt": "review-kimi/title-checks-batch-4.json"
       }
     ]
   },

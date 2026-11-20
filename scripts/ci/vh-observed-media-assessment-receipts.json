@@ -1,0 +1,505 @@
+{
+  "provenance": {
+    "guided-offline": {
+      "receipt": "/Users/dhyana/.dharma/bunki_review/2026-10-11/r6-gates/battery-3/guided-offline/guided-offline-9s1B6D/guided-offline.json",
+      "sha256": "db1d4f8fd8211e51ee8b31308213cd8c7b96f142c4c2dacb6563e77331628edd"
+    },
+    "assessment-question-source": {
+      "receipt": "/Users/dhyana/.dharma/bunki_review/2026-10-11/r6-gates/battery-3/assessment-question-source/check-Uoopbo/receipt.json",
+      "sha256": "52a91090790cf84db25aa4646742f594ad299ac4167da2796019e01e7399d729"
+    },
+    "assessment-question-practice": {
+      "receipt": "/Users/dhyana/.dharma/bunki_review/2026-10-11/r6-gates/battery-3/assessment-question-practice/check-R8taeA/receipt.json",
+      "sha256": "830083a7396ed3cf6d623e206a9ac0e5f0779113e8daed4fffe196d6ceb48910"
+    },
+    "personal-reading": {
+      "receipt": "/Users/dhyana/.dharma/bunki_review/2026-10-11/r6-gates/battery-3/personal-reading/receipt.json",
+      "sha256": "d44b5f1b250da3a18e0d5837bcf9313b9b2d6d7fac9cbd88550f7146d340f270"
+    },
+    "assessment-v2-controller": {
+      "receipt": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/H/codex-H1/VH1/axi-review-fix-round/lane-B2/producer-runs/assessment-v2-controller/runtime-9urlhL/result.json",
+      "sha256": "942701124e49a1fb07e40552369e5207f5fd491f6befd112c9116342d91c7c30"
+    },
+    "assessment-controller": {
+      "receipt": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/H/codex-H1/VH1/axi-review-fix-round/lane-B2/producer-runs/assessment-controller-artifact/receipt.json",
+      "sha256": "f8c8828b910566f9082d1acef5da8ee5aa5874a5c01984b78e5ca6b3c4046b9d"
+    }
+  },
+  "guided-offline": {
+    "layout": {
+      "run": "guided-offline-9s1B6D",
+      "receipt": "guided-offline.json",
+      "standalone": "corridor-standalone.html"
+    },
+    "report": {
+      "installedGuided": [
+        "guided-moments.css",
+        "guided-moments.mjs",
+        "guided-session-content.mjs",
+        "guided-session-engine.mjs",
+        "guided-session.css",
+        "guided-session.mjs",
+        "guided/samurai-sprites-v2.png",
+        "guided/sets/index.json",
+        "guided/sets/n2-living-thread-01.json"
+      ],
+      "offlineRequests": [],
+      "summary": {
+        "total": 14,
+        "failed": 0
+      },
+      "results": [
+        {
+          "name": "one online visit installs the app's own worker, and it controls the page",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "the app starts offline from its worker",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "control: an uncached request really fails offline",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "offline, the guided room opens the first time its door is pressed",
+          "pass": true,
+          "detail": "room · guided session your field learn sensei about 回廊 KAIRO / guided practice Spend fifteen minutes with Japanese. Try six questions, open the ideas behind them, and"
+        },
+        {
+          "name": "offline, its stylesheet loads",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "offline, its question set loads: the first question opens",
+          "pass": true,
+          "detail": "stage=question"
+        },
+        {
+          "name": "offline, its moments play: module, style and the sprite sheet the samurai is painted from",
+          "pass": true,
+          "detail": "samurai=true · sprite 1226px wide"
+        },
+        {
+          "name": "no guided asset was asked of the network while offline",
+          "pass": true,
+          "detail": "0 other request(s) refused: none"
+        },
+        {
+          "name": "the single-file handoff boots from file:// offline",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "in the single-file handoff, the guided room opens the first time its door is pressed",
+          "pass": true,
+          "detail": "room · guided session your field learn sensei about 回廊 KAIRO / guided practice Spend fifteen minutes with Japanese. Try six questions, open the ideas behind them, and"
+        },
+        {
+          "name": "in the single-file handoff, its stylesheet loads",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "in the single-file handoff, its question set loads: the first question opens",
+          "pass": true,
+          "detail": "stage=question"
+        },
+        {
+          "name": "in the single-file handoff, its moments play: module, style and the sprite sheet the samurai is painted from",
+          "pass": true,
+          "detail": "samurai=true · sprite 1226px wide"
+        },
+        {
+          "name": "no page errors",
+          "pass": true,
+          "detail": "clean"
+        }
+      ]
+    }
+  },
+  "assessment-question-source": {
+    "layout": {
+      "run": "check-Uoopbo",
+      "receipt": "receipt.json"
+    },
+    "report": {
+      "format": "kairo-assessment-question-source-verification",
+      "v": 1,
+      "results": [
+        {
+          "name": "real local terminal evidence without wire kind resolves an enrolled reviewed question",
+          "pass": true
+        },
+        {
+          "name": "local missing or ambiguous result views never bypass source visibility",
+          "pass": true
+        },
+        {
+          "name": "local current result must still name the exact submitted form and terminal revision",
+          "pass": true
+        },
+        {
+          "name": "local enrollment, suspension, eligible outcome and current form trust are required",
+          "pass": true
+        },
+        {
+          "name": "received exact bound applied evidence resolves with body-free wire item refs",
+          "pass": true
+        },
+        {
+          "name": "received stale projection, hidden source, conflict or unbound followup cannot issue a grade",
+          "pass": true
+        },
+        {
+          "name": "received changed heads and source refs remain blocked even with a current projection digest",
+          "pass": true
+        },
+        {
+          "name": "received wrong or flagged evidence is eligible; skips and unflagged correct are not",
+          "pass": true
+        },
+        {
+          "name": "local mark and received wire flag drive the fixed truth table; truthy stand-ins do not",
+          "pass": true
+        },
+        {
+          "name": "remote undo preserves a reviewed retained-history card and explicit removal remains absent",
+          "pass": true
+        }
+      ],
+      "passed": 10,
+      "failed": 0,
+      "limitations": [
+        "Real v2 engine, learning planner and wire serializers with synthetic view projections. Does not replace atomic receive/browser integration tests."
+      ],
+      "sourceNames": [
+        "assessment-question-source.mjs",
+        "assessment-question-practice.mjs",
+        "assessment-v2-controller.mjs",
+        "assessment-learning.mjs",
+        "assessment-cloze.mjs",
+        "sentence-practice.mjs",
+        "teacher-context.mjs",
+        "teacher-drafts.mjs",
+        "sentence-drafts.mjs"
+      ]
+    }
+  },
+  "assessment-question-practice": {
+    "layout": {
+      "run": "check-R8taeA",
+      "receipt": "receipt.json"
+    },
+    "report": {
+      "format": "kairo-assessment-question-practice-verification",
+      "v": 1,
+      "results": [
+        {
+          "name": "reviewed exact source produces a question card without lexical inference or grades",
+          "pass": true
+        },
+        {
+          "name": "unreviewed, denied-rights, and manually marked source cannot create cards",
+          "pass": true
+        },
+        {
+          "name": "front excludes answer key and rationale; repeated exposure is explicit",
+          "pass": true
+        },
+        {
+          "name": "repeat sittings deduplicate identity and preserve first capture",
+          "pass": true
+        },
+        {
+          "name": "question IDs distinguish same answer labels across distinct items",
+          "pass": true
+        },
+        {
+          "name": "content, refs, key and presentation tampering fail before use",
+          "pass": true
+        },
+        {
+          "name": "only later constrained response can create a grade; wrong and reveal force Again",
+          "pass": true
+        },
+        {
+          "name": "exact response/grade retries are idempotent and changed retries are refused",
+          "pass": true
+        },
+        {
+          "name": "I do not know reveals without fabricating a response and can only grade Again",
+          "pass": true
+        },
+        {
+          "name": "historical bytes survive source deletion while new response and grade stop",
+          "pass": true
+        },
+        {
+          "name": "record validation links each grade to one real scheduler row and preserves undo",
+          "pass": true
+        },
+        {
+          "name": "ordered and exact written responses keep their actual response contracts",
+          "pass": true
+        },
+        {
+          "name": "audio needs native full review and exact reviewed presentation, never transcript fallback",
+          "pass": true
+        },
+        {
+          "name": "actual media byte digest is required; supplied hash JSON is not a capability",
+          "pass": true
+        },
+        {
+          "name": "forged successful grades and unknown root fields fail historical validation",
+          "pass": true
+        }
+      ],
+      "passed": 15,
+      "failed": 0,
+      "limitations": [
+        "Synthetic content; this pure contract check does not establish actual audio decoding, audibility, review authority, or browser scheduling."
+      ]
+    }
+  },
+  "personal-reading": {
+    "layout": {
+      "receipt": "receipt.json"
+    },
+    "report": {
+      "browser": {
+        "name": "chromium",
+        "version": "153.0.8010.12",
+        "driverModule": "playwright-core"
+      },
+      "corridorSha256": "fa06ed7daa995251ffaf55b393dbb6fb2aa544f15b4aaffcd61db1810b084a32",
+      "counterfactualSource": null,
+      "controllerSha256": "1dc87b5b47cb6f1816bfbabec78d7b89fdbd0881334eccda3a6d1f9c717e4500",
+      "results": [
+        {
+          "name": "preferences-and-separate-kagami-bands-reach-provider-without-private-record",
+          "pass": true
+        },
+        {
+          "name": "full-version-brief-and-reported-model-preserved-with-pending-editorial-state",
+          "pass": true
+        },
+        {
+          "name": "article-and-editable-preferences-survive-real-reload",
+          "pass": true
+        },
+        {
+          "name": "rejected-truncated-response-preserves-accepted-article-and-learning",
+          "pass": true
+        },
+        {
+          "name": "rejected-authority-response-preserves-accepted-article-and-learning",
+          "pass": true
+        },
+        {
+          "name": "rejected-malformed-response-preserves-accepted-article-and-learning",
+          "pass": true
+        },
+        {
+          "name": "rejected-oversized-response-preserves-accepted-article-and-learning",
+          "pass": true
+        },
+        {
+          "name": "cancelled-reply-cannot-replace-new-job-or-create-review-debt",
+          "pass": true
+        },
+        {
+          "name": "phone-reader-and-preferences-fit-viewport",
+          "pass": true
+        },
+        {
+          "name": "saved-reading-remains-accessible-without-provider-credentials",
+          "pass": true
+        },
+        {
+          "name": "dictionary-walk-returns-to-the-same-place-in-personal-reading",
+          "pass": true
+        },
+        {
+          "name": "tampered-projection-is-quarantined-with-original-bytes-preserved",
+          "pass": true
+        }
+      ],
+      "failures": 0,
+      "pageErrors": [],
+      "providerCalls": 7,
+      "externalRequestsSent": 0
+    }
+  },
+  "assessment-v2-controller": {
+    "layout": {
+      "run": "runtime-9urlhL",
+      "receipt": "result.json"
+    },
+    "report": {
+      "format": "kairo-assessment-v2-controller-verification",
+      "v": 1,
+      "passed": 9,
+      "failed": 0,
+      "checks": [
+        {
+          "name": "same library retains exact form, all questions and safe current question",
+          "passes": true
+        },
+        {
+          "name": "dictionary help is durable before an answer, never reveals a key or locks the response",
+          "passes": true
+        },
+        {
+          "name": "dictionary lookups stay tied to their questions beside explanations and unanswered items",
+          "passes": true
+        },
+        {
+          "name": "deadline checkpoint persists with blanks and explicit next-block activation",
+          "passes": true
+        },
+        {
+          "name": "ownership mismatch, stale revision and parallel active attempt are rejected",
+          "passes": true
+        },
+        {
+          "name": "stopping produces no inferred weaknesses and retains earlier attempts",
+          "passes": true
+        },
+        {
+          "name": "malformed, tampered, unsupported and accessor inputs fail without executing accessors",
+          "passes": true
+        },
+        {
+          "name": "511 finished attempts stay reused while the active attempt is written",
+          "passes": true
+        },
+        {
+          "name": "600 finished attempts stay reused while the active attempt is written",
+          "passes": true
+        }
+      ],
+      "compiler": {
+        "name": "esbuild",
+        "version": "0.28.2"
+      },
+      "limits": ["synthetic fixtures", "no browser walk", "no external review or content approval"]
+    }
+  },
+  "assessment-controller": {
+    "layout": {
+      "receipt": "receipt.json"
+    },
+    "artifactSha256": "339f7b39d99f72dbc079359780b6e516efb7cbf3aaef15dee528b0184748a29d",
+    "report": {
+      "format": "kairo-assessment-controller-verification",
+      "v": 1,
+      "currentInputDifferences": [],
+      "core": {
+        "path": "modules/assessment-core.mjs",
+        "bytes": 628253,
+        "compiler": {
+          "name": "esbuild",
+          "version": "0.28.2"
+        }
+      },
+      "fixture": {
+        "path": "prototypes/corridor/data/mock/sets/n5-01.json",
+        "items": 18,
+        "approved": false
+      },
+      "results": [
+        {
+          "name": "strict-library-rehydration-owns-data-and-keeps-local-scope",
+          "pass": true
+        },
+        {
+          "name": "source-form-is-pinned-on-start-and-legacy-display-stays-short-unreviewed",
+          "pass": true
+        },
+        {
+          "name": "two-completed-attempts-on-one-form-retain-earlier-answers-after-done-and-reload",
+          "pass": true
+        },
+        {
+          "name": "answer-changes-retain-every-response-and-genuine-prompt-exposure",
+          "pass": true
+        },
+        {
+          "name": "pure-proposals-deterministic-replay-and-stale-cas-do-not-mutate-the-caller",
+          "pass": true
+        },
+        {
+          "name": "start-replay-is-idempotent-without-reopening-a-finished-attempt",
+          "pass": true
+        },
+        {
+          "name": "new-source-revision-does-not-rebind-earlier-attempts",
+          "pass": true
+        },
+        {
+          "name": "cross-profile-and-inactive-attempt-commands-fail-without-changing-history",
+          "pass": true
+        },
+        {
+          "name": "reload-interruption-keeps-answers-cursor-and-known-time-without-inventing-downtime",
+          "pass": true
+        },
+        {
+          "name": "monotonic-time-deltas-charge-the-current-block-and-wall-clock-rollback-is-only-observed",
+          "pass": true
+        },
+        {
+          "name": "partial-abandonment-is-preserved-and-neither-partial-submit-nor-unfinished-dismiss-is-accepted",
+          "pass": true
+        },
+        {
+          "name": "assistance-and-interruptions-stay-in-the-sitting-and-never-admit-measured-evidence",
+          "pass": true
+        },
+        {
+          "name": "historical-bundles-retain-every-original-field-and-never-bind-old-position-indices",
+          "pass": true
+        },
+        {
+          "name": "tampered-content-history-scope-pointers-and-duplicate-identities-fail-closed",
+          "pass": true
+        },
+        {
+          "name": "malformed-command-and-accessor-inputs-reject-without-executing-getters",
+          "pass": true
+        },
+        {
+          "name": "500-full-short-practice-attempts-retain-all-answers-and-one-form-on-rehydration",
+          "pass": true
+        },
+        {
+          "name": "capacity-and-untrusted-shallow-freeze-cannot-bypass-validation",
+          "pass": true
+        }
+      ],
+      "passed": 17,
+      "failed": 0,
+      "stress": {
+        "attempts": 500,
+        "itemsPerAttempt": 18,
+        "totalRetainedResponses": 9000,
+        "forms": 1,
+        "serializedBytes": 10878260,
+        "parseMs": 12367.907832999997,
+        "fixtureAndCheckMs": 41590.786708
+      },
+      "limitations": [
+        "Pure compiled module checks; not browser/native UI testing",
+        "Synthetic identities and times; no real learner record used",
+        "No storage mutations, profile migration, cloud sync or editorial authority",
+        "No completed or reviewed full exam forms created"
+      ]
+    }
+  }
+}

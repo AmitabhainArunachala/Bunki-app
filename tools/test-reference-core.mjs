@@ -76,9 +76,11 @@ const require = createRequire(import.meta.url);
 const core = require(CORE_PATH);
 
 let testCount = 0;
+const completedTests = [];
 function test(name, fn) {
   fn();
   testCount++;
+  completedTests.push({ name, passed: true });
   console.log(`PASS ${name}`);
 }
 function deepFreeze(value) {
@@ -733,9 +735,28 @@ const evidence = {
       .filter((e) => e.type === 'kanji' && input.kanji[e.id])
       .flatMap((e) =>
         Object.entries(e.metadataSources)
-          .filter(([, p]) => p.source !== 'kanji' && p.source !== 'kmeta')
+          // K02 full reference fields sit beside legacy metadata; they do not fill an empty lesson field.
+          .filter(
+            ([field, p]) =>
+              !['completeMeanings', 'radicalSchemes'].includes(field) &&
+              p.source !== 'kanji' &&
+              p.source !== 'kmeta',
+          )
           .map(([field, provider]) => ({ id: e.id, field, ...provider })),
       ),
+    completeReferenceFacts: {
+      sourceLiterals: committed.kanjiFacts.length,
+      sourceNelsonFields: committed.kanjiFacts.filter((row) => row[3] !== null).length,
+      catalogEntries: referenceEntries.filter(
+        (entry) => entry.type === 'kanji' && entry.completeMeanings?.length,
+      ).length,
+      canonicalEntries: Object.keys(input.kanji).filter((id) =>
+        core.kanjiReferenceFacts(committed, id),
+      ).length,
+      canonicalAbsentFromSource: Object.keys(input.kanji)
+        .filter((id) => !core.kanjiReferenceFacts(committed, id))
+        .sort(),
+    },
     policy:
       'Glyphless records and absent metadata are not broken canonical links. Missing on or kun alone is not proof of a metadata gap; a character need not have both.',
   },
@@ -908,3 +929,24 @@ console.log(
   ),
 );
 console.log(`Coverage evidence: ${COVERAGE_PATH}`);
+
+if (EVIDENCE_OUT)
+  writeFileSync(
+    resolve(EVIDENCE_OUT, 'verification-report.json'),
+    JSON.stringify(
+      {
+        kind: 'bunki-reference-core',
+        runId: process.env.KAIRO_GATE_RUN_ID,
+        fullAcceptance: true,
+        checks: completedTests,
+        coverageParity: true,
+        relationshipParity: true,
+        completedAt: new Date().toISOString(),
+        verifierSha256: createHash('sha256')
+          .update(readFileSync(new globalThis.URL(import.meta.url)))
+          .digest('hex'),
+      },
+      null,
+      2,
+    ) + '\n',
+  );

@@ -19,11 +19,85 @@ Pure standard library, so it runs without the tokenizer:
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 GLOSS_CAP = 32
 MAX_SENSES = 3
 MAX_GLOSSES = 3
+# E2's reviewed word/reading pairs. Short or empty source glosses can be wrong
+# too; these do not broaden the generic dictionary-completion rule.
+REVIEWED_GLOSSES = {
+    ("拍子", "ひょうし"): "time; meter; rhythm",
+    ("初耳", "はつみみ"): "something heard for the first time",
+    ("金", "かね"): "money; metal",
+    ("正確", "せいかく"): "accurate, correct, precise",
+    ("～等", "～とう"): "class, rank",
+    ("伯父さん", "おじさん"): "uncle",
+    ("納める", "おさめる"): "to pay (fees, taxes), to supply",
+    ("人目", "ひとめ"): "public gaze, notice",
+    ("繊維", "せんい"): "fiber",
+    ("着色", "ちゃくしょく"): "coloring",
+}
+
+REVIEWED_SKY_GLOSSES = {
+    ("撮る", "とる"): "to take (a photograph)",
+    ("正確", "せいかく"): "accurate, correct, precise",
+    ("～等", "～とう"): "class, rank",
+    ("伯父さん", "おじさん"): "uncle",
+    ("納める", "おさめる"): "to pay (fees, taxes), to supply",
+    ("空く", "あく"): "to open, to become empty",
+    ("人目", "ひとめ"): "public gaze, notice",
+    ("現在", "げんざい"): "the present, now",
+    ("者", "もの"): "person",
+    ("多少", "たしょう"): "a little, some",
+    ("昼食", "ちゅうしょく"): "lunch",
+    ("親類", "しんるい"): "relative, relation",
+    ("関西", "かんさい"): "Kansai region",
+    ("関東", "かんとう"): "Kantō region",
+    ("繊維", "せんい"): "fiber",
+    ("着色", "ちゃくしょく"): "coloring",
+    ("凍結", "とうけつ"): "freezing",
+    ("重み", "おもみ"): "weight",
+}
+
+
+def short(gloss: str) -> str:
+    text = str(gloss or "")
+    unparenthesized = []
+    depth = 0
+    for char in text:
+        if char == "(":
+            if depth == 0:
+                while unparenthesized and unparenthesized[-1].isspace():
+                    unparenthesized.pop()
+            depth += 1
+        elif char == ")":
+            depth = max(0, depth - 1)
+        elif depth == 0:
+            unparenthesized.append(char)
+    parts = [part.strip() for part in re.split(r"[;,]", "".join(unparenthesized)) if part.strip()]
+    parts = list(dict.fromkeys(parts))
+    out = parts[0] if parts else ""
+    if len(parts) > 1 and len(out) + len(parts[1]) < 26:
+        out += ", " + parts[1]
+    return out[:44]
+
+
+def sky_gloss(word: str, reading: str, gloss: str) -> str:
+    reviewed = REVIEWED_SKY_GLOSSES.get((word, reading))
+    return reviewed if reviewed is not None else short(gloss)
+
+
+def apply_reviewed_glosses(words: dict[str, dict]) -> int:
+    """Final bounded pass after shelf/semantic words and their readings exist."""
+    changed = 0
+    for word, rec in words.items():
+        replacement = REVIEWED_GLOSSES.get((word, rec.get("r", "")))
+        if replacement is not None and rec.get("g", "") != replacement:
+            rec["g"] = replacement
+            changed += 1
+    return changed
 
 
 def dict_glosses(share_alike: Path) -> dict[str, tuple[str, str]]:
@@ -83,6 +157,9 @@ def sense_glosses(sense) -> list[str]:
 
 def complete(word: str, reading: str, gloss: str, full: dict[str, tuple[str, str]],
              v2: dict[str, list[tuple[set[str], str, frozenset[str]]]]) -> str:
+    reviewed = REVIEWED_GLOSSES.get((word, reading))
+    if reviewed is not None:
+        return reviewed
     if len(gloss) < GLOSS_CAP:
         return gloss
     matched = [(text, foreign) for readings, text, foreign in v2.get(word, []) if reading in readings]

@@ -1,10 +1,14 @@
-export function createEngine(data, api) {
+import * as srsCore from '../../srs-core.mjs';
+
+/** pin: data/fsrs-pin.json. The scheduler is built by the app's one schedule owner (srs-core.mjs) from it. PIN below is
+ * this ledger format's name for that parameter set (the pin's own numbers since the first event), kept so every stored
+ * ledger and backup stays readable. Every past grade is replayed through this scheduler, so the learner's own policy
+ * (another preset) does not reach this deck without a ruling: it would re-date grades already given. */
+export function createEngine(data, api, pin) {
   const PIN = 'john-fsrs6-r090-ts541-v1';
-  const scheduler = api.fsrs(api.generatorParameters({
-    w: [0.212,1.2931,2.3065,8.2956,6.4133,0.8334,3.0194,0.001,1.8722,0.1666,0.796,1.4835,0.0614,0.2629,1.6483,0.6014,1.8729,0.5425,0.0912,0.0658,0.1542],
-    request_retention: 0.9, maximum_interval: 36500, enable_fuzz: false,
-    enable_short_term: true, learning_steps: ['1m','10m'], relearning_steps: ['10m']
-  }));
+  if (!pin || !Array.isArray(pin.w)) throw new Error('The scheduler pin is missing.');
+  const scheduler = srsCore.createScheduler(api, pin);
+  const isStep = state => !!state && (state.state === 1 || state.state === 3);
   const kinds = ['meaning','reading','grammar','apply'];
   const lessonMap = new Map(data.lessons.map(l => [l.id,l]));
   const cards = data.lessons.flatMap(l => kinds.map((kind,k) => ({
@@ -93,7 +97,8 @@ export function createEngine(data, api) {
     const paused = c => pauses.get(c.id)===true || ((failureCount.get(c.id)||0)>=6 && (lastFailure.get(c.id)||0)>(resumes.get(c.id)||0));
     return {states,first,familyLast,paused,grades,failureCount,undone};
   }
-  function queue(ledger,now=Date.now()) {
+  /** ahead: the learner chose, with nothing else left, to review learning steps due within the learn-ahead limit */
+  function queue(ledger,now=Date.now(),{ahead=false}={}) {
     const d=derive(ledger), today=day(now,ledger.timezone);
     const startedToday=[...d.first.values()].filter(at=>day(Date.parse(at),ledger.timezone)===today).length;
     const due=[],newCards=[],waiting=[];
@@ -111,8 +116,15 @@ export function createEngine(data, api) {
     due.sort((a,b)=>d.states.get(a.id).due-d.states.get(b.id).due||a.order-b.order);
     const allowed=Math.max(0,ledger.settings.newLimit-startedToday);
     const selectedNew=newCards.slice(0,allowed);
+    // the next card by srs-core's rule (Anki's order): a learning step that is due, then due reviews and new cards, then,
+    // only by the learner's choice with nothing else left, a step due within the learn-ahead limit; else a pause
+    const learning=[...due.filter(c=>isStep(d.states.get(c.id))).map(c=>({id:c.id,due:d.states.get(c.id).due.getTime()})),
+      ...waiting.filter(x=>isStep(d.states.get(x.card.id))).map(x=>({id:x.card.id,due:x.at}))];
+    const step=srsCore.nextStep({now:new Date(now),queue:[...due.filter(c=>!isStep(d.states.get(c.id))).map(c=>c.id),...selectedNew.map(c=>c.id)],learning,ahead});
     return {...d,due,newCards:selectedNew,availableNew:newCards.length,startedToday,buried,pausedCount:paused,
-      next:due[0]||selectedNew[0]||null,nextAt:waiting.length?Math.min(...waiting.map(x=>x.at)):null};
+      next:step.show?cardMap.get(step.show):null,early:!!step.early,
+      pause:step.pause?{...step,words:new Set(learning.map(l=>cardMap.get(l.id).family)).size}:null,
+      nextAt:waiting.length?Math.min(...waiting.map(x=>x.at)):null};
   }
   function append(ledger,payload,id,now=Date.now()) {
     const out=copy(ledger), previous=out.events.length?Date.parse(out.events.at(-1).at):-Infinity;
@@ -121,9 +133,9 @@ export function createEngine(data, api) {
     out.events.push({...payload,id,seq:out.events.length+1,at,observedAt:iso(now)});
     return validate(out,now);
   }
-  function grade(ledger,cardId,rating,id,durationMs=0,now=Date.now()) {
-    const q=queue(ledger,now);
-    require(q.due.some(c=>c.id===cardId)||q.newCards.some(c=>c.id===cardId),'This card is no longer eligible or is not due. Refresh the review.');
+  function grade(ledger,cardId,rating,id,durationMs=0,now=Date.now(),ahead=false) {
+    const q=queue(ledger,now,{ahead});
+    require(q.due.some(c=>c.id===cardId)||q.newCards.some(c=>c.id===cardId)||(q.early&&q.next?.id===cardId),'This card is no longer eligible or is not due. Refresh the review.');
     require(Number.isInteger(rating)&&rating>=1&&rating<=4,'Choose a valid rating.');
     return append(ledger,{type:'grade',card:cardId,rating,durationMs:Math.min(86400000,Math.max(0,durationMs))},id,now);
   }

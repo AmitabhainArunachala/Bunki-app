@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
-import { cpSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, extname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium, webkit } from 'playwright-core';
@@ -49,12 +49,13 @@ const CASES = [
 ];
 assert(!FILTER || CASES.includes(FILTER), `Unknown case: ${FILTER}`);
 
-// Preserve the exact immutable artifact, verifier and available build inputs.
+// Share the exact immutable artifact; preserve verifier and available build inputs.
 // Current source hashes are recorded separately from the pinned artifact's
 // module-input hashes, so concurrent edits cannot masquerade as tested bytes.
-const retainedSite = resolve(OUT, 'tested-site');
-cpSync(SITE, retainedSite, { recursive: true, errorOnExist: true, force: false });
-for (const file of manifest.files) assert.equal(sha(readFileSync(resolve(retainedSite, file.path))), file.sha256, `Retained artifact copy differs: ${file.path}`);
+// resolveCorridorSite verifies the preserved shared artifact before use.
+// The gate only reads it; synthetic mutations are served from memory.
+const retainedSite = SITE;
+for (const file of manifest.files) assert.equal(sha(readFileSync(resolve(retainedSite, file.path))), file.sha256, `Shared artifact differs: ${file.path}`);
 const sourcePaths = new Set(['prototypes/corridor/tools/verify-record-reading-position.mjs',
   'prototypes/corridor/tools/record-test-support.mjs', 'prototypes/corridor/record-controller.mjs',
   'prototypes/corridor/record-host.mjs', 'prototypes/corridor/record-app.mjs',
@@ -631,8 +632,10 @@ try {
         await page.locator('#reader .tok').first().waitFor();
         await page.waitForFunction((index) => document.activeElement?.matches(`#reader .tok[data-index="${index}"]`), tokenIndex);
         assert.equal(await page.locator('#reader-place-save').isDisabled(), true, 'Returning cannot silently select a new learner capture target');
-        assert.equal(await page.locator('#reader-take').isDisabled(), true, 'Returning cannot select a word to memorize');
-        assert.equal(await page.locator('#reader-take').getAttribute('aria-pressed'), 'false');
+        // one Save (the one-hand pass): the bar has no Save; a selected word would wear its mark and open its slip
+        assert.equal(await page.locator('#reader .tok-current').count(), 0, 'Returning cannot select a word to memorize');
+        assert.equal(await page.locator('#mini').count(), 0, 'Returning opens no slip');
+        assert.equal(await page.locator('#app > .chrome #reader-take').count(), 0, 'The bar carries no Save of its own');
         const returned = await admit(page, evidence, 'ui-return-from-confirmed-position'); rootsUnchanged(after, returned);
         assert.deepEqual(returned.snapshot.replica.operations, after.snapshot.replica.operations, 'Returning to a sole saved place cannot mint reading or learning evidence');
         await page.reload(); await page.waitForFunction(() => document.body.dataset.ready === '1');

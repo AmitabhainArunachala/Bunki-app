@@ -1,0 +1,764 @@
+{
+ "meaning": "Verbatim fresh-demo.arrival observed arrays from retained real producer receipts (read-only originals; path and sha256 kept). No field is added, removed or changed. The producer of that run judged only the current mount and reported the row ok.",
+ "retained": [
+  {
+   "file": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/H/codex-H1/VH1/visual/final-arrival-document-chromium/contrast-sweep.json",
+   "sha256": "827adfca1df834fe4e4b088500f3da6f35fb188f146b30c06e934b508f172083",
+   "runId": "12020a9b-aa2e-487f-befe-e7b11c6e9f2e",
+   "engines": {
+    "chromium": "153.0.8010.12"
+   },
+   "gitSha": "384d4a70e05a33019f1ad36789d13d22de04094a",
+   "artifactSha256": "339f7b39d99f72dbc079359780b6e516efb7cbf3aaef15dee528b0184748a29d",
+   "verifierSha256": "8f2ada20c7a4a42e351c45a516ccae589e99d51deac16a12a504b74aa969933d",
+   "arrivalPredicateSha256": "6308a3b9272c151130cac483827047e3da02ac12fb1be4d0758af52ecf4b2d91",
+   "requestedScope": "diagnostic",
+   "partial": true,
+   "selectors": {
+    "worlds": null,
+    "states": null,
+    "demoOnly": true
+   },
+   "fullAcceptance": false,
+   "contrastTimingContract": "Lead rulings 0806/0842, 2026-10-19 VH-1: D2/C1 at rest; actual named read-mini-rise finishes at full opacity by its authored end plus one independently pre-calibrated frame. Elapsed is observing RAF/document.timeline timestamp minus CSSAnimation.startTime; performance.now is callback-delivery telemetry only.",
+   "rowId": "chromium/hokusai/fresh-demo.arrival",
+   "producerRowOk": true,
+   "observed": [
+    {
+     "name": "read-mini-rise",
+     "animationType": "CSSAnimation",
+     "actualAnimationNames": [
+      "read-mini-rise"
+     ],
+     "sampled": true,
+     "connected": false,
+     "timeOrigin": 1792367338729.9,
+     "documentId": "54827ba4-39e6-4d51-b1c6-4f66244dc99f",
+     "sameDocument": true,
+     "frameCalibration": {
+      "method": "median-of-12-pre-arrival-raf-intervals",
+      "timeOrigin": 1792367338729.9,
+      "timestamps": [
+       1291.2,
+       1307.9,
+       1324.5,
+       1341.2,
+       1357.9,
+       1374.5,
+       1391.2,
+       1407.9,
+       1424.6,
+       1441.2,
+       1457.9,
+       1474.5,
+       1491.2
+      ],
+      "frameMs": 16.700000000000045,
+      "documentId": "54827ba4-39e6-4d51-b1c6-4f66244dc99f",
+      "sameDocument": true
+     },
+     "samples": [
+      {
+       "rafTime": 2274.5,
+       "observedAt": 2292.399999976158,
+       "elapsed": null,
+       "callbackDeliveryMs": 17.899999976158142,
+       "currentTime": 0,
+       "opacity": 0.01,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2291.2,
+       "observedAt": 2299.5,
+       "elapsed": null,
+       "callbackDeliveryMs": 8.300000000000182,
+       "currentTime": 0,
+       "opacity": 0.01,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2307.8,
+       "observedAt": 2309.0999999046326,
+       "elapsed": 16.647000030800882,
+       "callbackDeliveryMs": 1.2999999046323865,
+       "currentTime": 16.64700003080055,
+       "opacity": 0.321384,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2324.5,
+       "observedAt": 2326,
+       "elapsed": 33.3470000308007,
+       "callbackDeliveryMs": 1.5,
+       "currentTime": 33.347000030800714,
+       "opacity": 0.562703,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2341.1,
+       "observedAt": 2343.399999976158,
+       "elapsed": 49.94700003080061,
+       "callbackDeliveryMs": 2.299999976158233,
+       "currentTime": 49.94700003080066,
+       "opacity": 0.729124,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2357.8,
+       "observedAt": 2360.0999999046326,
+       "elapsed": 66.64700003080088,
+       "callbackDeliveryMs": 2.2999999046323865,
+       "currentTime": 66.64700003080083,
+       "opacity": 0.837184,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2374.5,
+       "observedAt": 2375.7999999523163,
+       "elapsed": 83.3470000308007,
+       "callbackDeliveryMs": 1.2999999523162842,
+       "currentTime": 83.34700003080053,
+       "opacity": 0.904399,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2391.2,
+       "observedAt": 2393.1999999284744,
+       "elapsed": 100.04700003080052,
+       "callbackDeliveryMs": 1.9999999284746082,
+       "currentTime": 100.04700003080069,
+       "opacity": 0.945504,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2407.8,
+       "observedAt": 2409.0999999046326,
+       "elapsed": 116.64700003080088,
+       "callbackDeliveryMs": 1.2999999046323865,
+       "currentTime": 116.64700003080064,
+       "opacity": 0.970146,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2424.5,
+       "observedAt": 2425.5999999046326,
+       "elapsed": 133.3470000308007,
+       "callbackDeliveryMs": 1.0999999046325684,
+       "currentTime": 133.3470000308008,
+       "opacity": 0.984738,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2441.1,
+       "observedAt": 2442.399999976158,
+       "elapsed": 149.9470000308006,
+       "callbackDeliveryMs": 1.299999976158233,
+       "currentTime": 149.94700003080075,
+       "opacity": 0.992917,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2457.9,
+       "observedAt": 2459.399999976158,
+       "elapsed": 166.7470000308008,
+       "callbackDeliveryMs": 1.4999999761580511,
+       "currentTime": 166.74700003080068,
+       "opacity": 0.997243,
+       "playState": "running"
+      }
+     ],
+     "authoredDuration": 220,
+     "authoredDelay": 0,
+     "authoredEndDelay": 0,
+     "authoredIterations": 1,
+     "authoredEnd": 220,
+     "startTime": 2291.1529999691993,
+     "currentTime": 166.74700003080068,
+     "playbackRate": 1,
+     "opacity": 0.997243,
+     "playState": "running",
+     "rafTime": 2457.9,
+     "observedAt": 2459.399999976158,
+     "callbackDeliveryMs": 1.4999999761580511,
+     "elapsed": 166.7470000308008,
+     "superseded": true,
+     "current": false,
+     "motionPreference": "no-preference",
+     "completed": false,
+     "frameMs": 16.700000000000045,
+     "deadlineMs": 236.70000000000005,
+     "arrivalErrors": [
+      "Arrival missed its authored duration plus independently calibrated one-frame deadline",
+      "Arrival did not finish at full opacity"
+     ]
+    },
+    {
+     "name": "read-mini-rise",
+     "animationType": "CSSAnimation",
+     "actualAnimationNames": [
+      "read-mini-rise"
+     ],
+     "sampled": true,
+     "connected": true,
+     "timeOrigin": 1792367338729.9,
+     "documentId": "54827ba4-39e6-4d51-b1c6-4f66244dc99f",
+     "sameDocument": true,
+     "frameCalibration": {
+      "method": "median-of-12-pre-arrival-raf-intervals",
+      "timeOrigin": 1792367338729.9,
+      "timestamps": [
+       1291.2,
+       1307.9,
+       1324.5,
+       1341.2,
+       1357.9,
+       1374.5,
+       1391.2,
+       1407.9,
+       1424.6,
+       1441.2,
+       1457.9,
+       1474.5,
+       1491.2
+      ],
+      "frameMs": 16.700000000000045,
+      "documentId": "54827ba4-39e6-4d51-b1c6-4f66244dc99f",
+      "sameDocument": true
+     },
+     "samples": [
+      {
+       "rafTime": 2474.5,
+       "observedAt": 2485.7999999523163,
+       "elapsed": null,
+       "callbackDeliveryMs": 11.299999952316284,
+       "currentTime": 0,
+       "opacity": 0.01,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2491.1,
+       "observedAt": 2496.399999976158,
+       "elapsed": 16.621000032313077,
+       "callbackDeliveryMs": 5.299999976158233,
+       "currentTime": 16.621000032313038,
+       "opacity": 0.320949,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2507.8,
+       "observedAt": 2508.899999976158,
+       "elapsed": 33.32100003231335,
+       "callbackDeliveryMs": 1.0999999761579602,
+       "currentTime": 33.321000032313194,
+       "opacity": 0.562387,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2524.5,
+       "observedAt": 2526.1999999284744,
+       "elapsed": 50.02100003231317,
+       "callbackDeliveryMs": 1.6999999284744263,
+       "currentTime": 50.02100003231335,
+       "opacity": 0.72972,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2541.1,
+       "observedAt": 2543.1999999284744,
+       "elapsed": 66.62100003231308,
+       "callbackDeliveryMs": 2.099999928474517,
+       "currentTime": 66.6210000323133,
+       "opacity": 0.837052,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2557.8,
+       "observedAt": 2558.2999999523163,
+       "elapsed": 83.32100003231335,
+       "callbackDeliveryMs": 0.4999999523161023,
+       "currentTime": 83.32100003231302,
+       "opacity": 0.904318,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2574.5,
+       "observedAt": 2576.1999999284744,
+       "elapsed": 100.02100003231317,
+       "callbackDeliveryMs": 1.6999999284744263,
+       "currentTime": 100.02100003231318,
+       "opacity": 0.945455,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2591.2,
+       "observedAt": 2592.1999999284744,
+       "elapsed": 116.72100003231299,
+       "callbackDeliveryMs": 0.9999999284746082,
+       "currentTime": 116.72100003231334,
+       "opacity": 0.970229,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2607.8,
+       "observedAt": 2608.5999999046326,
+       "elapsed": 133.32100003231335,
+       "callbackDeliveryMs": 0.7999999046323865,
+       "currentTime": 133.3210000323133,
+       "opacity": 0.984721,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2624.5,
+       "observedAt": 2626.5,
+       "elapsed": 150.02100003231317,
+       "callbackDeliveryMs": 2,
+       "currentTime": 150.021000032313,
+       "opacity": 0.992943,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2641.1,
+       "observedAt": 2643.399999976158,
+       "elapsed": 166.62100003231308,
+       "callbackDeliveryMs": 2.299999976158233,
+       "currentTime": 166.62100003231296,
+       "opacity": 0.997221,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2657.8,
+       "observedAt": 2658.2999999523163,
+       "elapsed": 183.32100003231335,
+       "callbackDeliveryMs": 0.4999999523161023,
+       "currentTime": 183.32100003231312,
+       "opacity": 0.999193,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2674.5,
+       "observedAt": 2676.6999999284744,
+       "elapsed": 200.02100003231317,
+       "callbackDeliveryMs": 2.1999999284744263,
+       "currentTime": 200.02100003231328,
+       "opacity": 0.999882,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2691.1,
+       "observedAt": 2692.1999999284744,
+       "elapsed": 216.62100003231308,
+       "callbackDeliveryMs": 1.0999999284745172,
+       "currentTime": 216.62100003231322,
+       "opacity": 0.999999,
+       "playState": "running"
+      },
+      {
+       "rafTime": 2707.8,
+       "observedAt": 2708.899999976158,
+       "elapsed": 233.32100003231335,
+       "callbackDeliveryMs": 1.0999999761579602,
+       "currentTime": 220,
+       "opacity": 1,
+       "playState": "finished"
+      }
+     ],
+     "authoredDuration": 220,
+     "authoredDelay": 0,
+     "authoredEndDelay": 0,
+     "authoredIterations": 1,
+     "authoredEnd": 220,
+     "startTime": 2474.478999967687,
+     "currentTime": 220,
+     "playbackRate": 1,
+     "opacity": 1,
+     "playState": "finished",
+     "rafTime": 2707.8,
+     "observedAt": 2708.899999976158,
+     "callbackDeliveryMs": 1.0999999761579602,
+     "elapsed": 233.32100003231335,
+     "current": true,
+     "motionPreference": "no-preference",
+     "completed": true,
+     "frameMs": 16.700000000000045,
+     "deadlineMs": 236.70000000000005,
+     "arrivalErrors": []
+    }
+   ]
+  },
+  {
+   "file": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/H/codex-H1/VH1/visual/final-arrival-document-webkit/contrast-sweep.json",
+   "sha256": "2719128a828330d15aba71902bdb3ebc0ca4d0fdc4ddc8080bb66523db3e9fe0",
+   "runId": "0a77e8dd-961e-469a-8ca0-9a9ebfdb1998",
+   "engines": {
+    "webkit": "26.6"
+   },
+   "gitSha": "384d4a70e05a33019f1ad36789d13d22de04094a",
+   "artifactSha256": "339f7b39d99f72dbc079359780b6e516efb7cbf3aaef15dee528b0184748a29d",
+   "verifierSha256": "8f2ada20c7a4a42e351c45a516ccae589e99d51deac16a12a504b74aa969933d",
+   "arrivalPredicateSha256": "6308a3b9272c151130cac483827047e3da02ac12fb1be4d0758af52ecf4b2d91",
+   "requestedScope": "diagnostic",
+   "partial": true,
+   "selectors": {
+    "worlds": null,
+    "states": null,
+    "demoOnly": true
+   },
+   "fullAcceptance": false,
+   "contrastTimingContract": "Lead rulings 0806/0842, 2026-10-19 VH-1: D2/C1 at rest; actual named read-mini-rise finishes at full opacity by its authored end plus one independently pre-calibrated frame. Elapsed is observing RAF/document.timeline timestamp minus CSSAnimation.startTime; performance.now is callback-delivery telemetry only.",
+   "rowId": "webkit/keyblock/fresh-demo.arrival",
+   "producerRowOk": true,
+   "observed": [
+    {
+     "name": "read-mini-rise",
+     "animationType": "CSSAnimation",
+     "actualAnimationNames": [
+      "read-mini-rise"
+     ],
+     "sampled": true,
+     "connected": false,
+     "timeOrigin": 1792367487741,
+     "documentId": "0a935a53-e600-4019-9afb-dbf9deb74732",
+     "sameDocument": true,
+     "frameCalibration": {
+      "method": "median-of-12-pre-arrival-raf-intervals",
+      "timeOrigin": 1792367487741,
+      "timestamps": [
+       1478,
+       1495,
+       1510,
+       1528,
+       1545,
+       1561,
+       1576,
+       1595,
+       1611,
+       1628,
+       1645,
+       1661,
+       1678
+      ],
+      "frameMs": 17,
+      "documentId": "0a935a53-e600-4019-9afb-dbf9deb74732",
+      "sameDocument": true
+     },
+     "samples": [
+      {
+       "rafTime": 3280,
+       "observedAt": 3281,
+       "elapsed": 19,
+       "callbackDeliveryMs": 1,
+       "currentTime": 19,
+       "opacity": 0.360004,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3315,
+       "observedAt": 3316,
+       "elapsed": 54,
+       "callbackDeliveryMs": 1,
+       "currentTime": 54,
+       "opacity": 0.767216,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3338,
+       "observedAt": 3338,
+       "elapsed": 77,
+       "callbackDeliveryMs": 0,
+       "currentTime": 77,
+       "opacity": 0.882609,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3360,
+       "observedAt": 3360,
+       "elapsed": 99,
+       "callbackDeliveryMs": 0,
+       "currentTime": 99,
+       "opacity": 0.943487,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3361,
+       "observedAt": 3361,
+       "elapsed": 100,
+       "callbackDeliveryMs": 0,
+       "currentTime": 100,
+       "opacity": 0.945415,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3397,
+       "observedAt": 3397,
+       "elapsed": 136,
+       "callbackDeliveryMs": 0,
+       "currentTime": 136,
+       "opacity": 0.986393,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3417,
+       "observedAt": 3418,
+       "elapsed": 156,
+       "callbackDeliveryMs": 1,
+       "currentTime": 156,
+       "opacity": 0.995109,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3428,
+       "observedAt": 3429,
+       "elapsed": 167,
+       "callbackDeliveryMs": 1,
+       "currentTime": 167,
+       "opacity": 0.997455,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3443,
+       "observedAt": 3443,
+       "elapsed": 182,
+       "callbackDeliveryMs": 0,
+       "currentTime": 182,
+       "opacity": 0.999095,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3460,
+       "observedAt": 3460,
+       "elapsed": 199,
+       "callbackDeliveryMs": 0,
+       "currentTime": 199,
+       "opacity": 0.999863,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3477,
+       "observedAt": 3478,
+       "elapsed": 216,
+       "callbackDeliveryMs": 1,
+       "currentTime": 216,
+       "opacity": 1,
+       "playState": "running"
+      }
+     ],
+     "authoredDuration": 220,
+     "authoredDelay": 0,
+     "authoredEndDelay": 0,
+     "authoredIterations": 1,
+     "authoredEnd": 220,
+     "startTime": 3261,
+     "currentTime": 216,
+     "playbackRate": 1,
+     "opacity": 1,
+     "playState": "running",
+     "rafTime": 3477,
+     "observedAt": 3478,
+     "callbackDeliveryMs": 1,
+     "elapsed": 216,
+     "superseded": true,
+     "current": false,
+     "motionPreference": "no-preference",
+     "completed": false,
+     "frameMs": 17,
+     "deadlineMs": 237,
+     "arrivalErrors": [
+      "Arrival missed its authored duration plus independently calibrated one-frame deadline",
+      "Arrival did not finish at full opacity"
+     ]
+    },
+    {
+     "name": "read-mini-rise",
+     "animationType": "CSSAnimation",
+     "actualAnimationNames": [
+      "read-mini-rise"
+     ],
+     "sampled": true,
+     "connected": true,
+     "timeOrigin": 1792367487741,
+     "documentId": "0a935a53-e600-4019-9afb-dbf9deb74732",
+     "sameDocument": true,
+     "frameCalibration": {
+      "method": "median-of-12-pre-arrival-raf-intervals",
+      "timeOrigin": 1792367487741,
+      "timestamps": [
+       1478,
+       1495,
+       1510,
+       1528,
+       1545,
+       1561,
+       1576,
+       1595,
+       1611,
+       1628,
+       1645,
+       1661,
+       1678
+      ],
+      "frameMs": 17,
+      "documentId": "0a935a53-e600-4019-9afb-dbf9deb74732",
+      "sameDocument": true
+     },
+     "samples": [
+      {
+       "rafTime": 3498,
+       "observedAt": 3499,
+       "elapsed": null,
+       "callbackDeliveryMs": 1,
+       "currentTime": 0,
+       "opacity": 0.01,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3511,
+       "observedAt": 3512,
+       "elapsed": 13,
+       "callbackDeliveryMs": 1,
+       "currentTime": 13,
+       "opacity": 0.258681,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3530,
+       "observedAt": 3530,
+       "elapsed": 32,
+       "callbackDeliveryMs": 0,
+       "currentTime": 32,
+       "opacity": 0.546091,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3544,
+       "observedAt": 3544,
+       "elapsed": 46,
+       "callbackDeliveryMs": 0,
+       "currentTime": 46,
+       "opacity": 0.695589,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3560,
+       "observedAt": 3560,
+       "elapsed": 62,
+       "callbackDeliveryMs": 0,
+       "currentTime": 62,
+       "opacity": 0.811975,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3579,
+       "observedAt": 3580,
+       "elapsed": 81,
+       "callbackDeliveryMs": 1,
+       "currentTime": 81,
+       "opacity": 0.900108,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3595,
+       "observedAt": 3595,
+       "elapsed": 97,
+       "callbackDeliveryMs": 0,
+       "currentTime": 97,
+       "opacity": 0.939453,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3610,
+       "observedAt": 3610,
+       "elapsed": 112,
+       "callbackDeliveryMs": 0,
+       "currentTime": 112,
+       "opacity": 0.964476,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3627,
+       "observedAt": 3627,
+       "elapsed": 129,
+       "callbackDeliveryMs": 0,
+       "currentTime": 129,
+       "opacity": 0.98168,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3643,
+       "observedAt": 3643,
+       "elapsed": 145,
+       "callbackDeliveryMs": 0,
+       "currentTime": 145,
+       "opacity": 0.990976,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3661,
+       "observedAt": 3661,
+       "elapsed": 163,
+       "callbackDeliveryMs": 0,
+       "currentTime": 163,
+       "opacity": 0.996529,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3679,
+       "observedAt": 3679,
+       "elapsed": 181,
+       "callbackDeliveryMs": 0,
+       "currentTime": 181,
+       "opacity": 0.999016,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3694,
+       "observedAt": 3694,
+       "elapsed": 196,
+       "callbackDeliveryMs": 0,
+       "currentTime": 196,
+       "opacity": 0.999791,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3711,
+       "observedAt": 3712,
+       "elapsed": 213,
+       "callbackDeliveryMs": 1,
+       "currentTime": 213,
+       "opacity": 0.999997,
+       "playState": "running"
+      },
+      {
+       "rafTime": 3727,
+       "observedAt": 3727,
+       "elapsed": 229,
+       "callbackDeliveryMs": 0,
+       "currentTime": 220,
+       "opacity": 1,
+       "playState": "finished"
+      }
+     ],
+     "authoredDuration": 220,
+     "authoredDelay": 0,
+     "authoredEndDelay": 0,
+     "authoredIterations": 1,
+     "authoredEnd": 220,
+     "startTime": 3498,
+     "currentTime": 220,
+     "playbackRate": 1,
+     "opacity": 1,
+     "playState": "finished",
+     "rafTime": 3727,
+     "observedAt": 3727,
+     "callbackDeliveryMs": 0,
+     "elapsed": 229,
+     "current": true,
+     "motionPreference": "no-preference",
+     "completed": true,
+     "frameMs": 17,
+     "deadlineMs": 237,
+     "arrivalErrors": []
+    }
+   ]
+  }
+ ]
+}

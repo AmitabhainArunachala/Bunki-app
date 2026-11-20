@@ -11,6 +11,7 @@ import { dirname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 import { parse } from 'acorn';
+import { readAuthoredCorridor } from './authored-corridor-source.mjs';
 
 const argument = (name, fallback) => {
   const at = process.argv.indexOf(name);
@@ -39,11 +40,13 @@ const inputs = inputPaths.map((path) => {
 });
 const functions = new Set(['GRAMMARS', 'mergeGrammar', 'buildSearchIndex', 'searchResults', 'dictionarySearchContext', 'requestDictionarySearch',
   'kataToHira', 'hiraToKata', 'normalizeGloss', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'dictionaryGlossSummary', 'dictionaryReadingSupportsForm',
+  'dictionaryInflectionCandidates',
   // D23: search folds an identical numbered row into the core row only while the core sheet offers its door
   'searchRowShownByCore', 'dictionaryHomographChoices', 'dictionaryRowsForForm']);
 // introduced by that D23 change: required of the candidate, absent from an older --baseline-site source
 const sinceD23 = new Set(['searchRowShownByCore', 'dictionaryHomographChoices']);
-const variables = new Set(['GRAMMAR', 'PARTICLES', 'searchIndex', 'KATA_TO_HIRA_OFFSET', 'ROMAJI', 'GLOSS_MESSY', 'GLOSS_LEAD', 'JLPT_RANK', 'jlptRank']);
+const variables = new Set(['GRAMMAR', 'PARTICLES', 'searchIndex', 'KATA_TO_HIRA_OFFSET', 'ROMAJI', 'GLOSS_MESSY', 'GLOSS_LEAD', 'JLPT_RANK', 'jlptRank',
+  'GODAN_ROW', 'INFLECTION_ROWS', 'INFLECTION_RULES']);
 function extract(source, baseline = false) {
   const ast = parse(source, { ecmaVersion: 'latest', sourceType: 'module', locations: true });
   const selected = [], found = new Set();
@@ -66,8 +69,16 @@ const fallback = Object.entries(words).filter(([form]) => !Object.hasOwn(dict, f
 const writtenForms = new Set(compact.entries.flatMap((row) => row[4]));
 const fallbackWithoutDeep = fallback.filter(([form]) => !writtenForms.has(form));
 const beforeDataSha256 = sha(JSON.stringify({ words, dict, kanji, grammar, compact }));
-function actualSource(root, name) {
-  const source = readFileSync(resolve(root, 'corridor.js'), 'utf8'), extracted = extract(source, name === 'baseline');
+function actualSource(root, name, identity) {
+  const authored = readAuthoredCorridor(root);
+  for (const file of authored.files) {
+    const expected = identity.files.find((entry) => entry.path === file.path);
+    assert.equal(file.sha256, expected?.sha256, `Changed candidate source ${file.path}`);
+    assert.equal(file.bytes, expected?.bytes, `Changed candidate source size ${file.path}`);
+  }
+  const rootBytes = readFileSync(resolve(root, 'corridor.js'));
+  assert.equal(sha(rootBytes), identity.files.find((entry) => entry.path === 'corridor.js')?.sha256, 'Changed candidate corridor.js');
+  const source = authored.source, extracted = extract(source, name === 'baseline');
   const program = extracted.map((entry) => entry.text).join('\n\n');
   writeFileSync(resolve(out, `${name}-extracted-source.js`), program);
   // the form-row caches installDictionaryIndex gives every loaded index (dictionaryRowsForForm fills them)
@@ -80,12 +91,13 @@ function actualSource(root, name) {
     context.query = query;
     return clone(vm.runInContext(expression, context, { timeout: 5000 }));
   };
-  return { sourceSha256: sha(source), extracted: extracted.map(({ name: binding, line, text }) => ({ name: binding, line, sha256: sha(text) })),
+  return { sourceSha256: sha(rootBytes), sourceFiles: authored.files,
+    extracted: extracted.map(({ name: binding, line, text }) => ({ name: binding, line, sha256: sha(text) })),
     index: () => invoke('api.index()'), search: (query, deep = false) => { D.dictionaryIndex = deep ? compact : null; return invoke('api.search(query)', query); },
     // the entry doors the seq-less core sheet renders for a form, from the actual dictionaryHomographChoices
     choices: (form) => { D.dictionaryIndex = compact; return invoke('api.choices(query)', form); } };
 }
-const actual = actualSource(site, 'candidate'), baselineArg = argument('--baseline-site');
+const actual = actualSource(site, 'candidate', identity), baselineArg = argument('--baseline-site');
 let baseline = null, baselineIdentity = null;
 if (baselineArg) {
   const baselineSite = resolve(baselineArg); baselineIdentity = readJson(baselineSite, 'build-identity.json');
@@ -93,7 +105,7 @@ if (baselineArg) {
   // not a hidden corpus substitution under the old source functions.
   for (const entry of inputs.filter((entry) => entry.path !== 'corridor.js')) assert.equal(sha(readFileSync(resolve(baselineSite, entry.path))), entry.sha256, `Baseline corpus differs: ${entry.path}`);
   assert.equal(sha(readFileSync(resolve(baselineSite, 'corridor.js'))), baselineIdentity.files.find((entry) => entry.path === 'corridor.js')?.sha256);
-  baseline = actualSource(baselineSite, 'baseline');
+  baseline = actualSource(baselineSite, 'baseline', baselineIdentity);
 }
 const rows = actual.index(), checks = [];
 const check = (name, run) => {
@@ -199,8 +211,8 @@ check('actual search leaves the input corpus unchanged and repeated immediate in
 const pass = checks.every((entry) => entry.pass);
 writeFileSync(resolve(out, 'receipt.json'), `${JSON.stringify({ package: 'PI-SEARCH-FALLBACK-08', suite: 'actual-source-search-fallback', pass,
   site, artifactSha256: identity.artifactSha256, sourceAssetSha256: identity.sourceAssetSha256,
-  verifierSha256: sha(readFileSync(fileURLToPath(import.meta.url))), sourceSha256: actual.sourceSha256, inputs, extractedBindings: actual.extracted,
-  baseline: baseline ? { site: resolve(baselineArg), artifactSha256: baselineIdentity.artifactSha256, sourceSha256: baseline.sourceSha256 } : null,
+  verifierSha256: sha(readFileSync(fileURLToPath(import.meta.url))), sourceSha256: actual.sourceSha256, sourceFiles: actual.sourceFiles, inputs, extractedBindings: actual.extracted,
+  baseline: baseline ? { site: resolve(baselineArg), artifactSha256: baselineIdentity.artifactSha256, sourceSha256: baseline.sourceSha256, sourceFiles: baseline.sourceFiles } : null,
   checks, limits: { sourceInitMs: 3000, eachQueryMs: 5000 },
   scope: 'AST-extracted actual functions with real pinned corpus; immediate and inline deep tiers. Worker transport and UI are separate browser verification.',
   state: 'No browser, provider, active app state or repository runtime mutation.' }, null, 2)}\n`);

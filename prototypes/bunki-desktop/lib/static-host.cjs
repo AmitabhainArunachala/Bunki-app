@@ -141,6 +141,7 @@ async function serve(req, res, root, port) {
     }
     res.writeHead(range ? 206 : 200, {
       ...HEADERS,
+      ...(segments.join('/') === 'decks/player/shared-frame.html' ? {'content-security-policy': "frame-ancestors 'self'"} : {}),
       'content-type': MIME[path.extname(file).toLowerCase()] || 'application/octet-stream',
       'content-length': range ? range.end - range.start + 1 : size,
       'accept-ranges': 'bytes',

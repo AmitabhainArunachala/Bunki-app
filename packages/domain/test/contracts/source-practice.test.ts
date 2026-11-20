@@ -119,6 +119,59 @@ describe('explicit source wording and production contracts', () => {
         }),
       ).toThrow();
   });
+  it('binds a voice-locked cue, whose path must be its own voice’s folder', () => {
+    // since the voice lock (slice V) the builder emits cues that name their voice, role and
+    // model; this contract used to accept 'ami' alone, so every one of them was refused here
+    const locked = {
+      version: 1,
+      path: 'audio/s/main-voice/bundled-fixture-001.m4a',
+      sha256: 'c'.repeat(64),
+      bytes: 9000,
+      sentenceIndex: 1,
+      voice: 'main-voice',
+      speakerRole: 'example',
+      model: 'fixture-model-1',
+      alignment: 'sentence-order',
+      transcriptStatus: 'unreviewed',
+    };
+    const value = createSourcePracticePlan(
+      context(),
+      listeningOrigin,
+      ['listening'],
+      undefined,
+      locked,
+    );
+    expect(value.listeningCue).toEqual(locked);
+    expect(parseSourcePracticePlan(JSON.parse(JSON.stringify(value)))).toEqual(value);
+    for (const change of [
+      { path: 'audio/s/ami/bundled-fixture-001.m4a' },
+      { path: 'audio/s/other-voice/bundled-fixture-001.m4a' },
+      { voice: 'Main' },
+      { voice: '' },
+      { speakerRole: '' },
+      { model: '' },
+      { model: 'Model With Spaces' },
+      { reviewed: true },
+    ])
+      expect(() =>
+        createSourcePracticePlan(context(), listeningOrigin, ['listening'], undefined, {
+          ...locked,
+          ...change,
+        }),
+      ).toThrow();
+    // the pre-lock shape stays parseable, so a stored plan survives; it is the app's lock, not
+    // this contract, that refuses to play it
+    expect(
+      createSourcePracticePlan(context(), listeningOrigin, ['listening'], undefined, cue)
+        .listeningCue,
+    ).toEqual(cue);
+    expect(() =>
+      createSourcePracticePlan(context(), listeningOrigin, ['listening'], undefined, {
+        ...cue,
+        speakerRole: 'example',
+      }),
+    ).toThrow();
+  });
   it('cannot bless changed clip bytes or modality by retaining a listening contract id', () => {
     const value = createSourcePracticePlan(
       context(),

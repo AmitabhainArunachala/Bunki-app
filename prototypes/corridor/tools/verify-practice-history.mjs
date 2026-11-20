@@ -28,6 +28,25 @@ import { setTimeout as delay } from 'node:timers/promises';
 import { chromium, webkit } from 'playwright-core';
 import { readAppRecordSnapshot, readAppRecord, waitForAppRecord, armRecordWriteFailure, clearRecordWriteFailure } from './record-test-support.mjs';
 import { silenceBrowserAudio, TEST_AUDIO_OUTPUT } from './browser-audio-silence.mjs';
+import { collectBootScripts, eagerBootClosure } from './offline-boot-closure.mjs';
+
+/** Every backup restore asks first (Hfix-2a, 71907eb2). Answer exactly that question, with record-fixture-support's
+ * selectBackupFile checks, around the caller's own unchanged waits; any other dialog fails the row. */
+async function answeringRestore(page, run) {
+  let problem;
+  const answer = async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { problem = error; await dialog.dismiss().catch(() => {}); }
+  };
+  page.on('dialog', answer);
+  try { const value = await run(); if (problem) throw problem; return value; }
+  catch (error) { throw problem || error; }
+  finally { page.off('dialog', answer); }
+}
 
 const LEGACY_CASES = [
   'two-completed-attempts-and-failed-save-actions',
@@ -104,7 +123,7 @@ assert.deepEqual(files, manifest.files, 'Every served byte belongs to the suppli
 const { selectPractice } = await import(pathToFileURL(resolve(ROOT, 'assessment-controller.mjs')).href);
 const sourcePath = fileURLToPath(import.meta.url);
 const sourceSha256 = hash(readFileSync(sourcePath));
-const helperPaths = ['record-test-support.mjs', 'browser-audio-silence.mjs'];
+const helperPaths = ['record-test-support.mjs', 'browser-audio-silence.mjs', 'offline-boot-closure.mjs'];
 const helperSha256 = Object.fromEntries(helperPaths.map(name => [name, hash(readFileSync(new URL(name, import.meta.url)))]));
 function bookends() {
   assert.equal(hash(readFileSync(sourcePath)), sourceSha256, 'Verifier source stayed fixed');
@@ -251,6 +270,8 @@ async function fresh(record = seed, options = {}) {
   const errors = [];
   const diagnostics = [];
   const setRequests = [];
+  const observedScriptRoots = new Set();
+  const siteURL = new URL(`${base}/`);
   context.on('page', (page) => {
     page.on('pageerror', (error) => {
       errors.push(error.message);
@@ -269,6 +290,12 @@ async function fresh(record = seed, options = {}) {
     );
     page.on('request', (request) => {
       if (/\/data\/mock\/sets\//u.test(request.url())) setRequests.push(request.url());
+      if (request.resourceType() === 'script') {
+        const url = new URL(request.url());
+        assert(url.origin === siteURL.origin && !url.username && !url.password &&
+          url.pathname.startsWith(siteURL.pathname), `Loaded script escapes the site: ${url.href}`);
+        observedScriptRoots.add(decodeURIComponent(url.pathname.slice(siteURL.pathname.length)));
+      }
     });
   });
   const page = await context.newPage();
@@ -282,7 +309,7 @@ async function fresh(record = seed, options = {}) {
     localStorage.setItem('kairo-corridor-v1', JSON.stringify(record));
   }, { record, installation });
   await boot(page);
-  return { context, page, errors, setRequests, diagnostics };
+  return { context, page, errors, setRequests, diagnostics, observedScriptRoots };
 }
 async function record(page) {
   return readAppRecord(page);
@@ -630,7 +657,7 @@ const receivedRow = operation => `[data-received-practice="${operation.payload.a
 async function openReceived(peer, operation, { formStatus = 'available', statuses = {}, label = 'detail' } = {}) {
   const before = await receivedNative(peer, `${label}-before-open`), row = peer.page.locator(receivedRow(operation));
   await row.waitFor(); const rowText = await row.innerText();
-  assert(rowText.startsWith('Response record · '));
+  assert(rowText.startsWith('Your answers · '));
   assert(rowText.includes(operation.payload.outcome === 'submitted' ? 'Submitted' : 'Stopped'));
   assert(rowText.includes(`${operation.payload.answers.filter(answer => answer.response.kind !== 'no-response').length}/${operation.payload.answers.length}`));
   await row.click(); await peer.page.locator('#received-practice-detail').waitFor();
@@ -641,7 +668,7 @@ async function openReceived(peer, operation, { formStatus = 'available', statuse
   const detail = peer.page.locator('#received-practice-detail');
   if (formStatus !== 'available') await peer.page.locator('#received-practice-reference summary').click();
   const text = await detail.innerText();
-  assert.equal(await detail.locator('h1').innerText(), 'Response record');
+  assert.equal(await detail.locator('h1').innerText(), 'Your answers');
   assert.equal(await peer.page.locator('#received-practice-status').innerText(), 'Saved responses, not a score or a correctness assessment.');
   const declaredDate = await peer.page.evaluate(value => new Date(value).toLocaleString(), operation.payload.startedAt);
   assert(rowText.includes(declaredDate)); assert(text.includes(declaredDate));
@@ -958,36 +985,29 @@ async function checkReceived(name) {
 try {
   await check('two-completed-attempts-and-failed-save-actions', async ({ page }) => {
     await door(page);
-    assert.match(await page.locator('main').innerText(), /Short practice sets/u);
+    assert.match(await page.locator('main').innerText(), /Short sets/u);
+    // S · no provenance in the learner's app (John, 2026-10-16): this pinned the intro's one Made by AI mark and its reason
+    // ("answers not yet checked by a person"), with mutations of that mark as its controls. The new truth: the intro and
+    // every row carry no provenance chip or line; the controls now put one back — on the page, as a reason line, on a row —
+    // and each must be caught.
     const assertIntro = async () => {
-      const mark = page.locator('main > .mock-review-mark');
-      assert.equal(await mark.count(), 1);
-      assert.equal(await mark.isVisible(), true);
-      assert.equal(await mark.locator('.status-chip').innerText(), 'Unreviewed');
-      assert.equal(await mark.locator('.exam-review-reason').innerText(), 'answers not yet checked by a person');
-      assert.equal(await page.locator('[data-mock-set] .status-chip').count(), 0);
-      assert.match(await page.locator('main').innerText(), /No listening and no time limit\./u);
+      assert.equal(await page.locator('main .mock-review-mark, main .status-chip, main .exam-review-reason').count(), 0);
+      const text = await page.locator('main').innerText();
+      assert.doesNotMatch(text, /Made by AI|AI作成|not yet checked|checked by a person|未確認|人の確認|unreviewed/iu);
+      assert.match(text, /No listening and no time limit\./u);
     };
     await assertIntro();
     const introRecord = await readAppRecord(page);
-    const originalMark = await page.locator('main > .mock-review-mark').evaluate(n => n.outerHTML);
-    for (const mutation of ['hidden', 'wrong-chip', 'missing-reason', 'repeated-on-row']) {
+    for (const mutation of ['chip-on-page', 'reason-line', 'chip-on-row']) {
       await page.evaluate(mutation => {
-        const mark = document.querySelector('main > .mock-review-mark');
-        if (mutation === 'hidden') mark.style.display = 'none';
-        if (mutation === 'wrong-chip') mark.querySelector('.status-chip').textContent = 'Reviewed';
-        if (mutation === 'missing-reason') mark.querySelector('.exam-review-reason').textContent = '';
-        if (mutation === 'repeated-on-row') {
-          const duplicate = mark.querySelector('.status-chip').cloneNode(true);
-          duplicate.dataset.introNegativeControl = '1';
-          document.querySelector('button[data-mock-set]').append(duplicate);
-        }
+        const control = document.createElement('span');
+        control.dataset.introNegativeControl = '1';
+        if (mutation === 'chip-on-page') { control.className = 'status-chip'; control.textContent = 'Made by AI'; document.querySelector('main').prepend(control); }
+        if (mutation === 'reason-line') { control.textContent = 'answers not yet checked by a person'; document.querySelector('main').append(control); }
+        if (mutation === 'chip-on-row') { control.className = 'status-chip'; control.textContent = 'Made by AI'; document.querySelector('button[data-mock-set]').append(control); }
       }, mutation);
       await assert.rejects(assertIntro, { name: 'AssertionError' }, `intro must reject ${mutation}`);
-      await page.evaluate(original => {
-        document.querySelector('main > .mock-review-mark').outerHTML = original;
-        document.querySelectorAll('[data-intro-negative-control]').forEach(n => n.remove());
-      }, originalMark);
+      await page.evaluate(() => document.querySelectorAll('[data-intro-negative-control]').forEach(n => n.remove()));
       await assertIntro();
     }
     assert.deepEqual(await readAppRecord(page), introRecord, 'warning probes leave the learner record unchanged');
@@ -1172,7 +1192,7 @@ try {
 
   await check(
     'real-offline-reload-retains-answers-without-set-fetch',
-    async ({ context, page, setRequests }) => {
+    async ({ context, page, setRequests, observedScriptRoots }) => {
       // The unchanged release installs its worker automatically over HTTPS.
       await pollNativeState(
         () => page.evaluate(async () =>
@@ -1192,13 +1212,16 @@ try {
       await advance(page);
       await choose(page, 0);
       const before = await selected(page);
+      const scriptRoots = await page.evaluate(collectBootScripts, readFileSync(resolve(ROOT, 'index.html'), 'utf8'));
+      // Dynamic imports actually used by this journey (including record boot)
+      // also need their static closure; unrequested optional imports stay lazy.
+      const loadedScriptRoots = [...observedScriptRoots].sort();
+      const bootClosure = await eagerBootClosure(ROOT, [...scriptRoots, ...loadedScriptRoots]);
       const cachePaths = [
         'index.html',
         'corridor.js',
-        // Boot now loads the assessment, source-cloze and shared record graph.
-        // Require its complete staged module inventory, including transitive
-        // dependencies, rather than letting an online first visit hide a gap.
-        ...files.filter((file) => file.path.endsWith('.mjs')).map((file) => file.path),
+        // Certify the staged HTML's eager graph, including static dependencies.
+        ...bootClosure,
         'data/manifest.json',
       ];
       const cacheHashes = await page.evaluate(async (paths) => {
@@ -1262,6 +1285,7 @@ try {
           navigatorOnline,
           receivedServerResponses: servedResponses - responseCount,
           workerInstallation: 'Automatic HTTPS registration by the unchanged release',
+          eagerBoot: { scriptRoots, loadedScriptRoots, files: bootClosure },
           cachedReleaseEntries: cacheHashes,
           cachedShell: true,
           upstreamSetRequests: 0,
@@ -1399,13 +1423,15 @@ try {
         await restored.page.evaluate(() => {
           window.__practiceBeforeImport = true;
         });
-        await restored.page.locator('#import-file').setInputFiles({
-          name: 'synthetic-practice-backup.json',
-          mimeType: 'application/json',
-          buffer: bytes,
-        });
-        await restored.page.waitForFunction(() => window.__practiceBeforeImport !== true, null, {
-          timeout: 20_000,
+        await answeringRestore(restored.page, async () => {
+          await restored.page.locator('#import-file').setInputFiles({
+            name: 'synthetic-practice-backup.json',
+            mimeType: 'application/json',
+            buffer: bytes,
+          });
+          await restored.page.waitForFunction(() => window.__practiceBeforeImport !== true, null, {
+            timeout: 20_000,
+          });
         });
         await ready(restored.page);
         const restoredAfter = await readAppRecordSnapshot(restored.page);

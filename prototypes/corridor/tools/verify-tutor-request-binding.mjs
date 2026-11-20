@@ -64,6 +64,7 @@ async function tutor(page) {
 }
 async function configure(page, label, suffix = '') {
   const provider = providers.find((provider) => provider.label === label);
+  await page.evaluate(() => { const d = document.getElementById('ai-connection'); if (d) d.open = true; }); // Q · the address and model fold under the tutor's Details
   await page.locator('#ai-base-url').fill(provider.origin);
   await page.locator('#ai-model-input').fill(`synthetic-tutor-${label}${suffix}`);
   await page.locator('#ai-key-input').fill(`synthetic-${label}-not-a-real-key`);

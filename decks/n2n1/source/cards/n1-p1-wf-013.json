@@ -53,7 +53,7 @@
    "passage": {
     "ja": "AIの精度が95パーセントって聞くと、すごいなって思うじゃないですか。でも、それってテストに使った問題という、全体のほんの一断面を切り取った数字にすぎないんです。実際の現場では、サンプルの偏りも、質問のされ方も、使う人の慣れ具合や期待も、まるで違うことがよくあります。だから、数字を見たら、『これは何を切り取ったものなのか』って、一回立ち止まるのがおすすめですよ。",
     "form": "一断面",
-    "en": "When you hear that an AI's accuracy is 95 percent, you think, wow, don't you? But that is only a number cutting out one cross-section of the whole, namely the questions used in the test. In the real world, the bias of the samples, the way questions get asked and how practiced the users are are often completely different. So when you see a number, I recommend stopping once to think, 'what exactly was this cut from?'",
+    "en": "When you hear that an AI's accuracy is 95 percent, you think, wow, don't you? But that is only a number cutting out one cross-section of the whole, namely the questions used in the test. In the real world, the bias of the samples, the way questions get asked, and the users' level of practice and expectations are often completely different. So when you see a number, I recommend stopping once to think, 'what exactly was this cut from?'",
     "register": "話",
     "topic": "ai",
     "tipJa": "「社会の一断面」のように、全体の一部から全体像を考える言い方。",
@@ -427,7 +427,7 @@
    "passage": {
     "ja": "インドの公務員試験は、合格者の数が極端に限定されており、大半の受験者が最初の関門ではねられる。それでも毎年、多くの若者がこの狭き門に挑み続けている。背景には、公務員という地位が持つ、安定した収入と社会的な信用の高さがある。職を得れば、本人のみならず一族の暮らしまで変わると考えられているのだ。試験の準備に何年もかけ、複数回挑戦する人も少なくないとされ、その覚悟の重さがうかがえる。",
     "form": "はねられる",
-    "en": "India's civil service exam admits an extremely limited number of successful candidates, and most examinees are rejected at the first hurdle. Even so, every year many young people keep challenging this narrow gate. Behind it lies the high social credibility that the status of civil servant carries. It is believed that landing a post changes not only one's own life but the lives of the whole extended family. Many are said to spend years preparing and to sit the exam several times, which shows how heavy their resolve is.",
+    "en": "India's civil service exam admits an extremely limited number of successful candidates, and most examinees are rejected at the first hurdle. Even so, every year many young people keep challenging this narrow gate. Behind it lies the stable income and high social credibility that the status of civil servant carries. It is believed that landing a post changes not only one's own life but the lives of the whole extended family. Many are said to spend years preparing and to sit the exam several times, which shows how heavy their resolve is.",
     "register": "報",
     "topic": "india",
     "tipJa": "受け身の「はねられる」で、試験や審査で不合格にされる意味になる。",

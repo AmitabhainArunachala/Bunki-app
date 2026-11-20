@@ -24,7 +24,7 @@
  *     removed row never takes away a card the learner already had.
  */
 
-export const GUIDED_STATE_VERSION = 1;
+const GUIDED_STATE_VERSION = 1;
 const VIEWS = new Set([
   'home',
   'setup',
@@ -43,7 +43,7 @@ const VIEWS = new Set([
 /** added: this session enrolled the card · existing: it was already in the deck ·
  * held: the deck cannot take it here · failed: the write did not land · removed: this
  * session took its own card out again · pending: not attempted yet. */
-export const CARD_STATUS = new Set(['pending', 'added', 'existing', 'held', 'failed', 'removed']);
+const CARD_STATUS = new Set(['pending', 'added', 'existing', 'held', 'failed', 'removed']);
 const MAX_EVENTS = 1000;
 
 const plain = (value) => !!value && typeof value === 'object' && !Array.isArray(value);
@@ -354,7 +354,7 @@ const validRow = (row) =>
   Array.isArray(row.cards) &&
   row.cards.every(validCard);
 
-export function validGuidedState(value, questionIds, setId) {
+function validGuidedState(value, questionIds, setId) {
   const expected = cleanIds(questionIds);
   if (
     !plain(value) ||

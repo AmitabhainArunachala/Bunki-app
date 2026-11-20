@@ -11,14 +11,15 @@
  */
 
 import { createServer } from 'node:http';
-import { existsSync, readFileSync } from 'node:fs';
+import { createHash, randomUUID } from 'node:crypto';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { extname, resolve } from 'node:path';
 import process from 'node:process';
 
 import { chromium } from 'playwright-core';
 import { openShelfTools } from './shelf-tools-support.mjs';
 import { restoreAppFixture } from './record-fixture-support.mjs';
-import { resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
+import { resolveCorridorSite, resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 
 const CORRIDOR_DIR = resolveCorridorSite();
 const PHONE = { width: 390, height: 844 };
@@ -112,7 +113,8 @@ async function roomSnapshot(page) {
   return page.evaluate(() => {
     const room = document.querySelector('#stroke-page');
     if (!room) return null;
-    const visible = (node) => {
+    // `ownOpacity: false` excuses the node's own transparency and nothing else.
+    const visible = (node, { ownOpacity = true } = {}) => {
       if (!node || node.closest('[inert]')) return false;
       let current = node;
       while (current && current !== room.parentElement) {
@@ -120,7 +122,7 @@ async function roomSnapshot(page) {
         if (
           style.display === 'none' ||
           style.visibility === 'hidden' ||
-          Number.parseFloat(style.opacity || '1') <= 0.02
+          ((ownOpacity || current !== node) && Number.parseFloat(style.opacity || '1') <= 0.02)
         )
           return false;
         current = current.parentElement;
@@ -128,11 +130,43 @@ async function roomSnapshot(page) {
       const rect = node.getBoundingClientRect();
       return rect.width > 0 && rect.height > 0;
     };
+    // Ink (a80f54f5, merged 1c2a499f, John's 10-19 speed spec) dresses the writing-speed corner as one
+    // native range laid transparent over its painted ink marks 緩 中 速. Such a control is seen through its
+    // dress, and only then: apart from its own opacity it passes every test above, and a painted mark of its
+    // own wrapper (a text leaf, itself visible, unclipped up to the wrapper, at least 8 px square) lies inside
+    // its box, where a press at the mark's centre lands on the control. A transparent control whose dress is
+    // missing, hidden, clipped away (a visually-hidden label) or covered still reads as absent.
+    const seenThroughDress = (node) => {
+      if (!node.matches('input') || !visible(node, { ownOpacity: false })) return false;
+      const wrapper = node.parentElement;
+      const box = node.getBoundingClientRect();
+      const unclipped = (mark) => {
+        for (let current = mark; current && current !== wrapper.parentElement; current = current.parentElement) {
+          const style = getComputedStyle(current);
+          if (style.clipPath !== 'none' || (style.clip && style.clip !== 'auto')) return false;
+        }
+        return true;
+      };
+      return [...wrapper.querySelectorAll('*')].some((mark) => {
+        if (mark === node || mark.children.length || !mark.textContent.trim()) return false;
+        if (!visible(mark) || !unclipped(mark)) return false;
+        const rect = mark.getBoundingClientRect();
+        return (
+          rect.width >= 8 &&
+          rect.height >= 8 &&
+          rect.left >= box.left - 1 &&
+          rect.right <= box.right + 1 &&
+          rect.top >= box.top - 1 &&
+          rect.bottom <= box.bottom + 1 &&
+          document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2) === node
+        );
+      });
+    };
     const interactive = [
       ...room.querySelectorAll(
         'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       ),
-    ].filter((node) => !node.disabled && visible(node));
+    ].filter((node) => !node.disabled && (visible(node) || seenThroughDress(node)));
     const trigger = room.querySelector('.stroke-chrome-trigger');
     const field = room.querySelector('#stroke-awake-field');
     const stage = room.querySelector('.stroke-stage');
@@ -274,6 +308,8 @@ async function main() {
   const { server, base, misses } = await startServer();
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
   const noise = [];
+  const startedAt = new Date().toISOString(), identity = JSON.parse(readFileSync(resolve(CORRIDOR_DIR, 'build-identity.json'), 'utf8'));
+  let completed = false, failure = null;
 
   try {
     const context = await browser.newContext({
@@ -512,9 +548,10 @@ async function main() {
         readings.every((row) => row.lang === 'ja'),
       JSON.stringify(readings),
     );
+    // Kanji-trust K01: the room shows every KANJIDIC2 reading, the lessons' バツ・ハツ・カ first, then ボチ
     check(
       'all on and kun readings render without two-item truncation',
-      readings[0]?.value === 'バツ・ハツ・カ' &&
+      readings[0]?.value === 'バツ・ハツ・カ・ボチ' &&
         readings[1]?.value === 'き（る）・そむ（く）・う（つ）',
       JSON.stringify(readings),
     );
@@ -960,9 +997,20 @@ async function main() {
       noise.length === 0,
       noise.join(' | '),
     );
+    completed = true;
+  } catch (error) {
+    failure = String(error.stack || error);
+    throw error;
   } finally {
     await browser.close();
     server.close();
+    writeFileSync(resolve(resolveCorridorEvidence(), 'writing-room.json'), JSON.stringify({
+      schemaVersion: 1, runId: process.env.KAIRO_GATE_RUN_ID || randomUUID(), startedAt, finishedAt: new Date().toISOString(),
+      site: CORRIDOR_DIR, artifactSha256: identity.artifactSha256,
+      verifierSha256: createHash('sha256').update(readFileSync(new URL(import.meta.url))).digest('hex'),
+      engine: 'chromium', browserVersion: browser.version(), completed, failure, results, failures,
+      errors: noise, missingAssets: misses, fullAcceptance: completed && !failure && failures === 0,
+    }, null, 2) + '\n');
   }
 
   console.log(`\n${results.length - failures}/${results.length} checks passed`);

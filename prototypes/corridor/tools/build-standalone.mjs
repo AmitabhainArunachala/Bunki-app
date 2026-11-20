@@ -51,6 +51,13 @@ const recordImports = new Map([
   ['./record-app.mjs', 'app'],
   ['./record-sync.mjs', 'sync'],
   ['./modules/record-core.mjs', 'core'],
+  // the one schedule owner, loaded beside ts-fsrs at boot
+  ['./srs-core.mjs', 'srsCore'],
+  // HOOKS r8: the one review caller and W3's help-relevance rule, installed right after it
+  ['./review-caller.mjs', 'reviewCaller'],
+  ['./help-relevance.mjs', 'helpRelevance'],
+  // HOOKS r8 rev 3.2 §7: the journey's lifecycle, switched by JOURNEY_WRITES
+  ['./journey-lifecycle.mjs', 'journeyLifecycle'],
 ]);
 const assessmentImports = new Map([
   ['./assessment-v2-controller.mjs', 'assessmentV2'],
@@ -64,9 +71,14 @@ const assessmentImports = new Map([
   ['./assessment-delivery.mjs', 'assessmentDelivery'],
   ['./assessment-received.mjs', 'assessmentReceived'],
 ]);
+// Device-local stores outside the portable record. Backup adoption refuses while one holds learner activity, so the
+// single file carries the store its check opens (the collections stay hidden in the standalone; the check does not).
+const deviceStoreImports = new Map([
+  ['./decks/personal/store.mjs', 'personalStore'],
+]);
 const recordRuntimeBuild = buildSync({
   absWorkingDir: CORRIDOR,
-  stdin: { contents: [...recordImports, ...assessmentImports, ...controllerImports.values()].map(([specifier, name]) =>
+  stdin: { contents: [...recordImports, ...assessmentImports, ...deviceStoreImports, ...controllerImports.values()].map(([specifier, name]) =>
     `export * as ${name} from ${JSON.stringify(specifier)};`).join('\n'),
   resolveDir: CORRIDOR, sourcefile: 'standalone-record-entry.mjs', loader: 'js' },
   outfile: 'standalone-record-runtime.mjs', bundle: true, format: 'esm',
@@ -138,7 +150,7 @@ function moduleUrlExpression(dataUrl) {
 }
 let appScript = read('corridor.js');
 assert(appScript.includes('window.__KAIRO_SHELF_ART_URL__'), 'Standalone shelf art requires the application asset URL hook');
-for (const [specifier, name] of [...recordImports, ...assessmentImports]) {
+for (const [specifier, name] of [...recordImports, ...assessmentImports, ...deviceStoreImports]) {
   const original = `import('${specifier}')`;
   assert.equal(appScript.split(original).length - 1, 1, `Standalone runtime import changed: ${specifier}`);
   appScript = appScript.replace(original, `import(window.__KAIRO_RECORD_RUNTIME_URL__).then(module => module.${name})`);
@@ -150,6 +162,39 @@ for (const [hook, [specifier, name]] of controllerImports) {
 }
 assert.equal(appScript.split("import('./corridor-ink.js')").length - 1, 1, 'Standalone writing import changed');
 appScript = appScript.replace("import('./corridor-ink.js')", 'import(window.__KAIRO_INK_URL__)');
+
+// G3: corridor.js imports its thirteen seams as sibling modules (SAVE, 2026-11-11: modules/save-places.mjs is the twelfth;
+// the voice's one vocabulary, 2026-11-13: modules/voice-lines.mjs the thirteenth, imports nothing). A single file cannot
+// fetch siblings (a file:// document blocks cross-origin module fetches), so fold each
+// static seam import back into one module scope. The moved declarations are unchanged;
+// only the module boundary the split added is removed for the standalone document.
+const seamImports = [...appScript.matchAll(/^import\s*\{[^}]*\}\s*from\s*'\.\/modules\/([^']+)\.mjs';$/gmu)]
+  .map((match) => match[1]);
+assert.equal(seamImports.length, 13, 'Standalone must fold exactly the thirteen corridor seams');
+let seamScript = '';
+for (const seam of seamImports) {
+  const seamSource = read(`modules/${seam}.mjs`)
+    .replace(/^import\b[^\n]*?from\s*'[^\n']*';\n/gmu, '')
+    .replace(/^export\s*\{[^\n]*\};\n?/gmu, '');
+  assert(!/^import\b/mu.test(seamSource) && !/^export\b/mu.test(seamSource), `Standalone seam ${seam} still carries module syntax`);
+  seamScript += seamSource.trim() + '\n\n';
+}
+appScript = appScript.replace(/^import\s*\{[^}]*\}\s*from\s*'\.\/modules\/[^']+\.mjs';\n/gmu, '');
+// Since 2026-11-08 corridor.js also imports ./device-voice.mjs (the review card's device speech).
+// A file:// document cannot fetch that sibling either, and with it unfetched the page never boots.
+// Fold it in the same way. Its declarations keep a scope of their own: only the two names
+// corridor.js imports cross into the application's.
+const DEVICE_VOICE_IMPORT = "import { createDeviceVoice, REASONS as DEVICE_VOICE_REASONS } from './device-voice.mjs';\n";
+assert.equal(appScript.split(DEVICE_VOICE_IMPORT).length - 1, 1, 'Standalone device-voice import changed');
+const deviceVoiceSource = read('device-voice.mjs');
+assert(!/^import\b/mu.test(deviceVoiceSource), 'Standalone device voice gained an import of its own');
+const deviceVoiceBody = deviceVoiceSource.replace(/^export\s+(?=(?:const|function)\b)/gmu, '');
+assert(!/^export\b/mu.test(deviceVoiceBody), 'Standalone device voice still carries module syntax');
+appScript = appScript.replace(DEVICE_VOICE_IMPORT, '');
+const deviceVoiceScript = `const { createDeviceVoice, REASONS: DEVICE_VOICE_REASONS } = (() => {\n${deviceVoiceBody.trim()}\nreturn { createDeviceVoice, REASONS };\n})();\n\n`;
+appScript = deviceVoiceScript + seamScript + appScript;
+// Any static sibling import left here is one the single file cannot fetch: fail the build, not the boot.
+assert(!/^import\b[^\n]*\bfrom\s*['"]\.{1,2}\//mu.test(appScript), 'Standalone application still imports a sibling module');
 let driftScript = read('drift-layer.js');
 assert.equal(driftScript.split('import("./record-controller.mjs")').length - 1, 1, 'Standalone Drift record import changed');
 driftScript = driftScript.replace('import("./record-controller.mjs")',
@@ -168,7 +213,10 @@ const BUNDLES = {
   'original/grammar-v11': 'data/original/grammar-v11.json',
   manifest: 'data/manifest.json',
   'fsrs-pin': 'data/fsrs-pin.json',
+  'help-relevance-catalog': 'data/help-relevance-catalog.json',
   'share_alike/reference-extra': 'data/share_alike/reference-extra.json',
+  'share_alike/kanji-structure': 'data/share_alike/kanji-structure.json',
+  'share_alike/kanji-family': 'data/share_alike/kanji-family.json',
   'share_alike/kkld': 'data/share_alike/kkld.json',
 };
 
@@ -275,6 +323,9 @@ ${read('maintenance/report-client.js')}
 </script>
 <script>
 ${read('reference-core.js')}
+${read('kanji-structure.js')}
+${read('kanji-family.js')}
+${read('kanji-course.js')}
 ${read('reference-ui.js')}
 </script>
 <script type="application/json" id="corridor-bundle">${JSON.stringify(bundle).replace(/</g, '\\u003c')}</script>
@@ -388,6 +439,8 @@ ${read('rooms/words.css')}
 ${read('rooms/me.css')}
 ${read('rooms/cards.css')}
 ${read('rooms/motion.css')}
+${read('tighten.css')}
+${read('depth.css')}
 </style>
 ${BODY}
 `;
@@ -395,7 +448,7 @@ ${BODY}
 const FAVICON = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%239e2b25'/%3E%3Ctext x='8' y='12' font-size='11' text-anchor='middle' fill='%23fcfbf6' font-family='serif'%3E回%3C/text%3E%3C/svg%3E`;
 
 const html = `<!doctype html>
-<html lang="ja">
+<html lang="ja" data-live-depth="1">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -418,6 +471,8 @@ ${read('rooms/words.css')}
 ${read('rooms/me.css')}
 ${read('rooms/cards.css')}
 ${read('rooms/motion.css')}
+${read('tighten.css')}
+${read('depth.css')}
 </style>
 </head>
 <body>
@@ -437,7 +492,7 @@ writeFileSync(out + '.build.json', JSON.stringify({ status: 'passed', site: CORR
   output: out, standaloneSha256: digest(readFileSync(out)),
   inlinedControllerModules: [...controllerImports.values()].map(([specifier]) => specifier),
   recordRuntimeSha256: digest(recordRuntimeBytes), inlinedRecordModules: [...recordImports.keys()],
-  inlinedAssessmentModules: [...assessmentImports.keys()],
+  inlinedAssessmentModules: [...assessmentImports.keys()], inlinedDeviceStoreModules: [...deviceStoreImports.keys()],
   assessmentAssets: [...assessmentAssets].map(([path, { bytes, sha256 }]) => ({ path, bytes, sha256 })),
   recordModuleTransport: 'blob', inlinedModuleTransport: 'blob', driftSharesRecordRuntime: true,
   inkModuleSha256: digest(inkBytes), builderSha256: digest(readFileSync(fileURLToPath(import.meta.url))),

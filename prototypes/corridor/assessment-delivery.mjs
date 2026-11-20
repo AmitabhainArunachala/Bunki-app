@@ -22,8 +22,8 @@ export const machineCheckedEditorial = editorial => editorial?.status === 'ai-re
 // It is never in the public catalog, never cached with public assets, and never leaves the device.
 export const OFFICIAL_PRIVATE = 'official-private';
 export const PRIVATE_ROUTE = 'device-private';
-export const PRIVATE_PACK_SCHEMA = 'kairo-private-assessment-pack/1';
-export const PRIVATE_DB_NAME = 'kairo-private-assessment';
+const PRIVATE_PACK_SCHEMA = 'kairo-private-assessment-pack/1';
+const PRIVATE_DB_NAME = 'kairo-private-assessment';
 export const PRIVATE_BASE_URL = 'https://kairo-private.invalid/';
 export function officialPrivateEntry(entry) {
   return entry?.privatePack === true && entry.sourceClass === OFFICIAL_PRIVATE &&
@@ -42,7 +42,7 @@ export function assessmentEntryAdmitted(entry) {
   if (entry.review?.status === 'ai-reviewed') return entry.publicationRoute !== MACHINE_CHECK_ROUTE;
   return machineCheckedEntry(entry);
 }
-export function assessmentAssetPath(path) {
+function assessmentAssetPath(path) {
   if (typeof path !== 'string') throw new TypeError('assessment-asset-path');
   if (!path.startsWith('data/assessment/')) path = `data/assessment/${path}`;
   if (!/^data\/assessment\/[a-zA-Z0-9_./-]+$/u.test(path) ||

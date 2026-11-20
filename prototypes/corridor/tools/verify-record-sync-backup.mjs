@@ -7,7 +7,7 @@ import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { extname, resolve } from 'node:path';
 import { chromium, webkit } from 'playwright-core';
 import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/resolve-corridor-site.mjs';
-import { createAppBackupFixture, restoreAppFixture } from './record-fixture-support.mjs';
+import { createAppBackupFixture, restoreAppFixture, selectBackupFile } from './record-fixture-support.mjs';
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecordSnapshot } from './record-test-support.mjs';
 
 const SITE = resolveCorridorSite();
@@ -85,7 +85,7 @@ async function tray(page) {
 }
 async function submit(page, backup) {
   await tray(page);
-  await page.locator('#import-file').setInputFiles({ name: 'synthetic-full-backup.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(backup)) });
+  await selectBackupFile(page, { name: 'synthetic-full-backup.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(backup)) });
 }
 async function failedImport(page, expected = 'Import could not finish') {
   await page.waitForFunction((message) => [...document.querySelectorAll('.airead-note')]

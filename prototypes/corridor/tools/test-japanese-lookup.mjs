@@ -15,7 +15,44 @@ const names = ['lookup', 'dictionaryCoreMatch', 'dictionaryReadingSummaries', 'd
   'kataToHira', 'KATA_TO_HIRA_OFFSET', 'normalizeGloss', 'GLOSS_MESSY', 'GLOSS_LEAD',
   'LOOKUP_HELPER_POS', 'japaneseLookupRecord', 'openJapaneseLookup', 'appendJapaneseLookup',
   'enhanceJapaneseProse', 'showMini', 'wordSaveFacts', 'paintWordSave', 'paintMiniPath', 'placeFloating', 'revealFloatingFocus', 'keepFloatingBeside', 'miniAnchor', 'SAVE_PRESS_MS', 'lookupBlockWords', 'setLookupStop', 'japaneseLookupHelpId', 'lookupOccurrence',
-  'lookupItemBlocks', 'findLookupOccurrence', 'japaneseLookupMini', 'lookupWordKey'];
+  'lookupItemBlocks', 'findLookupOccurrence', 'japaneseLookupMini', 'lookupWordKey',
+  // the one-hand pass: the slip's dive into the entry and the close callback every surface hears
+  'slipDive', 'miniDiving', 'miniOnClose', 'slipSummons',
+  // G1 (2026-10-16): a slip stands only beside a word on the top layer, a slip leaving into its page is not standing, and
+  // its headword is the match cut's source
+  'slipAllowed', 'standingSlip', 'slipHeadword',
+  // S (2026-10-16): the slip's Save is the one Save, built by one component (saveOne) for every keep in the app
+  'saveOne',
+  // R2 (2026-10-17): a reader word's sound change, at the lookup door and the reader's (Codex's f2e3015e review: 仏 ぶっ)
+  'soundChangeReadings', 'SOUND_VOICED', 'SOUND_PLAIN', 'kanjiReadingsOf', 'readerLookupAnswer', 'dictionaryAnsweredForm',
+  'soundChangeDoor', 'dictionaryRowsReadAs', 'readerReadingFits',
+  // Q (2026-10-17): the slip stands clear of its word with the word's reading (anchorBox); lookup prose keeps each word's
+  // doors in one no-break unit, by the app's one word rule (jaGroupSegments); the bar's Save fits its bar (fitChromeKeep)
+  'anchorBox', 'fitChromeKeep', 'chromeKeepFitting', 'jaGroupSegments', 'jaMendSegments', 'JA_KANA_WORDS', 'JA_KANJI', 'JA_KANA_RUN',
+  'JA_COUNTER', 'JA_OPENS_WORD', 'JA_CLOSES',
+  // G3 (2026-10-18): a tap climbs the word's ladder (activateWordLadder: reading, stage, page); a phonetic parenthetical is
+  // no door (phoneticAnnotationRanges); a prose block is one roving stop (installProseWordRoving)
+  'activateWordLadder', 'clearWordLadder', 'ladderVisit', 'ladderCleanupGeneration', 'ladderReturning', 'readingSlipSerial',
+  'phoneticAnnotationRanges', 'phoneticAnnotationCandidates', 'installProseWordRoving', 'proseWordRovers',
+  // G5 (2026-10-18): the slip's floor stops above the 層 mark where the two would share a column (placeFloating)
+  'layersMarkTop',
+  // G6 (2026-10-19, merge): the slip's ceiling is the frame's foot, the scale thread under the bar (placeFloating)
+  'frameFoot',
+  // R3 (2026-10-18): the sense a word's text uses — the lookup's entry before its sense, the record its sense shapes, the
+  // slip's second line, and the marks the slip leaves (for the page, and for a sense still to come)
+  'japaneseLookupEntryRecord', 'senseRecord', 'senseNameHeldText', 'senseIsQuick', 'senseMoreLine', 'SENSE_BY_ANCHOR', 'SENSE_LATER', 'senseLaterDraw', 'sensePatch', 'SLIP_NODE', 'senseMoreElement',
+  // Hfix-1A (2026-10-19): a cut slip ends between two rows and fades at its foot (rowCut, markCardMore); a meaning still to
+  // come keeps its room and lands in place (reserveSenseRoom, SLIP_OWN_MEANING); a slip drawn again on its word is the
+  // same element, cleared (blankSlip)
+  'rowCut', 'markCardMore', 'reserveSenseRoom', 'SLIP_OWN_MEANING', 'blankSlip',
+  // Ladder (2026-10-19, John: "one tap should just be the furigana, two taps should be the furigana plus the english word
+  // underneath, three taps should reveal the box"): a word set in text climbs reading → English → stage (inlineWordReading,
+  // ladderGlossRung, inlineWordGloss, inlineGlossLine), and its card rides with it where its text scrolls (slipScroller)
+  'inlineWordReading', 'ladderGlossRung', 'inlineWordGloss', 'inlineGlossLine', 'inlineGloss', 'slipScroller',
+  // Ladder R2 (2026-10-20): the English row is seated and set by one hand each (seatGlossRow, setGlossLine)
+  'seatGlossRow', 'setGlossLine',
+  // Ladder R4 (2026-10-20): a lookup word's English is the gloss its box leads with (boxLeadGloss)
+  'boxLeadGloss'];
 const declarations = new Map();
 for (const statement of ast.statements) {
   const declared = ts.isFunctionDeclaration(statement) ? [statement.name?.text]
@@ -27,6 +64,7 @@ const program = [...new Set(declarations.values())].join('\n');
 const dict = JSON.parse(readFileSync(new URL('../data/share_alike/dict.json', import.meta.url), 'utf8')).words;
 const words = JSON.parse(readFileSync(new URL('../data/share_alike/words.json', import.meta.url), 'utf8')).words;
 const index = JSON.parse(readFileSync(new URL('../data/share_alike/dict-v2/index.json', import.meta.url), 'utf8'));
+const kanjiTable = JSON.parse(readFileSync(new URL('../data/share_alike/kanji.json', import.meta.url), 'utf8')).kanji;
 const copy = value => JSON.parse(JSON.stringify(value));
 
 class Element {
@@ -41,10 +79,14 @@ class Element {
         if (on) this.classList.add(name); else this.classList.remove(name); return on; } };
   }
   get textContent() { return this.ownText + this.children.map(child => child.textContent).join(''); }
+  get lastChild() { return this.children[this.children.length - 1] ?? null; }
+  // the reading rung wraps a word's own nodes (inlineWordReading): here a word's nodes are its children
+  get childNodes() { return this.children; }
   set textContent(text) { this.ownText = text; this.children = []; }
   append(...nodes) { for (const node of nodes) { this.children.push(node); node.parentElement = this; } }
   setAttribute(name, value) { this.attributes[name] = String(value); }
   getAttribute(name) { return this.attributes[name] ?? null; }
+  removeAttribute(name) { delete this.attributes[name]; }
   addEventListener(kind, handler) { (this.listeners[kind] ||= []).push(handler); }
   async click() { if (!this.disabled) for (const handler of this.listeners.click || []) await handler({ stopPropagation() {}, detail: 0 }); }
   matches(selector) {
@@ -53,6 +95,9 @@ class Element {
     if (selector === '[data-japanese-lookup]') return this.dataset.japaneseLookup !== undefined;
     if (selector === '[data-lookup-item]') return this.dataset.lookupItem !== undefined;
     if (selector === '[data-lookup-block]') return this.dataset.lookupBlock !== undefined;
+    // G3's roving reads its paragraph by [data-prose-roving] and asks whether a block is div or span
+    if (selector.includes(',')) return selector.split(',').some(one => this.matches(one.trim()));
+    if (/^\[data-[a-z-]+\]$/.test(selector)) return selector.slice(6, -1).replace(/-([a-z])/g, (_m, c) => c.toUpperCase()) in this.dataset;
     return this.tag === selector;
   }
   closest(selectors) {
@@ -72,42 +117,104 @@ class Element {
     this.isConnected = false;
   }
   getBoundingClientRect() { return { top: 200, bottom: 220, left: 20, width: 40, height: 20 }; }
+  // data-* attributes live in dataset here, as the browser reflects them
+  hasAttribute(name) { return name.startsWith('data-') ? name.slice(5).replace(/-([a-z])/g, (_m, c) => c.toUpperCase()) in this.dataset : name in this.attributes; }
+  contains(node) { for (let at = node; at; at = at.parentElement) if (at === this) return true; return false; }
   focus() {}
   remove() { this.isConnected = false; if (this.parentElement) this.parentElement.children = this.parentElement.children.filter(node => node !== this); }
 }
 const find = (node, className) => node.querySelector('.' + className);
 const text = value => new Element('#text', '', value);
 
-function app({ withIndex = true } = {}) {
-  const body = new Element('body'), opened = [], chosen = [];
-  const D = { dict, words, kanji: {}, dictionaryIndex: withIndex ? index : null,
+function app({ withIndex = true, withKanji = false } = {}) {
+  const body = new Element('body'), opened = [], chosen = [], menus = [];
+  const D = { dict, words, kanji: withKanji ? copy(kanjiTable) : {}, dictionaryIndex: withIndex ? index : null,
     dictionaryByForm: new Map(), dictionaryCompleteForms: new Set(), dictionaryBySeq: new Map() };
   const document = { body, querySelectorAll: selector => body.querySelectorAll(selector),
+    createRange: () => ({ selectNodeContents() {}, getClientRects: () => [] }),
     getElementById: id => body.querySelector(`#${id}`),
-    createTextNode: text, createDocumentFragment: () => new Element('#fragment'),
+    createTextNode: text, createDocumentFragment: () => new Element('#fragment'), createElement: tag => new Element(tag),
     createTreeWalker(parent) {
       const nodes = [];
       const visit = node => { for (const child of node.children) { if (child.tag === '#text') nodes.push(child); visit(child); } };
       visit(parent); let at = -1;
       return { nextNode() { return ++at < nodes.length; }, get currentNode() { return nodes[at]; } };
     } };
-  const context = vm.createContext({ D, S: { view: 'shelf', taken: [], deepWords: {}, dials: { kanji: 0, furigana: 1 } },
-    document, NodeFilter: { SHOW_TEXT: 4 }, Intl, window: { innerWidth: 400 },
+  // G3 · the reading dial shows readings. Ladder · a word set in text still climbs its rungs where they have something to
+  // show: a reading not yet up, then its English, then the stage (open() below climbs only rungs it has seen);
+  // verify-word-grammar pins every rung in both engines
+  const context = vm.createContext({ D, S: { view: 'shelf', taken: [], deepWords: {}, dials: { kanji: 0, furigana: 2 } },
+    document, NodeFilter: { SHOW_TEXT: 4 }, Intl, window: { innerWidth: 400 }, queueMicrotask,
+    // Ladder · a word's reading rung puts a ruby in its anchor, which the card's seat reads (anchorBox): the browser's
+    // computed style and text boxes, stubbed at their boundary (no pseudo-element label, no text box: one ruby line)
+    getComputedStyle: () => ({ content: 'none', display: 'inline', visibility: 'visible', opacity: '1', fontSize: '16px' }),
+    // G3's ladder touches device Back's sentinel, the top bar's keep and the room's re-render, and wires the word menu's
+    // gestures: those are the browser's and other rooms' (their own verifiers), stubbed at their boundary here
+    // G4 · the stage's ink ceremony (dressStage: depth, the writing, 読 · 意) is the browser's; verify-word-grammar's G4
+    // part proves it. Here a stage is dressed with none, as a stage outside the ladder is
+    dressStage: () => null,
+    // This suite's lookup prose is outside #reader. Its instant ruby class boundary is
+    // stubbed here; touch-reading-lifecycle.test.mjs executes the real reader lifecycle.
+    setTouchReadingShown: (rt, shown) => {
+      for (let node = rt; node; node = node.parentElement) assert.notEqual(node.id, 'reader', 'lookup fixture must stay outside the reader lifecycle');
+      rt.classList.toggle('hidden-rt', !shown);
+    },
+    syncWalkSentinel: () => {}, syncChromeKeep: () => {}, refreshLadderRoom: () => {}, wireReaderWordMenu: () => {},
+    // the page's match cut is the browser's motion (Element.animate, reduced motion): none here
+    pageCutAllowed: () => false,
     tx: (_ja, en) => en, el: (tag, cls, value) => new Element(tag, cls, value),
     biLabel: (tag, cls, _ja, en) => new Element(tag, cls, en),
     removeMini: () => body.querySelector('#mini')?.remove(), activeTokenAlternatives: null, articleNarration: null,
+    // G1's frame sampler and the page built at idle are the browser's (frames, idle callbacks), not the slip's logic
+    sampleTransition: () => {}, sampleWhere: () => '', schedulePagePrebuild: () => {},
     ensureDictionaryRowsForForm: async () => [], wordCaptureState: () => 'take',
     readerCaptureReasonText: () => 'No confirmed meaning to save', readerGlossMissText: () => 'No confirmed meaning',
+    // G5 · the slip's Save is the one keep (saveWord, add-only); Save ▾'s Review row still toggles (toggleWordSave): either
+    // is the save boundary, and receives the exact node
+    saveWord: node => chosen.push(copy(node)),
     toggleWordSave: node => chosen.push(copy(node)), go: node => opened.push(copy(node)),
+    // Save ▾ opens its menu once the word is saved (1.3.0): the menu is observed at its boundary
+    openVocabularyListPopover: (node, label, invoker, options) => menus.push({ node: copy(node), label, invoker: invoker?.id, menu: !!options?.menu }),
     excerptListenLabel: () => { throw new Error('This lookup suite must not enter audio controls'); } });
   vm.runInContext(program, context);
-  const open = async (surface, details = {}) => {
+  // Ladder · the stage is the word's last rung before its page: each activation climbs one rung, and the next is taken only
+  // from a rung the anchor shows (reading, then English), never blindly; `rungs` records the climb
+  const climb = async (surface, details = {}) => {
     const anchor = new Element('button', '', surface); body.append(anchor);
-    await context.openJapaneseLookup(anchor, surface, details);
-    return body.querySelector('#mini');
+    const rungs = [await context.openJapaneseLookup(anchor, surface, details)];
+    const shown = [{ rung: anchor.dataset.ladderRung, english: find(anchor, 'tok-en')?.textContent ?? null }];
+    for (let step = 0; step < 2 && ['reading', 'gloss'].includes(anchor.dataset.ladderRung) && !body.querySelector('#mini'); step++) {
+      rungs.push(await context.openJapaneseLookup(anchor, surface, details));
+      shown.push({ rung: anchor.dataset.ladderRung, english: find(anchor, 'tok-en')?.textContent ?? null });
+    }
+    return { mini: body.querySelector('#mini'), rungs, shown, anchor };
   };
-  return { context, body, document, opened, chosen, open };
+  const open = async (surface, details = {}) => (await climb(surface, details)).mini;
+  return { context, body, document, opened, chosen, menus, open, climb };
 }
+
+test('Ladder: a lookup word climbs its reading, then its English under it, then its stage; a kana word starts at its English', async () => {
+  const f = app();
+  // 上手 read うわて: the reading is not up, so it comes first; then the English of the sense its text names; then the stage
+  const kanji = await f.climb('上手', { reading: 'うわて', pos: '名詞' });
+  assert.deepEqual(kanji.shown.map((row) => row.rung), ['reading', 'gloss', 'stage']);
+  assert.equal(kanji.shown[0].english, null, 'the reading rung shows no English');
+  const english = kanji.shown[1].english;
+  assert.ok(english && english !== '—', `the English rung shows the word's English (${english})`);
+  assert.equal(kanji.shown[2].english, english, 'the stage keeps the English under the word');
+  assert.equal(kanji.anchor.dataset.depthAside, 'meaning', 'the occurrence steps its depth dot aside while its English shows');
+  assert.equal(find(kanji.mini, 'mini-word').textContent, '上手');
+  // しま is written as it is read: no reading rung, its English first
+  const kana = await f.climb('しま');
+  assert.deepEqual(kana.shown.map((row) => row.rung), ['gloss', 'stage']);
+  assert.equal(kana.shown[0].english, 'will do');
+  assert.equal(find(kana.mini, 'mini-gloss').textContent, 'will do');
+  // the fold, as now: the word returns bare in one step, its English and its aside mark gone
+  f.context.clearWordLadder();
+  assert.equal(find(kana.anchor, 'tok-en'), null);
+  assert.equal(kana.anchor.dataset.depthAside, undefined);
+  assert.equal(kana.anchor.classList.contains('has-en'), false);
+});
 
 test('Auxiliary ます never borrows 升; its unresolved full-entry door cannot reopen that entry', async () => {
   const f = app();
@@ -115,14 +222,22 @@ test('Auxiliary ます never borrows 升; its unresolved full-entry door cannot 
   assert(index.entries.some(row => row[1] === '升' && row[5].includes('ます')));
   const mini = await f.open('ます', { reading: 'ます', pos: '助動詞' });
   assert.equal(find(mini, 'mini-word').textContent, 'ます');
-  assert.equal(find(mini, 'mini-reading').textContent, 'ます');
+  // L · a word written exactly as it is read does not say itself twice: ます has no reading line (a kanji word in this
+  // same run keeps its own, at the end of this test, so hiding every reading cannot pass)
+  assert.equal(find(mini, 'mini-reading'), null, 'ます, written as it is read, shows no reading line');
   assert.equal(find(mini, 'mini-gloss').textContent, 'No dictionary entry for this spelling.');
   assert.equal(find(mini, 'mini-take').disabled, true);
   await find(mini, 'mini-take').click();
   assert.deepEqual(f.chosen, []);
-  assert.equal(find(mini, 'mini-entry').disabled, true, 'No unresolved spelling-only route may reopen 升');
-  await find(mini, 'mini-entry').click();
+  // the word is the door into its full entry (1.3.0); an unresolved spelling's word is plain text, no door
+  assert.equal(find(mini, 'mini-word').tag, 'span', 'No unresolved spelling-only route may reopen 升');
+  assert.equal(mini.querySelectorAll('button').filter((b) => b.dataset.action === 'entry.open').length, 0);
+  await find(mini, 'mini-word').click();
   assert.deepEqual(f.opened, []);
+  // the same run, a kanji word: its reading line is still there (上手 read うわて)
+  const kanji = await f.open('上手', { reading: 'うわて', pos: '名詞' });
+  assert.equal(find(kanji, 'mini-word').textContent, '上手');
+  assert.equal(find(kanji, 'mini-reading')?.textContent, 'うわて', 'a kanji word keeps its reading line');
 });
 
 test('A plain kana segment しま stays on its exact dictionary spelling, never 島 or 縞', async () => {
@@ -131,7 +246,11 @@ test('A plain kana segment しま stays on its exact dictionary spelling, never 
   assert.equal(find(mini, 'mini-gloss').textContent, 'will do');
   await find(mini, 'mini-take').click();
   assert.deepEqual(f.chosen, [{ t: 'word', id: 'しま', seq: '2861315', reading: 'しま' }]);
-  await find(mini, 'mini-entry').click();
+  // Save ▾: the save is followed by its menu, for the same word
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(f.menus, [{ node: { t: 'word', id: 'しま', seq: '2861315', reading: 'しま' }, label: 'しま', invoker: 'mini-take', menu: true }]);
+  assert.equal(find(mini, 'mini-word').dataset.action, 'entry.open');
+  await find(mini, 'mini-word').click();
   assert.deepEqual(f.opened, [{ t: 'word', id: 'しま', seq: '2861315', reading: 'しま' }]);
 });
 
@@ -145,7 +264,7 @@ test('The supplied reading selects a same-spelled entry and survives popup, save
     assert.equal(find(mini, 'mini-word').textContent, fixture.word);
     assert.equal(find(mini, 'mini-reading').textContent, fixture.reading);
     assert.equal(find(mini, 'mini-gloss').textContent, fixture.gloss);
-    await find(mini, 'mini-take').click(); await find(mini, 'mini-entry').click();
+    await find(mini, 'mini-take').click(); await find(mini, 'mini-word').click();
     const expected = { t: 'word', id: fixture.word, seq: fixture.seq, reading: fixture.reading };
     assert.deepEqual(f.chosen, [expected]); assert.deepEqual(f.opened, [expected]);
   }
@@ -157,9 +276,12 @@ test('Missing and mismatched readings cannot fall through to a different core an
   ]) {
     const f = app({ withIndex }), mini = await f.open(fixture.word, { reading: fixture.reading });
     assert.equal(find(mini, 'mini-reading').textContent, fixture.reading);
-    assert.equal(find(mini, 'mini-gloss').textContent, 'No dictionary entry for this spelling.');
+    // R2 (2026-10-17): a spelling the full dictionary lists, read otherwise than every entry, says so ("…this reading");
+    // one it does not list at all, or with no full dictionary to ask, keeps "…this spelling"
+    const listed = withIndex && index.entries.some((row) => row[1] === fixture.word || row[4].includes(fixture.word) || row[5].includes(fixture.word));
+    assert.equal(find(mini, 'mini-gloss').textContent, listed ? 'No dictionary entry for this reading.' : 'No dictionary entry for this spelling.');
     assert.equal(find(mini, 'mini-take').disabled, true);
-    assert.equal(find(mini, 'mini-entry').disabled, true);
+    assert.equal(find(mini, 'mini-word').tag, 'span', 'an unresolved word has no door into an entry');
   }
 });
 
@@ -172,8 +294,8 @@ test('Known kana and kanji core words keep their existing save route; unresolved
   }
   const f = app(); f.context.D.kanji['産'] = {};
   const mini = await f.open('産', { reading: 'さん' });
-  assert.equal(find(mini, 'mini-entry').disabled, false);
-  await find(mini, 'mini-entry').click(); assert.deepEqual(f.opened, [{ t: 'kanji', id: '産' }]);
+  assert.equal(find(mini, 'mini-word').tag, 'button');
+  await find(mini, 'mini-word').click(); assert.deepEqual(f.opened, [{ t: 'kanji', id: '産' }]);
 });
 
 test('The prose enhancer skips writing-room instructions while keeping existing word and character controls', async () => {
@@ -197,17 +319,49 @@ test('Each prose block is one Tab stop of plain-word names sharing one keyboard 
   const second = new Element('p'); second.append(text('分かりました。'));
   root.append(first, second); f.body.append(root);
   f.context.enhanceJapaneseProse(root);
+  // G3 · the block itself is the one Tab stop (installProseWordRoving): its words are plain spans, retired until the arrows
+  // select one, each named by its own visible text, and the block carries the shared help (the word keeps it for when
+  // it is selected)
   for (const block of [first, second]) {
     const words = block.querySelectorAll('.japanese-lookup-word');
     assert(words.length > 1, 'The fixture block has several words');
-    assert.deepEqual(words.map(word => word.tabIndex), [0, ...words.slice(1).map(() => -1)]);
+    assert.equal(block.dataset.proseRoving, 'true');
+    assert.equal(block.tabIndex, 0, 'The block is the one Tab stop');
+    assert(String(block.getAttribute('aria-describedby')).split(' ').includes('japanese-lookup-help'));
     for (const word of words) {
+      assert.equal(word.tag, 'span', 'A word is a plain span, not a button');
+      assert(word.tabIndex !== 0 && !('tabindex' in word.attributes), 'A word is never its own Tab stop');
+      assert.equal(word.getAttribute('role'), 'presentation', 'An unselected word is not its own group');
       assert.equal(word.getAttribute('aria-label'), null, 'The visible word is its own name');
-      assert.equal(word.getAttribute('aria-describedby'), 'japanese-lookup-help');
+      assert.equal(word.dataset.lookupText, word.textContent);
+      assert.equal(word.dataset.proseDescription, 'japanese-lookup-help');
     }
   }
   const help = f.body.querySelectorAll('#japanese-lookup-help');
   assert.equal(help.length, 1);
   assert.equal(help[0].hidden, true);
   assert(!root.textContent.includes(help[0].textContent), 'The help stays outside the prose it describes');
+});
+
+test('R2 · a sound change keeps the text\'s voicing first: 仏 read ぶっ is the kanji (its on\'yomi ぶつ), never 仏 ふつ, France', () => {
+  const f = app({ withKanji: true });
+  f.context.D.dictionaryMode = 'main';
+  const plain = (value) => (value ? JSON.parse(JSON.stringify(value)) : value);
+  const answer = (word, reading) => plain(f.context.readerLookupAnswer(word, { reading }));
+  const door = (word, reading) => plain(f.context.soundChangeDoor({ s: word, b: word, r: reading, p: '名詞', c: true }));
+  // the premise: the quick dictionary reads 仏 ふつ, "France"; no entry reads 仏 ぶつ (nor ぶっ); ぶつ is one of 仏's on'yomi
+  assert.equal(dict['仏'].r, 'ふつ');
+  assert.equal(dict['仏'].m[0], 'France');
+  assert(!index.entries.some((row) => (row[1] === '仏' || row[4].includes('仏')) && row[5].some((kana) => ['ぶつ', 'ぶっ'].includes(kana))));
+  assert(kanjiTable['仏'].on.includes('ブツ'));
+  // the lookup door and the reader's door: the kanji, never the voicing change's France
+  assert.deepEqual(answer('仏', 'ぶっ'), { kanjiOnly: true });
+  assert.deepEqual(door('仏', 'ぶっ'), { s: '仏', b: '仏', r: 'ぶっ', p: '名詞', c: true, kanjiOnly: true });
+  // the same rule still restores what the text's voicing allows, and a voicing change where nothing else does (so a door
+  // answering nothing cannot pass): 一 read いっ is 一 いち, 本 read ぽん is 本 ほん; 仏 read ぶつ stays the kanji
+  assert.deepEqual(answer('一', 'いっ'), { reading: 'いち', shown: 'いっ' });
+  assert.deepEqual(answer('本', 'ぽん'), { reading: 'ほん', shown: 'ぽん' });
+  assert.deepEqual(answer('仏', 'ぶつ'), { kanjiOnly: true });
+  assert.deepEqual(door('一', 'いっ'), { s: '一', b: '一', r: 'いち', p: '名詞', c: true, shown: 'いっ' });
+  assert.deepEqual(door('本', 'ぽん'), { s: '本', b: '本', r: 'ほん', p: '名詞', c: true, shown: 'ぽん' });
 });

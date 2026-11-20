@@ -1,0 +1,231 @@
+{
+ "provenance": {
+  "meaning": "Normalized observed type-ruby receipts from the concurrently approved producer cda18876 (17 rows per engine plus the two sheet rows). Rows keep their observed engine, name and passed values; observations are omitted. These do not prove the current-base producer green.",
+  "producerCommit": "cda188760ec4ed464ffb88be037ad5f31b92f821",
+  "producerSha256": "32d472f58d433d13e093cfec160cc237ba3a7463b0d3054ce54305ca28c8771e",
+  "receipts": [
+   {
+    "engine": "chromium",
+    "file": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/INTG3/verify-9/type-ruby-chromium/type-ruby.json",
+    "sha256": "29a3372cb516c351a970f9788d1e589402fefd62c2b66d7e0587fd9e0d4dd0b7"
+   },
+   {
+    "engine": "webkit",
+    "file": "/Users/dhyana/.dharma/bunki_review/2026-10-15/juncture/one-hand/INTG3/verify-9/type-ruby-webkit/type-ruby.json",
+    "sha256": "a8f7c1b9e4c0b56481f51fa97aa74a990936d6b060a7ab8364a6408d400806a8"
+   }
+  ]
+ },
+ "receipts": {
+  "chromium": {
+   "artifactSha256": "5d995dfd2008e51e0b93d1e4282669a43ec017dbd9945956bb79c6e1f9c16cfc",
+   "gitSha": "7d0eea01ba4cc67a7cd4673f48423a845d8a982f",
+   "sourceDirty": false,
+   "verifierSha256": "32d472f58d433d13e093cfec160cc237ba3a7463b0d3054ce54305ca28c8771e",
+   "scope": "F type and ruby: one ladder (sheets and rendered), one ruby rule, readings at half their word and 10 px or more on touch and always at 320/390/430/1368, never touching another reading, never crossing or running off a line, over their word (a touch reading overhangs its neighbours instead of widening its word; an always reading never meets a glyph), moving and re-breaking no line; a fresh 320 reader 320 wide revealed and folded; the deck back the same; glosses 13 px or more; the reader at 200 % text",
+   "passed": true,
+   "results": [
+    {
+     "engine": "sheets",
+     "name": "L1-one-ladder",
+     "passed": true
+    },
+    {
+     "engine": "sheets",
+     "name": "L2-one-ruby",
+     "passed": true
+    },
+    {
+     "engine": "chromium 153.0.8010.12",
+     "name": "L3-one-ladder-rendered",
+     "passed": true
+    },
+    {
+     "engine": "chromium 153.0.8010.12",
+     "name": "R1-on-touch-320",
+     "passed": true
+    },
+    {
+     "engine": "chromium 153.0.8010.12",
+     "name": "R4-breaks-on-touch-320",
+     "passed": true
+    },
+    {
+     "engine": "chromium 153.0.8010.12",
+     "name": "R2-always-320",
+     "passed": true
+    },
+    {
+     "engine": "chromium 153.0.8010.12",
+     "name": "R1-on-touch-390",
+     "passed": true
+    },
+    {
+     "engine": "chromium 153.0.8010.12",
+     "name": "R4-breaks-on-touch-390",
+     "passed": true
+    },
+    {
+     "engine": "chromium 153.0.8010.12",
+     "name": "R2-always-390",
+     "passed": true
+    },
+    {
+     "engine": "chromium 153.0.8010.12",
+     "name": "R1-on-touch-430",
+     "passed": true
+    },
+    {
+     "engine": "chromium 153.0.8010.12",
+     "name": "R4-breaks-on-touch-430",
+     "passed": true
+    },
+    {
+     "engine": "chromium 153.0.8010.12",
+     "name": "R2-always-430",
+     "passed": true
+    },
+    {
+     "engine": "chromium 153.0.8010.12",
+     "name": "R1-on-touch-1368",
+     "passed": true
+    },
+    {
+     "engine": "chromium 153.0.8010.12",
+     "name": "R4-breaks-on-touch-1368",
+     "passed": true
+    },
+    {
+     "engine": "chromium 153.0.8010.12",
+     "name": "R2-always-1368",
+     "passed": true
+    },
+    {
+     "engine": "chromium 153.0.8010.12",
+     "name": "W1-fresh-320-reveal-fold",
+     "passed": true
+    },
+    {
+     "engine": "chromium 153.0.8010.12",
+     "name": "R3-deck-back-390",
+     "passed": true
+    },
+    {
+     "engine": "chromium 153.0.8010.12",
+     "name": "G1-glosses-390",
+     "passed": true
+    },
+    {
+     "engine": "chromium 153.0.8010.12",
+     "name": "Z1-200-percent",
+     "passed": true
+    }
+   ]
+  },
+  "webkit": {
+   "artifactSha256": "5d995dfd2008e51e0b93d1e4282669a43ec017dbd9945956bb79c6e1f9c16cfc",
+   "gitSha": "7d0eea01ba4cc67a7cd4673f48423a845d8a982f",
+   "sourceDirty": false,
+   "verifierSha256": "32d472f58d433d13e093cfec160cc237ba3a7463b0d3054ce54305ca28c8771e",
+   "scope": "F type and ruby: one ladder (sheets and rendered), one ruby rule, readings at half their word and 10 px or more on touch and always at 320/390/430/1368, never touching another reading, never crossing or running off a line, over their word (a touch reading overhangs its neighbours instead of widening its word; an always reading never meets a glyph), moving and re-breaking no line; a fresh 320 reader 320 wide revealed and folded; the deck back the same; glosses 13 px or more; the reader at 200 % text",
+   "passed": true,
+   "results": [
+    {
+     "engine": "sheets",
+     "name": "L1-one-ladder",
+     "passed": true
+    },
+    {
+     "engine": "sheets",
+     "name": "L2-one-ruby",
+     "passed": true
+    },
+    {
+     "engine": "webkit 26.6",
+     "name": "L3-one-ladder-rendered",
+     "passed": true
+    },
+    {
+     "engine": "webkit 26.6",
+     "name": "R1-on-touch-320",
+     "passed": true
+    },
+    {
+     "engine": "webkit 26.6",
+     "name": "R4-breaks-on-touch-320",
+     "passed": true
+    },
+    {
+     "engine": "webkit 26.6",
+     "name": "R2-always-320",
+     "passed": true
+    },
+    {
+     "engine": "webkit 26.6",
+     "name": "R1-on-touch-390",
+     "passed": true
+    },
+    {
+     "engine": "webkit 26.6",
+     "name": "R4-breaks-on-touch-390",
+     "passed": true
+    },
+    {
+     "engine": "webkit 26.6",
+     "name": "R2-always-390",
+     "passed": true
+    },
+    {
+     "engine": "webkit 26.6",
+     "name": "R1-on-touch-430",
+     "passed": true
+    },
+    {
+     "engine": "webkit 26.6",
+     "name": "R4-breaks-on-touch-430",
+     "passed": true
+    },
+    {
+     "engine": "webkit 26.6",
+     "name": "R2-always-430",
+     "passed": true
+    },
+    {
+     "engine": "webkit 26.6",
+     "name": "R1-on-touch-1368",
+     "passed": true
+    },
+    {
+     "engine": "webkit 26.6",
+     "name": "R4-breaks-on-touch-1368",
+     "passed": true
+    },
+    {
+     "engine": "webkit 26.6",
+     "name": "R2-always-1368",
+     "passed": true
+    },
+    {
+     "engine": "webkit 26.6",
+     "name": "W1-fresh-320-reveal-fold",
+     "passed": true
+    },
+    {
+     "engine": "webkit 26.6",
+     "name": "R3-deck-back-390",
+     "passed": true
+    },
+    {
+     "engine": "webkit 26.6",
+     "name": "G1-glosses-390",
+     "passed": true
+    },
+    {
+     "engine": "webkit 26.6",
+     "name": "Z1-200-percent",
+     "passed": true
+    }
+   ]
+  }
+ }
+}

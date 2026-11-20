@@ -105,7 +105,7 @@ export function prepareAssessmentFinalization({ binding, snapshot, meta, input: 
       { kind: 'put', collection: 'kairo:record-host-commands', id: meta.changeId, value: row }],
     operations: intents });
 }
-export function validateAssessmentProof(raw) {
+function validateAssessmentProof(raw) {
   const proof = copy(raw);
   fields(proof, ['attemptId', 'attemptRevisionId', 'followupId', 'intentsSha256', 'operations']);
   insist([proof.attemptId, proof.attemptRevisionId, proof.followupId].every(id) &&

@@ -1,0 +1,134 @@
+/* Scoped to the optional answer-side kanji panel. Inherit the active app theme. */
+.kanji-depth {
+  --kd-line: var(--line, #d7cdbb);
+  --kd-ink: var(--ink, #2a2117);
+  --kd-secondary: var(--secondary, #594d3e);
+  --kd-surface: var(--surface, #fbf6ea);
+  --kd-raised: var(--raised, #f3ead6);
+  --kd-accent: var(--accent, #93301a);
+  color: var(--kd-ink);
+  display: block;
+  padding-block: 4px 12px;
+  font-family: var(--uiFont, sans-serif);
+  font-size: 14px;
+  line-height: 1.7;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.kanji-depth *, .kanji-capacity * { box-sizing: border-box; min-width: 0; }
+.kanji-depth h3, .kanji-depth h4, .kanji-depth p, .kanji-depth dl, .kanji-depth dd,
+.kanji-depth ul, .kanji-capacity p, .kanji-capacity h3 { margin: 0; }
+.kanji-depth h3 { font-size: 15px; font-weight: 600; line-height: 1.5; }
+.kanji-depth h4 { font-size: 13px; font-weight: 600; margin-bottom: 9px; }
+.kanji-depth__title-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.kanji-depth__count { color: var(--kd-secondary); font-size: 11px; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+.kanji-depth__word { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 14px; padding-top: 12px; }
+.kanji-depth__word strong { font: 500 24px/1.6 var(--passageFont, serif); }
+.kanji-depth__word-reading { color: var(--kd-secondary); font-size: 13px; margin-inline-start: 8px; }
+.kanji-depth__word>.kanji-depth__word-reading { margin-inline-start: 0; }
+.kanji-depth__word-meaning { margin-top: 5px!important; font-size: 13px; color: var(--kd-secondary); line-height: 1.85; white-space: pre-line; }
+.kanji-depth__selector { display: flex; flex-wrap: wrap; gap: 9px; margin-block: 20px 18px; }
+.kanji-depth__glyph {
+  position: relative;
+  width: 70px;
+  min-height: 78px;
+  flex: 0 0 70px;
+  padding: 9px 5px 12px;
+  font: 500 45px/1.2 var(--passageFont, serif);
+  border: 1px solid var(--kd-line);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--kd-ink);
+  touch-action: manipulation;
+}
+.kanji-depth__glyph:hover:not(:disabled) { background: var(--kd-raised); }
+.kanji-depth__glyph[aria-pressed=true] { color: var(--kd-accent); border-color: var(--kd-accent); background: var(--kd-raised); }
+.kanji-depth__glyph[aria-pressed=true]::after { content: ''; position: absolute; inset: auto 26px 6px; height: 2px; background: currentColor; }
+.kanji-depth button:focus-visible, .kanji-depth summary:focus-visible, .kanji-depth a:focus-visible {
+  outline: 3px solid var(--kd-accent); outline-offset: 3px;
+}
+.kanji-depth__character { border-block-start: 1px solid var(--kd-line); padding-top: 18px; }
+.kanji-depth__facts { display: grid; gap: 12px; }
+.kanji-depth__eyebrow { color: var(--kd-secondary); font-size: 10px; font-weight: 600; letter-spacing: .04em; }
+.kanji-depth__character-meaning { font-size: 16px; line-height: 1.7; margin-top: 4px!important; }
+.kanji-depth__attributes { display: flex; flex-wrap: wrap; gap: 12px 28px; }
+.kanji-depth__attributes>div { display: grid; gap: 4px; }
+.kanji-depth__attributes dt { color: var(--kd-secondary); font-size: 10px; }
+.kanji-depth__attributes dd { font-size: 13px; font-variant-numeric: tabular-nums; }
+.kanji-depth__source-label { color: var(--kd-secondary); font-size: 10px; }
+.kanji-depth__components { padding-block: 18px 16px; }
+.kanji-depth__component-list { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 0; }
+.kanji-depth__component-list li { display: grid; place-items: center; min-width: 42px; min-height: 42px; padding: 4px 9px; background: var(--kd-raised); border: 1px solid var(--kd-line); border-radius: 5px; font: 22px/1.4 var(--passageFont, serif); }
+.kanji-depth__note { color: var(--kd-secondary); font-size: 12px; line-height: 1.8; }
+.kanji-depth__components>.kanji-depth__note { margin-top: 9px; }
+.kanji-depth__fold { margin: 0; border-block-start: 1px solid var(--kd-line); }
+.kanji-depth__fold>summary { cursor: pointer; min-height: 48px; padding: 13px 2px; font-size: 13px; font-weight: 500; color: var(--kd-ink); }
+.kanji-depth__fold>summary::marker { color: var(--kd-accent); }
+.kanji-depth__fold[open]>summary { color: var(--kd-accent); }
+.kanji-depth__fold-body { display: grid; gap: 12px; padding: 2px 0 18px; }
+.kanji-depth__family-clue { display: flex; gap: 15px; align-items: center; margin-bottom: 15px!important; }
+.kanji-depth__family-glyph { font: 500 44px/1.4 var(--passageFont, serif); color: var(--kd-accent); }
+.kanji-depth__family-clue>span:last-child { display: grid; gap: 3px; }
+.kanji-depth__family-clue strong { font-size: 17px; font-weight: 500; }
+.kanji-depth__explanation { font-size: 13px; line-height: 1.9; white-space: pre-line; }
+.kanji-depth__family-members { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 18px; padding: 0; margin-block: 13px!important; }
+.kanji-depth__family-members li { display: flex; align-items: start; gap: 12px; border-block-start: 1px solid var(--kd-line); padding: 12px 0; }
+.kanji-depth__member-glyph { font: 500 30px/1.4 var(--passageFont, serif); width: 1.1em; flex-shrink: 0; }
+.kanji-depth__example-word { font-family: var(--passageFont, serif); font-size: 18px; line-height: 1.7; }
+.kanji-depth__reading { font-size: 12px; line-height: 1.7; color: var(--kd-secondary); }
+.kanji-depth__family-members .kanji-depth__note { font-size: 11px; margin-top: 3px; }
+.kanji-depth__provenance { padding-top: 14px; }
+.kanji-depth__sources { padding-inline-start: 17px; margin-top: 5px!important; font-size: 11px; line-height: 1.9; }
+.kanji-depth__sources a { display: inline-block; min-height: 44px; padding-block: 9px; color: var(--kd-accent); text-underline-offset: .2em; }
+.kanji-depth__contrast+.kanji-depth__contrast { border-block-start: 1px solid var(--kd-line); padding-top: 14px; }
+.kanji-depth__contrast-pair { display: flex; align-items: center; gap: 17px; font: 500 38px/1.5 var(--passageFont, serif); margin-bottom: 8px!important; }
+.kanji-depth__contrast-pair .kanji-depth__versus { font: 14px/1 var(--uiFont, sans-serif); color: var(--kd-secondary); }
+.kanji-depth__contrast>.kanji-depth__example-word { margin-top: 8px; }
+.kanji-depth__mnemonic { border-inline-start: 2px solid var(--kd-accent); padding-inline-start: 13px; font: 17px/1.9 var(--passageFont, serif); white-space: pre-wrap; }
+.kanji-depth__related { list-style: none; display: grid; gap: 0; padding: 0; }
+.kanji-depth__related li+li { border-block-start: 1px solid var(--kd-line); }
+.kanji-depth__related-word { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: baseline; text-align: start; width: 100%; min-height: 48px; padding: 11px 7px; background: transparent; border: 0; border-radius: 4px; }
+.kanji-depth__related-word:hover:not(:disabled) { background: var(--kd-raised); }
+.kanji-depth__related-meaning { grid-column: 1/-1; font-size: 12px; color: var(--kd-secondary); font-weight: 400; line-height: 1.8; white-space: pre-line; }
+.kanji-depth__collocation-section { border-block-start: 1px solid var(--kd-line); padding-top: 16px; margin-top: 6px; }
+.kanji-depth__collocations { list-style: none; display: grid; gap: 10px; padding: 0; }
+.kanji-depth__collocations>li { padding-inline-start: 12px; border-inline-start: 2px solid var(--kd-line); }
+.kanji-depth__collocations .passage { font-size: 17px; line-height: 2; }
+.kanji-depth__sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px!important; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.kanji-capacity { border-block-start: 1px solid var(--line, #d7cdbb); margin: 0; min-width: 0; font: 13px/1.8 var(--uiFont, sans-serif); color: var(--ink, #2a2117); overflow-wrap: anywhere; }
+.kanji-capacity>summary { min-height: 48px; padding: 13px 2px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.kanji-capacity>summary::marker { color: var(--accent, #93301a); }
+.kanji-capacity>summary:focus-visible { outline: 3px solid var(--accent, #93301a); outline-offset: 3px; }
+.kanji-capacity__body { display: grid; gap: 14px; padding-bottom: 18px; }
+.kanji-capacity__counts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; }
+.kanji-capacity__counts dt { font-size: 10px; color: var(--secondary, #594d3e); line-height: 1.7; }
+.kanji-capacity__counts dd { margin: 4px 0 0; font: 500 26px/1.4 var(--passageFont, serif); font-variant-numeric: tabular-nums; }
+.kanji-capacity__note { font-size: 11px; line-height: 1.8; color: var(--secondary, #594d3e); }
+.kanji-capacity__criterion { font-size: 12px; line-height: 1.85; }
+.kanji-capacity__windows { border-collapse: collapse; width: 100%; table-layout: fixed; font-size: 12px; }
+.kanji-capacity__windows caption { text-align: start; font-size: 11px; font-weight: 600; padding-bottom: 8px; }
+.kanji-capacity__windows th, .kanji-capacity__windows td { text-align: start; vertical-align: top; padding: 10px 5px; border-block-end: 1px solid var(--line, #d7cdbb); font-variant-numeric: tabular-nums; }
+.kanji-capacity__windows thead th { color: var(--secondary, #594d3e); font-size: 10px; font-weight: 500; }
+.kanji-capacity__windows th:first-child { width: 30%; padding-inline-start: 0; }
+.kanji-capacity__windows th:last-child, .kanji-capacity__windows td:last-child { width: 16%; padding-inline-end: 0; }
+.kanji-capacity__windows tbody th { font-size: 12px; font-weight: 500; }
+.kanji-capacity__windows tbody th>span { display: block; font-size: 9px; color: var(--secondary, #594d3e); margin-top: 3px; }
+.kanji-capacity__recommendation { padding-inline-start: 12px; border-inline-start: 2px solid var(--accent, #93301a); font-size: 12px; }
+.kanji-capacity__recommendation>strong { font-size: 13px; font-weight: 600; }
+.kanji-capacity__recommendation>p { margin-top: 6px; }
+.kanji-capacity__workload { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; padding-block: 12px; border-block: 1px solid var(--line, #d7cdbb); }
+.kanji-capacity__workload dt { font-size: 10px; color: var(--secondary, #594d3e); line-height: 1.7; }
+.kanji-capacity__workload dd { margin: 4px 0 0; font-size: 17px; font-variant-numeric: tabular-nums; }
+.kanji-capacity__explanation>summary { min-height: 44px; padding-block: 10px; cursor: pointer; font-size: 12px; }
+.kanji-capacity__explanation>summary:focus-visible { outline: 3px solid var(--accent, #93301a); outline-offset: 3px; }
+.kanji-capacity__explanation>ul { margin: 0; padding-inline-start: 18px; font-size: 11px; color: var(--secondary, #594d3e); }
+.kanji-capacity__explanation li { margin-bottom: 8px; line-height: 1.85; white-space: pre-line; }
+@media(max-width:480px) {
+  .kanji-depth__family-members { grid-template-columns: minmax(0, 1fr); }
+  .kanji-depth__related-word { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .kanji-depth__word strong { font-size: 22px; }
+  .kanji-depth__glyph { width: 64px; flex-basis: 64px; min-height: 74px; font-size: 42px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .kanji-depth *, .kanji-capacity * { transition: none!important; animation: none!important; }
+}

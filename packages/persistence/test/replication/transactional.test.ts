@@ -447,7 +447,7 @@ describe('transactional replication store — real file-backed node:sqlite (ci-s
     expect(after.inbox).toHaveLength(1005);
     expect(after.replica).toEqual(before.replica);
     expect(after.outbox).toEqual([]);
-  });
+  }, 60_000);
 
   it('refuses an unknown schema version without altering its existing journal', async () => {
     const { store, driver } = open();

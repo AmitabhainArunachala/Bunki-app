@@ -524,6 +524,12 @@ export default tseslint.config(
     },
   },
   {
+    files: ['scripts/ci/**/*.mjs'],
+    languageOptions: {
+      globals: { structuredClone: 'readonly', URL: 'readonly' },
+    },
+  },
+  {
     files: ['scripts/**/*.mjs', '*.config.mjs', '*.config.ts'],
     languageOptions: {
       globals: {

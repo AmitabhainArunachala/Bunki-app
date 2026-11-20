@@ -58,7 +58,7 @@ export function createKanjiWorldEncounter({ container, content, imageUrl, onRetu
     root.replaceChildren();
     answerInput = null;
     const top = node('header', 'kw-top');
-    top.append(button('return', copy('← Return', '← 戻る'), true));
+    top.append(button('return', copy('‹ Back', '‹ 戻る'), true));
     top.append(node('span', 'kw-progress', stage === 5 ? copy('Practice complete', '練習完了') : `${Math.min(stage + 1, 5)} / 5`));
     root.append(top);
     const body = node('div', `kw-body${stage === 0 ? ' kw-body--place' : ''}`);
@@ -76,7 +76,8 @@ export function createKanjiWorldEncounter({ container, content, imageUrl, onRetu
       } else {
         figure.append(node('p', 'kw-image-fallback', copy('The scene is unavailable. You can still practise the character.', '風景を表示できません。漢字の練習は続けられます。')));
       }
-      figure.append(node('figcaption', 'kw-candidate', copy('Rajōmon · art candidate', '羅城門 · 画像候補')));
+      // the picture's review status (a candidate awaiting John's verdict) stays in the packet's own status field, never on
+      // the learner's page
       body.append(figure);
       heading.textContent = copy('Look through the rain.', '雨の向こうを、見てみよう。');
       body.append(heading, node('p', 'kw-hook', fromPacket(content.scene?.memory_hook)), node('p', 'kw-note', fromPacket(content.scene?.label)));

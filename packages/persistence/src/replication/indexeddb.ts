@@ -21,7 +21,14 @@ import {
 
 import { planJournalRestore, prepareRestoreRequest } from './backup.ts';
 import { ReplicationStoreError } from './errors.ts';
-import { assertCounter, assertLocalKey, encodeLocalJson, readLocalJson } from './json.ts';
+import {
+  assertCounter,
+  assertLocalKey,
+  copyLocalJson,
+  encodeLocalJson,
+  isNormalizedLocalJson,
+} from './json.ts';
+import { LocalJsonReadCache } from './read-cache.ts';
 import type {
   DurableCommitReceipt,
   LocalCommit,
@@ -101,14 +108,33 @@ interface Current {
 }
 
 function assertKeys(value: unknown, keys: readonly string[]): void {
-  if (
-    !value ||
-    typeof value !== 'object' ||
-    Array.isArray(value) ||
-    Object.keys(value).sort().join('\u0000') !== [...keys].sort().join('\u0000')
-  )
+  if (!value || typeof value !== 'object' || Array.isArray(value))
+    throw new ReplicationStoreError('invalid-request');
+  const actual = Object.keys(value);
+  // The usual case without sorting: as many keys as expected and every expected
+  // one present. Those two facts make the key sets equal, so the comparison
+  // below would pass; anything else is decided by that comparison as before.
+  if (actual.length === keys.length) {
+    let present = 0;
+    for (const key of keys)
+      if (Object.prototype.propertyIsEnumerable.call(value, key)) present += 1;
+      else break;
+    if (present === keys.length) return;
+  }
+  if (actual.sort().join('\u0000') !== [...keys].sort().join('\u0000'))
     throw new ReplicationStoreError('invalid-request');
 }
+
+/**
+ * Checks of a row's own content that have passed, kept by the row's identity.
+ * A row value comes from the decode cache or from an encode in this
+ * transaction, so it is frozen all the way down and the same object for as long
+ * as its bytes on disk are the same. Its shape cannot stop being valid. What a
+ * check compares with the rest of the store (the revision, the operations a
+ * receipt names) is never kept and is evaluated in every transaction.
+ */
+const CHECKED_DOCUMENTS = new WeakMap<object, string>();
+const CHECKED_RECEIPTS = new WeakSet<object>();
 function id(...parts: string[]): string {
   return JSON.stringify(parts);
 }
@@ -130,6 +156,7 @@ class Rows {
   constructor(
     readonly scope: Scope,
     readonly store: IDBObjectStore,
+    readonly cache: LocalJsonReadCache,
     raw: readonly StoredRow[],
   ) {
     try {
@@ -145,7 +172,7 @@ class Rows {
           throw new ReplicationStoreError('corrupt-store');
         const table = this.#rows.get(row.kind);
         if (!table || table.has(row.id)) throw new ReplicationStoreError('corrupt-store');
-        table.set(row.id, readLocalJson(row.text, row.sha256));
+        table.set(row.id, cache.read(id(row.kind, row.id), row.text, row.sha256));
       }
     } catch {
       throw new ReplicationStoreError('corrupt-store');
@@ -155,10 +182,14 @@ class Rows {
     return this.#rows.get(kind)?.get(key) as T | undefined;
   }
   all<T>(kind: Kind): [string, T][] {
-    return [...(this.#rows.get(kind) ?? [])].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)) as [
-      string,
-      T,
-    ][];
+    const entries = [...(this.#rows.get(kind) ?? [])] as [string, T][];
+    // Rows arrive from the index in key order; only a table this transaction
+    // has added to can be out of order. Keys are unique, so ascending is sorted.
+    for (let index = 1; index < entries.length; index += 1) {
+      if (!((entries[index - 1] as [string, T])[0] < (entries[index] as [string, T])[0]))
+        return entries.sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+    }
+    return entries;
   }
   put(kind: Kind, key: string, value: unknown): void {
     const payload = encodeLocalJson(value);
@@ -170,10 +201,15 @@ class Rows {
       text: payload.text,
       sha256: payload.sha256,
     } satisfies StoredRow);
+    // The text and digest were made from this value just now, so the read that
+    // follows a commit need not decode its own bytes again. A hit still needs
+    // those exact bytes back from disk (read-cache.ts).
+    this.cache.remember(id(kind, key), payload.text, payload.sha256, payload.value);
     this.#rows.get(kind)?.set(key, payload.value);
   }
   delete(kind: Kind, key: string): void {
     this.store.delete([this.scope[0], this.scope[1], kind, key]);
+    this.cache.forget(id(kind, key));
     this.#rows.get(kind)?.delete(key);
   }
 }
@@ -190,6 +226,9 @@ export class IndexedDbReplicationStore implements ReplicationStore {
   readonly #actor: ActorIdentity;
   readonly #scope: Scope;
   readonly #active = new Set<Promise<unknown>>();
+  // Every transaction reads every row of the scope, so the cache must hold a
+  // whole aged store (two small rows for each command a learner has made).
+  readonly #cache = new LocalJsonReadCache(262_144, 48 * 1024 * 1024);
   #closed = false;
 
   private constructor(db: IDBDatabase, policy: ReplicaPolicy, actor: ActorIdentity) {
@@ -198,12 +237,17 @@ export class IndexedDbReplicationStore implements ReplicationStore {
     this.#actor = actor;
     this.#scope = [policy.binding.accountId, policy.binding.learnerId];
     db.onversionchange = () => {
-      this.#closed = true;
+      this.#retire();
       db.close();
     };
     db.onclose = () => {
-      this.#closed = true;
+      this.#retire();
     };
+  }
+
+  #retire(): void {
+    this.#closed = true;
+    this.#cache.retire();
   }
 
   static async open(
@@ -345,7 +389,7 @@ export class IndexedDbReplicationStore implements ReplicationStore {
         try {
           tx.abort();
         } catch {
-          this.#closed = true;
+          this.#retire();
           this.#db.close();
         }
       };
@@ -366,7 +410,7 @@ export class IndexedDbReplicationStore implements ReplicationStore {
       tx.oncomplete = () => {
         globalThis.clearTimeout(timer);
         if (!ready || failure) {
-          this.#closed = true;
+          this.#retire();
           this.#db.close();
           reject(failure ?? new ReplicationStoreError('reopen-required'));
         } else resolve(result);
@@ -399,7 +443,7 @@ export class IndexedDbReplicationStore implements ReplicationStore {
                 encodeLocalJson({ id: 'schema', format: SCHEMA, v: VERSION }).text
             )
               throw new ReplicationStoreError('unsupported-schema');
-            result = body(new Rows(this.#scope, table, stored.result as StoredRow[]));
+            result = body(new Rows(this.#scope, table, this.#cache, stored.result as StoredRow[]));
             ready = true;
           } catch (error) {
             abort(error);
@@ -507,11 +551,13 @@ export class IndexedDbReplicationStore implements ReplicationStore {
       return operation;
     };
     const documents = rows.all<LocalDocument>('document').map(([key, document]) => {
+      if (CHECKED_DOCUMENTS.get(document) === key) return document;
       assertKeys(document, ['collection', 'id', 'value']);
       assertLocalKey(document.collection);
       assertLocalKey(document.id);
       if (key !== id(document.collection, document.id))
         throw new ReplicationStoreError('corrupt-store');
+      if (isNormalizedLocalJson(document)) CHECKED_DOCUMENTS.set(document, key);
       return document;
     });
     const outbox: SyncOperation[] = [];
@@ -539,15 +585,18 @@ export class IndexedDbReplicationStore implements ReplicationStore {
       return row;
     });
     for (const [, row] of rows.all<Receipt>('receipt')) {
-      assertKeys(row, ['requestSha256', 'revision', 'operations']);
-      assertCounter(row.revision);
-      if (
-        typeof row.requestSha256 !== 'string' ||
-        !/^[0-9a-f]{64}$/u.test(row.requestSha256) ||
-        row.revision > current.revision ||
-        !Array.isArray(row.operations)
-      )
-        throw new ReplicationStoreError('corrupt-store');
+      if (!CHECKED_RECEIPTS.has(row)) {
+        assertKeys(row, ['requestSha256', 'revision', 'operations']);
+        assertCounter(row.revision);
+        if (
+          typeof row.requestSha256 !== 'string' ||
+          !/^[0-9a-f]{64}$/u.test(row.requestSha256) ||
+          !Array.isArray(row.operations)
+        )
+          throw new ReplicationStoreError('corrupt-store');
+        if (isNormalizedLocalJson(row)) CHECKED_RECEIPTS.add(row);
+      }
+      if (row.revision > current.revision) throw new ReplicationStoreError('corrupt-store');
       for (const ref of row.operations) checked(ref);
     }
     return {
@@ -612,7 +661,7 @@ export class IndexedDbReplicationStore implements ReplicationStore {
   }
 
   async commitLocal(raw: LocalCommit): Promise<DurableCommitReceipt> {
-    const request = encodeLocalJson(raw).value as unknown as LocalCommit;
+    const request = copyLocalJson(raw) as unknown as LocalCommit;
     assertKeys(request, [
       'changeId',
       'binding',
@@ -887,7 +936,7 @@ export class IndexedDbReplicationStore implements ReplicationStore {
   }
 
   async close(): Promise<void> {
-    this.#closed = true;
+    this.#retire();
     this.#db.close();
     await Promise.allSettled([...this.#active]);
   }

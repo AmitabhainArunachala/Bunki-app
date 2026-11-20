@@ -1,0 +1,25 @@
+{
+  "source": "2602ec65f79154616abb2f3666f3928929a93413",
+  "files": [
+    {
+      "path": "tools/build_bunki.py",
+      "bytes": 7021,
+      "sha256": "cecfd501a5f395d077fa5d987804c5bbb0847565674337231d4db72a340341fe"
+    },
+    {
+      "path": "tools/passage_readings.py",
+      "bytes": 10534,
+      "sha256": "d32d297f05f5a529c765848f1d58ece36ab39e1687f72c937657685d5d3ca289"
+    },
+    {
+      "path": "master/vocab.jsonl",
+      "bytes": 18553745,
+      "sha256": "86814c0801e3c77bc34c4be47e4a1c5f6da926b6bc3df90692f77e258136e021"
+    },
+    {
+      "path": "master/passage-readings.v1.json",
+      "bytes": 1130045,
+      "sha256": "b90a8fe5290163b28258e2d5c84b87795e8a95d59288663aa4bfb085a61fd446"
+    }
+  ]
+}

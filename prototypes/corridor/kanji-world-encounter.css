@@ -37,17 +37,6 @@
 .kw-encounter .kw-title:focus { outline: none; }
 .kw-encounter .kw-place { margin: 0 0 28px; position: relative; background: #101a29; }
 .kw-encounter .kw-image { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: contain; }
-.kw-encounter .kw-candidate {
-  position: absolute;
-  bottom: 10px;
-  right: 12px;
-  background: #101a29e8;
-  color: #dae2e7;
-  padding: 3px 8px;
-  border-radius: 2px;
-  font-size: 11px;
-  line-height: 1.6;
-}
 .kw-encounter .kw-image-fallback { min-height: 240px; margin: 0; padding: 80px 30px; color: var(--kw-muted); }
 .kw-encounter .kw-hook { margin: 0 20px 8px; font-size: 17px; line-height: 1.7; }
 .kw-encounter .kw-note { max-width: 440px; margin: 12px auto 24px; color: var(--kw-muted); font-size: 13px; line-height: 1.7; padding: 0 12px; }
@@ -97,7 +86,6 @@
   .kw-encounter .kw-body { min-height: 460px; padding-top: 20px; }
   .kw-encounter .kw-body--place { padding-top: 0; }
   .kw-encounter .kw-body--place .kw-title { padding: 0 20px; }
-  .kw-encounter .kw-candidate { position: static; text-align: right; padding: 5px 12px; font-size: 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .kw-encounter *, .kw-encounter *::before, .kw-encounter *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }

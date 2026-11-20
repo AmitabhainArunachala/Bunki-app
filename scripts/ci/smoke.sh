@@ -57,7 +57,8 @@ for path in '' 'apple-touch-icon.png' 'corridor.css' 'fonts.css' 'corridor.js' \
             'decks/kotoba-mcd/deck.json' \
             'decks/n2/deck.json' 'decks/n2/tokens.json' \
             'decks/n1/deck.json' 'decks/n1/tokens.json' \
-            'decks/senmon/deck.json' 'decks/senmon/tokens.json'; do
+            'decks/senmon/deck.json' 'decks/senmon/tokens.json' \
+            'decks/kotoba-master/deck.json' 'decks/kotoba-master/tokens.json'; do
   code=""
   for _ in 1 2 3 4 5; do
     code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:$port/$path" || true)

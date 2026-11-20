@@ -16,6 +16,23 @@ import { resolveCorridorEvidence, resolveCorridorSite } from '../../../scripts/r
 import { verifyBundledArtifact } from '../../bunki-desktop/lib/artifact.cjs';
 import { armRecordWriteFailure, clearRecordWriteFailure, readAppRecordSnapshot, waitForAppRecord } from './record-test-support.mjs';
 
+/** Every backup restore asks first (Hfix-2a, 71907eb2). A page that imports answers exactly that question, with
+ * record-fixture-support's selectBackupFile checks, for as long as it lives: an interrupted or refused restore asks before
+ * its boundary or its refusal, and some rows never await the import. Any other dialog is recorded and fails the row. */
+const restoreAnswered = new WeakSet(), dialogProblems = [];
+function answerRestore(page) {
+  if (restoreAnswered.has(page)) return;
+  restoreAnswered.add(page);
+  page.on('dialog', async (dialog) => {
+    try {
+      assert.equal(dialog.type(), 'confirm');
+      assert.match(dialog.message(), /^Restore saved words, lists, notes, learning records and \d+ conversation turns/u);
+      assert.match(dialog.message(), /Separate deck progress is not included\./u);
+      await dialog.accept();
+    } catch (error) { dialogProblems.push(String(error?.message || error)); await dialog.dismiss().catch(() => {}); }
+  });
+}
+
 const OUT = resolveCorridorEvidence();
 const ROOT = resolveCorridorSite();
 assert.equal(process.env.KAIRO_RECORD_SOURCE, undefined, 'Integrity must test the selected immutable runtime without source overrides');
@@ -178,6 +195,7 @@ async function imported(page, value, reload = true) {
   await tray(page);
   const marker = randomUUID();
   await page.evaluate((marker) => { window.__integrityDocument = marker; }, marker);
+  answerRestore(page);
   await page.locator('#import-file').setInputFiles({ name: 'synthetic-record.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(value)) });
   if (reload) {
     await page.waitForFunction((marker) => window.__integrityDocument !== marker, marker, { timeout: 20000 });
@@ -262,13 +280,14 @@ async function test(name, body, options = {}) {
     fixture = await fresh(options);
     await Promise.race([body(fixture), new Promise((_, fail) => { timer = setTimeout(() => fail(new Error('Integrity journey exceeded 90 seconds')), 90000); })]);
     assert.deepEqual(fixture.errors, [], 'no unexpected JavaScript page errors');
+    assert.deepEqual(dialogProblems, [], 'a page that imports is asked only the restore question');
     results.push({ name, pass: true, elapsedMs: Date.now() - started }); console.log(`ok ${name}`);
   } catch (error) {
     results.push({ name, pass: false, message: error.message, pageErrors: fixture?.errors || [], elapsedMs: Date.now() - started });
     writeFileSync(resolve(dir, 'failure.txt'), error.stack || error.message);
     console.error(`FAIL ${name}: ${error.message}`);
   } finally {
-    clearTimeout(timer);
+    clearTimeout(timer); dialogProblems.length = 0;
     if (fixture) await fixture.context.close();
     writeFileSync(resolve(dir, 'receipt.json'), JSON.stringify(results.at(-1), null, 2) + '\n');
   }
