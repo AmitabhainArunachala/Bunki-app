@@ -4,14 +4,20 @@ export {startAcceptedAudioHost,acceptedAudioSourceRevision} from './accepted-aud
 export {createBrowserAudioPackHost} from './browser-audio-pack-host.mjs';
 import {createBackupStatusObserver} from './backup-status.mjs';
 import {createFactoryStatusReader,factoryRequest} from './factory-status.mjs';
+import {provisionalRows} from './provisional-cards.mjs';
 import {applyKinsoku} from '../player/kinsoku.mjs';
 import {watchRubyLayout} from '../player/ruby-layout.mjs';
+import {watchWordPopover} from './word-popover.mjs';
 import { createRecallTimer, createNode } from '../player/presentation.mjs';
 import { renderVocabularyPassage,renderVocabularyBack,renderVocabularyRelated,renderVocabularyEntry } from '../player/vocabulary.mjs';
 import {contentReady} from '../player/content-ready.mjs';
 import {lookupReadingPresentation,reviewedDictionaryEntry,reviewedActionCapture} from '../player/passage-reading-evidence.mjs';
 import { dayBounds } from '../replay.mjs';
 import {translateInterfaceText,formatInterfaceText,defaultInterfaceLanguage,renderInterfacePair,formatStudyDate,formatStudyMinutes} from './interface-language.mjs';
+import {createEar,createEarHandlers,createEarMarkHandlers,findEarUnit,earAvailability,buildEarMark,paintEar,aimEarHighlight,earCaretAt,earReadingIndex,earNoVoiceLine,createEarBands} from './ear.mjs';
+import {createOneVoice} from './one-voice.mjs';
+import {joinSpeak,flightKey} from '../audio/speak-join.mjs';
+import {cardFrontRead,cardWordSpeech,answerAudioPath,answerAudioPress,answerAudioMode,readStatus,readFailure,freeTextAvailable,createClipMemo,READING_LIGHT_KEY,readingLightOn} from './card-audio.mjs';
 import {nextStep} from '../vendor/engine.js';
 import {customSessionPanel} from './custom-session.mjs';
 import {studyDayView,studyNewCardAvailability,studyReviewSummary,studyNewCardCost} from './study-loop.mjs';
@@ -21,10 +27,27 @@ import {createSharedActivityTracker} from './sync-evidence.mjs';
 import {createUpdateBoundary} from './update-boundary.mjs';
 import {isRetryableProdSyncError} from './prod-native-sync.mjs';
 import {watchLocalDayBudget} from './local-budget.mjs';
-import {createStudyAudio,studyAudioSourceFields,studyAudioSourcePlan,studyAudioProfileAssignments} from './study-audio.mjs';
+import {createTrialAudio} from './trial-audio.mjs';
+import {createRevealSpeak} from './reveal-speak.mjs';
+import {trialAudioFor,cardSpeakFailureRoute,autoSpeechStops,speakLineKind,createSpeechLineLog,SPEAK_OFFLINE_LINE,pairingProven} from './card-speak-route.mjs';
+import {voiceLine,voiceCause,voiceStatusLine,VOICE_WORDS,withKey,VOICE_KEY_HELP,VOICE_MEDIA} from '../audio/voice-lines.mjs';
+import {createMediaSessionLink,webClientShell} from '../audio/media-session.mjs';
+import {createStudyAudio,studyAudioSourceFields,studyAudioSourcePlan} from './study-audio.mjs';
+import {planOnDemandSpeech,describeSpeakError,SPEAK_ERRORS} from '../audio/on-demand-speech.mjs';
+import {createSpeechInput} from '../audio/speech-input.mjs';
+import {createSpeechQueue,SPEEDS} from '../audio/speech-queue.mjs';
+import {splitSentences,normaliseSpeechText,isJapaneseEnough,voiceKeyFor} from '../audio/speech-text.mjs';
+import {createAudioPlayer,clipBroken} from '../audio/speech-player.mjs';
+import {speakableText,offsetOf,rangeFor,showSpeaking as markSpeaking} from '../audio/speech-highlight.mjs';
+import {createSpeechLight} from '../audio/speech-bands.mjs';
+import {cardSpeakTarget,cardVoiceProfile,speechInputFor,cardSpeakEligible} from '../audio/speak-keys.mjs';
 const MODULES = [['all','すべて','すべてのデッキ'],['n2','N2','日本語能力試験'],['n1','N1','日本語能力試験'],['senmon','専門','考えを深める言葉'],['kotoba','わたしの言葉','拾い集めた言葉'],['grammar','文法','意味・思い出す']];
 const GRADES = [[1,'もう一度','Again','再'],[2,'難しい','Hard','難'],[3,'正解','Good','良'],[4,'簡単','Easy','易']];
-const interval = ms => ms < 60000 ? '1分未満' : ms < 3600000 ? `${Math.ceil(ms/60000)}分` : ms < 86400000 ? `${Math.ceil(ms/3600000)}時間` : `${Math.round(ms/86400000)}日`;
+// R1 grades (the owner, 11-18: "days, minutes, hours, months ... just like ANKI"): months from 30 days, years from 365, one decimal at most.
+const oneDecimal = n => { const r = Math.round(n*10)/10; return Number.isInteger(r) ? String(r) : r.toFixed(1); };
+export const intervalLabel = ms => ms < 60000 ? '1分未満' : ms < 3600000 ? `${Math.ceil(ms/60000)}分` : ms < 86400000 ? `${Math.ceil(ms/3600000)}時間` : ms < 30*86400000 ? `${Math.round(ms/86400000)}日` : ms < 365*86400000 ? `${oneDecimal(ms/(30*86400000))}ヶ月` : `${oneDecimal(ms/(365*86400000))}年`;
+const interval = intervalLabel;
+export const intervalLabelEn = ms => ms < 60000 ? 'Under 1 minute' : ms < 3600000 ? `${Math.ceil(ms/60000)} min` : ms < 86400000 ? `${Math.ceil(ms/3600000)} hr` : ms < 30*86400000 ? `${Math.round(ms/86400000)} days` : ms < 365*86400000 ? `${oneDecimal(ms/(30*86400000))} mo` : `${oneDecimal(ms/(365*86400000))} yr`;
 
 /** Select only from scheduler-admitted queues; daily permits and topic filters remain backend-owned. */
 export function nextRapidFireStudy(backend,module='all',at=Date.now(),gradedTaskKey=null,onReadyQueue=null,backlog=false) {
@@ -63,13 +86,48 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   if(platform.presentation!==undefined&&!['phone','desktop'].includes(platform.presentation))throw Error('invalid-study-presentation');
   const phonePresentation=platform.presentation===undefined?pairedPhone:platform.presentation==='phone';
   const sharedAudioDeclared=platform.audioDownloadFailure===true||platform.audio!==undefined&&platform.audio!==null;
-  const sharedAudioGuarded=sharedAudioDeclared&&typeof platform.audioDownloads?.authorizePlayback==='function';
+  // One request per text and voice in flight: the reveal, P, 読む and the ear share it (N2-INT).
+  // N7: a reply from the network proves the pairing again (a kept clip does not): automatic speech comes back, no reload.
+  // N7 fix 2: the same reply tells the reveal's line log which standing causes it disproves (voiceAnswered).
+  const speakJoined=joinSpeak((target,input)=>Promise.resolve(win.nihongoSpeak.speak(target,input)).then(reply=>{if(pairingProven(reply))restoreAutoSpeech();voiceAnswered(reply);return reply;}));
+  const cardSpeakBridge=!sharedAudioDeclared&&typeof win.nihongoSpeak?.speak==='function'?Object.freeze({web:win.nihongoSpeak.web===true,speak:speakJoined}):null;
   let audioDownloadsSuspended=false,audioDownloadActionFailed=false,audioDownloadsSnapshot=null;
-  // Audio requires the current Japanese-only shared authority.
-  const trialAudio=null;
+  const trialAudio=trialAudioFor({sharedAudio:sharedAudioDeclared,bridge:cardSpeakBridge,create:()=>createTrialAudio({origin:platform.audioOrigin??win.nihongoNativeSync?.origin??win.location?.origin})});
   let trialAudioPlaybackGeneration=0;
-  let sharedAudioOwner=null,sharedAudioRoot=null,sharedAudioRootState=sharedAudioGuarded?'idle':sharedAudioDeclared?'unsupported':'absent',sharedAudioRootPromise=null,sharedAudioRootController=null;
-  const studyAudio=sharedAudioGuarded?createStudyAudio({capability:platform.audio,authorize:()=>sharedAudioAuthorized(),preflight:platform.audioDownloads?.authorizePlayback}):null;
+  let cardSpeakContext=null,cardSpeakSource=null,cardSpeakOwner=null,cardSpeakPlayGeneration=0;
+  let cardSpeakPresses=0,cardSpeakOwnSuspend=null;  // N7 fix 2: his presses on a held clip; the client's own suspend
+  let cardClipResume=null;  // N7 fix 3b (F2): the pending check of the last resume of the held clip
+  let sharedAudioOwner=null,sharedAudioRoot=null,sharedAudioRootState=sharedAudioDeclared?'idle':'absent',sharedAudioRootPromise=null,sharedAudioRootController=null;
+  const studyAudio=sharedAudioDeclared?createStudyAudio({capability:platform.audio,authorize:()=>sharedAudioAuthorized(),preflight:platform.audioDownloads?.authorizePlayback}):null;
+  const speakPlayer=createAudioPlayer(document,{onOutsideStart:()=>outsideStartPaused()});
+  // N7 fix 3: the lock screen's, Control Center's and the earphones' play and pause (syncMediaSession). Fix 3b (the lead,
+  // M): only in the iPhone's web client in this round. In the Mac app's shell the link touches nothing (no handler, no
+  // playback state, no metadata), and the platform's play stays an outside start, paused again at once.
+  const mediaLink=createMediaSessionLink(webClientShell(win)?win:null);
+  let speakRate=1;
+  try{const stored=Number(win.localStorage.getItem('nihongo.speak-rate.v1'));if(SPEEDS.includes(stored))speakRate=stored;}catch{}
+  let speakReader=null,wordSpeech=null,blockSpeech=null,selectionSpeech=null,selectionSpeechTarget=null,readSessions=0;
+  let selectionChip=null,selectionChipTimer=null,dynamicSpeech='unknown';
+  // N6-6 (owner 2026-11-11, "the option to have no highlighting at all"): one device switch; off, no band is drawn on text
+  // being read or aimed at by the ear. The reading, its order, stop and the data marks are unchanged.
+  let readingLight=true;try{readingLight=readingLightOn(preferences.getItem(READING_LIGHT_KEY));}catch{}
+  const readingLightKept=()=>typeof preferences?.supports!=='function'||preferences.supports(READING_LIGHT_KEY)===true;
+  // N5: the speaking light is one even band per line in its own layer, the same in every engine; the custom highlight
+  // and the data-speaking marks stay as data and carry no colour (WebKit paints neither inside a word button).
+  // N7 (review of c4f6312): a paused read keeps its sentence lit but nothing moves by itself: the light looks four times a
+  // second instead of every frame (battery on a phone); pause and resume redraw it, which re-decides.
+  const speechLight=createSpeechLight(document,{parent:root,enabled:()=>readingLight,idle:()=>readOf(speakReader)==='paused'&&!wordSpeech&&!blockSpeech&&!selectionSpeech});
+  // N6-9: the clips of the card on screen are kept while it is shown, so a second tap, or the answer side after the
+  // question side (one text, one voice), asks for nothing again. A day's budget refusal of free text holds for that day.
+  const cardClips=createClipMemo();let cardClipsVoice=null,freeTextRefusedDay=null;
+  // Any other speaker clearing its light hands it back to the sentence a read is on.
+  function readHost(session,item){return !session||!item?null:item.part==='word'?session.term:session.passage;}
+  function showSpeaking(range,host){
+    const reading=speakReader,lit=reading?.sentences[reading.lit],litHost=readHost(reading,lit);
+    if(!range&&lit&&litHost?.isConnected){range=rangeFor(litHost,lit.start,lit.end);host=litHost;}
+    markSpeaking(range,host);speechLight.set('speaking',range??null);
+  }
+  let cardSpeakTurn=null;
   const h = (tag, attrs, ...children) => createNode(document, tag, attrs, ...children);
   const button = (text, fn, attrs = {}) => h('button', { type:'button', onclick: fn, ...attrs }, text);
   let screen = 'today', module = initialModule, current = null, busy = false, notice = '', pendingIntent = null, pendingAction = null, factoryRetry = null, disposed = false, pop = null, lastReview = null;
@@ -80,6 +138,21 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   let typedBusy=false,typedDraft='',typedSentence='';
   const typedSaved={word:'',sentence:''};
   let swipeGrading=false;try{swipeGrading=preferences.getItem('nihongo.swipe-grading.v1')==='true';}catch{}
+  let speakOnReveal=true;try{speakOnReveal=preferences.getItem('nihongo.speak-on-reveal.v1')!=='false';}catch{}
+  // Speak on reveal (John 2026-11-10): the clip is asked for when the front appears and plays once on reveal; P reuses it.
+  // Offline it still asks the bridge (a kept clip may answer); an offline answer is silent. A refusal that will not fix
+  // itself stops automatic requests for the session.
+  const revealSpeak=createRevealSpeak({
+    speak:c=>cardSpeakBridge.speak(sharedAudioGuid(c.entry),speechInputFor(cardSpeakTarget(c.entry).text,cardVoiceProfile(c.entry))),
+    play:(c,reply)=>playCardSpeak(c,{reply,auto:true}),fail:(c,reply)=>playCardSpeak(c,{reply,auto:true}),
+    enabled:()=>speakOnReveal,
+    canSpeak:c=>cardSpeakSpeakable(c),
+    stops:reply=>autoSpeechStops(reply?.error),
+    prime:()=>{try{resumeCardSpeakContext(ensureCardSpeakContext());}catch{}},
+  });
+  // N7 (review mu34, concern 4): after a 401 stopped automatic speech, the pairing proven again (a reply from the network,
+  // or this Mac's pairing or sync succeeding) brings it back in the same session; no reload.
+  function restoreAutoSpeech(){try{revealSpeak.restore();}catch{}}
   const shippedCatalog=catalog;
   const activityTracker=createSharedActivityTracker({installation:backend.installation,afterSeq:platform.activitySince??backend.readProjection().appliedSeq,now,labelForInstallation:platform.labelForInstallation});
   let sharedActivity=activityTracker.snapshot(),boundaryQueue=[],boundaryNotice=null,lastSharedActivityKey=null;
@@ -93,7 +166,8 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   const sessionEvidence=createSessionEvidence({preferences:sessionPreferences,learner:backend.learner,installation:backend.installation,now});
   let activeSession=null,finishState=null,finishGuardTimer=null,costState=null;const acknowledgedDays=new Set();
   let toastTimer=null,lastInputSource='pointer';const frontCache=new Map();
-  let intervalHints=false;try{intervalHints=preferences.getItem('nihongo.interval-hints.v1')==='true';}catch{}
+  // R1 (the owner, 11-18): each grade shows its wait, as in Anki; on unless this device stored an explicit "false".
+  let intervalHints=true;try{intervalHints=preferences.getItem('nihongo.interval-hints.v1')!=='false';}catch{}
   let budgetWatcher=null;
   let pendingObservation=false,pendingOperation=null,operationSequence=0;
   const manualDraft={word:'',reading:'',meaning:'',example:'',note:''};
@@ -151,7 +225,9 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     if(preferenceChanged('nihongo.interface-language.v1',interfaceLanguage,defaultLanguage,value=>['ja','en','both'].includes(value)))blockers.add('preference-language');
     if(preferenceChanged('nihongo.qa.appearance.v1',theme,'auto',value=>value==='auto'||Object.hasOwn(themes.themes,value)))blockers.add('preference-theme');
     if(preferenceChanged('nihongo.swipe-grading.v1',String(swipeGrading),'false',value=>value==='true'||value==='false'))blockers.add('preference-swipe');
-    if(preferenceChanged('nihongo.interval-hints.v1',String(intervalHints),'false',value=>value==='true'||value==='false'))blockers.add('preference-hints');
+    if(preferenceChanged('nihongo.speak-on-reveal.v1',String(speakOnReveal),'true',value=>value==='true'||value==='false'))blockers.add('preference-speak-on-reveal');
+    if(preferenceChanged('nihongo.interval-hints.v1',String(intervalHints),'true',value=>value==='true'||value==='false'))blockers.add('preference-hints');
+    if(readingLightKept()&&preferenceChanged(READING_LIGHT_KEY,String(readingLight),'true',value=>value==='true'||value==='false'))blockers.add('preference-reading-light');
     if(nativePairDraft.trim())blockers.add('pairing-draft');
     for(const field of document.querySelectorAll('[data-host-settings] input,[data-host-settings] textarea')){
       const hint=[field.id,field.name,field.getAttribute('data-pair-code'),field.getAttribute('data-invitation')].join(' ').toLowerCase();
@@ -210,7 +286,12 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   }
   function languagePicker(compact=false){const select=h('select',{'aria-label':'表示言語','data-interface-language':'',onchange:async e=>{if(updateBoundary?.held)return;interfaceLanguage=e.target.value;for(const picker of root.querySelectorAll('[data-interface-language]'))picker.value=interfaceLanguage;const end=beginFlight('preference');try{await preferences.setItem('nihongo.interface-language.v1',interfaceLanguage);}catch{message('表示言語を保存できません。');}finally{end();render();}}},h('option',{value:'ja'},'日本語'),h('option',{value:'en'},'English'),h('option',{value:'both'},'両方'));select.value=interfaceLanguage;return h('label',{class:`language-picker${compact?' compact':''}`},h('span',{},'表示言語'),select);}
   let refreshFactoryRows=()=>{};
-  const factoryStatuses=createFactoryStatusReader({inspect:platform.inspectCardFactory,catalog,getProjection:()=>backend.readProjection(),onUpdate:()=>{if(!disposed&&screen==='words')refreshFactoryRows();}});
+  let provisionalListener=null, provisionalGeneration=0;
+  function stopProvisionalListener(){
+    provisionalGeneration++;
+    if(provisionalListener){win.removeEventListener('nihongo-provisional-changed',provisionalListener);provisionalListener=null;}
+  }
+  const factoryStatuses=createFactoryStatusReader({inspectMany:platform.inspectCardsFactory,inspect:platform.inspectCardFactory,catalog,getProjection:()=>backend.readProjection(),onUpdate:()=>{if(!disposed&&screen==='words')refreshFactoryRows();}});
   function reconcileUnknownFactoryRows(){factoryStatuses.inspectUnknown(backend.readProjection().captures.filter(c=>!c.targetTaskKey&&['unknown','unsure'].includes(c.kind)));}
   let themePreferenceSet=false;
   let theme = 'auto', query = '', wordFilter = 'all',wordPage=0;
@@ -250,6 +331,35 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     h('footer',{},h('span',{},'一つずつ、確かに。')));
   const backupAlert=h('aside',{class:'backup-alert',role:'alert','data-backup-alert':'',hidden:true});
   if(typeof platform.backupStatus==='function')main.before(backupAlert);
+  // The ear (voice plan N2): one mark in the top bar, the state on <html>, one document-level capture handler (ear.mjs).
+  const earParts=buildEarMark(document),earTimer=(fn,ms)=>win.setTimeout(fn,ms),earClear=id=>win.clearTimeout(id);
+  let earReading=null,earReadingFrom=null;
+  const earBands=createEarBands(document,{enabled:()=>readingLight});
+  function applyReadingLight(redraw=false){
+    if(readingLight)delete document.documentElement.dataset.readingLight;else document.documentElement.dataset.readingLight='off';
+    if(redraw){speechLight.redraw();earBands.redraw();}
+  }
+  applyReadingLight();
+  // N8e: the card the ear belongs to: the one shown when it was turned on (none, away from the cards), then each card shown
+  // while it is on. A card other than that one turns it off, even after a stay away from the cards (placeEar).
+  let earCard=null,earMode='off';
+  // In study the no-voice line is the study toast: in the bar it would cover 残り (fix round 1).
+  const ear=createEar({phone:phonePresentation,speak:earSpeak,paint:view=>{if(disposed)return;
+      if(view.mode!=='off'&&earMode==='off')earCard=current?.entry?.taskKey??null;earMode=view.mode;
+      paintEar(earParts,view,interfaceLanguage);
+      if(view.state==='novoice'&&main.querySelector('[data-focus]')){const [ja,en]=earNoVoiceLine(view.reason);showToast(ja,en,4000,{'data-ear-toast':''});}
+    },aim:unit=>{aimEarHighlight(unit);earBands.set('aim',unit?.host?.isConnected?rangeFor(unit.host,unit.start,unit.end):null);},
+    setTimer:earTimer,clearTimer:earClear,availability:()=>earAvailability({bridge:win.nihongoSpeak,dynamicSpeech}),quiet:()=>readerReading()});
+  const earHandlers=createEarHandlers({ear,phone:phonePresentation,caretAt:event=>earCaretAt(document,event),isMark:node=>earParts.root.contains(node),
+    find:(target,options)=>findEarUnit(target,{...options,readingFor:term=>{if(earReadingFrom!==catalog){earReadingFrom=catalog;earReading=earReadingIndex(catalog);}return earReading(term);}})});
+  for(const [type,listener] of Object.entries(createEarMarkHandlers({ear,setTimer:earTimer,clearTimer:earClear})))earParts.mark.addEventListener(type,listener);
+  // One sound at a time (N2-INT): a path about to sound claims the floor; every other path stops.
+  const oneVoice=createOneVoice();
+  oneVoice.path('card',()=>stopCardSpeak());
+  oneVoice.path('packs',()=>{if(current?.audioPlaying){stopTrialAudio();syncSharedAudioDom(current);}});
+  // N5: a read held for a pressed speaker (P, 🔊, the ear) is not stopped by that speaker's claim; it takes itself up again.
+  // N7 (the owner's rule: only pause, the end or leaving stops a reading): no claim stops the card's read, held or paused.
+  oneVoice.path('reading',()=>{stopSpeakBlocks();stopWordSpeech();stopSpeakSelection();});
   const backupObserver=createBackupStatusObserver({read:platform.backupStatus,isVisible:()=>document.visibilityState!=='hidden',onChange:()=>paintBackupStatus(),schedule:(fn,delay)=>win.setTimeout(fn,delay),cancel:id=>win.clearTimeout(id)});
   function backupFailureCopy(code){
     if(code==='export-too-large')return 'バックアップに失敗しました。サーバーのエクスポートが大きすぎます。新しいバックアップは作成されませんでした。';
@@ -284,7 +394,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     if (disposed||generation!==saveStatusGeneration) return;
     if(noticeOwner==='save-status')message('');
     paintSaveStatus(status);let nativeRequested=false;
-    if(platform.nativeSync&&!nativeSyncBusy){nativeRequested=true;const generation=++nativeStatusGeneration;try{const sync=await platform.nativeSync.status();if(disposed||generation!==nativeStatusGeneration)return;const pairedChanged=nativeSyncState.paired!==sync.paired,couldRequest=canRequestNewCards();nativeSyncState=sync;if((pairedChanged||couldRequest!==canRequestNewCards())&&['today','settings'].includes(screen)){render();return;}const state=root.querySelector('[data-native-sync-status]');if(state){const description=nativeSyncDescription();renderInterfacePair(state,description,translateInterfaceText(description),interfaceLanguage);}}catch(error){if(!disposed&&generation===nativeStatusGeneration){nativeSyncState={...nativeSyncState,state:'error',error:['authentication-required','credential-storage-failed','invalid-credential'].includes(error?.message)?error.message:'status-unavailable'};const state=root.querySelector('[data-native-sync-status]');if(state){const description=nativeSyncDescription();renderInterfacePair(state,description,translateInterfaceText(description),interfaceLanguage);}}}}
+    if(platform.nativeSync&&!nativeSyncBusy){nativeRequested=true;const generation=++nativeStatusGeneration;try{const sync=await platform.nativeSync.status();if(disposed||generation!==nativeStatusGeneration)return;const pairedChanged=nativeSyncState.paired!==sync.paired,couldRequest=canRequestNewCards();nativeSyncState=sync;if(pairedChanged&&sync.paired&&!sync.error)restoreAutoSpeech();if((pairedChanged||couldRequest!==canRequestNewCards())&&['today','settings'].includes(screen)){render();return;}const state=root.querySelector('[data-native-sync-status]');if(state){const description=nativeSyncDescription();renderInterfacePair(state,description,translateInterfaceText(description),interfaceLanguage);}}catch(error){if(!disposed&&generation===nativeStatusGeneration){nativeSyncState={...nativeSyncState,state:'error',error:['authentication-required','credential-storage-failed','invalid-credential'].includes(error?.message)?error.message:'status-unavailable'};const state=root.querySelector('[data-native-sync-status]');if(state){const description=nativeSyncDescription();renderInterfacePair(state,description,translateInterfaceText(description),interfaceLanguage);}}}}
     if(disposed||generation!==saveStatusGeneration)return;
     if(nativeRequested)paintSaveStatus(status);
     // A render or backend notice can supersede the first status request. Only
@@ -363,7 +473,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function pauseStudy(next){
     if(updateBoundary?.held)return;
     if(!current||current.committed||boundaryPreparation)return message('保存を確認してから移動してください。失敗した場合は再試行できます。');
-    stopTrialAudio();setStudyMenu(false);closePopover();current.timer.pause();
+    stopTrialAudio();stopSpeakReader();stopWordSpeech();setStudyMenu(false);closePopover();current.timer.pause();
     parkedStudy={current,customRun,activeSession,boundaryQueue,boundaryNotice,sessionShown,module,scroll:main.querySelector('[data-card]')?.scrollTop??0};
     current=null;customRun=null;activeSession=null;screen=next;render();main.focus({preventScroll:true});
   }
@@ -418,6 +528,9 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   let panelObserver=null;
   function render() {
     if (disposed) return;
+    stopSpeakSelection();stopSpeakBlocks();
+    // N8: the read serves both faces; it ends with its screen, its card or its face (cardReader).
+    if(screen!=='study'||!current||speakReader&&speakReader!==cardReader(current))stopSpeakReader();
     expireLastReview();
     catalog=backend.catalogEntries?.()??shippedCatalog;
     factoryStatuses.leave();refreshFactoryRows=()=>{};
@@ -427,8 +540,10 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const paceFieldId=focusedField?.id.startsWith('study-pace-')?focusedField.id:null;
     const selection=paceFieldId&&focusedField.selectionStart!=null?[focusedField.selectionStart,focusedField.selectionEnd,focusedField.selectionDirection]:null;
     const previousCard=main.querySelector('[data-card]'),previousView=previousCard&&cardViews.get(previousCard),previousScroll=previousCard?.scrollTop??0;
+    stopProvisionalListener();
     const openPanels=screen==='today'?['[data-custom-session]','[data-weighted-days]','[data-manual-card]'].filter(selector=>main.querySelector(selector)?.open):[];
     main.replaceChildren(screen === 'finish' ? finishScreen() : screen === 'study' ? studyScreen() : screen === 'words' ? wordsScreen() : screen === 'record' ? recordScreen() : screen === 'settings' ? settingsScreen() : todayScreen());
+    placeEar();
     if(parkedStudy&&!['study','today'].includes(screen))main.prepend(h('div',{class:'sheet-actions','data-paused-session':''},button('学習に戻る',resumeStudy,{'data-resume-study':'',class:'primary'})));
     for(const selector of openPanels)main.querySelector(selector)?.setAttribute('open','');
     if(paceFieldId){
@@ -445,6 +560,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     live.textContent = notice;localize();paintBackupStatus();rubyLayout.fit();
     panelObserver?.disconnect();panelObserver=null;const panel=main.querySelector('[data-decision-panel]'),readingCard=main.querySelector('[data-card]');if(panel&&readingCard){const fit=()=>readingCard.style.setProperty('--decision-height',panel.getBoundingClientRect().height+'px');fit();if(win.ResizeObserver){panelObserver=new win.ResizeObserver(fit);panelObserver.observe(panel);}}
     if(previousView?.current===current&&previousView.revealed===current?.revealed){const card=main.querySelector('[data-card]');if(card)card.scrollTop=previousScroll;}
+    pop?.position?.update();
     if(screen==='study'&&!pop&&!document.querySelector('dialog[open]')){if(current?.sessionInfoOpen)(menuItems()[menuFocus]??menuItems()[0])?.focus({preventScroll:true});else focusStudyCard();}
     if(screen==='study'&&current?.revealed)current.revealSource='settled';
     if(screen==='study'&&current&&!current.revealed)current.entrySource='settled';
@@ -453,6 +569,9 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     if(parkedStudy&&!busy&&!pendingIntent&&parkedDayEnded()){const saved=parkedStudy;queueMicrotask(()=>{if(!disposed&&parkedStudy===saved&&parkedDayEnded())retireParkedStudy(()=>render());});}
     updateBoundary?.sync();
     if(sharedAudioDeclared)syncSharedAudioCurrent();
+    if(cardSpeakBridge||sharedAudioDeclared&&!current?.revealed)syncSpeakReader();
+    paintCardAudio();
+    syncScreenSpeakBlocks();
   }
   function todayScreen() {
     const p=backend.readProjection(),view=dayView(),today=view.today,queue=backend.queue({module});
@@ -532,7 +651,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     return record;
   }
   function readyCount(entries){const p=backend.readProjection(),at=now(),today=backend.todayAllowance?.()??dayBounds(at,p.settings.learnerTimezone),permits=Object.values(p.permits),held=permits.filter(permit=>!permit.usedBy&&permit.install===backend.installation&&permit.startsAt<=at&&permit.endsAt>at).length,spent=permits.filter(permit=>permit.usedBy&&permit.startsAt<today.endsAt&&permit.endsAt>today.startsAt).length;let reviews=0,fresh=0;for(const entry of entries){if(p.introductions[entry.taskKey])reviews++;else fresh++;}return reviews+Math.min(fresh,held,Math.max(0,(today.limit??Infinity)-spent));}
-  function showToast(ja,en){win.clearTimeout(toastTimer);root.querySelector('[data-study-toast]')?.remove();const toast=copy('p',ja,en,{class:'study-toast',role:'status','data-study-toast':''});root.append(toast);toastTimer=win.setTimeout(()=>toast.remove(),2000);}
+  function showToast(ja,en,ms=2000,attrs={}){win.clearTimeout(toastTimer);root.querySelector('[data-study-toast]')?.remove();const toast=copy('p',ja,en,{class:'study-toast',role:'status','data-study-toast':'',...attrs});root.append(toast);toastTimer=win.setTimeout(()=>toast.remove(),ms);}
   async function beginToday(size=null,reviewsOnly=false,source=lastInputSource,newSession=false){
     if(updateBoundary?.held)return;
     if(customBusy||busy||pendingIntent)return;
@@ -707,7 +826,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   }
   function start(entry, practice = false,learnAhead=false,session=null,{source=lastInputSource,remaining=null,restore=null,preserveRun=false,readyTaskKeys=null,backlog=false}={}) {
     if (updateBoundary?.held || !entry) return;
-    stopTrialAudio();
+    stopTrialAudio();stopSpeakReader();stopWordSpeech();
     if(parkedStudy)return retireParkedStudy(()=>start(entry,practice,learnAhead,session,{source,remaining,restore,preserveRun,readyTaskKeys,backlog}));
     try {
       boundaryPreparation=null;
@@ -722,12 +841,12 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     } catch { message('翻訳・カードの確認が完了していないため、採点を開始できません。'); }
   }
   function gradeScopeCopy(entry=current?.entry){
-    return entry?.contractId==='vocabulary.read.v1'&&!entry.manual?['採点は下線の語だけです。ほかの語は採点に影響しません。','You grade only the underlined word. Other words never change the grade.']:['採点はこのカードの学習対象だけです。ほかの語は採点に影響しません。',"You grade only this card’s target. Other words never change the grade."];
+    return entry?.contractId==='vocabulary.read.v1'&&!entry.manual?['採点は色のついた語だけです。ほかの語は採点に影響しません。','You grade only the highlighted word. Other words never change the grade.']:['採点はこのカードの学習対象だけです。ほかの語は採点に影響しません。',"You grade only this card’s target. Other words never change the grade."];
   }
   function keySheet(){
-    const rows=[['Space・Return','Space / Return','解答を表示','Show answer'],['Space・Return（解答後）','Space / Return (back)','正解','Good'],['1〜4','1–4','採点：もう一度・難しい・正解・簡単','Grade: Again · Hard · Good · Easy'],['U・⌘Z','U / ⌘Z','最後の採点を元に戻す','Undo last rating'],['E','E','英訳の表示を切り替える','Show or hide the English'],['Esc','Esc','学習を終える','End session'],['?','?','この一覧','This list']];
+    const rows=[['Space・Return','Space / Return','解答を表示','Show answer'],['Space・Return（解答後）','Space / Return (back)','正解','Good'],['1〜4','1–4','採点：もう一度・難しい・正解・簡単','Grade: Again · Hard · Good · Easy'],['U・⌘Z','U / ⌘Z','最後の採点を元に戻す','Undo last rating'],['E','E','英訳の表示を切り替える','Show or hide the English'],['L','L','耳のオン・オフ','Turn the ear on or off'],['Esc','Esc','学習を終える','End session'],['?','?','この一覧','This list']];
     const node=h('dialog',{class:'key-sheet','data-key-sheet':''},h('h2',{},copy('span','キー操作','Keys')),h('dl',{},...rows.flatMap(([keyJa,keyEn,ja,en])=>[h('dt',{},copy('kbd',keyJa,keyEn)),h('dd',{},copy('span',ja,en))])),
-      trialAudioReady()||(sharedAudioDeclared&&screen==='study'&&current?.revealed)?h('p',{class:'grade-rule','data-trial-audio-help':''},sharedAudioDeclared?copy('span','P：学習対象と全文を再生／停止','P: Play or stop audio'):copy('span',`P：単語と文を再生`,'P: Play word and sentence')):null,
+      main.querySelector('[data-card-audio]')?h('p',{class:'grade-rule','data-trial-audio-help':''},copy('span',...VOICE_KEY_HELP[!current?.revealed?'read':sharedAudioDeclared?'clip':cardSpeakBridge?'read':'trial'])):null,
       h('div',{class:'dialog-actions'},button('閉じる',()=>{node.close();node.remove();focusStudyCard();},{class:'primary'})));
     node.addEventListener('close',()=>{node.remove();focusStudyCard();updateBoundary?.sync();});
     root.append(node);node.showModal();localize();updateBoundary?.sync();
@@ -749,9 +868,9 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function sharedAudioSource(c=current){
     const e=c?.entry;if(!e)return null;
     try{
-      const assignments=c.audioSelectedAssignments??{},version=sharedAudioRoot?.version===2?2:1,snapshot=JSON.stringify([e,assignments,version]);
+      const assignments=c.audioSelectedAssignments??{},snapshot=JSON.stringify([e,assignments]);
       if(c.audioSourceSnapshot!==snapshot||!c.audioSourcePlan){
-        c.audioSourcePlan=studyAudioSourcePlan(e,assignments,{version});c.audioSourceSnapshot=snapshot;
+        c.audioSourcePlan=studyAudioSourcePlan(e,assignments);c.audioSourceSnapshot=snapshot;
       }
       return c.audioSourcePlan;
     }catch{return null;}
@@ -761,11 +880,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const id=c?.audioFieldId;
     return typeof id==='string'&&id!=='default'?id:'default';
   }
-  function sharedAudioV2Profiles(c=current){
-    return studyAudioProfileAssignments(sharedAudioRoot,c?.audioSelectedAssignments??{},sharedAudioSource(c)?.sourceFields??[],sharedAudioSelectedFields(c));
-  }
   function sharedAudioProfileChoice(c=current){
-    if(sharedAudioRoot?.version===2){const profiles=sharedAudioV2Profiles(c);return Object.values(profiles).some(id=>id===null)?null:JSON.stringify(profiles);}
     if(c&&c.audioProfileId!==undefined)return c.audioProfileId;
     return sharedAudioRoot?.defaultProfileId??null;
   }
@@ -773,7 +888,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const e=c?.entry;if(!e)return [];
     const available=new Set(studyAudioSourceFields(e).map(field=>field.fieldId));
     const grammar=!!e.grammarRecord&&typeof e.contractId==='string'&&e.contractId.startsWith('grammar.');
-    const ids=grammar?[]:['term','ja'];
+    const ids=grammar?['pattern']:['term','ja'];
     if(grammar){
       const examples=Array.isArray(e.grammarRecord.examples)?e.grammarRecord.examples:[];
       const passageId=e.passageId??e.grammarTask?.passageId??null;
@@ -794,10 +909,658 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function sharedAudioSelectionKey(c=current){
     if(!c)return null;
     return JSON.stringify([c.entry.taskKey,c.attempt.contentRevision,sharedAudioRevision(c),
-      platform.audio?.release?.contentRelease??null,sharedAudioSelectedFields(c),sharedAudioProfileChoice(c),c.revealed?'answer':'front',...(sharedAudioRoot?.version===2?[2]:[])]);
+      platform.audio?.release?.contentRelease??null,sharedAudioSelectedFields(c),sharedAudioProfileChoice(c),
+      sharedAudioSpeakAvailable()?1:0,c.revealed?'answer':'front']);
+  }
+  function sharedAudioSpeakAvailable(){
+    const bridge=win.nihongoSpeak;
+    return !!bridge&&typeof bridge.speak==='function';
+  }
+  // Text outside the Worker's allowlist (sentences, grammar, kanji, 読む, factory cards) speaks only in dynamic mode. The Worker
+  // has no capability signal, so the first not-in-release switches every such speaker off for this session (lead 1746/1750).
+  function dynamicSpeechAvailable(){return sharedAudioSpeakAvailable()&&dynamicSpeech!=='off';}
+  function cardSpeakAllowlisted(entry){return !!cardSpeakEligible(entry);}
+  function markDynamicSpeechOff({auto=false}={}){
+    if(dynamicSpeech==='off')return;
+    dynamicSpeech='off';
+    const owner=current;
+    win.setTimeout(()=>{
+      if(disposed)return;
+      stopSpeakSelection();stopSpeakBlocks();stopWordSpeech();stopSpeakReader();
+      for(const node of root.querySelectorAll('[data-speak-block],[data-speak-word],[data-speak-selection],[data-card-audio="front"],[data-menu-speed-row]'))node.remove();
+      for(const host of root.querySelectorAll('[data-speak-host]'))delete host.dataset.speakHost;
+      paintCardAudio();
+      if(!auto||current===owner){const [ja,en]=voiceLine('not-in-release');speechLine(ja,en,auto);}
+    },0);
+  }
+  function sharedAudioGuid(entry){
+    if(typeof entry?.guid==='string')return entry.guid;
+    if(typeof entry?.noteGuid==='string')return entry.noteGuid;
+    try{const tuple=JSON.parse(entry?.taskKey);if(Array.isArray(tuple)&&typeof tuple[0]==='string')return tuple[0];}catch{}
+    return null;
+  }
+  function speakProfile(c=current){
+    return cardVoiceProfile(c?.entry??null);
+  }
+  function speakBytes(base64){
+    const binary=win.atob(base64),bytes=new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+    return bytes;
+  }
+  function todayKey(){try{const day=studyDay();return day.timezone+'|'+day.day;}catch{return null;}}
+  function freeText(){return freeTextAvailable({bridge:sharedAudioSpeakAvailable(),dynamicSpeech,online:online(),refusedDay:freeTextRefusedDay,today:todayKey()});}
+  // Free text refused: not in the release switches it off for the session; the day's budget, for that day (N6-2a).
+  function refusedFreeText(code){if(code==='not-in-release')markDynamicSpeechOff();else if(code==='day-budget')freeTextRefusedDay=todayKey();}
+  // keep: the card's own control (its question side and its read) keeps the card's clips while the card is shown (N6-9);
+  // other speakers (the ear, a selection, the popup) ask as before.
+  async function speakClip(voiceKey,sentence,profile,{keep=false}={}){
+    const input=createSpeechInput({segments:[{language:'ja',text:sentence.text,pronunciationDirectives:[]}],profile});
+    const cardVoice=current?.entry&&sharedAudioGuid(current.entry)?'card:'+sharedAudioGuid(current.entry):null;
+    if(cardVoice!==cardClipsVoice){cardClips.clear();cardClipsVoice=cardVoice;}
+    const key=keep&&voiceKey===cardVoice?flightKey(voiceKey,input):null,kept=cardClips.get(key);
+    if(kept)return kept;
+    const reply=await speakJoined(voiceKey,input);
+    if(!reply||reply.ok!==true){
+      const code=reply&&typeof reply.error==='string'&&reply.error?reply.error:'speak-failed';
+      refusedFreeText(code);
+      const error=new Error(code);error.code=code;throw error;
+    }
+    if(typeof reply.bytes!=='string'||typeof reply.contentType!=='string'){
+      const error=new Error('invalid-response');error.code='invalid-response';throw error;
+    }
+    const clip={bytes:speakBytes(reply.bytes),contentType:reply.contentType};
+    clipOrigins.set(clip,{voiceKey,input,key:key&&cardClipsVoice===cardVoice?key:null});
+    if(key&&cardClipsVoice===cardVoice)cardClips.set(key,clip);
+    return clip;
+  }
+  // N7 (C10): a bad clip (clipBroken: it will not decode, or the element reports a decode or source error) leaves the
+  // card's memory and the device's store, so the next tap asks again instead of replaying the same broken bytes.
+  const clipOrigins=new WeakMap();
+  function forgetClip(clip){
+    const origin=clip&&clipOrigins.get(clip);if(!origin)return;
+    clipOrigins.delete(clip);
+    if(origin.key&&cardClips.get(origin.key)===clip)cardClips.delete(origin.key);
+    try{Promise.resolve(win.nihongoSpeak?.forget?.(origin.voiceKey,origin.input)).catch(()=>{});}catch{}
+  }
+  // The player of every sentence queue: a pause before the clip sounds is a stop, not a failure (AbortError); any other
+  // failure to play ends the queue as 'decode' (C10). N7 fix 1 (F1): the clip is forgotten only when it is bad (clipBroken,
+  // speech-player.mjs, the rule the whole clip follows too); a start the browser refused or an interruption keeps it.
+  const queuePlayer=()=>({...speakPlayer,play:async(clip,rate,hooks)=>{
+    try{return await speakPlayer.play(clip,rate,{...hooks,started(){voiceSounded();hooks?.started?.();}});}
+    catch(error){if(error?.name==='AbortError')return 'stopped';if(clipBroken(error))forgetClip(clip);throw error;}
+  }});
+  // N6: the read has no row of its own; its state shows on the card's one control (paintCardAudio). An error says one
+  // plain line, as a press of P always did.
+  function paintSpeakReader(session,state,code){
+    if(!session)return;
+    if(state==='error'&&speakReader===session&&!disposed&&screen==='study')cardSpeakFailure(typeof code==='string'?code:'speak-failed',false);
+    // N7 fix 1 (F3): a read held where it is because the browser refused its start (on a resume or a clip's first play)
+    // says so (C10) and shows paused; his next press takes it up again at the same place.
+    if(state==='paused'&&typeof code==='string'&&code&&speakReader===session&&!disposed&&screen==='study')cardSpeakFailure(code,false);
+    if(state==='paused')speechLight.redraw();
+    paintCardAudio();
+  }
+  function readState(session=speakReader){
+    if(!session)return 'idle';
+    // N5: while a speaker he pressed has its turn the read is held, not paused: it shows as it was.
+    const state=session.queue.state;return session.turn&&state==='paused'?session.turnState:state;
+  }
+  // Fix round 1, C1: going (loading, playing, or held for a speaker he pressed), paused (he paused it), or idle.
+  function readOf(session=speakReader){return session?readStatus({state:session.queue.state,turn:!!session.turn}):'idle';}
+  function stopSpeakReader(){
+    const session=speakReader;speakReader=null;
+    if(session){session.turn=null;session.queue.stop();}
+    showSpeaking(null);syncMediaSession();
+    if(session)paintSharedAudioStatus();
+  }
+  // N5: while a passage is read aloud nothing stops or restarts the read but its own stop and pause. A speaker he presses
+  // takes its turn: the read yields (held where it is) and takes itself up again at the same place when that clip ends,
+  // is stopped or fails, unless he pressed the read's pause or stop meanwhile. Returns the release for that speaker.
+  function readerReading(){
+    const session=speakReader;
+    return !!session&&(!!session.turn||['loading','playing'].includes(session.queue.state));
+  }
+  // C1 (review of 8c74b2f): a turn's request has a limit. A speaker that has not started sounding 20 s after it took
+  // its turn is ended as a failure (stop) and the read takes itself up again; the web path has no other timeout.
+  const TURN_REQUEST_MS=20000;
+  function yieldReader(stop=null){
+    const session=speakReader;
+    if(!readerReading())return Object.assign(()=>{},{sounding(){},hold(){}});
+    const turn={};
+    if(!session.turn)session.turnState=session.queue.state;
+    session.turn=turn;
+    if(session.queue.state!=='paused')session.queue.pause();
+    paintSpeakReader(session,session.queue.state);
+    let limit=win.setTimeout(()=>{
+      limit=null;
+      if(speakReader!==session||session.turn!==turn)return;
+      try{stop?.('voice-timeout');}catch{}
+      release();
+    },TURN_REQUEST_MS);
+    const clear=()=>{if(limit!==null){win.clearTimeout(limit);limit=null;}};
+    // After the current step settles: a speaker stopped on the way out of the screen, or by the next press, never
+    // wakes the read for an instant (by then the read is gone or held by the newer turn).
+    const release=Object.assign(()=>{clear();queueMicrotask(()=>{
+      if(speakReader!==session||session.turn!==turn)return;
+      session.turn=null;session.queue.resume();paintSpeakReader(session,session.queue.state);
+    });},{sounding:clear,
+      // N7 fix 1: the speaker that has the turn was held (its start refused, a pause from outside): the read stays paused
+      // where it is, now his to resume; nothing starts again by itself.
+      hold(){clear();if(speakReader!==session||session.turn!==turn)return;session.turn=null;paintSpeakReader(session,session.queue.state);}});
+    return release;
+  }
+  function stopWordSpeech(){
+    const session=wordSpeech;wordSpeech=null;
+    if(session)session.queue.stop();
+  }
+  function stopSpeakBlocks(){
+    const session=blockSpeech;blockSpeech=null;
+    if(session)session.queue.stop();
+    showSpeaking(null);
+  }
+  function hideSpeakSelection(){
+    selectionSpeechTarget=null;
+    if(selectionChip)selectionChip.hidden=true;
+  }
+  function stopSpeakSelection(){
+    const session=selectionSpeech;selectionSpeech=null;
+    if(session)session.queue.stop();
+    hideSpeakSelection();
+    showSpeaking(null);
+  }
+  function speakSelectionVoice(host){
+    if(host.closest('[data-card],aside.word-popover')){
+      const guid=sharedAudioGuid(current?.entry);
+      return guid?'card:'+guid:null;
+    }
+    try{return voiceKeyFor('record','selection');}catch{return null;}
+  }
+  function readSpeakSelection(target=selectionSpeechTarget,onEnd=null){
+    if(updateBoundary?.held||!target?.host.isConnected)return null;
+    let sentences;
+    try{sentences=splitSentences(target.text);}catch{return null;}
+    if(!sentences.length)return null;
+    const readerTurn=yieldReader(reason=>{if(selectionSpeech===session){session.timedOut=reason;stopSpeakSelection();}});
+    clearVoiceWhy();stopSpeakBlocks();stopWordSpeech();stopSpeakSelection();
+    const session={...target,sentences,queue:null,timedOut:null};let ended=false;
+    const queue=createSpeechQueue({
+      fetchClip:sentence=>speakClip(session.voiceKey,sentence,session.profile),
+      player:queuePlayer(),
+      onSentence:index=>{
+        if(selectionSpeech!==session||index>=0&&index!==session.queue.index)return;
+        if(index<0){showSpeaking(null);return;}
+        const sentence=session.sentences[index];
+        if(sentence&&session.host.isConnected){const range=session.span?rangeFor(session.host,session.span[0],session.span[1]):rangeFor(session.host,session.start+sentence.start,session.start+sentence.end);showSpeaking(range,session.host);}
+      },
+      onState:(state,code)=>{
+        // N7 fix 1: held (its start refused, a pause from outside): it ends quietly and the read it held stays paused; a
+        // refusal is the reason it ended for (timedOut), so 読む's toast or the ear's line says C10. The clip stays kept.
+        if(state==='paused'){readerTurn.hold();if(code)session.timedOut=code;if(selectionSpeech===session)stopSpeakSelection();return;}
+        if(state==='playing')readerTurn.sounding();
+        if(['done','stopped','error'].includes(state))readerTurn();
+        if(selectionSpeech===session&&['done','stopped','error'].includes(state))selectionSpeech=null;
+        // N7 (rule 6): ended by the turn's limit it is a failure like any other (C5): the ear shows its no-voice line, and
+        // 読む (whose chip is gone once it reads) says why in the toast for about four seconds or until the next press.
+        const timedOut=state==='stopped'&&session.timedOut;
+        if(onEnd&&!ended&&['done','stopped','error'].includes(state)){ended=true;if(timedOut)onEnd('error',timedOut);else onEnd(state,code);}
+        else if(!onEnd&&(timedOut||state==='error'))voiceToast(timedOut||code);
+      },
+    });
+    session.queue=queue;selectionSpeech=session;
+    oneVoice.claim('reading');queue.setRate(speakRate);queue.start(session.sentences,0);
+    return session;
+  }
+  // The ear speaks through the 読む session, so every other speaker already stops it and it stops them.
+  function earSpeak(unit,signal){
+    const profile=speakProfile(current);
+    let voiceKey=null;
+    if(unit.kind==='element'&&!unit.host.closest('[data-card],aside.word-popover'))voiceKey=screenSpeakWord(unit.label)?.voiceKey??null;
+    voiceKey??=speakSelectionVoice(unit.host);
+    if(!profile||!voiceKey)return Promise.reject(Object.assign(new Error('speak-failed'),{code:'speak-failed'}));
+    return new Promise((resolve,reject)=>{
+      const session=readSpeakSelection({host:unit.host,text:unit.text,profile,voiceKey,start:unit.start,span:unit.kind==='element'?[unit.start,unit.end]:null},
+        (state,code)=>state==='error'?reject(Object.assign(new Error(code||'speak-failed'),{code:code||'speak-failed'})):resolve(state));
+      if(!session){resolve('stopped');return;}
+      signal.addEventListener('abort',()=>{if(selectionSpeech===session)stopSpeakSelection();},{once:true});
+    });
+  }
+  // In study the mark sits in the bar's row but outside its grid (app.css places it), so no item of the bar moves.
+  // N8e: the ear goes off when a card other than its own is shown (John: "or else change cards"), even after a stay away
+  // from the cards; its own card turned over, left and come back to keeps it. Compared by task key, so a re-render that
+  // rebuilds the shown card's state is not another card.
+  function placeEar(){
+    const shownKey=current?.entry?.taskKey??null;
+    if(shownKey!==null){if(earCard!==null&&shownKey!==earCard)ear.cardChanged();earCard=shownKey;}
+    const heading=main.querySelector('[data-focus] .study-heading'),slot=main.querySelector('[data-finish]')??root.querySelector('.header-controls');
+    if(heading){if(earParts.root.parentNode!==heading)heading.append(earParts.root);}
+    else if(slot&&earParts.root.parentNode!==slot)slot.prepend(earParts.root);
+    paintEar(earParts,ear.read(),interfaceLanguage);earBands.redraw();
+  }
+  function syncSpeakSelection(){
+    selectionChipTimer=null;
+    const selection=win.getSelection();
+    if(disposed||updateBoundary?.held||!selection||selection.isCollapsed||selection.rangeCount===0||!dynamicSpeechAvailable()){hideSpeakSelection();return;}
+    const range=selection.getRangeAt(0),startElement=range.startContainer.nodeType===1?range.startContainer:range.startContainer.parentElement,endElement=range.endContainer.nodeType===1?range.endContainer:range.endContainer.parentElement;
+    const host=startElement?.closest(sourceCopy),excluded='[data-interface-copy],[data-speak-reader],[data-speak-block],[data-speak-word],[data-speak-selection]';
+    if(!host||endElement?.closest(sourceCopy)!==host||startElement.closest(excluded)||endElement?.closest(excluded)||host.closest('[data-card]')&&!current?.revealed){hideSpeakSelection();return;}
+    const profile=speakProfile(current),voiceKey=speakSelectionVoice(host);
+    if(!profile||!voiceKey){hideSpeakSelection();return;}
+    const fragment=range.cloneContents();fragment.querySelectorAll('rt,rp').forEach(node=>node.remove());
+    let text;
+    try{text=normaliseSpeechText(fragment.textContent);}catch{hideSpeakSelection();return;}
+    const start=offsetOf(host,range.startContainer,range.startOffset);
+    if(start===null||!isJapaneseEnough(text)){hideSpeakSelection();return;}
+    selectionSpeechTarget={host,text,profile,voiceKey,start};
+    // Fix round 1, C6: the chip wears the hairline mark's family (the same glyph, no box), 44 px to tap; its behaviour is
+    // unchanged.
+    if(!selectionChip){
+      selectionChip=h('button',{type:'button',class:'speak-selection','data-speak-selection':'',onmousedown:event=>event.preventDefault(),onclick:()=>readSpeakSelection()},speakerGlyph(),h('span',{'data-speak-selection-label':''}));
+      document.body.append(selectionChip);
+    }
+    // N7: the chip's name is the ruled one (VOICE_WORDS.selection); its short visible label is unchanged.
+    const label=interfaceLanguage==='both'?'読む / Read':'読む',name=sharedAudioText(...VOICE_WORDS.selection);selectionChip.querySelector('[data-speak-selection-label]').textContent=label;selectionChip.setAttribute('aria-label',name);selectionChip.title=name;selectionChip.hidden=false;
+    const rect=range.getBoundingClientRect(),width=selectionChip.offsetWidth,height=selectionChip.offsetHeight;
+    const left=Math.min(Math.max(win.scrollX+8,rect.left+win.scrollX),Math.max(win.scrollX+8,win.scrollX+win.innerWidth-width-8));
+    const top=Math.min(Math.max(win.scrollY+8,rect.top+win.scrollY-height-8),Math.max(win.scrollY+8,win.scrollY+win.innerHeight-height-8));
+    selectionChip.style.left=left+'px';selectionChip.style.top=top+'px';
+  }
+  function watchSpeakSelection(){
+    hideSpeakSelection();win.clearTimeout(selectionChipTimer);
+    selectionChipTimer=win.setTimeout(syncSpeakSelection,150);
+  }
+  function mountSpeakBlock(host,kind,profile,voiceKey,cardKey,text=null){
+    if(!host||host.dataset.speakHost)return;
+    let sentences;
+    try{sentences=splitSentences(text??speakableText(host));}catch{return;}
+    if(!sentences.length)return;
+    host.dataset.speakHost=kind;
+    const session={host,sentences,profile,voiceKey,cardKey,button:null,queue:null};
+    const label=sharedAudioText(...VOICE_WORDS.listen);
+    const control=button('🔊',()=>{
+      if(updateBoundary?.held)return;
+      clearVoiceWhy();
+      if(blockSpeech?.button===control&&['loading','playing','paused'].includes(session.queue.state)){stopSpeakBlocks();return;}
+      const readerTurn=yieldReader(reason=>{if(blockSpeech===session){session.timedOut=reason;stopSpeakBlocks();}});
+      oneVoice.claim('reading');stopSpeakSelection();stopWordSpeech();stopSpeakBlocks();blockSpeech=session;
+      session.timedOut=null;session.readerTurn=readerTurn;session.queue.setRate(speakRate);session.queue.start(session.sentences,0);
+    },{class:'quiet speak-block','data-speak-block':'','aria-label':label,title:label});
+    session.button=control;
+    session.queue=createSpeechQueue({
+      fetchClip:sentence=>speakClip(session.voiceKey,sentence,session.profile),
+      player:queuePlayer(),
+      onSentence:index=>{
+        if(blockSpeech!==session||index>=0&&index!==session.queue.index)return;
+        if(index<0){showSpeaking(null);return;}
+        const sentence=session.sentences[index];
+        if(sentence&&session.host.isConnected)showSpeaking(rangeFor(session.host,sentence.start,sentence.end),session.host);
+      },
+      onState:(state,code)=>{
+        // N7 fix 1: held (its start refused, a pause from outside): it rests, the read it held stays paused, a refusal says
+        // why beside it (C10). The clip stays kept, so the next press plays it with no new request.
+        if(state==='paused'){session.readerTurn?.hold?.();if(blockSpeech===session)stopSpeakBlocks();if(code&&session.button.isConnected)showVoiceWhy(session.button,code);return;}
+        if(state==='playing')session.readerTurn?.sounding();
+        if(['done','stopped','error'].includes(state)){const turn=session.readerTurn;session.readerTurn=null;turn?.();}
+        if(!session.button.isConnected)return;
+        session.button.dataset.speakState=state;
+        session.button.setAttribute('aria-busy',String(state==='loading'));
+        // N7: the state words (a press while it speaks stops it); rule 6: a failure, or the turn's limit, says why here.
+        const label=sharedAudioText(...(['loading','playing'].includes(state)?VOICE_WORDS.stop:VOICE_WORDS.listen));
+        session.button.setAttribute('aria-label',label);session.button.title=label;
+        if(state==='error')showVoiceWhy(session.button,code);
+        else if(state==='stopped'&&session.timedOut){const reason=session.timedOut;session.timedOut=null;showVoiceWhy(session.button,reason);}
+      },
+    });
+    session.queue.setRate(speakRate);
+    const controlHost=kind==='collocation'?host.querySelector('p.passage[data-passage="sheet"][data-collocation]')??host:host;
+    controlHost.append(control);
+  }
+  // N6-1: the card carries no block speakers any more (the word, the definition, the note, the collocations, the kanji
+  // panel, the grammar blocks, the answer line); what they said is heard through the one control, the ear or a selection.
+  function screenSpeakWord(text){
+    let word;
+    try{word=normaliseSpeechText(text);}catch{return null;}
+    if(!word)return null;
+    let entry=null;
+    for(const candidate of catalog){
+      try{if(normaliseSpeechText(candidate?.term)===word){entry=candidate;break;}}catch{}
+    }
+    const guid=sharedAudioGuid(entry);
+    if(guid)return {text:word,voiceKey:'card:'+guid,cardKey:entry?.taskKey??null};
+    try{return {text:word,voiceKey:voiceKeyFor('word',word),cardKey:null};}catch{return null;}
+  }
+  function mountScreenSpeakBlock(host,kind,text){
+    if(!host||host.dataset.speakHost)return;
+    const profile=speakProfile(null);if(!profile)return;
+    const word=screenSpeakWord(text);if(!word)return;
+    mountSpeakBlock(host,kind,profile,word.voiceKey,word.cardKey,word.text);
+  }
+  function syncScreenSpeakBlocks(){
+    if(disposed||!dynamicSpeechAvailable()||!['finish','record','words'].includes(screen))return;
+    if(!speakProfile(null))return;
+    if(screen==='finish'){
+      for(const item of main.querySelectorAll('[data-session-misses] li')){
+        const term=item.querySelector('strong');
+        if(term)mountScreenSpeakBlock(item,'miss',term.textContent);
+      }
+      return;
+    }
+    if(screen==='record'){
+      for(const item of main.querySelectorAll('[data-scheduled-list] li')){
+        const term=item.querySelector('span[data-vocabulary-entry]');
+        if(term)mountScreenSpeakBlock(item,'scheduled',term.textContent);
+      }
+      for(const item of main.querySelectorAll('section.sheet ul.forecast li')){
+        if(item.closest('[data-scheduled-list]')||item.closest('[data-legacy-history]'))continue;
+        const term=item.querySelector(':scope > span[data-vocabulary-entry]');
+        if(term)mountScreenSpeakBlock(item,'touched',term.textContent);
+      }
+      for(const item of main.querySelectorAll('li[data-legacy-review],li[data-legacy-lookup]')){
+        const term=item.querySelector('span[data-vocabulary-entry]');
+        if(term)mountScreenSpeakBlock(item,'legacy',term.textContent);
+      }
+      return;
+    }
+    for(const row of main.querySelectorAll('.word-row')){
+      const term=row.querySelector(':scope > div > strong[data-vocabulary-entry]')??row.querySelector(':scope > strong[data-vocabulary-entry]');
+      if(!term)continue;
+      mountScreenSpeakBlock(row,row.hasAttribute('data-factory-capture')?'capture':'word-row',term.textContent);
+    }
+  }
+  function setSpeakRate(rate,session=speakReader){
+    if(!SPEEDS.includes(rate))return;
+    speakRate=rate;
+    try{win.localStorage.setItem('nihongo.speak-rate.v1',String(rate));}catch{}
+    if(session)session.queue.setRate(rate);else speakPlayer.setRate(rate);
+    for(const chip of main.querySelectorAll('[data-menu-speed]'))chip.setAttribute('aria-checked',String(Number(chip.dataset.menuSpeed)===speakRate));
+  }
+  // N6-2: the card read aloud by its one control: the word by its stored reading (cardWordSpeech: the same text the
+  // question side says, so one clip), then the passage sentence by sentence with the light, under every rule of N5.
+  function readHosts(c=current){
+    const back=main.querySelector('[data-vocabulary-back]'),grammarBack=main.querySelector('.grammar-back'),manual=main.querySelector('[data-manual-back]');
+    if(back)return {term:back.querySelector('[data-vocabulary-entry] .term-block h1'),passage:back.querySelector(':scope > p.passage[data-passage="passage"]')};
+    if(grammarBack)return {term:grammarBack.querySelector('h2.grammar-pattern'),passage:grammarBack.querySelector('section.grammar-example > p.passage[lang="ja"]')};
+    if(manual)return {term:manual.querySelector(':scope > h2'),passage:manual.querySelectorAll(':scope > p')[2]??null};
+    return {term:null,passage:null};
+  }
+  // N8: what the question side prints (renderGrammarFront, renderVocabularyPassage): a meaning card's pattern heading and
+  // its example; a fill-in card's sentence (its English cue is not read); a vocabulary card's passage.
+  function frontHosts(){
+    const card=main.querySelector('[data-card][data-reveal]'),front=card?.querySelector(':scope > .grammar-front');
+    if(front)return {term:front.querySelector(':scope > h2.grammar-pattern'),passage:front.querySelector(':scope > p.passage[lang="ja"]')};
+    return {term:null,passage:card?.querySelector(':scope > p.passage[data-passage="passage"]')??null};
+  }
+  // The card's read on the face shown, if it is that face's.
+  function cardReader(c=current){return c?.entry&&speakReader?.cardKey===c.entry.taskKey&&speakReader.face===(c.revealed?'back':'front')?speakReader:null;}
+  // N8: the question side has the read too (cardFrontRead: the card as that face prints it), in the same voice key, so a
+  // sentence heard on one face is not asked again on the other (N6-9).
+  function syncSpeakReader(c=current){
+    if(disposed||!dynamicSpeechAvailable()||screen!=='study'||!c?.entry)return;
+    const face=c.revealed?'back':'front';
+    const {term,passage}=face==='back'?readHosts(c):frontHosts(),profile=speakProfile(c),guid=sharedAudioGuid(c.entry);
+    const word=face==='back'?cardWordSpeech(c.entry):term?speakableText(term):null;
+    if(!profile||!guid||!term&&!passage)return;
+    const text=passage?speakableText(passage):'';
+    // N5: the same card drawn again (a word looked up, a panel or the menu opened) keeps its read where it is; the light
+    // follows to the new text. Only another card, the other face or other text ends it here.
+    if(speakReader&&speakReader.cardKey===c.entry.taskKey&&speakReader.face===face&&speakReader.text===text&&speakReader.word===word){
+      if(speakReader.passage!==passage||speakReader.term!==term){speakReader.passage=passage;speakReader.term=term;showSpeaking(null);}
+      return;
+    }
+    if(speakReader)stopSpeakReader();
+    let items=[],kind=null;
+    if(face==='front'){const plan=cardFrontRead(c.entry,{pattern:word,passage:text});items=plan?.items??[];kind=plan?.kind??null;}
+    else{
+      let sentences=[];
+      try{sentences=text?splitSentences(text):[];}catch{sentences=[];}
+      items=[...(word&&term?[{text:word,start:0,end:speakableText(term).length,part:'word'}]:[]),...sentences.map(sentence=>({...sentence,part:'passage'}))];
+    }
+    if(!items.length)return;
+    const session={id:++readSessions,face,kind,cardKey:c.entry.taskKey,passage,term,text,word,sentences:items,profile,voiceKey:'card:'+guid,queue:null,lit:null,turn:null,turnState:null,kept:false,played:false,firstAnswer:null};
+    const queue=createSpeechQueue({
+      // F3: a read tried from kept clips asks for its first item (the word) alone; the sentences only once it is answered.
+      fetchClip:(sentence,index)=>{
+        const ask=()=>speakClip(session.voiceKey,sentence,session.profile,{keep:true}),gate=session.firstAnswer;
+        if(!gate)return ask();
+        if(index===0)return ask().then(clip=>{gate.open();return clip;},error=>{gate.shut(error);throw error;});
+        return gate.answered.then(ask);
+      },
+      player:queuePlayer(),
+      onSentence:index=>{
+        if(speakReader!==session||index>=0&&index!==session.queue.index)return;
+        session.lit=index>=0?index:null;
+        if(index<0){showSpeaking(null);return;}
+        session.played=true;
+        const item=session.sentences[index],host=readHost(session,item);
+        if(item&&host?.isConnected)showSpeaking(rangeFor(host,item.start,item.end),host);
+      },
+      onState:(state,code)=>{
+        if(state==='error'&&speakReader===session&&readFailure({kept:session.kept,played:session.played,cardClip:session.face==='back'})==='clip'){keptReadFailed(session,code);return;}
+        paintSpeakReader(session,state,code);
+      },
+    });
+    session.queue=queue;
+    queue.setRate(speakRate);
+    speakReader=session;paintSharedAudioStatus(c);
+  }
+  // kept (fix round 1, F3): free text cannot be asked of the network now; the read asks the bridge, which answers from
+  // the device's kept clips, and goes on to the card's whole clip if nothing of it is kept.
+  function startCardRead(session,{kept=false}={}){
+    oneVoice.claim('reading');stopSpeakSelection();stopSpeakBlocks();stopWordSpeech();
+    session.turn=null;session.kept=kept;session.played=false;session.firstAnswer=kept?firstAnswerGate():null;
+    session.queue.setRate(speakRate);session.queue.start(session.sentences,0);
+  }
+  function firstAnswerGate(){
+    let open,shut;const answered=new Promise((resolve,reject)=>{open=resolve;shut=reject;});answered.catch(()=>{});
+    return {answered,open:()=>open(),shut:error=>shut(error)};
+  }
+  // C1 (lead, 2026-11-12, the owner: "the only thing that should stop that is hitting the pause button itself"): a tap
+  // pauses the read where it is (a speaker he pressed meanwhile no longer hands it back); the next tap takes it up again
+  // at the same sentence, and nothing else sounds over it.
+  function pauseCardRead(session){
+    session.turn=null;if(session.queue.state!=='paused')session.queue.pause();paintCardAudio();speechLight.redraw();
+  }
+  function resumeCardRead(session){
+    oneVoice.claim('reading');stopSpeakSelection();stopSpeakBlocks();stopWordSpeech();
+    session.turn=null;session.queue.setRate(speakRate);session.queue.resume();paintCardAudio();speechLight.redraw();
+  }
+  // N7 fix 3 (the lead): the platform's play and pause (the lock screen, Control Center, the earphones) are his press, and
+  // they are offered only while his press can pause or resume something on the card: the read (going or paused) or the
+  // card's whole clip (sounding, or held where it is). Both play in the page itself: the read through the one <audio>
+  // element, the clip through the page's AudioContext (the Mac's native bridge only hands over bytes). The one-word
+  // controls, the text-block speakers, 読む, the ear, the pack player and the trial are stopped by a press, never paused:
+  // they offer nothing. Ended, stopped, failed, another card or another screen: nothing is offered.
+  function mediaHolding(){
+    if(disposed||screen!=='study'||!current?.entry)return null;
+    const c=current,clip=!!c.revealed&&cardSpeakOwner===c&&c.speakPlaying&&!!cardSpeakSource;
+    if(clip&&c.speakHeld)return {key:'clip#'+cardSpeakPlayGeneration,state:'paused',play:()=>resumeCardClip(c)};
+    const session=cardReader(c),read=readOf(session);
+    if(read==='going')return {key:'read#'+session.id,state:'playing',pause:()=>pauseCardRead(session)};
+    if(read==='paused')return {key:'read#'+session.id,state:'paused',play:()=>resumeCardRead(session)};
+    if(clip)return {key:'clip#'+cardSpeakPlayGeneration,state:'playing',pause:()=>holdCardClip(c)};
+    return null;
+  }
+  function syncMediaSession(){
+    const held=mediaHolding();
+    if(!held){mediaLink.clear();return;}
+    const {key,state}=held;
+    mediaLink.show({key,state,title:VOICE_MEDIA.title,artist:sharedAudioText(...VOICE_MEDIA.artist),play:()=>mediaAction('play',key),pause:()=>mediaAction('pause',key)});
+  }
+  // A start from outside was paused again at once (speech-player.mjs), or the platform's pause silenced the page (fix 3b).
+  // WebKit moves the media session's state with its element by itself (to 'playing' some milliseconds after an outside
+  // start, about 20 in the lane's WebKit) and leaves it there: the page puts it back to what it holds, now and a few times
+  // over the next second.
+  // N7 fix 4: the timers are kept, so dispose() clears them (what the app makes, the app takes away).
+  const OUTSIDE_SETTLE_MS=[60,300,1200],settleTimers=new Set();
+  function settleMediaState(){
+    if(disposed)return;
+    syncMediaSession();mediaLink.settle();
+    for(const ms of OUTSIDE_SETTLE_MS){const id=win.setTimeout(()=>{settleTimers.delete(id);if(!disposed)mediaLink.settle();},ms);settleTimers.add(id);}
+  }
+  function outsideStartPaused(){settleMediaState();}
+  // The platform's play is his press: what his press would do now, for the same holding only; a play that arrives when
+  // nothing can be resumed does nothing. Fix 3b (the lead, P): the platform's pause is silence now (platformPause).
+  function mediaAction(action,key){
+    if(action==='pause'){platformPause();return;}
+    if(updateBoundary?.held)return;
+    const held=mediaHolding();
+    if(held?.key===key)held.play?.();
+  }
+  // N7 fix 3b (the lead, P): the platform's pause means silence now. Whatever the page is sounding stops at once: the
+  // card's read is paused, or stays paused, at its place (first, so a speaker's ending does not hand the read back); the
+  // card's whole clip is held where it is, or stopped if it has not started sounding yet; a one-shot sound that has the
+  // read's turn or sounds over the paused read (a word's speaker, the selection's reader and the ear, which speaks through
+  // it, the question side's word, a text block's speaker, the pack player) is stopped and is not played again. The state
+  // then reads 'paused' for as long as something is held; the play handler resumes it. His own press and P are unchanged.
+  function platformPause(){
+    if(disposed)return;
+    const c=current,session=c?.entry&&speakReader?.cardKey===c.entry.taskKey?speakReader:null;
+    if(session&&readOf(session)==='going')pauseCardRead(session);
+    if(c&&cardSpeakOwner===c&&c.speakPlaying&&!c.speakHeld){if(cardSpeakSource)holdCardClip(c);else stopCardSpeak();}
+    if(wordSpeech)stopWordSpeech();
+    if(selectionSpeech)stopSpeakSelection();
+    if(blockSpeech)stopSpeakBlocks();
+    if(sharedAudioDeclared&&c?.audioPlaying){stopTrialAudio();syncSharedAudioDom(c);}
+    paintCardAudio();settleMediaState();
+  }
+  // The platform's pause on the whole clip holds it where it is, as a context stopped from outside does: the control shows
+  // paused and the client suspends the context (its own suspend, so his next press wins any race); the play handler or his
+  // press takes it up again from the same place (resumeCardClip).
+  function holdCardClip(c){
+    const context=cardSpeakContext;
+    if(!context||cardSpeakOwner!==c||!c.speakPlaying||c.speakHeld||!cardSpeakSource)return;
+    c.speakHeld=true;cardClipResume=null;paintCardAudio();
+    suspendHeldCardContext(context,c);
+  }
+  // F3: the read tried from kept clips was not answered at its first item: the card's whole clip, else the one line.
+  function keptReadFailed(session,code){
+    const c=current;
+    if(disposed||screen!=='study'||!c?.revealed||c.entry.taskKey!==session.cardKey){paintCardAudio();return;}
+    session.kept=false;
+    if(readFailure({kept:true,played:false,cardClip:answerClip(c).ready})==='clip'){if(sharedAudioDeclared)playSharedAudio(c);else playCardSpeak(c);return;}
+    cardSpeakFailure(typeof code==='string'?code:'speak-failed',false);paintCardAudio();
+  }
+  // N8 (replaces N6-3 and its fix round 1, F1): the question side's control stands on every card that has a question-side
+  // read, wherever speech is set up on this device, online or not, and is the card's read (syncSpeakReader): one press
+  // reads the face as it prints it, the next pauses, the one after takes it up again at the same place; the paths are the
+  // answer side's (the read; the read from the device's kept clips; the line for the true cause), with no whole clip. Its
+  // light is on the sentence being read. Nothing speaks there by itself; showing the answer ends it (reveal).
+  function frontReadable(c=current){
+    return !!c?.entry&&!c.revealed&&dynamicSpeechAvailable()&&!!sharedAudioGuid(c.entry)&&!!cardFrontRead(c.entry);
+  }
+  function pressFrontAudio(c=current){
+    if(updateBoundary?.held||disposed||screen!=='study'||!c||c!==current||c.revealed)return;
+    const session=cardReader(c);
+    // N7: the true cause, not "could not fetch": no bridge (C1), no new sentences (C16), or nothing printed to say (C14).
+    if(!session){const [ja,en]=voiceLine(!sharedAudioSpeakAvailable()?'not-paired':dynamicSpeech==='off'?'not-in-release':'nothing-to-say');speechLine(ja,en);return;}
+    readerPress(session,answerAudioPress({path:answerAudioPath({freeText:freeText(),reader:true}),read:readOf(session)}));
+  }
+  // What a press does to the card's read, on either face.
+  function readerPress(session,press){
+    if(press==='pause-read'){pauseCardRead(session);return true;}
+    if(press==='resume-read'){resumeCardRead(session);return true;}
+    if(press==='start-read'||press==='start-kept'){startCardRead(session,{kept:press==='start-kept'});paintCardAudio();return true;}
+    return false;
+  }
+  // N6-2/N6-2b and fix round 1 (F3, C1): one tap (or P) on the answer side. The path is chosen before anything starts:
+  // online and allowed, the read; otherwise the read from the device's kept clips, then the card's whole clip, then one
+  // plain line. A tap while it reads pauses it, the next takes it up again; a tap during the automatic reveal clip ends
+  // that clip and starts the read from the top. The whole clip keeps stop and restart, as P did before.
+  // The same on every mount: on the speak bridge the card's clip is its kept whole-passage clip; with audio packs (the
+  // Mac's QA mount) it is the pack player P was there.
+  function answerClip(c){
+    return sharedAudioDeclared?{ready:c.audioResult?.status==='ready',playing:!!c.audioPlaying,auto:false,held:false}:{ready:cardSpeakReady(c),playing:!!c.speakPlaying,auto:!!c.speakAuto,held:!!c.speakPlaying&&!!c.speakHeld};
+  }
+  function pressAnswerAudio(c=current){
+    if(updateBoundary?.held||disposed||screen!=='study'||!c||c!==current||!c.revealed)return;
+    if(!cardSpeakBridge&&!sharedAudioDeclared){playTrialAudio(c);return;}
+    const session=cardReader(c),clip=answerClip(c);
+    const path=answerAudioPath({freeText:freeText(),reader:!!session,cardClip:clip.ready});
+    const press=answerAudioPress({path,read:readOf(session),clipPlaying:clip.playing,clipAuto:clip.auto,clipHeld:clip.held});
+    if(press==='resume-clip'){resumeCardClip(c);return;}
+    if(readerPress(session,press))return;
+    if(press==='stop-clip'){if(sharedAudioDeclared){stopTrialAudio();syncSharedAudioDom(c);}else stopCardSpeak();return;}
+    if(press==='play-clip'){if(sharedAudioDeclared)playSharedAudio(c);else playCardSpeak(c);return;}
+    const [ja,en]=sharedAudioDeclared?sharedAudioStatusCopy(c.audioStatus??'preparing'):!online()?SPEAK_OFFLINE_LINE:voiceLine(dynamicSpeech==='off'?'not-in-release':'nothing-to-say');
+    speechLine(ja,en);
+  }
+  // The one mark (N6-5): a hairline speaker in the ink of the bar, no emoji and no box; the accent only while it speaks.
+  const SVG_NS='http://www.w3.org/2000/svg';
+  // Fix round 1, C1: three states told apart by shape as well as colour (app.css): at rest the outline speaker and its
+  // waves; speaking the speaker filled; paused two bars in place of the waves.
+  function speakerGlyph(){
+    const svg=document.createElementNS(SVG_NS,'svg');svg.setAttribute('class','card-audio-glyph');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');svg.setAttribute('focusable','false');
+    for(const [d,part] of [['M4.5 9.5h3l4.5-4v13l-4.5-4h-3z','body'],['M15.2 9.2a4 4 0 0 1 0 5.6','wave'],['M17.8 6.6a7.6 7.6 0 0 1 0 10.8','wave'],['M16 8.5v7','pause'],['M19.5 8.5v7','pause']]){const path=document.createElementNS(SVG_NS,'path');path.setAttribute('d',d);path.setAttribute('class','card-audio-'+part);svg.append(path);}
+    return svg;
+  }
+  function speakWordButton(entry,target,c=current){
+    if(!dynamicSpeechAvailable()||!entry)return null;
+    const profile=speakProfile(c);
+    let text;
+    try{text=normaliseSpeechText(entry.term);}catch{return null;}
+    if(!text||!profile)return null;
+    const guid=sharedAudioGuid(target);
+    let voiceKey;
+    if(target&&guid)voiceKey='card:'+guid;
+    else try{voiceKey=voiceKeyFor('word',text);}catch{return null;}
+    let node=null;
+    const name=state=>sharedAudioText(...(['loading','playing'].includes(state)?VOICE_WORDS.stop:VOICE_WORDS.listen));
+    node=button(speakerGlyph(),()=>{
+      if(updateBoundary?.held)return;
+      clearVoiceWhy();
+      // N7: a one-word control while it speaks says Stop, and a press stops it.
+      if(wordSpeech?.node===node&&['loading','playing'].includes(wordSpeech.queue.state)){stopWordSpeech();return;}
+      const readerTurn=yieldReader(reason=>{if(wordSpeech===session){session.timedOut=reason;stopWordSpeech();}});
+      stopSpeakSelection();stopSpeakBlocks();stopWordSpeech();
+      const session={voiceKey,profile,node,queue:null,timedOut:null};
+      const queue=createSpeechQueue({
+        fetchClip:sentence=>speakClip(session.voiceKey,sentence,session.profile),
+        player:queuePlayer(),
+        prefetch:0,
+        gapMs:0,
+        onState:(state,code)=>{
+          // N7 fix 1: held (its start refused, a pause from outside): it rests, the read it held stays paused, a refusal
+          // says why beside it (C10). The clip stays kept, so the next press plays it with no new request.
+          if(state==='paused'){readerTurn.hold();if(wordSpeech===session)stopWordSpeech();if(code&&session.node?.isConnected)showVoiceWhy(session.node,code);return;}
+          if(state==='playing')readerTurn.sounding();if(['done','stopped','error'].includes(state))readerTurn();
+          if(!session.node?.isConnected)return;
+          session.node.setAttribute('aria-busy',String(state==='loading'||state==='playing'));
+          session.node.setAttribute('aria-label',name(state));session.node.title=name(state);
+          // N7 (rule 6): a failure, or the turn's 20 s limit, says why beside the speaker.
+          if(state==='error')showVoiceWhy(session.node,code);
+          else if(state==='stopped'&&session.timedOut){const reason=session.timedOut;session.timedOut=null;showVoiceWhy(session.node,reason);}
+        },
+      });
+      session.queue=queue;
+      queue.setRate(speakRate);
+      oneVoice.claim('reading');wordSpeech=session;
+      queue.start([{text}],0);
+    },{class:'quiet speak-word card-audio','data-speak-word':'','aria-label':name('idle'),title:name('idle')});
+    return node;
+  }
+  function sharedAudioOnDemand(c=current){
+    if(!c?.entry||!sharedAudioSpeakAvailable())return [];
+    const profileId=sharedAudioProfileChoice(c);
+    const profile=(sharedAudioRoot?.profiles??[]).find(row=>row.id===profileId)?.profile;
+    const guid=sharedAudioGuid(c.entry);
+    if(!profile||!guid)return [];
+    const sources=sharedAudioSource(c)?.sourceFields??[];
+    const plans=[];
+    for(const fieldId of sharedAudioSelectedFields(c)){
+      const source=sources.find(field=>field.fieldId===fieldId);
+      if(!source||typeof source.text!=='string'||source.language!=='ja')continue;
+      // The pure planner only knows the headword and Japanese passage fields;
+      // other selected fields stay on the release path.
+      const planField=fieldId==='term'?'term':'passage';
+      const card={guid,term:source.text,passage:{ja:source.text}};
+      try{
+        const plan=planOnDemandSpeech(card,planField,profile);
+        plans.push(Object.freeze({fieldId,cardGuid:plan.cardGuid,speechInput:plan.speechInput}));
+      }catch{/* Unsupported or English-only fields keep their release status. */}
+    }
+    return plans;
   }
   function sharedAudioSelection(c=current){
-    const selection={
+    return {
       taskKey:c.entry.taskKey,
       contentRevision:c.attempt.contentRevision,
       audioContentRevision:sharedAudioRevision(c),
@@ -807,31 +1570,35 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       supportedReadingId:null,
       face:c.revealed?'answer':'front',
       sourceFields:sharedAudioSource(c)?.sourceFields??[],
+      onDemand:sharedAudioOnDemand(c),
     };
-    if(sharedAudioRoot?.version===2){const {profileId,...source}=selection;return {...source,version:2,profileAssignments:sharedAudioV2Profiles(c)};}
-    return selection;
   }
   const sharedAudioText=(ja,en)=>interfaceLanguage==='en'?en:interfaceLanguage==='both'?`${ja} / ${en}`:ja;
-  function sharedAudioStatusCopy(code){
-    switch(code){
-      case 'pending':return ['選択した項目の音声は準備中です。','Audio for the selected field is still pending preparation.'];
-      case 'profile-unassigned':return ['音声プロファイルが割り当てられていません。','No audio profile is assigned.'];
-      case 'profile-unavailable':return ['選択した音声プロファイルは利用できません。','The selected audio profile is unavailable.'];
-      case 'source-stale':return ['音声がこのカードの内容と一致しません。項目またはプロファイルを選び直してください。','Audio no longer matches this card. Choose another field or profile.'];
-      case 'content-release-mismatch':return ['音声のリリースがこのカードと一致しません。','The audio release does not match this card.'];
-      case 'integrity-invalid':return ['音声の完全性を確認できませんでした。','Audio integrity is invalid.'];
-      case 'unsupported-capability':return ['この端末では共有音声を利用できません。','Shared audio is unsupported on this device.'];
-      case 'preparation-failed':return ['音声の準備に失敗しました。','Audio preparation failed.'];
-      case 'offline-missing':return ['オフラインのため音声を利用できません。','Audio is not available offline.'];
-      case 'decode':return ['音声を再生できませんでした。もう一度タップしてください。','Audio could not play. Tap to try again.'];
-      case 'invalid':return ['音声の指定が正しくありません。','The audio selection is invalid.'];
-      default:return ['音声を準備しています…','Preparing audio…'];
-    }
+  // N7 fix 3b (F1, the lead: the line follows its fact for as long as it is shown). The one fact the pack panel's line
+  // needs: a tap on the answer side reaches a voice another way, through this card's read (the speak bridge, or the
+  // device's kept clips). While the panel is up it changes only when the read is made or ends, and both draw the line
+  // again through paintSharedAudioStatus (syncSpeakReader, stopSpeakReader), whatever ended the read: dynamic speech
+  // switched off by any speaker's refusal (markDynamicSpeechOff), another card, leaving the screen. The speak bridge
+  // cannot arrive or go while a page lives: each shell defines it before the app's scripts, frozen, non-writable and
+  // non-configurable. The end of the pairing, a day's budget used or going offline leave the read in place: both bridges
+  // answer from the device's kept clips before anything else, so a tap still tries, and C10 holds.
+  function answerOtherWay(c=current){return !!c?.entry&&dynamicSpeechAvailable()&&speakReader?.cardKey===c.entry.taskKey;}
+  function paintSharedAudioStatus(c=current){
+    if(disposed||!sharedAudioDeclared||screen!=='study'||!c||c!==current||!c.revealed)return;
+    const status=main.querySelector('[data-study-audio-panel] [data-study-audio-status]');
+    if(status)sharedAudioStatusInto(status,c);
+  }
+  // N7 fix 1: the Mac pack mount's statuses take their words from the one vocabulary: the waiting words while it loads,
+  // the ruled line of its cause when it failed (voice-lines.mjs voiceStatusLine). Fix 3 (F): the one fact the module needs
+  // to choose a true line (answerOtherWay). A pack that failed its integrity check is not read again by a tap.
+  function sharedAudioStatusCopy(code,c=current){
+    if(SPEAK_ERRORS.has(code))return describeSpeakError(code);
+    return voiceStatusLine(code,{otherWay:answerOtherWay(c)});
   }
   function sharedAudioStatusInto(node,c=current){
     const code=c?.audioStatus??'preparing';
-    if(code==='ready'||code==='cancelled'||code==='face-hidden'){node.hidden=true;renderInterfacePair(node,'','',interfaceLanguage);return;}
-    const [ja,en]=sharedAudioStatusCopy(code);node.hidden=false;renderInterfacePair(node,ja,en,interfaceLanguage);
+    if(code==='ready'||code==='cancelled'||code==='face-hidden'||(code==='offline-missing'&&sharedAudioSpeakAvailable())){node.hidden=true;renderInterfacePair(node,'','',interfaceLanguage);return;}
+    const [ja,en]=sharedAudioStatusCopy(code,c);node.hidden=false;renderInterfacePair(node,ja,en,interfaceLanguage);
   }
   function sharedAudioDefaultLabel(c=current){
     const fields=sharedAudioDefaultFields(c).map(fieldId=>sharedAudioFieldLabels(fieldId,c));
@@ -862,11 +1629,6 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     if(!sharedAudioRoot){
       select.append(h('option',{value:''},sharedAudioText('読み込み中…','Loading…')));
       select.disabled=true;return;
-    }
-    if(sharedAudioRoot.version===2){
-      const ids=Object.values(sharedAudioV2Profiles(c)),assigned=ids.length>0&&ids.every(id=>typeof id==='string');
-      select.append(h('option',{value:'configured'},assigned?sharedAudioText('指定済みの音声','Configured voices'):sharedAudioText('未割り当て','Unassigned')));
-      select.value='configured';select.disabled=true;return;
     }
     const profiles=sharedAudioRoot.profiles??[],defaultId=sharedAudioRoot.defaultProfileId??null;
     if(defaultId===null||profiles.length===0)select.append(h('option',{value:''},sharedAudioText('未割り当て','Unassigned')));
@@ -902,9 +1664,11 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       fieldSelect.value=choice==='default'||fields.some(field=>field.fieldId===choice)?choice:'default';
     }
     const profileSelect=panel.querySelector('[data-study-audio-profile]');if(profileSelect)fillSharedAudioProfiles(profileSelect,c);
-    const status=panel.querySelector('[data-study-audio-status]');if(status)sharedAudioStatusInto(status,c);
+    paintSharedAudioStatus(c);
   }
   function stopTrialAudio(){
+    clearSpeechToast();
+    stopCardSpeak();
     stopSharedAudioRoot();
     trialAudioPlaybackGeneration++;
     trialAudio?.stop();
@@ -949,38 +1713,77 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function trialAudioMember(c=current){return !!trialAudio&&!!c?.entry?.noteGuid&&trialAudio.has(c.entry.noteGuid);}
   function trialAudioReady(c=current){return !!trialAudio&&!!c?.revealed&&trialAudioMember(c);}
   function trialAudioLabel(active=false,c=current){
+    // N7: the ruled state words; a chosen field is named after the word, and the trial keeps its "Kore" mark.
+    const [listenJa,listenEn]=withKey(VOICE_WORDS.listen),[stopJa,stopEn]=withKey(VOICE_WORDS.stop);
     if(sharedAudioDeclared&&!active&&sharedAudioFieldChoice(c)!=='default'){
       const [ja,en]=sharedAudioFieldLabels(sharedAudioFieldChoice(c),c);
-      return sharedAudioText(`${ja}を再生（P）`,`Play ${en} (P)`);
+      return sharedAudioText(`${VOICE_WORDS.listen[0]}：${ja}（P）`,`${VOICE_WORDS.listen[1]}: ${en} (P)`);
     }
     const [ja,en]=sharedAudioDeclared
-      ?active?['音声を停止（P）','Stop audio (P)']:['学習対象と全文を再生（P）','Play target and entire passage (P)']
-      :active?['Kore 試聴：再生を停止（P）','Kore trial: Stop audio (P)']:['Kore 試聴：単語と文を再生（P）','Kore trial: Play word and sentence (P)'];
+      ?active?[stopJa,stopEn]:[listenJa,listenEn]
+      :active?[`Kore 試聴：${stopJa}`,`Kore trial: ${stopEn}`]:[`Kore 試聴：${listenJa}`,`Kore trial: ${listenEn}`];
     return sharedAudioText(ja,en);
   }
   function trialAudioButton(card=current){
-    const c=card,shared=sharedAudioDeclared,playing=shared&&!!c?.audioPlaying,ready=shared&&c?.audioResult?.status==='ready';
-    const label=trialAudioLabel(playing,c);
-    return button('🔊',event=>{
+    const c=card,shared=sharedAudioDeclared,bridge=!!cardSpeakBridge,playing=shared?!!c?.audioPlaying:bridge?!!c?.speakPlaying:false,ready=shared?c?.audioResult?.status==='ready':bridge?cardSpeakReady(c):false;
+    const label=bridge?cardSpeakLabel(playing&&!c?.speakAuto):trialAudioLabel(playing,c);
+    const target=bridge?cardSpeakTarget(c.entry):null;
+    return button(speakerGlyph(),event=>{
       event.preventDefault();event.stopPropagation();
-      if(shared)toggleSharedAudio(c,event.currentTarget);else playTrialAudio(c,event.currentTarget);
+      if(shared||bridge)pressAnswerAudio(c);else playTrialAudio(c,event.currentTarget);
       focusStudyCard();
-    },{class:'quiet study-icon','aria-label':label,title:label,'data-trial-audio':'','aria-busy':'false',...(shared?{'data-study-audio':'',disabled:!(ready||playing)}:{})});
+    },{class:'quiet study-icon card-audio','aria-label':label,title:label,'data-trial-audio':'','data-card-audio':'answer','aria-busy':bridge?String(playing):'false',...(shared?{'data-study-audio':'',disabled:!(ready||playing)}:bridge&&target?{'data-speak-field':target.field}:{})});
+  }
+  // N8: the question side's control (the same mark), on every card with a question-side read where speech is set up.
+  function frontAudioButton(c){
+    return button(speakerGlyph(),event=>{
+      event.preventDefault();event.stopPropagation();pressFrontAudio(c);focusStudyCard();
+    },{class:'quiet study-icon card-audio','data-trial-audio':'','data-card-audio':'front','aria-busy':'false'});
+  }
+  // The one control's look and words, from whatever it drives now: the read (either face) or the card's kept clip.
+  // Fix round 1, C1: data-audio-mode is rest, speaking or paused (the glyph's shape follows it); the label says what a
+  // press will do. N8: the question side's control is the read's, with no clip.
+  const NO_CLIP=Object.freeze({ready:false,playing:false,auto:false,held:false});
+  function paintCardAudio(){
+    syncMediaSession();
+    if(disposed||screen!=='study')return;
+    const control=main.querySelector('[data-card-audio]'),c=current;if(!control||!c)return;
+    let label,busy,state='idle',mode='rest';
+    const front=control.dataset.cardAudio==='front';
+    if(front||cardSpeakBridge||sharedAudioDeclared){
+      const session=cardReader(c),read=readOf(session),clip=front?NO_CLIP:answerClip(c);
+      const path=answerAudioPath({freeText:freeText(),reader:!!session,cardClip:clip.ready});
+      const clipLabel=active=>sharedAudioDeclared?trialAudioLabel(active,c):cardSpeakLabel(active);
+      const readLabel=()=>sharedAudioText(...withKey(VOICE_WORDS.listen));
+      mode=answerAudioMode({read,clipPlaying:clip.playing,clipHeld:clip.held});
+      if(clip.held){state='paused';busy=false;label=sharedAudioText(...withKey(VOICE_WORDS.resume));}
+      else if(read==='going'){state=readState(session);busy=true;label=sharedAudioText(...withKey(VOICE_WORDS.pause));}
+      else if(read==='paused'){state='paused';busy=false;label=sharedAudioText(...withKey(VOICE_WORDS.resume));}
+      else if(clip.playing){busy=true;state='clip';label=clip.auto&&['read','kept'].includes(path)?readLabel():clipLabel(!clip.auto);}
+      else{busy=false;state=session?readState(session):'idle';label=front||['read','kept'].includes(path)?readLabel():clipLabel(false);}
+      if(session)control.dataset.readSession=String(session.id);else delete control.dataset.readSession;
+      control.toggleAttribute('data-speak-turn',!!session?.turn);
+      if(front)control.dataset.frontKind=session?.kind??'none';
+      else if(sharedAudioDeclared)control.disabled=!(read!=='idle'||clip.playing||path!=='line');
+    }else return;
+    control.dataset.speakState=state;control.dataset.audioMode=mode;
+    control.setAttribute('aria-label',label);control.title=label;control.setAttribute('aria-busy',String(!!busy));
   }
   function syncTrialAudioControl(){
     if(disposed)return;
+    if(cardSpeakBridge){paintCardAudio();return;}
     if(sharedAudioDeclared){syncSharedAudioCurrent();return;}
     if(screen!=='study'||!current)return;
     const actions=main.querySelector('.study-actions');if(!actions)return;
     const existing=actions.querySelector('[data-trial-audio]');
     if(!trialAudioReady(current)){existing?.remove();return;}
     if(existing)return;
-    const node=trialAudioButton(current),remaining=actions.querySelector('[data-study-remaining]');
+    const node=trialAudioButton(current),remaining=actions.querySelector('.study-remaining');
     if(remaining)actions.insertBefore(node,remaining);else actions.prepend(node);
   }
   function trialAudioFailure(){
-    const ja=`音声を再生できません。もう一度タップしてください。`,en='Audio could not play. Tap to try again.';
-    message(interfaceLanguage==='en'?en:interfaceLanguage==='both'?`${ja} / ${en}`:ja);
+    const [ja,en]=voiceLine('decode');
+    speechLine(ja,en);
   }
   function playTrialAudio(card=current,control=null){
     const c=card;
@@ -992,6 +1795,285 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     control?.setAttribute('aria-busy','true');
     trialAudio.play(c.entry.noteGuid).catch(()=>{if(generation===trialAudioPlaybackGeneration&&!disposed&&screen==='study'&&c===current&&trialAudioReady(c))trialAudioFailure();})
       .finally(()=>{if(generation===trialAudioPlaybackGeneration&&!disposed&&screen==='study'&&c===current&&c.revealed&&control?.isConnected&&control===main.querySelector('[data-trial-audio]'))control.setAttribute('aria-busy','false');});
+  }
+  function cardSpeakSpeakable(c){
+    return !!cardSpeakBridge&&!!c?.entry&&!!cardSpeakTarget(c.entry)&&!!sharedAudioGuid(c.entry)&&(cardSpeakAllowlisted(c.entry)||dynamicSpeech!=='off');
+  }
+  function cardSpeakReady(c=current){
+    return screen==='study'&&!!c?.revealed&&cardSpeakSpeakable(c);
+  }
+  function cardSpeakLabel(active=false){
+    return sharedAudioText(...withKey(active?VOICE_WORDS.stop:VOICE_WORDS.listen));
+  }
+  // A line after a reveal floats as the study toast, so it cannot push the card down while the answer is read (the status
+  // line sits in flow above the card: app.css 271-273). A line after a press keeps the status line.
+  // N7 fix 1 (rule 6): a press's line goes after about four seconds, or at once when a play sounds (voiceSounded); a newer
+  // line replaces it. A play that sounds also resets the reveal's once-per-cause memory.
+  let voiceLineToken=null,voiceLineTimer=null;  // fix 4: the timer is kept, so dispose() clears it
+  function speechLine(ja,en,auto=false){
+    if(auto){showToast(ja,en,4000,{'data-speech-toast':''});return;}
+    message(interfaceLanguage==='en'?en:interfaceLanguage==='both'?`${ja} / ${en}`:ja,'voice-line');
+    const token={};voiceLineToken=token;
+    win.clearTimeout(voiceLineTimer);voiceLineTimer=win.setTimeout(()=>{voiceLineTimer=null;if(voiceLineToken===token)clearVoiceLine();},4000);
+  }
+  function clearVoiceLine(){voiceLineToken=null;if(!disposed&&noticeOwner==='voice-line')message('');}
+  function voiceSounded(){speechLines.sounded();clearVoiceLine();}
+  function voiceAnswered(reply){try{speechLines.answered(reply);}catch{}}
+  // The speech toast leaves with its card: grade, the next card's front and leaving study all stop card speech.
+  function clearSpeechToast(){
+    const toast=root.querySelector('[data-study-toast][data-speech-toast]');
+    if(toast){win.clearTimeout(toastTimer);toast.remove();}
+  }
+  // One automatic line per kind per page session (a press always answers); codes that share a line share a kind.
+  const speechLines=createSpeechLineLog();
+  function cardSpeakFailure(code,auto=false){
+    const kind=speakLineKind(code);
+    if(!speechLines.show({kind,auto}))return;
+    const [ja,en]=describeSpeakError(kind);
+    speechLine(ja,en,auto);
+  }
+  function cardSpeakOfflineLine(){
+    const [ja,en]=SPEAK_OFFLINE_LINE;
+    speechLine(ja,en);
+  }
+  // N7 (rule 6): a control that was pressed and stays silent says why, where it was pressed: one line beside it (the word
+  // popover's speaker, a text block's speaker), or the toast for 読む (its chip is gone once it reads); for about four
+  // seconds or until the next press.
+  const VOICE_WHY_MS=4000;let voiceWhy=null;
+  function clearVoiceWhy(){
+    const why=voiceWhy;voiceWhy=null;
+    if(why){win.clearTimeout(why.timer);why.node.remove();}
+    const toast=root.querySelector('[data-study-toast][data-voice-why]');
+    if(toast){win.clearTimeout(toastTimer);toast.remove();}
+  }
+  function showVoiceWhy(control,code){
+    clearVoiceWhy();
+    if(disposed||!control?.isConnected)return;
+    const [ja,en]=voiceLine(code);
+    const node=renderInterfacePair(h('span',{class:'voice-why',role:'status','data-voice-why':voiceCause(code),'data-interface-layout':'inline'}),ja,en,interfaceLanguage,{inline:true});
+    control.after(node);
+    const why={node,timer:win.setTimeout(()=>{if(voiceWhy===why)clearVoiceWhy();},VOICE_WHY_MS)};voiceWhy=why;
+  }
+  function voiceToast(code){
+    clearVoiceWhy();
+    if(disposed)return;
+    const [ja,en]=voiceLine(code);
+    showToast(ja,en,VOICE_WHY_MS,{'data-speech-toast':'','data-voice-why':voiceCause(code)});
+  }
+  function stopCardSpeak(){
+    const turn=cardSpeakTurn;cardSpeakTurn=null;turn?.();
+    revealSpeak.cancel();
+    cardSpeakPlayGeneration++;cardClipResume=null;
+    const source=cardSpeakSource;cardSpeakSource=null;
+    if(source){try{source.stop();}catch{}try{source.disconnect();}catch{}}
+    const owner=cardSpeakOwner;cardSpeakOwner=null;
+    if(owner){
+      owner.speakPlaying=false;owner.speakAuto=false;owner.speakHeld=false;cardSpeakOwnSuspend=null;
+      if(!disposed&&screen==='study'&&owner===current)paintCardAudio();
+    }
+    syncMediaSession();
+  }
+  function finishCardSpeak(c){
+    const turn=cardSpeakTurn;cardSpeakTurn=null;turn?.();
+    if(c){c.speakPlaying=false;c.speakAuto=false;c.speakHeld=false;}
+    if(cardSpeakOwner===c)cardSpeakOwner=null;
+    cardSpeakOwnSuspend=null;cardClipResume=null;
+    if(!disposed&&screen==='study'&&c===current)paintCardAudio();
+    syncMediaSession();
+  }
+  function ensureCardSpeakContext(){
+    if(cardSpeakContext&&cardSpeakContext.state!=='closed')return cardSpeakContext;
+    const Ctor=win.AudioContext||win.webkitAudioContext;
+    if(!Ctor)throw Error('card-speak-context-unavailable');
+    const context=new Ctor();
+    if(!context||typeof context.decodeAudioData!=='function'||typeof context.createBufferSource!=='function')throw Error('card-speak-context');
+    try{context.addEventListener?.('statechange',()=>cardSpeakContextChanged(context));}catch{}
+    cardSpeakContext=context;return context;
+  }
+  // N7 fix 1 (the lead): the client listens to the context while the whole clip sounds. A context that stops running in the
+  // middle (a call, the app sent away, another app's sound, the lock screen) holds the clip: the control shows its paused
+  // state; the source keeps its place. Nothing starts again by itself: a context that runs again on its own while the
+  // clip is held is suspended again. His press resumes it (resumeCardClip).
+  // Fix 2: a context closed under the clip holds it too (paused, not Stop (P) in silence); his press remakes the context.
+  // His press wins over the client's own suspend: the client remembers its own suspend (cardSpeakOwnSuspend) until the
+  // context is seen running for his press. A press that lands after that suspend was asked for (cardSpeakPresses moved on)
+  // runs the context again, when the suspension's statechange arrives and when the suspend settles, in either order; only
+  // a stop that comes after the context ran for his press holds the clip again.
+  function cardSpeakContextChanged(context){
+    if(disposed||context!==cardSpeakContext)return;
+    const c=cardSpeakOwner;
+    if(!c||!c.speakPlaying||!cardSpeakSource)return;
+    if(context.state==='running'){
+      // Fix 3b (F2): a resume pending when the context ran did not fail. The client's own suspend is forgotten only once it
+      // has settled: one still on its way (overtaken by a newer resume) lands later and is the client's, not one from outside.
+      if(cardClipResume)cardClipResume.ran=true;
+      if(c.speakHeld)suspendHeldCardContext(context,c);
+      else if(!cardSpeakOwnSuspend?.pending)cardSpeakOwnSuspend=null;
+      return;
+    }
+    const own=cardSpeakOwnSuspend;
+    if(context.state!=='closed'&&own?.context===context&&own.presses!==cardSpeakPresses){if(!c.speakHeld)resumeCardSpeakContext(context);return;}
+    if(c.speakHeld)return;
+    c.speakHeld=true;cardClipResume=null;
+    if(screen==='study'&&c===current)paintCardAudio();
+  }
+  function suspendHeldCardContext(context,c){
+    const own={context,presses:cardSpeakPresses,pending:true};cardSpeakOwnSuspend=own;
+    let pending=null;
+    try{pending=context.suspend?.();}catch{}
+    Promise.resolve(pending).catch(()=>{}).then(()=>{
+      own.pending=false;
+      if(own.presses===cardSpeakPresses||disposed||cardSpeakContext!==context||cardSpeakOwner!==c||!c.speakPlaying||c.speakHeld)return;
+      if(context.state==='running'){if(cardSpeakOwnSuspend===own)cardSpeakOwnSuspend=null;}
+      else resumeCardSpeakContext(context);
+    });
+  }
+  // His press on the whole clip held by its context, inside his gesture: the context is resumed and the clip goes on from
+  // the same place (the source never restarts). If it will not run, C10, and the clip stays paused for the next press.
+  function resumeCardClip(c){
+    const context=cardSpeakContext,generation=cardSpeakPlayGeneration;
+    cardSpeakPresses++;
+    // Fix 2: a closed context cannot go on: the press remakes it and plays the held clip again from its start (no request).
+    if(context?.state==='closed'&&cardSpeakOwner===c){stopCardSpeak();playCardSpeak(c);return;}
+    if(!context||cardSpeakOwner!==c||!cardSpeakSource){finishCardSpeak(c);return;}
+    c.speakHeld=false;paintCardAudio();
+    // Fix 3b (F2, the lead): anything that overtakes this resume ends its check: a hold (the platform's pause, the context
+    // stopped from outside), a stop, the end, or a newer resume. Only a resume still pending that did not run says C10.
+    const attempt={};cardClipResume=attempt;
+    resumeCardSpeakContext(context);
+    cardSpeakContextRuns(context).then(runs=>{
+      if(cardClipResume!==attempt)return;
+      cardClipResume=null;
+      if(disposed||generation!==cardSpeakPlayGeneration||cardSpeakOwner!==c||!c.speakPlaying)return;
+      if(runs||attempt.ran){voiceSounded();return;}
+      c.speakHeld=true;
+      if(screen==='study'&&c===current){paintCardAudio();cardSpeakFailure('decode',false);}
+    });
+  }
+  const CONTEXT_RESUME_MS=1500;
+  async function cardSpeakContextRuns(context){
+    if(context.state==='running')return true;
+    if(context.state==='closed')return false;
+    try{await Promise.race([Promise.resolve(context.resume?.()),new Promise(done=>win.setTimeout(done,CONTEXT_RESUME_MS))]);}catch{}
+    return context.state==='running';
+  }
+  function resumeCardSpeakContext(target){
+    try{
+      if(target.state!=='closed'){
+        const resumed=target.resume?.();
+        if(resumed&&typeof resumed.catch==='function')resumed.catch(()=>{});
+      }
+    }catch{}
+  }
+  function decodeCardSpeakAudio(target,buffer){
+    return new Promise((resolve,reject)=>{
+      let settled=false;
+      const done=value=>{if(!settled){settled=true;resolve(value);}};
+      const fail=error=>{if(!settled){settled=true;reject(error);}};
+      try{
+        const result=target.decodeAudioData(buffer,done,fail);
+        if(result&&typeof result.then==='function')result.then(done,fail);
+        else if(result!==undefined)done(result);
+      }catch(error){fail(error);}
+    });
+  }
+  function decodeCardSpeakBytes(value){
+    if(typeof value!=='string'||value.length===0||value.length>4*1024*1024||typeof win.atob!=='function')throw Error('invalid-response');
+    let binary;
+    try{binary=win.atob(value);}catch{throw Error('invalid-response');}
+    if(binary.length>2*1024*1024)throw Error('invalid-response');
+    const bytes=new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+    return bytes;
+  }
+  async function playCardSpeakBytes(c,generation,context,bytes,auto=false){
+    const active=()=>generation===cardSpeakPlayGeneration&&!disposed&&screen==='study'&&c===current&&c.revealed&&cardSpeakOwner===c;
+    if(!active())return;
+    let decoded;
+    try{
+      const buffer=bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength);
+      decoded=await decodeCardSpeakAudio(context,buffer);
+    }catch{
+      // A clip that will not decode is a bad clip by the one rule (clipBroken): it is let go, whatever the engine named it.
+      if(active()){forgetCardClip(c);finishCardSpeak(c);cardSpeakFailure('decode',auto);}
+      return;
+    }
+    if(!active())return;
+    // C2 (review of 8c74b2f): a clip that decodes to nothing ends P like any failure, so a read it held goes on. N7: it
+    // could not play (C10), and it leaves the card's memory and the device's store, so the next tap asks again.
+    if(!decoded){forgetCardClip(c);finishCardSpeak(c);cardSpeakFailure('decode',auto);return;}
+    // N7 (the lead, round 2): a suspended or interrupted context (the app back from the background, a call, another app's
+    // sound) would play into silence and never end. It is resumed first (a press already asked, inside its gesture); if it
+    // still will not run, nothing pretends to play and the line says why (C10). The clip itself is good: it stays held, so
+    // the next press plays it with no new request. An automatic reveal says it once, as any failed reveal does.
+    if(!(await cardSpeakContextRuns(context))){if(active()){finishCardSpeak(c);cardSpeakFailure('decode',auto);}return;}
+    if(!active())return;
+    const source=context.createBufferSource();
+    source.buffer=decoded;
+    cardSpeakSource=source;
+    source.onended=()=>{
+      if(cardSpeakSource===source)cardSpeakSource=null;
+      if(generation!==cardSpeakPlayGeneration||cardSpeakOwner!==c)return;
+      finishCardSpeak(c);
+    };
+    source.connect(context.destination);
+    try{source.start();cardSpeakTurn?.sounding?.();voiceSounded();syncMediaSession();}
+    catch(error){
+      if(cardSpeakSource===source)cardSpeakSource=null;
+      try{source.disconnect();}catch{}
+      // N7: the browser would not start the sound (C11 reads as C10). Fix 1 (F1): the clip decoded, so it is good and stays
+      // held for the next press; only a bad one (clipBroken) is let go.
+      if(active()){if(clipBroken(error))forgetCardClip(c);finishCardSpeak(c);cardSpeakFailure('decode',auto);}
+    }
+  }
+  // N7 (C10): the card's whole clip would not play: the held reply lets go and the device's store forgets it.
+  function forgetCardClip(c){
+    revealSpeak.forget(c);
+    const guid=sharedAudioGuid(c?.entry),target=c?.entry?cardSpeakTarget(c.entry):null;
+    if(!guid||!target)return;
+    try{Promise.resolve(win.nihongoSpeak?.forget?.(guid,speechInputFor(target.text,cardVoiceProfile(c.entry)))).catch(()=>{});}catch{}
+  }
+  function playCardSpeak(c=current,{reply,auto=false}={}){
+    if(!cardSpeakBridge||disposed||screen!=='study'||!c||c!==current||!c.revealed)return;
+    const entry=c.entry,guid=sharedAudioGuid(entry),target=cardSpeakTarget(entry);
+    if(!guid||!target)return;
+    if(auto&&readerReading())return;
+    // N7: the turn's 20 s limit is a slow voice (C5), not "no connection".
+    const readerTurn=auto?null:yieldReader(reason=>{if(cardSpeakOwner===c){stopCardSpeak();cardSpeakFailure(reason||'voice-timeout',false);}});
+    oneVoice.claim('card');
+    let context;
+    try{context=ensureCardSpeakContext();resumeCardSpeakContext(context);}
+    catch{readerTurn?.();if(!disposed&&screen==='study'&&c===current)cardSpeakFailure('decode',auto);return;}
+    const generation=++cardSpeakPlayGeneration,prior=cardSpeakSource;
+    cardSpeakSource=null;
+    if(prior){try{prior.stop();}catch{}try{prior.disconnect();}catch{}}
+    cardSpeakOwner=c;c.speakPlaying=true;c.speakAuto=auto;paintCardAudio();cardSpeakTurn=readerTurn;
+    const active=()=>generation===cardSpeakPlayGeneration&&!disposed&&screen==='study'&&c===current&&c.revealed&&cardSpeakOwner===c;
+    let pending;
+    try{pending=auto?Promise.resolve(reply):revealSpeak.clip(c);}
+    catch{if(!active())return;finishCardSpeak(c);cardSpeakFailure('speak-failed',auto);return;}
+    Promise.resolve(pending).then(value=>{
+      if(!active())return;
+      if(value?.ok!==true){
+        const code=typeof value?.error==='string'&&value.error?value.error:'speak-failed';
+        finishCardSpeak(c);
+        const route=cardSpeakFailureRoute({bridge:cardSpeakBridge,code,allowlisted:cardSpeakAllowlisted(entry),auto});
+        if(route==='silent')return;
+        if(route==='offline-line'){cardSpeakOfflineLine();return;}
+        if(route==='dynamic-off'){markDynamicSpeechOff({auto});return;}
+        cardSpeakFailure(code,auto);return;
+      }
+      let bytes;
+      // N7: unreadable bytes (C17) are not kept either, so the next tap asks again.
+      try{bytes=decodeCardSpeakBytes(value.bytes);}
+      catch{if(active()){forgetCardClip(c);finishCardSpeak(c);cardSpeakFailure('invalid-response',auto);}return;}
+      if(bytes.byteLength===0){if(active()){forgetCardClip(c);finishCardSpeak(c);cardSpeakFailure('invalid-response',auto);}return;}
+      playCardSpeakBytes(c,generation,context,bytes,auto);
+    },()=>{if(!active())return;finishCardSpeak(c);cardSpeakFailure('speak-failed',auto);});
+  }
+  function closeCardSpeakContext(){
+    const context=cardSpeakContext;cardSpeakContext=null;
+    if(context){try{context.close?.();}catch{}}
   }
   function stopSharedAudioRoot(){
     sharedAudioRootController?.abort();sharedAudioRootController=null;
@@ -1007,6 +2089,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       if(disposed||controller.signal.aborted)return null;
       sharedAudioRoot=root;sharedAudioRootState='ready';
       if(screen==='study'&&current?.revealed)syncSharedAudioCurrent();
+      syncScreenSpeakBlocks();
       return root;
     },error=>{
       if(!disposed&&!controller.signal.aborted){
@@ -1091,7 +2174,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const actions=main.querySelector('.study-actions');
     let control=actions?.querySelector('[data-trial-audio]');
     if(actions&&!control){
-      control=trialAudioButton(c);const remaining=actions.querySelector('[data-study-remaining]');
+      control=trialAudioButton(c);const remaining=actions.querySelector('.study-remaining');
       if(remaining)actions.insertBefore(control,remaining);else actions.prepend(control);
     }
     if(control){
@@ -1101,13 +2184,17 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       control.setAttribute('aria-busy',String(playing));
       control.setAttribute('data-study-audio','');
     }
+    // Fix 3: the card's read first, so the status line knows whether a tap has another way to the voice.
+    if(c===current)syncSpeakReader(c);
     let panel=main.querySelector('[data-study-audio-panel]');
     if(!panel){const heading=main.querySelector('.study-heading');if(heading){panel=sharedAudioPanel(c);heading.after(panel);}}
     if(panel)syncSharedAudioPanel(c,panel);
+    if(c===current)paintCardAudio();
   }
   function changeSharedAudioChoice(c,{fieldId,profileId}={}){
     if(disposed||c!==current||screen!=='study')return;
-    stopTrialAudio();
+    // B2: a choice in the panel changes what P plays next; the read (its own voice) goes on.
+    stopTrialAudio();stopSpeakSelection();stopSpeakBlocks();
     if(fieldId!==undefined)c.audioFieldId=fieldId;
     if(profileId!==undefined)c.audioProfileId=profileId;
     c.audioResolverKey=null;c.audioResult=null;c.audioPromise=null;c.audioStatus='preparing';
@@ -1115,17 +2202,32 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   }
   function playSharedAudio(c=current){
     if(disposed||audioDownloadsBlocked()||screen!=='study'||!c||c!==current||!c.revealed||c.audioResult?.status!=='ready')return;
+    // B2 (review of 8c74b2f): P here is a speaker he presses like any other: the read yields and takes itself up again
+    // however the clip ends. The pack player is not timed (its request is the native path's), so it counts as sounding.
+    const readerTurn=yieldReader();
+    readerTurn.sounding();
+    oneVoice.claim('packs');
+    const onDemand=c.audioResult?.onDemand===true;
     sharedAudioOwner=c;
     const generation=(c.audioPlayGeneration??0)+1;c.audioPlayGeneration=generation;
     c.audioPlaying=true;
+    if(onDemand)c.audioStatus='speak-fetching';
     const live=main.querySelector('[data-study-audio]');
     live?.setAttribute('aria-busy','true');
     syncSharedAudioDom(c);
-    studyAudio.play(c.audioResult).catch(()=>{
+    studyAudio.play(c.audioResult).catch(error=>{
       if(c.audioPlayGeneration!==generation||disposed||screen!=='study'||c!==current||!c.revealed)return;
-      c.audioStatus='decode';trialAudioFailure();syncSharedAudioDom(c);
+      if(onDemand){
+        const code=typeof error?.audioCode==='string'?error.audioCode:'speak-failed';
+        c.audioStatus=SPEAK_ERRORS.has(code)?code:'speak-failed';
+      }else{
+        c.audioStatus='decode';trialAudioFailure();
+      }
+      syncSharedAudioDom(c);
     }).finally(()=>{
+      readerTurn();
       if(c.audioPlayGeneration!==generation||disposed||screen!=='study'||c!==current||!c.revealed)return;
+      if(onDemand&&c.audioStatus==='speak-fetching')c.audioStatus='ready';
       c.audioPlaying=false;live?.setAttribute('aria-busy','false');syncSharedAudioDom(c);
     });
   }
@@ -1139,7 +2241,8 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   let lastCardActionAt=-Infinity;
   function revealCard(c=current,source=lastInputSource){
     if(updateBoundary?.held||!c||c!==current||c.revealed||c.sessionInfoOpen||busy||pendingIntent||pop||document.querySelector('dialog[open]'))return;
-    clearCardSelection();c.thinkMs=c.timer.freeze();c.revealed=true;c.revealSource=source;c.revealedAt=lastCardActionAt=win.performance.now();render();focusStudyCard();
+    clearCardSelection();stopSpeakReader();c.thinkMs=c.timer.freeze();c.revealed=true;c.revealSource=source;c.revealedAt=lastCardActionAt=win.performance.now();render();focusStudyCard();
+    revealSpeak.reveal(c);
   }
   function passage(text, options = {}) { return renderVocabularyPassage(document,current.entry,text,{...options,onWord:openWord,dictionary}); }
   const fold = (label, ...contents) => h('details',{class:'fold'},h('summary',{},label),...contents);
@@ -1149,13 +2252,18 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       'data-entry-source':c.entrySource,'data-focus':c.sessionInfoOpen?'session-info':'simple'});
     const studyAction=(label,icon,action,attrs)=>button(icon,action,
       {class:'quiet study-icon','aria-label':label,title:label,...attrs});
+    const remaining=h('span',{class:'study-remaining'},
+      copy('span',`残り${c.remaining}枚`,`${c.remaining} left`,{'data-study-remaining':''}));
+    if(c.revealed&&Number.isFinite(c.thinkMs)&&c.thinkMs>=0){const seconds=Math.round(c.thinkMs/1000);remaining.append(copy('span',`${seconds}秒`,`${seconds} s`,{class:'secondary answer-time','data-answer-time':''}));}
     const actions=h('div',{class:'study-actions'},
       studyAction('学習を終える','×',()=>navigate('today'),{'data-study-exit':''}),
-      copy('span',`残り${c.remaining}枚`,`${c.remaining} left`,{class:'study-remaining','data-study-remaining':''}),lastReview?studyAction('元に戻す','↶',undoLast,{'data-undo':''}):null);
+      remaining,lastReview?studyAction('元に戻す','↶',undoLast,{'data-undo':''}):null);
     actions.append(studyAction('メニュー','⋯',()=>{if(!current.sessionInfoOpen){const undo=main.querySelector('[data-menu-undo]');if(undo&&!availableUndo())undo.remove();}setStudyMenu(!c.sessionInfoOpen);},
       {'data-session-info':'','aria-haspopup':'menu','aria-expanded':String(!!c.sessionInfoOpen),'aria-controls':'study-help'}));
-    const audioControl=sharedAudioDeclared?(c.revealed?trialAudioButton(c):null):(trialAudioReady(c)?trialAudioButton(c):null);
-    if(audioControl)actions.insertBefore(audioControl,actions.querySelector('[data-study-remaining]'));
+    // N6-1: one audio control on each face, in the bar. Question side: on every card with a question-side read (N8).
+    // Answer side: on the speak bridge it is always there (N6-2a: never dead); with packs or the trial clips, as before.
+    const audioControl=!c.revealed?(frontReadable(c)?frontAudioButton(c):null):sharedAudioDeclared||cardSpeakBridge?trialAudioButton(c):(trialAudioReady(c)?trialAudioButton(c):null);
+    if(audioControl)actions.insertBefore(audioControl,remaining);
     const context=h('span',{id:'study-context'},`${MODULES.find(m=>m[0]===e.module)?.[1]||'文法'} · ${c.attempt.learnAhead?'学習ステップ（少し早め） · ':''}${c.attempt.mode==='practice'?'追加練習（採点なし）':e.contractId==='grammar.cloze.v1'?'思い出す':e.contractId==='grammar.meaning.v1'?'意味':'読んで思い出す'}`);
     const heading=h('div',{class:'study-heading'},actions,context);if(boundaryNotice)heading.append(copy('p',boundaryNotice.ja,boundaryNotice.en,{class:'boundary-notice',role:'status','data-boundary-update':''}));section.append(heading);
     if(sharedAudioDeclared&&c.revealed)section.append(sharedAudioPanel(c));
@@ -1164,9 +2272,9 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
         'aria-describedby':'study-card-content','aria-keyshortcuts':'Space Enter','data-reveal':''})});
     cardViews.set(card,{current:c,revealed:c.revealed});
     if(customRun)section.append(h('p',{id:'study-progress','data-session-progress':''},'カスタム学習',' · ',`${customRun.completed+1} / ${customRun.total}`,customRun.options?.mode==='review-ahead'?h('span',{},' · ','先取り復習'):null));
-    if(!c.revealed){card.append(frontFor(e).node.cloneNode(true));}
+    if(!c.revealed){card.append(frontFor(e).node.cloneNode(true));revealSpeak.prefetch(c);}
     else if(e.manual){
-      card.append(c.revealed?h('div',{'data-vocabulary-source':'','data-manual-back':''},h('h2',{},e.term),h('p',{},e.reading),h('p',{},e.meaning),h('p',{},e.ja),e.note?h('p',{},e.note):null):passage(e.ja,{front:true}));
+      card.append(c.revealed?h('div',{'data-vocabulary-source':'','data-manual-back':'','data-learner-typed':''},h('h2',{},e.term),h('p',{},e.reading),h('p',{},e.meaning),h('p',{},e.ja),e.note?h('p',{},e.note):null):passage(e.ja,{front:true}));
     } else if (e.contractId.startsWith('grammar.') && grammar && e.grammarRecord) {
       card.append(c.revealed ? grammar.renderGrammarBack(document,e.grammarRecord,e.grammarTask,{onCapture:intent=>openWord({surface:intent.surface,
         span:{...intent.span,unit:intent.span.unit==='utf16'?'utf16-code-unit':intent.span.unit},location:intent.field==='example'?'passage':'definition',source:{field:intent.field,exampleId:intent.exampleId??null,context:intent.context,recordRevision:intent.contentRevision}},null)}) : grammar.renderGrammarFront(document,e.grammarRecord,e.grammarTask));
@@ -1175,7 +2283,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     }
 
     if(!c.revealed)card.firstElementChild.id='study-card-content';
-    else card.querySelector('h1,h2').id='study-card-term';
+    else {card.querySelector('h1,h2').id='study-card-term';card.firstElementChild.setAttribute('data-vocabulary-source','');}
     for(const passage of card.querySelectorAll('.grammar-front .passage,.grammar-back .passage'))applyKinsoku(passage);
     if (c.revealed && (task?.card?.lapses??0)>=5) card.append(leechPanel(task));
     if(c.revealed&&c.firstInSession&&!e.manual)card.append(copy('p',phonePresentation?'本文の語をタップすると、読みと意味を確認できます。':'本文の語をクリックすると、読みと意味を確認できます。',phonePresentation?'Tap any word in the passage to see its reading and meaning.':'Click any word in the passage to see its reading and meaning.',{class:'back-lookup-hint','data-back-lookup-hint':''}));
@@ -1189,6 +2297,9 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       const t=themes.themes[id==='auto'?(dark.matches?'dark':'washi'):id].tokens;
       return chip([h('i',{style:`background:${t.ground};border-color:${t.accent}`}),name],theme===id,ev=>{applyTheme(id);for(const b of guide.querySelectorAll('[data-menu-theme]'))b.setAttribute('aria-checked',String(b.dataset.menuTheme===theme));ev.currentTarget.focus();},{'data-menu-theme':id});});
     const setLanguage=async value=>{if(updateBoundary?.held)return;interfaceLanguage=value;for(const picker of root.querySelectorAll('[data-interface-language]'))picker.value=value;const end=beginFlight('preference');try{await preferences.setItem('nihongo.interface-language.v1',value);}catch{message('表示言語を保存できません。');}finally{end();}render();main.querySelector(`[data-menu-language="${value}"]`)?.focus({preventScroll:true});};
+    // N6-2: the reading speed, one step away. Fix round 1, C2: only where the read can run (the whole clip does not obey it).
+    const speedRow=dynamicSpeechAvailable()?group('読む速さ','Reading speed',...SPEEDS.map(rate=>chip([`${rate}×`],speakRate===rate,event=>{if(updateBoundary?.held)return;setSpeakRate(rate);event.currentTarget.focus();},{'data-menu-speed':String(rate)}))):null;
+    speedRow?.setAttribute('data-menu-speed-row','');
     const guide=h('div',{id:'study-help',class:'study-help study-menu',role:'menu','aria-label':'メニュー'},
       item('学習を終える','End session',endStudy,{'data-menu-end':''},'Esc'),
       availableUndo()?item('最後の採点を元に戻す','Undo last rating',()=>{setStudyMenu(false);undoLast();},{'data-menu-undo':''},'U'):null,
@@ -1197,8 +2308,9 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       group('移動','Go to',...[['today','今日','Today'],['words','単語','Words'],['record','記録','Record'],['settings','設定','Settings']].map(([id,ja,en])=>chip([copy('span',ja,en)],false,()=>navigate(id),{role:'menuitem','aria-checked':null,'data-menu-nav':id}))),
       group('色','Theme',...themeChips()),
       group('表示言語','Language',...[['ja','日本語'],['en','English'],['both','両方']].map(([value,label])=>chip([label],interfaceLanguage===value,()=>setLanguage(value),{'data-menu-language':value}))),
+      speedRow,
       h('hr',{role:'separator'}),
-      h('details',{class:'study-menu-help','data-menu-help':'',open:!!c.menuHelpOpen,ontoggle:event=>{if(event.currentTarget.isConnected)c.menuHelpOpen=event.currentTarget.open;}},h('summary',{role:'menuitem'},copy('span','採点の目安とキー','Grading guide and keys')),copy('p',...gradeScopeCopy(e),{class:'grade-rule','data-grade-scope':''}),!phonePresentation?copy('p','?キーですべてのキー操作を表示します。','Press ? to see every key.',{class:'grade-rule'}):null,h('p',{class:'grade-rule'},'もう一度：思い出せなかった・難しい：苦労して思い出せた（合格）・正解：思い出せた・簡単：すぐに思い出せた'),h('p',{class:'grade-rule'},'思い出せなかったときは、惜しくても[もう一度]を選んでください。'),!phonePresentation?h('p',{class:'grade-rule'},'Space・Return：解答を表示・解答後は正解／1〜4：採点／U：元に戻す／E：英訳／?：キー操作／Esc：学習を終える'):null));
+      h('details',{class:'study-menu-help','data-menu-help':'',open:!!c.menuHelpOpen,ontoggle:event=>{if(event.currentTarget.isConnected)c.menuHelpOpen=event.currentTarget.open;}},h('summary',{role:'menuitem'},copy('span','採点の目安とキー','Grading guide and keys')),copy('p',...gradeScopeCopy(e),{class:'grade-rule','data-grade-scope':''}),!phonePresentation?copy('p','?キーですべてのキー操作を表示します。','Press ? to see every key.',{class:'grade-rule'}):null,h('p',{class:'grade-rule'},'もう一度：思い出せなかった・難しい：苦労して思い出せた（合格）・正解：思い出せた・簡単：すぐに思い出せた'),h('p',{class:'grade-rule'},'思い出せなかったときは、惜しくても[もう一度]を選んでください。'),!phonePresentation?h('p',{class:'grade-rule'},'Space・Return：解答を表示・解答後は正解／1〜4：採点／U：元に戻す／E：英訳／L：耳のオン・オフ／?：キー操作／Esc：学習を終える'):null));
     let dismissPointer=null,swallowClick=false;
     section.addEventListener('pointerdown',ev=>{
       dismissPointer=null;swallowClick=false;
@@ -1256,20 +2368,19 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
         {class:'primary','data-retry-ratings':'',disabled:busy||!!pendingIntent}));
       return;
     }
-    const panel=h('div',{class:'decision-panel','data-decision-panel':''}),answer=[c.entry.reading||c.entry.term,c.entry.meaning].filter(Boolean).join(' · ');
-    const answerLine=h('p',{class:'answer-line'},h('span',{'data-vocabulary-source':''},answer));
-    if(Number.isFinite(c.thinkMs)&&c.thinkMs>=0){const seconds=Math.round(c.thinkMs/1000);answerLine.append(copy('span',`${seconds}秒`,`${seconds} s`,{class:'secondary answer-time','data-answer-time':''}));}
-    panel.append(answerLine);
-    if(c.firstInSession&&c.firstEver)panel.append(h('p',{class:'first-grade-guide','data-first-grade-guide':''},'もう一度：思い出せなかった・難しい：苦労して思い出せた（合格）・正解：思い出せた・簡単：すぐに思い出せた'),h('p',{class:'first-grade-guide'},'思い出せなかったときは、惜しくても[もう一度]を選んでください。'));
+    const panel=h('div',{class:'decision-panel','data-decision-panel':''});
     const bar=h('div',{class:'grade-bar','aria-label':'思い出せた度合い'});
     for(const [rating,jp,en,seal] of GRADES) {
-      const wait=c.attempt.mode==='practice'?'追加練習':preview?.cards?.[rating] ? interval(Math.max(0,Date.parse(preview.cards[rating].due)-now())) : '確認中';
+      const waitMs=c.attempt.mode!=='practice'&&preview?.cards?.[rating]?Math.max(0,Date.parse(preview.cards[rating].due)-now()):null;
+      const wait=c.attempt.mode==='practice'?'追加練習':waitMs!==null ? interval(waitMs) : '確認中';
+      // R1: the wait is its own Japanese and English pair (stacked in bilingual mode, so it never wraps mid-label on a phone)
+      const waitEn=waitMs!==null?intervalLabelEn(waitMs):(translateInterfaceText(wait)||wait);
       const effective=preview?.ratings?.[rating]?.effectiveRating;
       const capped=effective&&effective!==rating;
       const effectiveGrade=capped?GRADES.find(g=>g[0]===effective):null;
       bar.append(button('',()=>grade(rating,'click'),{class:`grade rating-${effectiveGrade?.[0]||rating}`,disabled:busy||!!pendingIntent||c.attempt.mode==='scored'&&!preview||c.attempt.mode==='practice'&&!customRun,'data-grade':rating}));
       const label=copy('span',capped?`${jp} → ${effectiveGrade[1]}`:jp,capped?`${en} → ${effectiveGrade[2]}`:en,{class:'grade-caption','data-interface-layout':'grade',...(capped?{'data-grade-capped-label':interfaceLanguage}:{'data-grade-label':''})});bar.lastChild.append(label);
-      if(!phonePresentation||intervalHints)bar.lastChild.append(h('span',{class:'grade-hints'},!phonePresentation?h('small',{'data-grade-key':''},String(rating)):null,intervalHints?h('small',{'data-grade-interval':''},wait):null));
+      if(!phonePresentation||intervalHints)bar.lastChild.append(h('span',{class:'grade-hints'},!phonePresentation?h('small',{'data-grade-key':''},String(rating)):null,intervalHints?copy('small',wait,waitEn,{'data-grade-interval':'','data-interface-layout':'grade'}):null));
     }
     panel.append(bar);section.append(panel);
     if(phonePresentation)return;
@@ -1430,9 +2541,12 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const unique=new Map(exact.map(e=>[e.noteGuid,e]));
     return unique.size===1?[...unique.values()][0]:null;
   }
-  function closePopover() { const wasOpen=!!pop;pop?.node.remove();pop=null;if(wasOpen&&!disposed&&screen==='study')focusStudyCard();updateBoundary?.sync(); }
+  function closePopover() { const wasOpen=!!pop;stopSpeakSelection();stopWordSpeech();stopSpeakBlocks();pop?.position?.dispose();pop?.node.remove();pop=null;if(wasOpen&&!disposed&&screen==='study')focusStudyCard();updateBoundary?.sync(); }
   async function openWord(info,anchor) {
     if(updateBoundary?.held||!current?.revealed||busy||pendingIntent)return;
+    const previous=pop,chained=!!previous&&(!anchor||previous.node.contains(anchor));
+    if(chained)anchor=previous.anchor;
+    const lastWord=chained?previous.position?.anchorRect:null;
     closePopover();
     const e=current.entry,resolved=dictionary?.resolve(info),target=info.isTarget&&e.contractId==='vocabulary.read.v1'?e:resolved?resolved.deck||null:resolveWord(info.surface),p=backend.readProjection();
     const meaning=target?.defJa||(resolved?.kind==='dictionary'?resolved.glosses.join('; '):resolved?.kind==='kanji'?resolved.meanings.join('; '):null);
@@ -1465,12 +2579,29 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       info.surface!==lookupEntry.term?h('p',{class:'surface-form'},h('span',{'data-interface-copy':''},'本文のタップ'),'：',h('span',{'data-vocabulary-source':''},info.surface)):null,
       lookupTarget?button('この言葉のカードへ',()=>openRelated(lookupTarget.term),{class:'text-link','data-dictionary-card':''}):null,
       !reviewedEntry&&resolved?.kind==='chunk'?h('div',{class:'lookup-parts','data-lookup-chunk':''},h('h3',{},'組み立て'),...resolved.parts.map(part=>fold(h('span',{'data-vocabulary-source':''},`${part.surface} → ${part.lemma||part.surface}`),renderLookupEntry({term:part.lemma||part.surface,reading:part.reading,meaning:part.glosses?.join('; '),source:part.source||null},{dictionary,hideUnavailable:true},part.source==='deck'?'card':['JMdict','KANJIDIC2'].includes(part.source)?'dictionary':null),part.deck?button('この言葉のカードへ',()=>openRelated(part.deck.term),{class:'text-link'}):null)),resolved.grammar?h('div',{'data-chunk-grammar':''},h('h3',{'data-vocabulary-source':''},resolved.grammar.term),h('p',{lang:'en'},resolved.grammar.meaning),button('文法カードへ',()=>openRelated(resolved.grammar.term),{class:'text-link','data-grammar-card':''})):null):null,
-      copy('p','「知らない」は、この語のカード作成を依頼します。「うろ覚え」も、デッキにない語なら作成を依頼します。「知っている」は記録だけです。'+gradeScopeCopy(e)[0],'Unknown requests a card for this word. Not sure also requests one if the word is not already in your deck. Know it only records familiarity. '+gradeScopeCopy(e)[1],{class:'secondary capture-help','data-capture-help':''}),
+      h('details',{class:'capture-help'},
+        copy('summary','覚え具合を記録','Record familiarity',{'data-capture-summary':'','data-interface-layout':'inline'}),
+        copy('p','「知らない」は、この語のカード作成を依頼します。「うろ覚え」も、デッキにない語なら作成を依頼します。「知っている」は記録だけです。'+gradeScopeCopy(e)[0],'Unknown requests a card for this word. Not sure also requests one if the word is not already in your deck. Know it only records familiarity. '+gradeScopeCopy(e)[1],{class:'secondary','data-capture-help':''})),
       h('div',{class:'capture-actions'},...[['unknown','知らない'],['unsure','うろ覚え'],['known','知っている']].map(([kind,label])=>button(label,()=>afterLookup(()=>{
         if(pendingIntent||busy)return;const intent=backend.captureCommand(attempt,{...familiarityCapture,kind}),payload=intent.type==='capture-boost'?intent.data.capture:intent.data;
         run(intent,async result=>{if(kind==='unknown'||kind==='unsure'&&!familiarityCapture.targetTaskKey)await requestCard(result,payload,'tap');else message(kind==='unsure'?'迷いを記録しました。':'知っているという記録を残しました。');if(!disposed&&screen!=='finish')render();});
       })))),h('p',{class:'secondary','data-dictionary-source':''},reviewedEntry?`${reviewedEntry.source} · EDRDG · CC BY-SA 4.0`:resolved?.kind==='chunk'?'語のまとまり · 配布デッキ / JMdict':target?'配布デッキ · 本棚にあります。':resolved?.kind==='dictionary'?'JMdict · EDRDG · CC BY-SA 4.0':resolved?.kind==='kanji'?'KANJIDIC2 · EDRDG · CC BY-SA 4.0':'辞書未収録 · 読み・語義の確認待ち'));
-    pop={node,anchor};root.append(node);localize();node.querySelector('button').focus({preventScroll:true});
+    const wordSpeak=speakWordButton(lookupEntry,lookupTarget,card);
+    if(wordSpeak){
+      const term=node.querySelector('.term-block'),head=term?.querySelector('h1')??node.querySelector('h2[data-vocabulary-entry]');
+      if(head)head.after(wordSpeak);else term?.append(wordSpeak);
+    }
+    const sourcePassage=anchor?.closest('[data-passage]');
+    const passageIndex=[...main.querySelectorAll('[data-passage]')].indexOf(sourcePassage);
+    const wordIndex=sourcePassage?[...sourcePassage.querySelectorAll('[data-word]')].indexOf(anchor):-1;
+    const record={node,anchor};pop=record;root.append(node);localize();
+    record.position=watchWordPopover(node,()=>{
+      if(!record.anchor?.isConnected&&passageIndex>=0&&wordIndex>=0){
+        record.anchor=main.querySelectorAll('[data-passage]')[passageIndex]?.querySelectorAll('[data-word]')[wordIndex]??null;
+      }
+      return record.anchor;
+    },()=>[...main.querySelectorAll('[data-grade],[data-decision-panel] button,[data-retry-panel] button,.study-actions button')],lastWord);
+    node.querySelector('button').focus({preventScroll:true});
     const intent=backend.captureCommand(attempt,capture);
     await run(intent,async()=>{
       gate.applied=true;if(gate.action){await gate.action();return;}render();
@@ -1507,7 +2638,37 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   function undoLast(){stopTrialAudio();if(parkedStudy)return message('中断中の学習に戻ってから、別のカードを開いてください。');expireLastReview();const previous=lastReview;if(!previous)return;const p=backend.readProjection(),task=p.tasks[previous.entry.taskKey],effect=task&&p.effects[task.head];if(!effect||effect.root!==previous.eventId)return message('このカードは現在の状態から戻せません。');run(backend.command('undo',{taskKey:task.taskKey,parent:task.head,target:effect.root}),()=>{lastReview=null;customRun=previous.run?{...previous.run,remaining:[...previous.run.remaining]}:null;const review=p.reviews.find(row=>row.id===previous.eventId),labels=GRADES.find(([value])=>value===review?.effectiveRating),pressed=GRADES.find(([value])=>value===review?.rawRating),capped=review?.rawRating!==review?.effectiveRating;start(previous.entry,false,previous.learnAhead,previous.session,{source:'key',restore:{thinkMs:previous.thinkMs},preserveRun:!!previous.run});showToast(`[${capped?pressed?.[1]+' → ':''}${labels?.[1]||'評価'}]を元に戻しました`,`Undid [${capped?pressed?.[2]+' → ':''}${labels?.[2]||'rating'}]`);});}
   function wordsScreen(){
     reconcileUnknownFactoryRows();
-    const section=h('section',{},h('h1',{},'単語とカード'),h('p',{class:'secondary'},'文法の意味と想起は、別々のカードとして記録します。'));
+    const generation=++provisionalGeneration;
+    let readGeneration=0;
+    const provisionalList=h('div',{class:'provisional-list','data-provisional-list':''});
+    async function paintProvisional(){
+      if(disposed||generation!==provisionalGeneration)return;
+      const read=++readGeneration;
+      let result;
+      try{
+        if(typeof platform.provisionalCards!=='function')throw Error('provisional-unavailable');
+        result=await platform.provisionalCards();
+      }catch{
+        if(!disposed&&read===readGeneration&&generation===provisionalGeneration)provisionalList.replaceChildren();
+        return;
+      }
+      if(disposed||read!==readGeneration||generation!==provisionalGeneration||screen!=='words'||!provisionalList.isConnected)return;
+      const rows=provisionalRows(result,{catalog});
+      provisionalList.replaceChildren(
+        ...rows.beingChecked.map(r=>h('div',{class:'word-row','data-provisional':r.jobId},h('strong',{},r.term),
+          h('span',{},r.reading),copy('span','確認中','being checked',{class:'badge'}),r.meaning?h('span',{},r.meaning):null)),
+        ...rows.pulled.map(r=>h('div',{class:'word-row','data-pulled':r.jobId},h('strong',{},r.term),h('span',{},r.reason))));
+      localize();
+      // A word still being checked has no card yet: its row reads the word in a word voice (lead 2107 §2).
+      if(dynamicSpeechAvailable())for(const row of provisionalList.querySelectorAll('[data-provisional]')){
+        const term=row.querySelector(':scope > strong');
+        if(term)mountScreenSpeakBlock(row,'provisional',term.textContent);
+      }
+    }
+    provisionalListener=()=>{if(!disposed&&screen==='words')paintProvisional();};
+    win.addEventListener('nihongo-provisional-changed',provisionalListener);
+    paintProvisional();
+    const section=h('section',{},h('h1',{},'単語とカード'),h('p',{class:'secondary'},'文法の意味と想起は、別々のカードとして記録します。'),provisionalList);
     const input=h('input',{type:'search',placeholder:'言葉・読み・意味を検索','aria-label':'言葉を検索',value:query,oninput:e=>{query=e.target.value;wordPage=0;refreshRows();}});
     const filter=h('select',{'aria-label':'カードの状態',onchange:e=>{wordFilter=e.target.value;wordPage=0;refreshRows();}},...['all','suspended','leech','held'].map((s,i)=>h('option',{value:s,...(s==='held'?{'data-interface-option':''}:{})},['すべて','休ませているカード','つまずき5回以上','カード作成の依頼'][i])));filter.value=wordFilter;
     const rows=h('div',{class:'word-list'});
@@ -1515,9 +2676,9 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     function paintFactoryRows(){
       if(disposed||screen!=='words'||wordFilter!=='held')return;
       rows.replaceChildren();for(const c of visibleCaptures){const status=factoryStatuses.read(c.id),entry=status.taskKey?catalog.find(e=>e.taskKey===status.taskKey):null;
-        rows.append(h('div',{class:'word-row','data-factory-capture':c.id,'data-factory-state':status.kind},h('div',{},h('strong',{'data-vocabulary-entry':''},c.surface),h('span',{'data-factory-label':''},status.label),status.reasonLabel?h('small',{'data-factory-reason':''},status.reasonLabel):null,status.loading?h('small',{},'状況を確認中…'):status.failed?h('small',{},'状況を読み取れませんでした。'):!status.supported?h('small',{},'この端末では状況確認に未対応です。'):null),entry?button('このカードを開く',()=>{const latest=factoryStatuses.read(c.id);if(latest.kind==='ready'&&latest.taskKey===entry.taskKey)start(entry,true);},{class:'quiet','data-factory-open':entry.taskKey}):null));}
+        rows.append(h('div',{class:'word-row','data-factory-capture':c.id,'data-factory-state':status.kind},h('div',{},h('strong',{'data-vocabulary-entry':'','data-learner-typed':''},c.surface),h('span',{'data-factory-label':''},status.label),status.reasonLabel?h('small',{'data-factory-reason':''},status.reasonLabel):null,status.loading?h('small',{},'状況を確認中…'):status.failed?h('small',{},'状況を読み取れませんでした。'):!status.supported?h('small',{},'この端末では状況確認に未対応です。'):null),entry?button('このカードを開く',()=>{const latest=factoryStatuses.read(c.id);if(latest.kind==='ready'&&latest.taskKey===entry.taskKey)start(entry,true);},{class:'quiet','data-factory-open':entry.taskKey}):null));}
       if(!visibleCaptures.length)rows.append(h('p',{class:'empty'},'カード作成の依頼はありません。'));
-      localize();
+      localize();syncScreenSpeakBlocks();
     }
     function refreshRows(){const p=backend.readProjection();factoryStatuses.leave();rows.replaceChildren();if(wordFilter==='held'){
       const captures=p.captures.filter(c=>!c.targetTaskKey&&['unknown','unsure'].includes(c.kind)&&`${c.surface} ${c.lemma||''} ${c.reading||''}`.toLowerCase().includes(query.toLowerCase())).slice().reverse();
@@ -1531,11 +2692,11 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       wordPage=Math.min(wordPage,Math.max(0,Math.ceil(matches.length/100)-1));
       if(matches.length>100)rows.append(h('p',{class:'secondary','data-search-count':''},`${matches.length}件 · ${wordPage*100+1}〜${Math.min(matches.length,(wordPage+1)*100)}件を表示`));
       for(const e of matches.slice(wordPage*100,(wordPage+1)*100)){const t=p.tasks[e.taskKey];
-        const item=h('div',{class:'word-row'},h('div',{},h('strong',{'data-vocabulary-entry':''},e.term),h('span',{class:'reading','data-vocabulary-entry':''},e.reading),h('small',{},`${MODULES.find(item=>item[0]===e.module)?.[1]||'学習'} · ${e.contractId==='grammar.cloze.v1'?'思い出す':e.contractId==='grammar.meaning.v1'?'意味':'読む'} · ${t.suspended?'休止':t.card?'学習中':'新規カード'}`)),
+        const item=h('div',{class:'word-row',...(e.manual?{'data-learner-typed':''}:{})},h('div',{},h('strong',{'data-vocabulary-entry':''},e.term),h('span',{class:'reading','data-vocabulary-entry':''},e.reading),h('small',{},`${MODULES.find(item=>item[0]===e.module)?.[1]||'学習'} · ${e.contractId==='grammar.cloze.v1'?'思い出す':e.contractId==='grammar.meaning.v1'?'意味':'読む'} · ${t.suspended?'休止':t.card?'学習中':'新規カード'}`)),
           h('div',{class:'row-actions'},button('追加練習',()=>start(e,true),{disabled:!contentReady(e)}),button(t.suspended?'戻す':'休ませる',()=>run(backend.command('suspend',{taskKey:t.taskKey,parent:t.head,on:!t.suspended}),()=>{message('カードの状態を保存しました。');refreshRows();}))));
         if((t.card?.lapses??0)>=5)item.append(leechPanel(t));rows.append(item);}
       if(matches.length>100)rows.append(h('div',{class:'row-actions'},button('前の100件',()=>{wordPage--;refreshRows();},{disabled:wordPage===0}),button('次の100件',()=>{wordPage++;refreshRows();},{disabled:(wordPage+1)*100>=matches.length})));
-      if(!rows.childNodes.length)rows.append(h('p',{class:'empty'},'見つかりませんでした。言葉や読みを変えてみてください。'));localize();
+      if(!rows.childNodes.length)rows.append(h('p',{class:'empty'},'見つかりませんでした。言葉や読みを変えてみてください。'));localize();syncScreenSpeakBlocks();
     }
     const typed=h('input',{'aria-label':'新しい言葉',placeholder:'覚えたい言葉を入力',value:typedDraft,disabled:typedBusy||busy||!!pendingIntent,'data-typed-word':'',oninput:e=>{typedDraft=e.target.value;}});
     const sentence=h('textarea',{'aria-label':'自分の例文（任意）',placeholder:'自分の例文（任意）',disabled:typedBusy||busy||!!pendingIntent,'data-typed-sentence':'',oninput:e=>{typedSentence=e.target.value;}},typedSentence);
@@ -1601,6 +2762,8 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       if(disposed)return;
       nativeSyncState=result;nativeSyncActionError=result.error||(result.state==='update-required'?'update-required':null);
       if(!nativeSyncActionError)onSuccess?.(result);
+      // N7: this Mac paired (or synced) with its credential accepted: automatic speech may ask again.
+      if(!nativeSyncActionError&&result?.paired)restoreAutoSpeech();
       if(!quiet||nativeSyncActionError)message(nativeSyncActionError?'同期を完了できませんでした。記録は端末に残っています。':'通信と保存状態を確認しました。','native-sync-action');
       else if(noticeOwner==='native-sync-action')message('');
     }catch(error){
@@ -1686,11 +2849,25 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       catch{swipeGrading=previous;input.checked=previous;message('この端末に操作の設定を保存できません。');}
       finally{end();}
     }});
+    const revealSpeakToggle=cardSpeakBridge?h('input',{type:'checkbox',checked:speakOnReveal,'data-speak-on-reveal':'',onchange:async event=>{
+      if(updateBoundary?.held)return;const input=event.currentTarget,previous=speakOnReveal;speakOnReveal=input.checked;
+      const end=beginFlight('preference');
+      try{await preferences.setItem('nihongo.speak-on-reveal.v1',String(speakOnReveal));}
+      catch{speakOnReveal=previous;input.checked=previous;message('この端末に操作の設定を保存できません。');}
+      finally{end();}
+    }}):null;
     const file=h('input',{type:'file',accept:'.json,application/json','aria-label':'バックアップを選ぶ',onchange:async e=>{if(updateBoundary?.held)return;const end=beginFlight('import');try{const backup=JSON.parse(await e.target.files[0].text());await backend.importBackup(backup);message('互換のある保存済み記録を追加しました。');render();}catch(error){message(error.message==='backup-has-pending-events-recovery-required'?'未送信の記録を含むため自動復元できません。元の端末とバックアップを保管してください。':'学習者・内容の整合性を確認できませんでした。記録は置き換えていません。');}finally{end();}}});
     const sheet=(id,kicker,title,description,...body)=>h('section',{class:'sheet','data-settings-section':id},h('div',{class:'sheet-head'},h('p',{class:'kicker'},kicker),h('h2',{},title),description?h('p',{class:'sheet-desc'},description):null),...body);
     return h('section',{class:'settings'},h('header',{class:'screen-head stacked'},h('h1',{},'設定'),h('p',{class:'secondary'},'この端末の表示と、すべてのデッキ共通の学習設定。')),...(platform.nativeSync?[nativeSyncSettings()]:[]),...(typeof platform.backupStatus==='function'?[backupDetail()]:[]),platform.onScreenChange?h('section',{class:'sheet host-settings','data-host-settings':''}):null,
       ...((platform.audioDownloads||platform.audioDownloadFailure)?[audioDownloadsDetail()]:[]),
-      sheet('appearance','表示','この端末の見え方','色はこの端末だけに保存します。学習履歴や他の端末の色は変わりません。',h('div',{class:'control-grid'},themePicker(),languagePicker()),h('label',{class:'swipe-grading-setting'},swipe,h('span',{},'スワイプで採点（この端末のみ）')),h('p',{id:'swipe-grading-help',class:'secondary'},'初期設定はオフです。左で「もう一度」、右で「正解」。'),h('label',{class:'swipe-grading-setting'},h('input',{type:'checkbox',checked:intervalHints,'data-interval-hints':'',onchange:async event=>{if(updateBoundary?.held)return;intervalHints=event.target.checked;const end=beginFlight('preference');try{await preferences.setItem('nihongo.interval-hints.v1',String(intervalHints));}catch{message('この端末に表示設定を保存できません。');}finally{end();}}}),h('span',{},'次の復習までの間隔を表示（この端末のみ）'))),
+      sheet('appearance','表示','この端末の見え方','色はこの端末だけに保存します。学習履歴や他の端末の色は変わりません。',h('div',{class:'control-grid'},themePicker(),languagePicker()),h('label',{class:'swipe-grading-setting'},swipe,h('span',{},'スワイプで採点（この端末のみ）')),h('p',{id:'swipe-grading-help',class:'secondary'},'初期設定はオフです。左で「もう一度」、右で「正解」。'),h('label',{class:'swipe-grading-setting'},h('input',{type:'checkbox',checked:intervalHints,'data-interval-hints':'',onchange:async event=>{if(updateBoundary?.held)return;intervalHints=event.target.checked;const end=beginFlight('preference');try{await preferences.setItem('nihongo.interval-hints.v1',String(intervalHints));}catch{message('この端末に表示設定を保存できません。');}finally{end();}}}),h('span',{},'次の復習までの間隔を表示（この端末のみ）')),revealSpeakToggle?h('label',{class:'swipe-grading-setting'},revealSpeakToggle,h('span',{},VOICE_WORDS.speakOnReveal[0])):null,
+        readingLightKept()?h('label',{class:'swipe-grading-setting'},h('input',{type:'checkbox',checked:readingLight,'data-reading-light':'',onchange:async event=>{
+          if(updateBoundary?.held)return;const input=event.currentTarget,previous=readingLight;readingLight=input.checked;applyReadingLight(true);
+          const end=beginFlight('preference');
+          try{await preferences.setItem(READING_LIGHT_KEY,String(readingLight));}
+          catch{readingLight=previous;input.checked=previous;applyReadingLight(true);message('この端末に表示設定を保存できません。');}
+          finally{end();}
+        }}),copy('span','読んでいる文をハイライト','Highlight what is being read')):null),
       ...(legacyHistory?[sheet('legacy-display','引き継ぎ','引き継いだ表示設定',null,...legacyHistory.decks.map(d=>h('p',{class:'secondary','data-legacy-settings':''},`${d.deckId} · 一日の新規 ${d.preferences.newPerDay} · 読み方 ${d.preferences.mode} · 全文英訳 ${d.preferences.gloss} · 文脈 ${d.preferences.zoom}`)),h('p',{class:'secondary'},themePreferenceSet?'色はこの端末の指定を使っています。':'以前の色指定は未設定です。自動表示のまま、設定値は書き込んでいません。'))]:[]),
       sheet('pace','学習','共通の学習ペース','1日の新規カード上限と学習日の区切りは、すべてのデッキ共通です。変更は翌日の学習日から有効です。',h('div',{class:'setting-row'},h('label',{},'1日の新規カード上限',newCount),button('翌日から変更',()=>{const value=newCount.valueAsNumber;if(!Number.isSafeInteger(value)||value<1||value>200)return message('1日の新規カード上限は1〜200の整数を入力してください。');savePace('newPerDayTotal',newCount,value);},{disabled:weekdayPolicy})),weekdayPolicy?h('p',{class:'secondary','data-weekday-policy-active':''},'曜日ごとの新規カード上限を使っています。今日のカスタム学習パネルで変更できます。'):null,
       h('div',{class:'setting-row'},h('label',{},'学習日のタイムゾーン',tz),button('翌日から変更',()=>savePace('learnerTimezone',tz,tz.value))),
@@ -1713,8 +2890,11 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     const rating=/^(?:Digit|Numpad)([1-4])$/.exec(event.code)?.[1]??(/^[1-4]$/.test(event.key)?event.key:null);
     if(pop&&rating&&!editing&&current?.revealed){event.preventDefault();closePopover();grade(Number(rating),'key');return;}
     if(pop||document.querySelector('dialog[open]')||event.target.closest?.('button,input,select,textarea,summary,a,audio,video,[contenteditable]'))return;
+    if(screen==='study'&&current&&!event.shiftKey&&event.key.toLowerCase()==='l'){event.preventDefault();ear.tapMark();return;}
     if(screen==='study'&&current&&event.key.toLowerCase()==='p'){
-      if(sharedAudioDeclared){if(current.revealed&&(current.audioPlaying||current.audioResult?.status==='ready')){event.preventDefault();toggleSharedAudio(current);}return;}
+      if(!current.revealed){if(main.querySelector('[data-card-audio="front"]')){event.preventDefault();pressFrontAudio(current);}return;}
+      if(sharedAudioDeclared){event.preventDefault();pressAnswerAudio(current);return;}
+      if(cardSpeakBridge){event.preventDefault();pressAnswerAudio(current);return;}
       if(trialAudioReady(current)){event.preventDefault();playTrialAudio(current);}
       return;
     }
@@ -1727,7 +2907,11 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
     else if(current.revealed&&[' ','Enter'].includes(event.key)){event.preventDefault();if(!current.committed&&!event.shiftKey&&win.performance.now()-(current.revealedAt??Infinity)>=300)grade(3,'key');}
     else if(current.revealed&&!current.committed&&rating){event.preventDefault();grade(Number(rating),'key');}}
   document.addEventListener('keydown',onKey);
-  const outsidePopover=event=>{lastInputSource='pointer';if(pop&&!pop.node.contains(event.target)&&!pop.anchor?.contains(event.target))closePopover();};document.addEventListener('pointerdown',outsidePopover,true);
+  const outsidePopover=event=>{lastInputSource='pointer';if(event.target.closest?.('[data-speak-selection]'))return;if(pop&&!pop.node.contains(event.target)&&!pop.anchor?.contains(event.target))closePopover();};document.addEventListener('pointerdown',outsidePopover,true);
+  document.addEventListener('selectionchange',watchSpeakSelection);
+  for(const type of ['pointerdown','click','pointermove','keydown'])document.addEventListener(type,earHandlers[type],true);
+  document.addEventListener('scroll',earBands.redraw,true);win.addEventListener('resize',earBands.redraw);
+  document.documentElement.addEventListener('pointerleave',earHandlers.pointerleave);
   const escape=event=>{if(updateBoundary?.held||event.defaultPrevented||event.repeat||event.isComposing||event.keyCode===229)return;if(event.key==='Escape'){if(pop){event.preventDefault();closePopover();}else{const modal=root.querySelector('dialog[open]');if(modal){event.preventDefault();if(customBusy&&modal.hasAttribute('data-new-card-sheet'))return;modal.dispatchEvent(new Event('cancel',{cancelable:true}));modal.close();modal.remove();if(pendingIntent)render();}else if(screen==='finish'){event.preventDefault();finishDone();}else if(screen==='study'){event.preventDefault();if(current?.sessionInfoOpen)setStudyMenu(false);else endStudy();}}}};document.addEventListener('keydown',escape);
   const unsubscribe=backend.subscribe(()=>{observeSharedActivity();updateStatus({presentation:true}).catch(()=>{});if(!['study','finish'].includes(screen)&&!busy)render();scheduleOutboxSync();});
   if(backend.refreshLocalDayBudget)budgetWatcher=watchLocalDayBudget({refresh:trackBudgetRefresh,getProjection:()=>backend.readProjection(),now,canRefresh:()=>!updateBoundary?.held&&!busy&&!typedBusy&&!customBusy&&!pendingIntent&&!(screen==='study'&&current?.revealed),onRefresh:()=>{if(!['study','finish'].includes(screen))render();},schedule:(fn,delay)=>win.setTimeout(fn,delay),cancel:id=>win.clearTimeout(id)});
@@ -1793,6 +2977,7 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   observeSharedActivity();render();
   const loadTrialAudio=()=>{
     if(disposed||updateBoundary?.held||document.visibilityState==='hidden')return;
+    if(cardSpeakBridge)return;
     if(sharedAudioDeclared){
       if(sharedAudioRootState==='idle'||sharedAudioRootState==='offline')loadSharedAudioRoot();
       if(current?.audioResult?.status==='offline-missing'){
@@ -1801,7 +2986,6 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
       syncSharedAudioCurrent();
       return;
     }
-    if(!trialAudio)return;
     trialAudio.load().then(()=>{if(!disposed)syncTrialAudioControl();},()=>{if(!disposed)syncTrialAudioControl();});
   };
   const audioDownloadsChanged=()=>{
@@ -1831,5 +3015,5 @@ export function mountStudyApp(root, { backend, catalog, themes, grammar = null, 
   backupObserver.start();
   reconcileUnknownFactoryRows();
   if(platform.storageKind==='native-worker-prod'&&platform.nativeSync)updateStatus().catch(()=>{});
-  return Object.freeze({requestUpdateBoundary:token=>updateBoundary.request(token),readUpdateState:()=>updateBoundary.read(),releaseUpdateBoundary:token=>updateBoundary.release(token),subscribeUpdateState:listener=>updateBoundary.subscribe(listener),showTask:(...args)=>{if(updateBoundary.held)return;sessionShown=0;return start(...args);},refreshStatus:updateStatus,read:()=>({screen,module,current,busy:busy||typedBusy||customBusy,pendingIntent,theme,themePreferenceSet,interfaceLanguage}),dispose(){unsubscribeAudioDownloads?.();stopTrialAudio();studyAudio?.dispose?.();disposed=true;updateBoundary.dispose();root.removeEventListener('input',updateDraftWake);root.removeEventListener('change',updateDraftWake);backupObserver.dispose();win.removeEventListener('focus',backupWake);document.removeEventListener('visibilitychange',backupWake);nativeStatusGeneration++;clearSyncRetry();win.clearTimeout(outboxSyncTimer);win.clearTimeout(saveBacklogTimer);win.clearTimeout(toastTimer);win.clearTimeout(finishGuardTimer);panelObserver?.disconnect();budgetWatcher?.dispose();win.removeEventListener('online',availabilityWake);win.removeEventListener('online',reconnectSync);win.removeEventListener('offline',availabilityWake);win.removeEventListener('focus',budgetWake);document.removeEventListener('visibilitychange',budgetWake);win.removeEventListener('focus',autoSync);document.removeEventListener('visibilitychange',autoSync);platform.nativeSync?.dispose?.();factoryStatuses.dispose();rubyLayout.dispose();current?.timer.dispose();parkedStudy?.current.timer.dispose();closePopover();unsubscribe();unsubscribeSyncState?.();dark.removeEventListener('change',darkChanged);document.removeEventListener('keydown',onKey);document.removeEventListener('keydown',escape);document.removeEventListener('pointerdown',outsidePopover,true);win.removeEventListener('online',loadTrialAudio);win.removeEventListener('focus',loadTrialAudio);document.removeEventListener('visibilitychange',loadTrialAudio);trialAudioPlaybackGeneration++;trialAudio?.dispose();root.replaceChildren();}});
+  return Object.freeze({requestUpdateBoundary:token=>updateBoundary.request(token),readUpdateState:()=>updateBoundary.read(),releaseUpdateBoundary:token=>updateBoundary.release(token),subscribeUpdateState:listener=>updateBoundary.subscribe(listener),showTask:(...args)=>{if(updateBoundary.held)return;sessionShown=0;return start(...args);},refreshStatus:updateStatus,read:()=>({screen,module,current,busy:busy||typedBusy||customBusy,pendingIntent,theme,themePreferenceSet,interfaceLanguage}),dispose(){unsubscribeAudioDownloads?.();stopTrialAudio();ear.dispose();for(const type of ['pointerdown','click','pointermove','keydown'])document.removeEventListener(type,earHandlers[type],true);document.documentElement.removeEventListener('pointerleave',earHandlers.pointerleave);document.removeEventListener('scroll',earBands.redraw,true);win.removeEventListener('resize',earBands.redraw);earBands.dispose();aimEarHighlight(null);delete document.documentElement.dataset.ear;delete document.documentElement.dataset.earMode;stopSpeakSelection();stopSpeakReader();stopSpeakBlocks();stopWordSpeech();delete document.documentElement.dataset.readingLight;speakPlayer.dispose();clearVoiceWhy();win.clearTimeout(voiceLineTimer);voiceLineTimer=null;voiceLineToken=null;for(const id of settleTimers)win.clearTimeout(id);settleTimers.clear();studyAudio?.dispose?.();disposed=true;updateBoundary.dispose();root.removeEventListener('input',updateDraftWake);root.removeEventListener('change',updateDraftWake);backupObserver.dispose();win.removeEventListener('focus',backupWake);document.removeEventListener('visibilitychange',backupWake);nativeStatusGeneration++;clearSyncRetry();win.clearTimeout(outboxSyncTimer);win.clearTimeout(saveBacklogTimer);win.clearTimeout(toastTimer);win.clearTimeout(finishGuardTimer);panelObserver?.disconnect();budgetWatcher?.dispose();win.removeEventListener('online',availabilityWake);win.removeEventListener('online',reconnectSync);win.removeEventListener('offline',availabilityWake);win.removeEventListener('focus',budgetWake);document.removeEventListener('visibilitychange',budgetWake);win.removeEventListener('focus',autoSync);document.removeEventListener('visibilitychange',autoSync);platform.nativeSync?.dispose?.();factoryStatuses.dispose();stopProvisionalListener();rubyLayout.dispose();current?.timer.dispose();parkedStudy?.current.timer.dispose();closePopover();unsubscribe();unsubscribeSyncState?.();dark.removeEventListener('change',darkChanged);document.removeEventListener('keydown',onKey);document.removeEventListener('keydown',escape);document.removeEventListener('pointerdown',outsidePopover,true);document.removeEventListener('selectionchange',watchSpeakSelection);win.clearTimeout(selectionChipTimer);selectionChip?.remove();selectionChip=null;win.removeEventListener('online',loadTrialAudio);win.removeEventListener('focus',loadTrialAudio);document.removeEventListener('visibilitychange',loadTrialAudio);trialAudioPlaybackGeneration++;trialAudio?.dispose();revealSpeak.drop();closeCardSpeakContext();mediaLink.dispose();root.replaceChildren();}});
 }

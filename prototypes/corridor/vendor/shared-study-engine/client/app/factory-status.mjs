@@ -28,7 +28,7 @@ const policyReasons=Object.freeze({
  'card-shape':'カードの形式を確認してください',
  'passage-shape':'例文の形式を確認してください',
  'packet-shape':'生成内容の形式を確認してください',
- 'calibration-semantic-review-required':'最初の3枚は内容の確認待ちです'
+ 'calibration-semantic-review-required':'内容の確認待ちです'
 });
 function heldReason(reply){
  if(reply.reason==='daily-job-cap'||reply.jobReason==='daily-job-cap')return '今日の作成上限に達しました';
@@ -73,10 +73,52 @@ export function factoryStatus(reply,captureId,{catalog,projection}={}){
  return pending();
 }
 /** Read-only inspection: visible refreshes plus all-unknown reconciliation, with bounded concurrency. */
-export function createFactoryStatusReader({inspect,catalog,getProjection,onUpdate=()=>{},limit=20,concurrency=2,timeoutMs=10000,setTimer=setTimeout,clearTimer=clearTimeout}={}){
+export function createFactoryStatusReader({inspect,inspectMany,catalog,getProjection,onUpdate=()=>{},limit=20,concurrency=2,timeoutMs=10000,setTimer=setTimeout,clearTimer=clearTimeout}={}){
  if(!Number.isInteger(limit)||limit<1||limit>100||!Number.isInteger(concurrency)||concurrency<1||concurrency>4||!Number.isInteger(timeoutMs)||timeoutMs<1||timeoutMs>30000)throw Error('invalid-factory-inspection-config');
  const records=new Map(),work=new Map();let generation=0,disposed=false,queue=[],active=0;
- const supported=typeof inspect==='function';
+ const batching=typeof inspectMany==='function';
+ const supported=batching||typeof inspect==='function';
+ // One coalescing batcher serves every job's single read when the bridge has
+ // inspectMany: ids collect until the next microtask, then at most 100 go out
+ // per host read, with at most one batch in flight. Jobs keep their per-id
+ // generation/background rules; this only moves the wire call.
+ const batcher=batching?(function(){
+  let waiting=[],current=null,scheduled=false;const entriesByID=new Map();
+  function finish(batch,replies,error){
+   if(batch.settled)return;
+   batch.settled=true;
+   if(batch.timer!==null)clearTimer(batch.timer);
+   if(current===batch)current=null;
+   for(const entry of batch.entries){
+    if(entriesByID.get(entry.id)===entry)entriesByID.delete(entry.id);
+    const reply=error?null:(Array.isArray(replies)?replies.find(item=>item&&item.captureEventId===entry.id):null);
+    if(reply)entry.resolve(reply);else entry.reject(error||Error('inspection-missing'));
+   }
+   dispatch();
+  }
+  function dispatch(){
+   scheduled=false;
+   if(disposed||current||!waiting.length)return;
+   const batch={entries:waiting.splice(0,100),timer:null,settled:false};
+   current=batch;
+   const ids=batch.entries.map(entry=>entry.id);
+   batch.timer=setTimer(()=>finish(batch,null,Error('inspection-timeout')),timeoutMs);
+   Promise.resolve().then(()=>inspectMany({captureEventIds:ids})).then(replies=>finish(batch,replies),()=>finish(batch,null,Error('inspection-failed')));
+  }
+  return Object.freeze({
+   // One read per id even when the page leaves and re-enqueues before a flush.
+   read(id){
+    if(entriesByID.has(id))return entriesByID.get(id).promise;
+    const entry={id};entry.promise=new Promise((resolve,reject)=>{entry.resolve=resolve;entry.reject=reject;});
+    entriesByID.set(id,entry);waiting.push(entry);
+    if(!scheduled&&!current){scheduled=true;queueMicrotask(dispatch);}
+    return entry.promise;
+   },
+   cancel(){for(const entry of waiting.splice(0)){if(entriesByID.get(entry.id)===entry)entriesByID.delete(entry.id);entry.reject(Error('inspection-cancelled'));}scheduled=false;
+    if(current){for(const entry of current.entries)if(entriesByID.get(entry.id)===entry)entriesByID.delete(entry.id);
+     current.settled=true;if(current.timer!==null)clearTimer(current.timer);current=null;}}
+  });
+ })():null;
  function read(id){const item=records.get(id),status=factoryStatus(item?.reply,id,{catalog,projection:getProjection()});return Object.freeze({...status,loading:item?.loading===true,failed:item?.failed===true,supported});}
  const idsOf=captures=>[...new Set(captures.map(c=>c.id).filter(id=>typeof id==='string'&&id.length<=256))];
  function enqueue(id,background=false){
@@ -84,16 +126,17 @@ export function createFactoryStatusReader({inspect,catalog,getProjection,onUpdat
   if(existing){existing.background ||= background;existing.view=generation;records.set(id,{...records.get(id),loading:true,failed:false});return;}
   const job={id,view:generation,background};work.set(id,job);queue.push(job);records.set(id,{...records.get(id),loading:true,failed:false});
  }
- function pump(){while(!disposed&&active<concurrency&&queue.length){const job=queue.shift(),{id}=job;if(!job.background&&job.view!==generation){if(work.get(id)===job)work.delete(id);continue;}active++;let timer;
-  Promise.race([Promise.resolve().then(()=>inspect({captureEventId:id})),new Promise((_,reject)=>{timer=setTimer(()=>reject(Error('inspection-timeout')),timeoutMs);})]).then(reply=>{
+ function pump(){while(!disposed&&(batching||active<concurrency)&&queue.length){const job=queue.shift(),{id}=job;if(!job.background&&job.view!==generation){if(work.get(id)===job)work.delete(id);continue;}active++;let timer;
+  const reading=batching?batcher.read(id):Promise.race([Promise.resolve().then(()=>inspect({captureEventId:id})),new Promise((_,reject)=>{timer=setTimer(()=>reject(Error('inspection-timeout')),timeoutMs);})]);
+  reading.then(reply=>{
    if(disposed||!job.background&&job.view!==generation)return;records.set(id,{reply,loading:false,failed:false});onUpdate(id);
-  },()=>{if(disposed||!job.background&&job.view!==generation)return;records.set(id,{reply:null,loading:false,failed:true});onUpdate(id);}).finally(()=>{clearTimer(timer);active--;if(work.get(id)===job)work.delete(id);pump();});
+  },()=>{if(disposed||!job.background&&job.view!==generation)return;records.set(id,{reply:null,loading:false,failed:true});onUpdate(id);}).finally(()=>{if(timer!==undefined)clearTimer(timer);active--;if(work.get(id)===job)work.delete(id);pump();});
  }}
  function leave(){generation++;queue=queue.filter(job=>{if(job.background)return true;if(work.get(job.id)===job)work.delete(job.id);return false;});for(const[id,item]of records)if(item.loading&&!work.get(id)?.background)records.set(id,{...item,loading:false});}
  return Object.freeze({read,leave,
   inspectVisible(captures){leave();if(disposed||!supported)return;for(const id of idsOf(captures).slice(0,limit))enqueue(id);pump();},
   // A launch/Words reconciliation visits every unknown row, including off-page rows.
-  // This only calls inspect(captureEventId): it never replays capture or intake commands.
+  // This only calls inspect(captureEventId) or inspectMany({captureEventIds}): it never replays capture or intake commands.
   inspectUnknown(captures){if(disposed||!supported)return;for(const id of idsOf(captures))if(read(id).kind==='unknown')enqueue(id,true);pump();},
-  dispose(){leave();disposed=true;queue=[];work.clear();records.clear();}});
+  dispose(){leave();disposed=true;queue=[];work.clear();records.clear();batcher?.cancel();}});
 }
