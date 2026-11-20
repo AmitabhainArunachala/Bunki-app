@@ -3,7 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, lstatSync, readFileSync, readdirSync, realpathSync, statSync } from 'node:fs';
 import { dirname, relative, resolve } from 'node:path';
 import ts from 'typescript';
 import { gateEvidenceDeclaration } from './gate-evidence.mjs';
@@ -492,6 +492,41 @@ export function inventoryCensus(root, gates, out = '/inventory-census/no-executi
       sourceCache.set(path, row);
       return row;
     }
+    const info = lstatSync(absolute);
+    let directory = info.isDirectory();
+    if (info.isSymbolicLink()) {
+      const target = statSync(absolute);
+      assert(!target.isDirectory(), `Symbolic link directory resource rejected: ${path}`);
+      assert(target.isFile(), `Special filesystem resource rejected: ${path}`);
+    } else {
+      assert(info.isFile() || directory, `Special filesystem resource rejected: ${path}`);
+    }
+    if (directory) {
+      const realRoot = realpathSync(root),
+        realAbsolute = realpathSync(absolute),
+        realRelative = relative(realRoot, realAbsolute);
+      assert(!realRelative.startsWith('..'), 'Directory resource escapes repository');
+      assert(
+        realRelative === relative(root, absolute),
+        `Symbolic link directory path rejected: ${path}`,
+      );
+      const entries = readdirSync(absolute, { withFileTypes: true }).sort((a, b) =>
+        a.name < b.name ? -1 : a.name > b.name ? 1 : 0,
+      );
+      assert(entries.length <= 2000, 'Static closure cap exceeded');
+      const imports = entries.map((entry) => {
+        const member = relative(root, resolve(absolute, entry.name)).split('\\').join('/');
+        assert(!entry.isSymbolicLink(), `Symbolic link directory member rejected: ${member}`);
+        assert(
+          entry.isFile() || entry.isDirectory(),
+          `Special filesystem member rejected: ${member}`,
+        );
+        return member;
+      });
+      const row = { path, directory: true, imports, external: [], dynamic: [], environment: [] };
+      sourceCache.set(path, row);
+      return row;
+    }
     const bytes = readFileSync(absolute),
       row = {
         path,
@@ -560,7 +595,11 @@ export function inventoryCensus(root, gates, out = '/inventory-census/no-executi
         .split('\\')
         .join('/');
       if (rel.startsWith('..')) row.dynamic.push(`external relative import: ${name}`);
-      else row.imports.push(rel);
+      else {
+        if (match && statSync(match).isDirectory())
+          row.dynamic.push(`directory resource: ${name} -> ${rel}; closure unresolved`);
+        row.imports.push(rel);
+      }
     }
     for (const field of ['imports', 'external', 'dynamic', 'environment'])
       row[field] = [...new Set(row[field])];
@@ -587,7 +626,7 @@ export function inventoryCensus(root, gates, out = '/inventory-census/no-executi
       queue.push(...item.imports);
     }
     closures[path] = {
-      files: [...seen].map((file) => ({ path: file, sha256: scan(file).sha256 || null })),
+      files: [...seen].sort().map((file) => ({ path: file, sha256: scan(file).sha256 || null })),
       missing,
       dynamic,
       external,
