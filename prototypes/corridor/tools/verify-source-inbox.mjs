@@ -1,3 +1,4 @@
+import { openToday as navOpenToday } from './navigation-runtime-support.mjs';
 /** Ordinary source intake in fresh persistent browser profiles. All saved
  * records arise through visible controls. Native records are read as output;
  * the separate storage-failure phase is explicitly synthetic. */
@@ -250,8 +251,12 @@ for (const engine of engines) for (const width of sizes) {
     await page.locator('#source-reader-back').click();
     await page.waitForFunction(() => document.body.dataset.view === 'source-inbox');
     const saved = await readAppRecordSnapshot(page); assert.equal(saved.record.sourceInbox.entries.length, 2); noReviewChange(before, saved);
-    await shelf(page); await page.locator('#tray').click();
-    const downloadWork = page.waitForEvent('download'); await page.locator('#export-store').click();
+    await shelf(page); await navOpenToday(page, { via: 'gate' });
+    const closedToday = page.locator('#today-record:not([open]) > summary'); if (await closedToday.count()) await closedToday.click();
+    const exportStore = page.locator('#today-record[open] #export-store'), importFile = page.locator('#today-record[open] #import-file');
+    await exportStore.waitFor({ state: 'visible' }); await importFile.waitFor({ state: 'attached' });
+    const downloadWork = page.waitForEvent('download'); downloadWork.catch(() => {});
+    await exportStore.click();
     const download = await downloadWork, backupFile = join(out, 'ordinary-ui-backup.json'); await download.saveAs(backupFile);
     const backup = JSON.parse(readFileSync(backupFile));
     assert.deepEqual(backup.record.sourceInbox, saved.record.sourceInbox);
