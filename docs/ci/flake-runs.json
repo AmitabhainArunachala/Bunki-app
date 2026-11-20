@@ -1,12 +1,4 @@
 {
-  "38950321223/49": {
-    "result": "observed",
-    "startedAt": "2026-11-05T09:03:35Z"
-  },
-  "38919512644/49": {
-    "result": "observed",
-    "startedAt": "2026-11-05T09:03:39Z"
-  },
   "38950321223/50": {
     "result": "observed",
     "startedAt": "2026-11-05T15:13:36Z"
@@ -1594,5 +1586,13 @@
   "44659523472/1": {
     "result": "observed",
     "startedAt": "2026-11-20T02:15:52Z"
+  },
+  "42418249759/37": {
+    "result": "observed",
+    "startedAt": "2026-11-20T10:49:18Z"
+  },
+  "42489884950/36": {
+    "result": "observed",
+    "startedAt": "2026-11-20T10:49:06Z"
   }
 }
