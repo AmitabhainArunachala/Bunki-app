@@ -794,9 +794,9 @@ patch('    if(n.kind==="word"&&(n.mode==="free"||n.mode==="glide")&&n!==focusN&&
   + '      const zs2=(n.mode==="free"||n.mode==="glide")?cam.z:1;\n'
   + '      // A character count times the font box is right for a word and badly wrong for a\n'
   + '      // glyph (hero type above its own gloss line); measuring the wrong box only moves the\n'
-  + '      // cut instead of removing it. So the node\'s OWN untransformed box is read and kept,\n'
-  + '      // and only for a node that has come within reach of an edge — a few reads on\n'
-  + '      // approach, never a per-frame layout pass. The class list is the cache key because\n'
+  + '      // cut instead of removing it. So the node\'s OWN untransformed box is read and kept\n'
+  + '      // on approach, or when a revealed gloss needs its real height farther inside.\n'
+  + '      // The class list is the cache key because\n'
   + '      // it is exactly what changes when the box does: a hosted reading mounts its ruby\n'
   + '      // (hosted-reading-shown) long after spawn, and a word taken into a constellation\n'
   + '      // grows as bsat. A zero is never cached, so a node measured before it is laid out\n'
@@ -836,7 +836,7 @@ patch('      if(n.boxKey!==n.el.className&&n.el.isConnected&&Math.min(n.x,vw()-n
   + '      let dE=Math.min(n.x-ehw,vw()-n.x-ehw,n.y-ehh,vh()-n.y-ehh);',
   '      const pcx=n.x+n.dragX, pcy=n.y+n.dragY;\n'
   + '      const furi=document.body.dataset.furigana||"", boxKey=n.el.className+"|"+furi;\n'
-  + '      if(n.boxKey!==boxKey&&n.el.isConnected&&Math.min(pcx,vw()-pcx,pcy,vh()-pcy)<220){\n'
+  + '      if(n.boxKey!==boxKey&&n.el.isConnected&&(Math.min(pcx,vw()-pcx,pcy,vh()-pcy)<220||n.el.classList.contains("glossed"))){\n'
   + '        const bw=n.el.offsetWidth, bh=n.el.offsetHeight;\n'
   + '        if(bw>0&&bh>0){\n'
   + '          const cl=n.el.classList, lod=cl.contains("lod");\n'
@@ -868,7 +868,7 @@ patch(
   `function paintedBoxes(n,forThread=false){
   const el=n.el;
   if(!el||!el.isConnected)return [];
-  const parts=[n.kind==="word"?el.querySelector(":scope > .base")||el:el];
+  const parts=[forThread||n.kind!=="word"?el:el.querySelector(":scope > .base")||el];
   const extras=n.kind==="word"?el.querySelectorAll(":scope > .yomi, :scope > .gloss"):el.querySelectorAll("rt");
   const cl=el.classList,lod=cl.contains("lod"),furi=document.body.dataset.furigana||"";
   for(const extra of extras){
@@ -883,16 +883,19 @@ function paintedSeat(n){
   if(n.threadSeatFrame===frameCount&&n.threadSeat)return n.threadSeat;
   const boxes=paintedBoxes(n,true);
   if(!boxes.length)return nodeSeat(n);
+  const anchor=boxes[0];
   let l=Infinity,t=Infinity,r=-Infinity,b=-Infinity;
   for(const box of boxes){l=Math.min(l,box.left);t=Math.min(t,box.top);r=Math.max(r,box.right);b=Math.max(b,box.bottom);}
   const st=n.threadSeat||(n.threadSeat={});
-  st.cx=(l+r)/2;st.cy=(t+b)/2;st.c=1;st.s=0;
+  // The line course meets the word border-box centre. Reading and gloss ink
+  // grows the clipping room around that anchor; it never moves the anchor.
+  st.cx=(anchor.left+anchor.right)/2;st.cy=(anchor.top+anchor.bottom)/2;st.c=1;st.s=0;
   st.l=l-st.cx;st.r=r-st.cx;st.u=t-st.cy;st.d=b-st.cy;
   const style=getComputedStyle(n.el),turn=new DOMMatrix(style.transform==="none"?undefined:style.transform);
   const text=n.el.querySelector(":scope > .base, :scope > .g, :scope > .pch")||n.el;
   const font=parseFloat(getComputedStyle(text).fontSize)||n.fpx||14;
   st.g=Math.max(LINE_GAP_MIN,LINE_GAP*font*Math.hypot(turn.a,turn.b));
-  st.R=Math.hypot(st.r,Math.max(st.d,-st.u))+st.g;
+  st.R=Math.hypot(Math.max(-st.l,st.r),Math.max(st.d,-st.u))+st.g;
   n.threadSeatFrame=frameCount;
   return st;
 }
