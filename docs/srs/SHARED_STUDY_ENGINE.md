@@ -315,10 +315,35 @@ Ordinary legacy routes retain their 18px gutters.
 
 ## Regeneration and checks
 
-From the canonical source repository, export a committed version with
-`node tools/export_engine.mjs --include-ui --output <external-directory>`.
-Copy that complete verified distribution into Bunki's
-`prototypes/corridor/vendor/shared-study-engine`; never edit generated files.
+The copy is the released Nihongo Study build, not a branch of it.
+[`scripts/shared-study-release.json`](../../scripts/shared-study-release.json) names that
+release: its source commit, reducer digest, closure digest and the date it was named. The
+record stands in for a release pointer the Nihongo Study side will publish.
+`node scripts/verify-shared-study-release.mjs` recomputes the copy's file set, every file's
+bytes, the closure and the reducer with Bunki's own code and fails on any difference from the
+named release: another source commit, one changed byte, a file added or removed, or a reviewed
+pin that names another commit or closure. `npm test` runs it right after the pinned
+distribution/content verifier, so the entry check of `next` fails the day the copy is not the
+release.
+
+Refresh the copy with one command, given a clean nihongo-srs checkout that stands at the
+released commit:
+
+```sh
+node scripts/import-shared-study-engine.mjs --source /absolute/path/to/nihongo-srs
+```
+
+It runs that checkout's own exporter (`tools/export_engine.mjs --include-ui`) into a scratch
+folder and checks the result before touching this tree. Then it replaces
+`prototypes/corridor/vendor/shared-study-engine`, rewrites the reviewed pin and the release
+record, regenerates `prototypes/corridor/contracts/learner-state/w4-engine-shape.json` and runs
+the exporter's byte check, both verifiers and the learner-state contract test. `--commit <sha>`
+refuses a checkout standing anywhere else. `--content <reviewed-content-directory>` re-syncs
+the content binding; without it the release's frozen identity registry must be the one the
+binding already holds. `--check` writes nothing and tells whether the copy is a fresh export of
+the checkout. Never edit generated files; review the resulting diff, then build the site and
+run the browser verifiers below.
+
 The manifest pins source commit, reducer, closure, file sizes and SHA-256 hashes.
 `scripts/shared-study-pin.json` independently pins the reviewed source commit,
 closure, verifier bytes and content-binding hash. The trusted Bunki gate hashes
