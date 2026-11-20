@@ -1,0 +1,9 @@
+{
+  "format": "bunki-shared-study-release/v1",
+  "repository": "nihongo-srs",
+  "commit": "fbbad63519e8ab2b1afdcc7b83e5d8b0aeac0bf7",
+  "reducerSha256": "642ca6b6759de4cb137b3041670dab5457ad7d600603c58136bd923d14008686",
+  "closureSha256": "bd4f7ab0246d82d7f8b484d656224f1cf918cf840989b6f4390512ffccc2bb0c",
+  "date": "2026-11-20",
+  "note": "Names the Nihongo Study release that the engine copy in this tree must equal. It stands in for the release pointer the Nihongo Study side will publish; when that pointer exists, this file is taken from it."
+}

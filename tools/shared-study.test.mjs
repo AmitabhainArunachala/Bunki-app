@@ -69,10 +69,12 @@ function assertBrowserScriptWiring(scripts, name) {
     trace = join(temporary, 'commands.jsonl'),
     browser = 'scripts/verify-shared-study-browser.mjs',
     verifier = 'scripts/verify-shared-study.mjs',
+    release = 'scripts/verify-shared-study-release.mjs',
     expected =
       name === 'test'
         ? [
             ['node', verifier],
+            ['node', release],
             ['node', browser, '--if-ci'],
             ['vitest', 'run'],
           ]
@@ -92,7 +94,7 @@ process.exit(args[0] === process.env.BUNKI_WIRING_FAIL ? 23 : 0);
         { mode: 0o755 },
       );
     }
-    for (const failure of ['', browser, ...(name === 'test' ? [verifier] : [])]) {
+    for (const failure of ['', browser, ...(name === 'test' ? [verifier, release] : [])]) {
       rmSync(trace, { force: true });
       const result = spawnSync('npm', ['run', '--silent', name], {
         cwd: temporary,
@@ -645,12 +647,12 @@ describe('Bunki canonical shared study consumer', () => {
     [
       'test',
       'echo-only',
-      "node scripts/verify-shared-study.mjs && echo 'node scripts/verify-shared-study-browser.mjs --if-ci' && vitest run",
+      "node scripts/verify-shared-study.mjs && node scripts/verify-shared-study-release.mjs && echo 'node scripts/verify-shared-study-browser.mjs --if-ci' && vitest run",
     ],
     [
       'test',
       'comment-only',
-      'node scripts/verify-shared-study.mjs && vitest run # node scripts/verify-shared-study-browser.mjs --if-ci',
+      'node scripts/verify-shared-study.mjs && node scripts/verify-shared-study-release.mjs && vitest run # node scripts/verify-shared-study-browser.mjs --if-ci',
     ],
     [
       'verify:shared-study:browser',
@@ -667,6 +669,46 @@ describe('Bunki canonical shared study consumer', () => {
     expect(() => assertBrowserScriptWiring({ ...scripts, [name]: command }, name)).toThrow(
       'npm browser wiring must execute the required commands in order',
     );
+  });
+  it.each([
+    [
+      'no release check',
+      'node scripts/verify-shared-study.mjs && node scripts/verify-shared-study-browser.mjs --if-ci && vitest run',
+    ],
+    [
+      'an echo-only release check',
+      "node scripts/verify-shared-study.mjs && echo 'node scripts/verify-shared-study-release.mjs' && node scripts/verify-shared-study-browser.mjs --if-ci && vitest run",
+    ],
+    [
+      'a comment-only release check',
+      'node scripts/verify-shared-study.mjs && node scripts/verify-shared-study-browser.mjs --if-ci && vitest run # node scripts/verify-shared-study-release.mjs',
+    ],
+    [
+      'the release check after the browser check',
+      'node scripts/verify-shared-study.mjs && node scripts/verify-shared-study-browser.mjs --if-ci && node scripts/verify-shared-study-release.mjs && vitest run',
+    ],
+  ])('rejects npm run test with %s', (_kind, command) => {
+    const scripts = JSON.parse(readFileSync(new URL('../package.json', import.meta.url))).scripts;
+    expect(() => assertBrowserScriptWiring({ ...scripts, test: command }, 'test')).toThrow(
+      'npm browser wiring must execute the required commands in order',
+    );
+  });
+  it('rejects npm run test when a failing release check cannot stop the run', () => {
+    const scripts = JSON.parse(readFileSync(new URL('../package.json', import.meta.url))).scripts;
+    let refused = null;
+    try {
+      assertBrowserScriptWiring(
+        {
+          ...scripts,
+          test: 'node scripts/verify-shared-study.mjs && (node scripts/verify-shared-study-release.mjs || true) && node scripts/verify-shared-study-browser.mjs --if-ci && vitest run',
+        },
+        'test',
+      );
+    } catch (error) {
+      refused = error;
+    }
+    // Every command ran in order, but the run ended 0 where the failing check must end it 23.
+    expect(refused).toMatchObject({ code: 'ERR_ASSERTION', actual: 0, expected: 23 });
   });
   it('ignores the grammar-only query unless preview or a bound host owns study, and recovers after a failed deck', () => {
     const state = { view: 'dojo', deckPlay: 'n1' };

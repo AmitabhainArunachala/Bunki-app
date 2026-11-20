@@ -51,11 +51,16 @@ export function fitRubyReadings(root) {
       span.style.bottom = '100%'; span.style.width = ''; span.style.maxWidth = ''; span.style.whiteSpace = '';
       span.style.lineHeight = '';
     }
+    // A lane is as tall as its reading's text: the glyphs' ascent and descent run past the span's line box, by an
+    // amount each engine takes from its own font metrics, so lanes spaced by the box alone can overlap.
+    const textHeight = span => { const range = span.ownerDocument?.createRange?.(); range?.selectNodeContents(span);
+      return Math.max(span.getBoundingClientRect().height, ...(range ? [...range.getClientRects()].map(rect => rect.height) : [])); };
+    const readingHeight = Math.max(HEIGHT, ...spans.map(textHeight));
     const rows = [];
     for (const span of spans) {
       const base = span.closest('ruby').getBoundingClientRect(), natural = span.getBoundingClientRect();
       if (base.width < .01 || natural.width < .01) continue;
-      const width = Math.min(natural.width, bounds.width), height = natural.width > bounds.width ? Math.ceil(natural.width / bounds.width) * (HEIGHT + 6) : HEIGHT;
+      const width = Math.min(natural.width, bounds.width), height = natural.width > bounds.width ? Math.ceil(natural.width / bounds.width) * (readingHeight + 6) : readingHeight;
       let row = rows.find(row => Math.abs(row.bottom - base.bottom) < 1);
       if (!row) rows.push(row = {bottom:base.bottom, items:[]});
       row.items.push({span, base, width, height, naturalWidth:natural.width, center:(base.left + base.right) / 2});
@@ -87,12 +92,12 @@ export function fitRubyReadings(root) {
           item.span.style.transform = 'none';
           item.span.style.bottom = `calc(100% + ${rise}px)`;
           if (item.naturalWidth > bounds.width) {
-            item.span.style.width = bounds.width + 'px'; item.span.style.maxWidth = bounds.width + 'px'; item.span.style.whiteSpace = 'normal'; item.span.style.lineHeight = (HEIGHT + 6) + 'px';
+            item.span.style.width = bounds.width + 'px'; item.span.style.maxWidth = bounds.width + 'px'; item.span.style.whiteSpace = 'normal'; item.span.style.lineHeight = (readingHeight + 6) + 'px';
           }
         }
         rise += Math.max(...items.map(item => item.height)) + 6;
       }
-      extra = Math.max(extra, rise - 6 - HEIGHT);
+      extra = Math.max(extra, rise - 6 - readingHeight);
     }
     // Reserving the same extra room on both faces also handles zoom/narrow
     // windows. Position offsets are relative to each ruby and survive this move.

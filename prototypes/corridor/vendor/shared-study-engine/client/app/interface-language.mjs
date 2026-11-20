@@ -1,4 +1,5 @@
 /** Interface copy only. Passages, learner text and dictionary entries keep their source language. */
+import {voiceCopies} from '../audio/voice-lines.mjs';
 export function defaultInterfaceLanguage(device = globalThis.navigator) {
  const locales=Array.isArray(device?.languages)?device.languages:[];
  for(const locale of [...locales,device?.language]){
@@ -23,19 +24,8 @@ export function formatStudyMinutes(evidence,language='en'){
 }
 
 export const interfaceCopies = Object.freeze([
-  ["P：学習対象と全文を再生／停止", "P: Play or stop the target and full passage"],
-  ["選択した項目の音声は準備中です。", "Audio for the selected field is being prepared."],
-  ["音声プロファイルが割り当てられていません。", "No audio profile is assigned."],
-  ["選択した音声プロファイルは利用できません。", "The selected audio profile is unavailable."],
-  ["音声がこのカードの内容と一致しません。項目またはプロファイルを選び直してください。", "The audio does not match this card. Select the field or profile again."],
-  ["音声のリリースがこのカードと一致しません。", "The audio release does not match this card."],
-  ["音声の完全性を確認できませんでした。", "Audio integrity could not be verified."],
-  ["この端末では共有音声を利用できません。", "Shared audio is unavailable on this device."],
-  ["音声の準備に失敗しました。", "Audio preparation failed."],
-  ["オフラインのため音声を利用できません。", "Audio is unavailable while offline."],
-  ["音声を再生できませんでした。もう一度タップしてください。", "Audio could not play. Tap again to retry."],
-  ["音声の指定が正しくありません。", "The audio request is invalid."],
-  ["音声を準備しています…", "Preparing audio…"],
+  // N7: every voice line and voice word, from the one vocabulary (voice-lines.mjs).
+  ...voiceCopies,
   ["例文（日本語）", "Example (Japanese)"],
   ["定義（日本語）", "Definition (Japanese)"],
   ["意味（英語）", "Meaning (English)"],
@@ -50,10 +40,6 @@ export const interfaceCopies = Object.freeze([
   ["音声プロファイル", "Audio profile"],
   ["音声オプション", "Audio options"],
   ["プロファイル", "Profile"],
-  ["音声を停止（P）", "Stop audio (P)"],
-  ["学習対象と全文を再生（P）", "Play the target and full passage (P)"],
-  ["Kore 試聴：再生を停止（P）", "Kore sample: Stop playback (P)"],
-  ["Kore 試聴：単語と文を再生（P）", "Kore sample: Play the word and sentence (P)"],
   ["バックアップに失敗しました。サーバーのエクスポートが大きすぎます。新しいバックアップは作成されませんでした。", "Backup failed: the server export is too large. No new backup was created."],
   ["バックアップ先への保存を完了できませんでした。一部の保存先にはコピーがある場合があります。", "Backup destinations could not all be written. Some destinations may contain a copy."],
   ["バックアップが中断されました。完了を確認できません。", "The backup was interrupted. Completion is unconfirmed."],
@@ -65,12 +51,13 @@ export const interfaceCopies = Object.freeze([
   ["直近のバックアップは失敗しました。", "The latest backup failed."],
   ["この表示は確認できたバックアップ実行だけを示します。クラウドへのアップロード完了を示すものではありません。", "This reports only observed backup attempts. It does not confirm cloud upload."],
 
-  ["採点は下線の語だけです。ほかの語は採点に影響しません。", "You grade only the underlined word. Other words never change the grade."],
+  ["採点は色のついた語だけです。ほかの語は採点に影響しません。", "You grade only the highlighted word. Other words never change the grade."],
   ["採点はこのカードの学習対象だけです。ほかの語は採点に影響しません。", "You grade only this card’s target. Other words never change the grade."],
   ["Space・Return（解答後）", "Space / Return (back)"],
   ["採点：もう一度・難しい・正解・簡単", "Grade: Again · Hard · Good · Easy"],
   ["最後の採点を元に戻す", "Undo last rating"],
   ["英訳の表示を切り替える", "Show or hide the English"],
+  ["耳のオン・オフ", "Turn the ear on or off"],
   ["この一覧", "This list"],
   ["キー操作", "Keys"],
   ["本文の語をタップすると、読みと意味を確認できます。", "Tap any word in the passage to see its reading and meaning."],
@@ -79,7 +66,7 @@ export const interfaceCopies = Object.freeze([
   ["採点の目安とキー", "Grading guide and keys"],
   ["?キーですべてのキー操作を表示します。", "Press ? to see every key."],
   ["「知らない」は、この語のカード作成を依頼します。「うろ覚え」も、デッキにない語なら作成を依頼します。「知っている」は記録だけです。", "Unknown requests a card for this word. Not sure also requests one if the word is not already in your deck. Know it only records familiarity."],
-  ["Space・Return：解答を表示・解答後は正解／1〜4：採点／U：元に戻す／E：英訳／?：キー操作／Esc：学習を終える", "Space / Return: show answer; Good on the back / 1–4: grade / U: undo / E: English / ?: keys / Esc: end session"],
+  ["Space・Return：解答を表示・解答後は正解／1〜4：採点／U：元に戻す／E：英訳／L：耳のオン・オフ／?：キー操作／Esc：学習を終える", "Space / Return: show answer; Good on the back / 1–4: grade / U: undo / E: English / L: ear on or off / ?: keys / Esc: end session"],
   ["メニュー", "Menu"],
   ["移動", "Go to"],
   ["学習に戻る", "Resume study"],
@@ -473,7 +460,7 @@ export const interfaceCopies = Object.freeze([
   ["全文の英訳", "Full English translation"],
   ["漢字と、つながる言葉", "Kanji and related words"],
   ["出典と確認", "Sources and verification"],
-  ["読みは機械処理によるものです。ピッチ・音声は未対応。", "Readings are machine generated. Pitch and audio are unavailable."],
+  ["読みは機械処理によるものです。ピッチは未対応。", "Readings are machine generated. Pitch is unavailable."],
   ["語の原形・読みは形態素解析、英語の語義と漢字情報は各辞書に基づきます。", "Lemmas and readings are based on morphological analysis; English glosses and kanji information come from the dictionaries."],
   ["知らない語は辞書に見つかりませんでした。記録して確認に回します。", "This word was not found in the dictionary. Save it for review."],
   ["この語は辞書に見つかりませんでした。記録して確認に回します。", "This word was not found in the dictionary. Save it for review."],

@@ -1,11 +1,6 @@
 import {canonicalStringify, payloadHash, sha256} from '../schema/event.mjs';
 import {resolveAcceptedAudioDemand} from '../audio/accepted-demand.mjs';
-import {studyAudioSourcePlan,studyAudioProfileAssignments} from './study-audio.mjs';
-import {planCardSpeech} from '../audio/card-speech-plan.mjs';
-import {createJapaneseOnlySelection} from '../audio/japanese-only-selection.mjs';
-import {assertJapaneseOnlyRuntimeField} from '../audio/japanese-only-runtime-guard.mjs';
-import {verifyAudioPlacement} from './audio-release.mjs';
-import {passageReadingRules, passageReadingLedgerSha256} from '../player/passage-reading-rules.mjs';
+import {studyAudioSourcePlan} from './study-audio.mjs';
 import {validateAudioCapability} from './audio-resources.mjs';
 
 const AUTHORITY_KEYS = ['identities', 'correctionLedgerRevision', 'defaultProfileId', 'profiles'];
@@ -235,10 +230,9 @@ export function createAudioPackAdmission({
     return clean;
   }
 
-  async function validate(inspection, {reader, signal, placement, metadataOnly = false} = {}) {
+  async function validate(inspection, {reader, signal, placement} = {}) {
     alive(signal);
     if (!inspection || !reader || typeof reader.resolve !== 'function') throw invalid('validation-input');
-    if (expectedAuthority.correctionLedgerRevision !== passageReadingLedgerSha256) throw invalid('current-correction-ledger');
     const packId = text(inspection.pack?.id, 'inspection-pack-id');
     const root = inspection.root;
     if (!root || root.contentRelease !== binding.contentRelease || root.projectionId !== binding.projectionId) {
@@ -271,7 +265,6 @@ export function createAudioPackAdmission({
     const plans = new Map();
     const manualSelections = new Map();
     const proofs = new Map();
-    const japaneseSelectionDigests = new Map();
 
     async function manualEntryFor(taskKey) {
       if (manualSelections.has(taskKey)) return manualSelections.get(taskKey);
@@ -355,53 +348,21 @@ export function createAudioPackAdmission({
       let plan = plans.get(taskKey);
       if (!plan) {
         try {
-          plan = studyAudioSourcePlan(selected.entry, source.selectedAssignments ?? source.accepted?.inputs?.assignments ?? {}, {version: root.version === 2 ? 2 : 1});
+          plan = studyAudioSourcePlan(selected.entry, source.selectedAssignments ?? source.accepted?.inputs?.assignments ?? {});
         } catch { throw invalid('source-plan'); }
         plans.set(taskKey, plan);
       }
-      // Rebuild the complete current task, including exclusions and reading identity.
-      // The request scope comes from the validated owning task, never selection rows.
-      const assignments = source.selectedAssignments ?? source.accepted?.inputs?.assignments ?? {};
-      let japanesePlan, japaneseSelection;
-      try {
-        const selectedMap = values => Object.hasOwn(values ?? {}, taskKey) ? {[taskKey]: values[taskKey]} : {};
-        japanesePlan = planCardSpeech({catalog: [selected.entry],
-          grammarRecords: selected.entry.grammarRecord ? [selected.entry.grammarRecord] :
-            source.grammarRecords ?? [], readingRules: passageReadingRules,
-          sourceRevision: revision, correctionLedgerRevision: expectedAuthority.correctionLedgerRevision,
-          profiles: {}, languageAssignments: selectedMap(assignments.languageAssignments),
-          readingAssignments: selectedMap(assignments.readingAssignments), scope: expectedScope});
-        const options = {plan: japanesePlan, sourceRevision: revision,
-          correctionLedgerRevision: expectedAuthority.correctionLedgerRevision, taskKeys: [taskKey]};
-        japaneseSelection = createJapaneseOnlySelection(options);
-        assertJapaneseOnlyRuntimeField({...options, selection: japaneseSelection, taskKey,
-          fieldId: row.fieldId, profileId: row.version === 2 ? row.profileAssignments?.ja : row.profileId,
-          profiles: expectedAuthority.profiles, assignments});
-        const field = japanesePlan.tasks[0].fields.find(field => field.sourcePath === row.fieldId);
-        if (row.language !== 'ja' || row.contentRevision !== selected.contentRevision ||
-            row.audioContentRevision !== japanesePlan.tasks[0].audioContentRevision ||
-            row.sourceSha256 !== field.sourceHash || row.sourceBytes !== new TextEncoder().encode(field.sourceText).length) {
-          throw invalid('japanese-field-binding');
-        }
-      } catch (error) {
-        if (error?.audioCode === 'integrity') throw error;
-        throw invalid('japanese-selection');
-      }
-      japaneseSelectionDigests.set(taskKey, japaneseSelection.digest);
-      const selection = {
+      const result = await call(() => reader.resolve({
         taskKey,
         contentRevision: selected.contentRevision,
         audioContentRevision: plan.audioContentRevision,
         contentRelease: binding.contentRelease,
         fields: [row.fieldId],
-        ...(root.version === 2 ? {version: 2, profileAssignments: studyAudioProfileAssignments(root, assignments, plan.sourceFields, [row.fieldId])} : {profileId: row.profileId}),
+        profileId: row.profileId,
         supportedReadingId: row.supportedReadingId,
         face: 'answer',
         sourceFields: plan.sourceFields,
-      };
-      verifyAudioPlacement({root, placement: row, selection, packId});
-      if (metadataOnly) continue;
-      const result = await call(() => reader.resolve(selection, {signal}), signal);
+      }, {signal}), signal);
       alive(signal);
       if (result?.status === 'cancelled') throw cancelled();
       if (result?.status === 'offline-missing') {
@@ -421,7 +382,6 @@ export function createAudioPackAdmission({
       grantRevision: grant.revision,
       fingerprint: payloadHash({
         binding, packId, grant, sourceRevision: revision,
-        japaneseSelectionDigests: [...japaneseSelectionDigests.entries()].sort(([left], [right]) => left.localeCompare(right)),
         tasks: [...proofs.entries()].sort(([left], [right]) => left.localeCompare(right)),
       }),
     });

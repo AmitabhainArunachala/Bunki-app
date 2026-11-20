@@ -70,7 +70,10 @@ try {
       // Copy only the returned view, never padding outside byteOffset/length.
       return new Uint8Array(bytes);
     },packState:packId=>audioPort.packState(packId)}}}:basePlatform;
-  const app=mountStudyApp(root,{backend,catalog,themes,grammar,dictionary,preferences,platform,now:adapter.now,initialModule,corpus});
+  // Bunki's origin serves none of Nihongo Study's Kore trial clips. A canonical screen whose host gives it no
+  // voice looks for their manifest on its page origin at every mount. Naming an origin that is none keeps that
+  // screen silent and asks the network nothing; a host that brings a voice never reaches the trial player.
+  const app=mountStudyApp(root,{backend,catalog,themes,grammar,dictionary,preferences,platform:{audioOrigin:'about:blank',...platform},now:adapter.now,initialModule,corpus});
   const disposeViewport=bindSharedStudyViewport({app,root,onCardStart:window.frameElement.bunkiStudyPort.onCardStart});
   if(params.get('start')==='1')root.querySelector('[data-start]')?.click();
   window.bunkiSharedStudy=Object.freeze({app,backend:adapter.backend,store:adapter.store,catalog,dictionary});

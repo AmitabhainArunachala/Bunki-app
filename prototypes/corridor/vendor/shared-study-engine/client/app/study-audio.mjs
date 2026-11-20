@@ -8,8 +8,8 @@
  * error. There is no trial/device/voice fallback and no synthesis.
  */
 import {createAudioReleaseReader, hashAudioBytes} from './audio-release.mjs';
-import {canonicalStringify} from '../schema/event.mjs';
 import {planCardSpeech} from '../audio/card-speech-plan.mjs';
+import {shouldFallBackOnDemand} from '../audio/on-demand-speech.mjs';
 import {passageReadingRules,passageReadingLedgerSha256} from '../player/passage-reading-rules.mjs';
 
 const frozenField = (fieldId, text, language) => Object.freeze({fieldId, text, language,pronunciationDirectives:Object.freeze([]),pendingReasons:Object.freeze([])});
@@ -72,37 +72,15 @@ export function studyAudioSourceFields(entry) {
 
 /** One mounted accepted entry, exact current correction overlay, no provider/profile work.
  * The mount caches by exact source snapshot, so mutable QA inputs cannot retain stale directives. */
-export function studyAudioSourcePlan(entry, assignments = {}, {version = 1} = {}) {
-  if (version !== 1 && version !== 2) throw new TypeError('study-audio-version');
+export function studyAudioSourcePlan(entry, assignments = {}) {
   const selected = (rows = {}) => {
     if (rows === null || typeof rows !== 'object' || Array.isArray(rows)) throw new TypeError('study-audio-assignments');
     return Object.hasOwn(rows, entry.taskKey) ? {[entry.taskKey]: rows[entry.taskKey]} : {};
   };
   const task=planCardSpeech({catalog:[entry],grammarRecords:entry.grammarRecord?[entry.grammarRecord]:[],readingRules:passageReadingRules,sourceRevision:'runtime-projection',correctionLedgerRevision:passageReadingLedgerSha256,profiles:{},languageAssignments:selected(assignments.languageAssignments),readingAssignments:selected(assignments.readingAssignments),scope:{accessScope:'runtime-projection',licenseScope:'runtime-projection'}}).tasks[0];
-  const sourceFields=Object.freeze(task.fields.map(field=>Object.freeze({fieldId:field.sourcePath,text:field.sourceText,language:version===2?field.language:typeof field.language==='string'?field.language:null,pronunciationDirectives:Object.freeze(field.readingEvidence.map(({start,end,reading})=>Object.freeze({start,end,reading}))),pendingReasons:Object.freeze(field.pendingReasons.filter(reason=>!['profile-unassigned','profile-conflict','reading-review-pending'].includes(reason)))})));
+  const sourceFields=Object.freeze(task.fields.map(field=>Object.freeze({fieldId:field.sourcePath,text:field.sourceText,language:typeof field.language==='string'?field.language:null,pronunciationDirectives:Object.freeze(field.readingEvidence.map(({start,end,reading})=>Object.freeze({start,end,reading}))),pendingReasons:Object.freeze(field.pendingReasons.filter(reason=>!['profile-unassigned','profile-conflict','reading-review-pending'].includes(reason)))})));
   const plan=Object.freeze({audioContentRevision:task.audioContentRevision,sourceFields});
   return plan;
-}
-
-/** Resolve IDs from current explicit profile definitions, never from a default. */
-export function studyAudioProfileAssignments(root, assignments, sourceFields, selectedFields) {
-  const result = {};
-  const selected = new Set(selectedFields);
-  for (const source of sourceFields) {
-    if (!selected.has(source.fieldId) || source.language === null) continue;
-    const languages = Array.isArray(source.language) ? source.language.map(part => part.language) : [source.language];
-    for (const language of languages) {
-      if (Object.hasOwn(result, language)) continue;
-      const supplied = assignments?.profiles?.[language];
-      let matches = [];
-      try {
-        if (supplied && typeof supplied === 'object') matches = (root?.profiles ?? []).filter(entry =>
-          canonicalStringify(entry.profile) === canonicalStringify(supplied));
-      } catch { /* Invalid current profile remains explicitly unassigned. */ }
-      result[language] = matches.length === 1 ? matches[0].id : null;
-    }
-  }
-  return Object.freeze(result);
 }
 
 function browserContext() {
@@ -136,21 +114,59 @@ function copyRef(ref) {
   return Object.freeze({key: ref.key, sha256: ref.sha256, bytes: ref.bytes});
 }
 
-function snapshotReady(result) {
-  const segments = result.segments.map(segment => Object.freeze({
-    ...(result.version === 2 ? {index: segment.index, unit: segment.unit, byteStart: segment.byteStart, byteEnd: segment.byteEnd, language: segment.language} : {}),
+function speakBridge() {
+  const bridge = globalThis.nihongoSpeak;
+  return bridge && typeof bridge.speak === 'function' ? bridge : null;
+}
+
+function decodeBase64(value) {
+  if (typeof value !== 'string' || value.length === 0 || value.length > 4 * 1024 * 1024 ||
+      typeof globalThis.atob !== 'function') {
+    throw audioError('invalid-response', 'study-audio-speak-bytes');
+  }
+  let binary;
+  try { binary = globalThis.atob(value); }
+  catch { throw audioError('invalid-response', 'study-audio-speak-bytes'); }
+  if (binary.length > 2 * 1024 * 1024) {
+    throw audioError('invalid-response', 'study-audio-speak-bytes');
+  }
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+function onDemandSegment(segment) {
+  return Object.freeze({
     fieldId: segment.fieldId,
-    packId: segment.packId,
-    supportedReadingId: segment.supportedReadingId,
-    start: segment.start,
-    end: segment.end,
+    packId: null,
+    supportedReadingId: null,
+    start: null,
+    end: null,
     inputKey: segment.inputKey,
     profileId: segment.profileId,
-    ref: copyRef(segment.ref),
-  }));
+    ref: null,
+    onDemand: Object.freeze({
+      cardGuid: segment.onDemand.cardGuid,
+      speechInput: segment.onDemand.speechInput,
+    }),
+  });
+}
+
+function snapshotReady(result) {
+  const segments = result.segments.map(segment => segment.onDemand
+    ? onDemandSegment(segment)
+    : Object.freeze({
+        fieldId: segment.fieldId,
+        packId: segment.packId,
+        supportedReadingId: segment.supportedReadingId,
+        start: segment.start,
+        end: segment.end,
+        inputKey: segment.inputKey,
+        profileId: segment.profileId,
+        ref: copyRef(segment.ref),
+      }));
   return Object.freeze({
     status: 'ready',
-    ...(result.version === 2 ? {version: 2, profileAssignments: result.profileAssignments} : {}),
     releaseId: result.releaseId,
     projectionId: result.projectionId,
     contentRelease: result.contentRelease,
@@ -160,7 +176,33 @@ function snapshotReady(result) {
     profileId: result.profileId,
     supportedReadingId: result.supportedReadingId,
     localState: result.localState,
+    onDemand: result.onDemand === true,
     segments: Object.freeze(segments),
+  });
+}
+
+// A field with no accepted release clip may still be spoken on demand. The
+// planning data is supplied by the app; this module only validates the bridge
+// reply and plays the bytes through the same AudioContext path.
+function onDemandReady(selection, plans) {
+  return Object.freeze({
+    status: 'ready',
+    releaseId: null,
+    projectionId: null,
+    contentRelease: selection.contentRelease ?? null,
+    taskKey: selection.taskKey,
+    contentRevision: selection.contentRevision,
+    audioContentRevision: selection.audioContentRevision,
+    profileId: selection.profileId,
+    supportedReadingId: null,
+    localState: 'nonpersistent',
+    onDemand: true,
+    segments: Object.freeze(plans.map(plan => Object.freeze({
+      fieldId: plan.fieldId,
+      inputKey: plan.speechInput.inputKey,
+      profileId: selection.profileId,
+      onDemand: Object.freeze({cardGuid: plan.cardGuid, speechInput: plan.speechInput}),
+    }))),
   });
 }
 
@@ -278,30 +320,60 @@ export function createStudyAudio({
       if (cancelled(token)) return;
       if (!authorized()) { cancelToken(token); return; }
       let bytes;
-      try {
-        bytes = await Promise.race([
-          reader.readClip(segment.ref, {signal: token.controller?.signal}),
-          token.done,
-        ]);
-      } catch (error) {
+      if (segment.onDemand) {
+        const bridge = speakBridge();
+        if (!bridge) throw audioError('speak-failed', 'study-audio-speak-unavailable');
+        let reply;
+        try {
+          reply = await Promise.race([
+            Promise.resolve().then(() =>
+              bridge.speak(segment.onDemand.cardGuid, segment.onDemand.speechInput)),
+            token.done,
+          ]);
+        } catch (error) {
+          if (cancelled(token)) return;
+          throw audioError('speak-failed', 'study-audio-speak-request');
+        }
+        if (!reply || cancelled(token)) return;
+        if (!authorized()) { cancelToken(token); return; }
+        if (reply.ok !== true) {
+          const code = typeof reply.error === 'string' && reply.error ? reply.error : 'speak-failed';
+          throw audioError(code, 'study-audio-speak');
+        }
+        if (typeof reply.contentType !== 'string' ||
+            !reply.contentType.toLowerCase().startsWith('audio/')) {
+          throw audioError('invalid-response', 'study-audio-speak-content-type');
+        }
+        bytes = decodeBase64(reply.bytes);
+        // On-demand bytes are not in the release, so there is no release
+        // digest to check. An empty body is still refused.
+        if (bytes.byteLength === 0) throw audioError('integrity', 'study-audio-speak-length');
+      } else {
+        try {
+          bytes = await Promise.race([
+            reader.readClip(segment.ref, {signal: token.controller?.signal}),
+            token.done,
+          ]);
+        } catch (error) {
+          if (cancelled(token)) return;
+          throw error;
+        }
+        if (!bytes || cancelled(token)) return;
+        if (!authorized()) { cancelToken(token); return; }
+        if (bytes.byteLength !== segment.ref.bytes) {
+          throw audioError('integrity', 'study-audio-clip-length');
+        }
+        let digest;
+        try {
+          digest = await Promise.race([hashAudioBytes(bytes), token.done]);
+        } catch (error) {
+          if (cancelled(token)) return;
+          throw error;
+        }
         if (cancelled(token)) return;
-        throw error;
-      }
-      if (!bytes || cancelled(token)) return;
-      if (!authorized()) { cancelToken(token); return; }
-      if (bytes.byteLength !== segment.ref.bytes) {
-        throw audioError('integrity', 'study-audio-clip-length');
-      }
-      let digest;
-      try {
-        digest = await Promise.race([hashAudioBytes(bytes), token.done]);
-      } catch (error) {
-        if (cancelled(token)) return;
-        throw error;
-      }
-      if (cancelled(token)) return;
-      if (digest !== segment.ref.sha256) {
-        throw audioError('integrity', 'study-audio-clip-digest');
+        if (digest !== segment.ref.sha256) {
+          throw audioError('integrity', 'study-audio-clip-digest');
+        }
       }
       if (!authorized()) { cancelToken(token); return; }
       const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
@@ -314,7 +386,7 @@ export function createStudyAudio({
       }
       if (!decoded || cancelled(token)) return;
       if (!authorized()) { cancelToken(token); return; }
-      if (typeof preflight === 'function') {
+      if (!segment.onDemand && typeof preflight === 'function') {
         try {
           await Promise.race([
             preflight(snapshot, {signal: token.controller?.signal, ref: segment.ref, segment}),
@@ -354,7 +426,13 @@ export function createStudyAudio({
 
   async function resolve(selection) {
     if (disposed) return {status: 'cancelled'};
+    const {onDemand = [], ...releaseSelection} = selection ?? {};
+    const plans = Array.isArray(onDemand)
+      ? onDemand.filter(plan => plan && typeof plan === 'object' &&
+          typeof plan.cardGuid === 'string' && plan.speechInput && typeof plan.speechInput === 'object')
+      : [];
     if (readerError) {
+      if (!authorized()) return {status: 'face-hidden'};
       return {status: readerError.audioCode === 'unsupported'
         ? 'unsupported-capability' : 'integrity-invalid'};
     }
@@ -365,7 +443,7 @@ export function createStudyAudio({
     resolveController = controller;
     let result;
     try {
-      result = await reader.resolve(selection, {signal: controller?.signal});
+      result = await reader.resolve(releaseSelection, {signal: controller?.signal});
     } catch (error) {
       if (disposed || controller?.signal.aborted || epoch!==resolutionEpoch) return {status: 'cancelled'};
       return {status: error?.audioCode === 'unsupported'
@@ -377,6 +455,12 @@ export function createStudyAudio({
     if (!authorized()) return {status: 'face-hidden'};
     if (result && result.status === 'ready') {
       snapshots.set(result, snapshotReady(result));
+      return result;
+    }
+    if (plans.length && shouldFallBackOnDemand(result)) {
+      const ready = onDemandReady(releaseSelection, plans);
+      snapshots.set(ready, snapshotReady(ready));
+      return ready;
     }
     return result;
   }
