@@ -1,16 +1,4 @@
 {
-  "38950321223/50": {
-    "result": "observed",
-    "startedAt": "2026-11-05T15:13:36Z"
-  },
-  "38919512644/50": {
-    "result": "observed",
-    "startedAt": "2026-11-05T15:13:40Z"
-  },
-  "42075839878/1": {
-    "result": "observed",
-    "startedAt": "2026-11-05T17:33:50Z"
-  },
   "42262673202/1": {
     "result": "observed",
     "startedAt": "2026-11-06T17:33:08Z"
@@ -86,10 +74,10 @@
   "42431546894/2": {
     "result": "retry",
     "policy": "002dc875d95d7d62d63eaed04ff00e3c74fed894c7b0b9d4615572cf2957a401",
-    "startedAt": "2026-11-19T10:40:34Z",
-    "failures": 16,
-    "attemptedAt": "2026-11-19T17:23:09.278Z",
-    "reason": "Observation artifact not yet available: bunki-plan-42431546894-2"
+    "startedAt": "2026-11-20T10:49:07Z",
+    "failures": 17,
+    "attemptedAt": "2026-11-20T18:16:14.778Z",
+    "reason": "Command failed: gh api --paginate --slurp repos/AmitabhainArunachala/Bunki-app/actions/runs/42431546894/attempts/2/jobs?per_page=100"
   },
   "42407075841/3": {
     "result": "observed",
@@ -1614,5 +1602,9 @@
   "44747105874/1": {
     "result": "observed",
     "startedAt": "2026-11-20T13:45:26Z"
+  },
+  "44784454183/1": {
+    "result": "observed",
+    "startedAt": "2026-11-20T17:33:39Z"
   }
 }
