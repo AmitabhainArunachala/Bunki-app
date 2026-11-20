@@ -655,16 +655,6 @@ describe('Bunki canonical shared study consumer', () => {
       'node scripts/verify-shared-study.mjs && node scripts/verify-shared-study-release.mjs && vitest run # node scripts/verify-shared-study-browser.mjs --if-ci',
     ],
     [
-      'test',
-      'missing release check',
-      'node scripts/verify-shared-study.mjs && node scripts/verify-shared-study-browser.mjs --if-ci && vitest run',
-    ],
-    [
-      'test',
-      'echo-only release check',
-      "node scripts/verify-shared-study.mjs && echo 'node scripts/verify-shared-study-release.mjs' && node scripts/verify-shared-study-browser.mjs --if-ci && vitest run",
-    ],
-    [
       'verify:shared-study:browser',
       'echo-only',
       "echo 'node scripts/verify-shared-study-browser.mjs'",
@@ -674,9 +664,32 @@ describe('Bunki canonical shared study consumer', () => {
       'comment-only',
       '# node scripts/verify-shared-study-browser.mjs',
     ],
-  ])('rejects npm run %s with an %s invocation', (name, _kind, command) => {
+  ])('rejects npm run %s with an %s browser invocation', (name, _kind, command) => {
     const scripts = JSON.parse(readFileSync(new URL('../package.json', import.meta.url))).scripts;
     expect(() => assertBrowserScriptWiring({ ...scripts, [name]: command }, name)).toThrow(
+      'npm browser wiring must execute the required commands in order',
+    );
+  });
+  it.each([
+    [
+      'no release check',
+      'node scripts/verify-shared-study.mjs && node scripts/verify-shared-study-browser.mjs --if-ci && vitest run',
+    ],
+    [
+      'an echo-only release check',
+      "node scripts/verify-shared-study.mjs && echo 'node scripts/verify-shared-study-release.mjs' && node scripts/verify-shared-study-browser.mjs --if-ci && vitest run",
+    ],
+    [
+      'a comment-only release check',
+      'node scripts/verify-shared-study.mjs && node scripts/verify-shared-study-browser.mjs --if-ci && vitest run # node scripts/verify-shared-study-release.mjs',
+    ],
+    [
+      'the release check after the browser check',
+      'node scripts/verify-shared-study.mjs && node scripts/verify-shared-study-browser.mjs --if-ci && node scripts/verify-shared-study-release.mjs && vitest run',
+    ],
+  ])('rejects npm run test with %s', (_kind, command) => {
+    const scripts = JSON.parse(readFileSync(new URL('../package.json', import.meta.url))).scripts;
+    expect(() => assertBrowserScriptWiring({ ...scripts, test: command }, 'test')).toThrow(
       'npm browser wiring must execute the required commands in order',
     );
   });
