@@ -121,6 +121,14 @@ no real sync transport, live server or production permit authority;
 further/day-rollover grants need an explicit test transport. The shell does not
 claim this preview is paired.
 
+The released screen carries its own voice layer (the ear, speak on reveal, card
+audio). This preview gives it neither shared audio nor a speak bridge, so it is
+silent: no card audio control is shown, and the canonical ear, when armed and
+tapped on Japanese, answers "No voice yet. Pair this device in Settings." Bunki's
+origin serves none of Nihongo Study's trial clips, so `decks/player/shared-frame.mjs`
+names an audio origin that is none and the canonical trial player asks the network
+for nothing. Giving this screen its voice is separate work.
+
 In shared mode, mapped legacy pack writes are disabled. Old kotoba-mine/MCD,
 context-dense, personal collections, saved-word/kanji/sentence/question reviews
 and world/course hooks are fenced from grading. Their identities and histories
@@ -343,6 +351,10 @@ the content binding; without it the release's frozen identity registry must be t
 binding already holds. `--check` writes nothing and tells whether the copy is a fresh export of
 the checkout. Never edit generated files; review the resulting diff, then build the site and
 run the browser verifiers below.
+
+The copy named on 2026-11-20 is nihongo-srs `fbbad63`. All nine behaviour modules, the reducer
+and its replay dependencies are byte-identical to the copy it replaced (`6f4e3f41`, a side
+branch); the study screen and the audio layer are the released ones.
 
 The manifest pins source commit, reducer, closure, file sizes and SHA-256 hashes.
 `scripts/shared-study-pin.json` independently pins the reviewed source commit,
