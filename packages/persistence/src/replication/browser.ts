@@ -6,7 +6,7 @@ export {
   parseOperationJournalBackup,
   type OperationJournalBackup,
 } from './backup.ts';
-export { type LocalJson } from './json.ts';
+export { copyLocalJson, isNormalizedLocalJson, sameLocalJson, type LocalJson } from './json.ts';
 export {
   IndexedDbReplicationStore,
   type OpenIndexedDbReplicationStoreOptions,

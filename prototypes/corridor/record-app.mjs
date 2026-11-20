@@ -3,7 +3,7 @@
  * rejected producer has no effects here; a durable but uncertain commit is not
  * retried. Callers must inspect the complete acknowledgement before UI effects.
  */
-import { createSyncOperation, encodeLocalJson, operationReference, readSourceReferenceViews } from './modules/record-core.mjs';
+import { createSyncOperation, copyLocalJson, encodeLocalJson, operationReference, readSourceReferenceViews, sameLocalJson } from './modules/record-core.mjs';
 import { createRecordHost, readingResumeIntent } from './record-host.mjs';
 import { parseSourceReferenceInput, prepareSourceReferenceCapture } from './source-inbox.mjs';
 
@@ -26,9 +26,9 @@ const MAX_ROOT_LENGTH = 256;
 const NONPORTABLE = new Set(['ai', 'aiEvidence', 'recordGeneration']);
 const own = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
 const plain = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
-const copy = (value) => encodeLocalJson(value).value;
+const copy = copyLocalJson;
 const digest = (value) => encodeLocalJson(value).sha256;
-const same = (a, b) => encodeLocalJson(a).text === encodeLocalJson(b).text;
+const same = sameLocalJson;
 
 export class RecordAppError extends Error {
   constructor(code) {

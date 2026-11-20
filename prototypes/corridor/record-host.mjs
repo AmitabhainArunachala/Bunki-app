@@ -7,7 +7,7 @@
  * records, archives, command receipts and migration custody never become sync
  * operations merely because this host can persist them.
  */
-import { createSyncOperation, encodeLocalJson, exportOperationJournal, operationReference, parseOperationJournalBackup, parseReadingAnchor, readNoteViews, readReadingViews, readSourceReferenceViews, readExamAttemptViews } from './modules/record-core.mjs';
+import { createSyncOperation, copyLocalJson, encodeLocalJson, isNormalizedLocalJson, sameLocalJson, exportOperationJournal, operationReference, parseOperationJournalBackup, parseReadingAnchor, readNoteViews, readReadingViews, readSourceReferenceViews, readExamAttemptViews } from './modules/record-core.mjs';
 import { parseSourceReferenceInput, sourceReferenceIntent, prepareSourceReferenceCapture } from './source-inbox.mjs';
 
 const PRACTICE_FINALIZE = 'host.practice-finalize/1';
@@ -39,9 +39,9 @@ const NOTE_COMMANDS = new Set([NOTE_CREATE, NOTE_EDIT, NOTE_DELETE, NOTE_RESTORE
 const BUILTIN = new Set(['host.observations/1', 'host.archive/1', 'host.restore/1', 'host.restore/2', ...NOTE_COMMANDS, PRACTICE_FINALIZE, ASSESSMENT_FINALIZE, ASSESSMENT_SUPPRESS, ASSESSMENT_RECONCILE, ASSESSMENT_ENRICH, READING_RESUME, SOURCE_REFERENCE, JOURNEY_LIFECYCLE]);
 const own = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
 const plain = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
-const copy = (value) => encodeLocalJson(value).value;
+const copy = copyLocalJson;
 const digest = (value) => encodeLocalJson(value).sha256;
-const same = (a, b) => encodeLocalJson(a).text === encodeLocalJson(b).text;
+const same = sameLocalJson;
 const deepFreeze = (value) => {
   if (value !== null && typeof value === 'object' && !Object.isFrozen(value)) { Object.values(value).forEach(deepFreeze); Object.freeze(value); }
   return value;
@@ -419,7 +419,7 @@ function capture(writer, binding) {
 }
 
 class RecordHost {
-  #controller; #writer; #binding; #validateRecord; #validateArchive; #reducers;
+  #controller; #writer; #binding; #validateRecord; #validateArchive; #reducers; #validated = new WeakMap(); #receiptsChecked = new WeakSet();
   #assessmentSubjectResolver;
   #assessmentFormResolver;
   #assessmentPresentationResolver;
@@ -447,7 +447,16 @@ class RecordHost {
     this.#tail = run.catch(() => undefined);
     return run;
   }
+  /** validateRecord and validateArchive are the app's schema checks and must be functions of their argument alone
+   * (a parser that is not loaded yet refuses; it never accepts in the meantime). A value the store has normalized is
+   * frozen all the way down, so a pair that passed every check below would pass again unchanged: the pass is kept by
+   * identity for this host. A refusal is never kept and is examined again on every call */
   #validate(record, archive) {
+    if (this.#validated.get(record) === archive && isNormalizedLocalJson(record) && isNormalizedLocalJson(archive)) return;
+    this.#validateUnseen(record, archive);
+    if (isNormalizedLocalJson(record) && isNormalizedLocalJson(archive)) this.#validated.set(record, archive);
+  }
+  #validateUnseen(record, archive) {
     insist(plain(record) && [1, 2].includes(record.v) && !own(record, 'ai') &&
       (record.v === 2 || (record.assessmentLibraryV2 == null && record.assessmentLearning == null && record.assessmentReceived == null && record.assessmentQuestionPractice == null)) &&
       (record.aiChat === undefined || Array.isArray(record.aiChat)) &&
@@ -467,6 +476,17 @@ class RecordHost {
     }
   }
   #checkedReceipt(value, rowId, revision) {
+    // A receipt the store has normalized cannot change, so the checks of its own content are made once for this host.
+    // Its row and the store's revision are not its content: they are compared on every read, as before
+    if (this.#receiptsChecked.has(value)) {
+      insist(value.changeId === rowId && value.committedRevision <= revision, 'unsupported-command-receipt');
+      return value;
+    }
+    this.#checkedReceiptContent(value, rowId, revision);
+    if (isNormalizedLocalJson(value)) this.#receiptsChecked.add(value);
+    return value;
+  }
+  #checkedReceiptContent(value, rowId, revision) {
     keys(value, ['format', 'version', 'changeId', 'type', 'occurredAt', 'scope', 'commandSha256',
       'beforeRevision', 'committedRevision', 'recordSha256', 'archiveSha256'], value.type === JOURNEY_LIFECYCLE ? ['journey'] : value.type === PRACTICE_FINALIZE ? ['practice'] : value.type === ASSESSMENT_FINALIZE ? ['assessment'] : value.type === ASSESSMENT_SUPPRESS ? ['learningSuppression'] : value.type === ASSESSMENT_ENRICH ? ['learningEnrichment'] : value.type === ASSESSMENT_RECONCILE ? ['assessmentReconciliation'] : value.type === SOURCE_REFERENCE ? ['sourceReference'] : [], 'unsupported-command-receipt');
     insist(value.format === 'kairo-local-command-receipt' && value.version === 1 && id(rowId) && value.changeId === rowId &&
