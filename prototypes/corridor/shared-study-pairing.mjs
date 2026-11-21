@@ -1,10 +1,12 @@
 /** Study pairing: this browser as one study device of a learner's Nihongo Study record (ENGINE-ONE.3).
  *
- * A study device holds a bearer credential for the Nihongo Study server. It gets one by redeeming a 12-character
- * pairing code that an admin minted for one installation of one learner (`POST /v1/pair/redeem`). This module is the
- * part that needs no study engine: the credential's place on this device, the pairing and unpairing steps, and the
- * block Settings shows beside the voice pairing. shared-study-paired-host.mjs turns a kept credential into the bound
- * host; shared-study-boot.mjs decides at page start whether there is one.
+ * A study device holds a bearer credential for the Nihongo Study server. An admin mints a 12-character pairing code
+ * for one named installation of one learner (`bunkiweb-<32 hex>` for this app); the device presents the code with
+ * that scope (`POST /v1/pair`, the call the engine's own pairing client makes) and is answered with the scope and
+ * the credential. The installation is the admin's to name: this device never makes one up. This module is the part
+ * that needs no study engine: the credential's place on this device, the pairing and unpairing steps, and the block
+ * Settings shows beside the voice pairing. shared-study-paired-host.mjs turns a kept credential into the bound host;
+ * shared-study-boot.mjs decides at page start whether there is one.
  *
  * The server's address is not in this code (this repository is public and the server is the learner's own). It is the
  * address the voice client keeps on this device, or, on a device that knows none yet, the one the pasted pairing line
@@ -22,9 +24,13 @@ import { isVoiceServer } from './modules/voice-client.mjs';
 export const PAIRED_MARKER = 'bunki-shared-study:paired:v1';
 /** A full study device of the Bunki web app. `bunki-<32 hex>` is a speak-only voice install and is refused. */
 export const STUDY_INSTALLATION = /^bunkiweb-[a-f0-9]{32}$/;
-/** The same rule as the voice server: the learner's Worker over https, or a stand-in on this machine for tests. */
-export const isStudyServer = (value) => isVoiceServer(value);
+const LOCAL_HTTPS = /^https:\/\/(?:127\.0\.0\.1|localhost):\d{1,5}$/;
+/** A study server is what a voice server is (the learner's Worker over https, or a plain-http stand-in on this
+ * machine for tests), or this machine over https, which is how the Nihongo Study repository's own local server answers. */
+export const isStudyServer = (value) => isVoiceServer(value) || (typeof value === 'string' && value.length <= 200 && LOCAL_HTTPS.test(value));
+/** The plain-http stand-in: the one address the engine's https-only sync client has to be carried to. */
 export const isLoopbackServer = (value) => typeof value === 'string' && /^http:\/\/(?:127\.0\.0\.1|localhost):\d{1,5}$/.test(value);
+const isLocalServer = (value) => isLoopbackServer(value) || (typeof value === 'string' && LOCAL_HTTPS.test(value));
 
 const CODE = /^[A-F0-9]{12}$/;
 const ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/;
@@ -51,21 +57,25 @@ export function checkStudyCredential(token, scope) {
   return token;
 }
 
-/** What the learner gives: the 12-character code and the learner id in two boxes, or one pasted line in either box.
- * A line may carry labelled parts in any order: "… code: XXXXXXXXXXXX · learner: <id> · server: <address> ·
- * environment: <prod|dev|qa>". Resolves { code, learner } with `server` and `environment` only when the text named them. */
+/** What the learner gives: the pairing line in the first box and, when it came apart from the line, the 12-character
+ * code in the second. A line carries labelled parts in any order: "… code: XXXXXXXXXXXX · learner: <id> · device:
+ * <installation> · server: <address> · environment: <prod|dev|qa>"; the installation is also taken when it stands
+ * by itself. Resolves { code, learner, installation }, with `server` and `environment` only when the text named
+ * them. A code with no installation cannot pair (`pairing-line-required`); an installation of another kind, such as
+ * a speak-only voice install, is not a study device (`not-a-study-device`). */
 export function parseStudyPairing(input) {
   const bad = { error: 'invalid-pairing' };
   if (!input || typeof input !== 'object') return bad;
   let first = typeof input.learner === 'string' ? input.learner : '';
   let second = typeof input.code === 'string' ? input.code : '';
   if (first.length + second.length > 1000) return bad;
-  let server = null, environment = null;
+  let server = null, environment = null, installation = null;
   const take = (pattern) => {
     const found = pattern.exec(`${first}\n${second}`);
     if (!found) return null;
-    first = first.replace(found[0], ' ');
-    second = second.replace(found[0], ' ');
+    const text = found[0].replace(/^\n/u, '');
+    first = first.replace(text, ' ');
+    second = second.replace(text, ' ');
     return found[1];
   };
   const address = take(/server:\s*(\S+)/i);
@@ -78,11 +88,16 @@ export function parseStudyPairing(input) {
     environment = named.replace(/[.]+$/u, '');
     if (!ENVIRONMENTS.has(environment)) return bad;
   }
+  // the installation the code was minted for, labelled or standing by itself; taken before the code is looked for
+  installation = take(/(?:installation|device):\s*([A-Za-z0-9][A-Za-z0-9._-]*)/i) ??
+    take(/(?:^|[^A-Za-z0-9._-])((?:bunkiweb|bunki|iphone)-[a-f0-9]{32})(?![A-Za-z0-9._-])/);
+  if (installation !== null) installation = installation.replace(/[.]+$/u, '');
   let learner, code;
   const printed = take(/learner:\s*([A-Za-z0-9][A-Za-z0-9._-]*)/i);
   if (printed !== null) {
     learner = printed.replace(/[.]+$/u, '');
-    code = /(?:^|[^A-Za-z0-9])([A-Fa-f0-9]{12})(?![A-Za-z0-9])/.exec(`${first} ${second}`)?.[1] || '';
+    // the code where it stands whole in what was pasted; otherwise what the second box holds, as it was typed
+    code = /(?:^|[^A-Za-z0-9])([A-Fa-f0-9]{12})(?![A-Za-z0-9])/.exec(`${first} ${second}`)?.[1] || second;
   } else {
     learner = first.trim();
     code = second;
@@ -91,7 +106,9 @@ export function parseStudyPairing(input) {
   }
   code = code.replace(/[\s-]+/gu, '').toUpperCase();
   if (!CODE.test(code) || !ID.test(learner) || /^nsrs_/i.test(learner)) return bad;
-  return { code, learner, ...(server ? { server } : {}), ...(environment ? { environment } : {}) };
+  if (installation === null) return { error: 'pairing-line-required' };
+  if (!STUDY_INSTALLATION.test(installation)) return { error: 'not-a-study-device' };
+  return { code, learner, installation, ...(server ? { server } : {}), ...(environment ? { environment } : {}) };
 }
 
 /** Open a database only if this origin already has it. Opening by name alone would create an empty one, and an
@@ -262,19 +279,20 @@ export function createStudyPairing({ env = globalThis, fetch: fetchFn = env.fetc
     if (!isStudyServer(server)) return refuse('server-missing');
     // a code can be spent once: make sure this browser can keep what it buys before spending it
     if (!store.available || !marker.probe() || !(await store.probe())) return refuse('storage-unavailable');
-    const environment = parsed.environment || (isLoopbackServer(server) ? 'qa' : 'prod');
+    // the learner's own Worker is `prod`; a server on this machine is the repository's local one, `dev`
+    const asked = { environment: parsed.environment || (isLocalServer(server) ? 'dev' : 'prod'), learner: parsed.learner, installation: parsed.installation };
     let headers, response;
     try { headers = await compatibility(); } catch { return refuse('server-unreachable'); }
     try {
-      response = await ask(`${server}/v1/pair/redeem`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...headers },
-        body: JSON.stringify({ code: parsed.code, environment, learner: parsed.learner }) });
+      response = await ask(`${server}/v1/pair`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...headers },
+        body: JSON.stringify({ scope: asked, code: parsed.code }) });
     } catch { return refuse('server-unreachable'); }
     if (response.status !== 200) return refuse(REFUSALS.get(response.status) || (response.status >= 500 ? 'server-unavailable' : 'pairing-failed'));
     let body;
     try { body = await response.json(); } catch { return refuse('invalid-response'); }
+    // the identity is the server's answer, and the answer must be the scope that was asked for and no other
     const scope = body?.scope;
-    if (!validScope(scope) || scope.environment !== environment || scope.learner !== parsed.learner) return refuse('invalid-response');
-    if (!STUDY_INSTALLATION.test(scope.installation)) return refuse('not-a-study-device');
+    if (!validScope(scope) || ['environment', 'learner', 'installation'].some((key) => scope[key] !== asked[key])) return refuse('invalid-response');
     try { checkStudyCredential(body.token, scope); } catch { return refuse('invalid-response'); }
     try { await store.write({ server, token: body.token, scope, pairedAt: now() }); } catch { return refuse('storage-unavailable'); }
     if (!marker.set()) {
@@ -325,9 +343,9 @@ const LINES = Object.freeze({
   ended: ['サーバーがこの端末のペアリングを終了しました。同期は止まっています。この端末に残っている記録は送信されません。ペアリングを消してから、新しいコードでもう一度ペアリングしてください。',
     'The server ended this device’s pairing. Sync has stopped, and what is still on this device is not sent. Forget the pairing, then pair again with a new code.'],
   failed: ['このブラウザーの保存領域を読めませんでした。ページを読み込み直してください。', 'This browser’s storage could not be read. Reload the page.'],
-  how: ['Nihongo Study 側で表示されたペアリングの1行（コード・学習者ID・サーバー）を最初の欄に貼って「ペアリング」を押してください。コードは12文字で、10分で切れます。',
-    'Paste the pairing line shown on the Nihongo Study side (code, learner id and server) into the first box and press Pair. The code has 12 characters and lasts 10 minutes.'],
-  learner: ['学習者ID（または表示された1行）', 'Learner id (or the whole pairing line)'],
+  how: ['Nihongo Study 側で表示されたペアリングの1行（学習者ID・端末・サーバー・コード）を最初の欄にそのまま貼って「ペアリング」を押してください。12文字のコードだけ別に届いたときは、2つ目の欄に入れます。コードは10分で切れます。',
+    'Paste the whole pairing line shown on the Nihongo Study side (learner id, device, server and code) into the first box and press Pair. If the 12-character code came separately, put it in the second box. The code lasts 10 minutes.'],
+  learner: ['ペアリングの1行（学習者ID・端末・サーバー）', 'Pairing line (learner id, device and server)'],
   code: ['ペアリングコード（12文字）', 'Pairing code (12 characters)'],
   submit: ['ペアリング', 'Pair'],
   pairing: ['ペアリング中…', 'Pairing…'],
@@ -350,6 +368,8 @@ const LINES = Object.freeze({
   }),
   errors: Object.freeze({
     'invalid-pairing': ['コードか学習者IDの形が違います。確かめて、もう一度お試しください。', 'That does not look like a pairing code and learner id. Check them and try again.'],
+    'pairing-line-required': ['ペアリングの1行がそろっていません。コードだけではペアリングできません。表示された1行（学習者ID・端末・サーバー）をそのまま貼ってください。',
+      'The pairing line is incomplete. A code alone cannot pair: paste the whole line shown (learner id, device and server).'],
     'code-invalid-or-expired': ['コードが違うか、使用済みか、期限切れです。新しいコードでもう一度お試しください。', 'That code is wrong, already used or expired. Try again with a new code.'],
     'code-used': ['このコードの端末はすでにペアリング済みです。新しいコードが必要です。', 'That code belongs to a device that is already paired. A new code is needed.'],
     'pairing-refused': ['サーバーがこのペアリングを受け付けませんでした。学習者IDとコードを確かめてください。', 'The server did not accept this pairing. Check the learner id and the code.'],
@@ -412,7 +432,9 @@ export function fillStudyPairingBlock(block, { tx, el, env = globalThis, pairing
     block.dataset.paired = String(paired); block.dataset.bound = String(bound);
     state.textContent = failed ? words(LINES.failed) : !paired ? words(LINES.unpaired)
       : ended ? words(LINES.ended) : bound ? words(LINES.paired(who, installation.slice(-4))) : words(LINES.reopen);
-    const line = live?.started && !ended ? syncLine(live.state, live.error) : null;
+    // while the page is about to be opened again, the one note under the block says what happened
+    state.hidden = leaving;
+    const line = live?.started && !ended && !leaving ? syncLine(live.state, live.error) : null;
     sync.textContent = line ? words(line) : ''; sync.hidden = !line; block.dataset.sync = live?.started ? live.state : '';
     form.hidden = paired || failed || leaving;
     reopen.hidden = !(paired && !ended && !bound) || leaving;
@@ -434,7 +456,7 @@ export function fillStudyPairingBlock(block, { tx, el, env = globalThis, pairing
     busy = false;
     if (answer.ok) {
       learner.input.value = ''; code.input.value = '';
-      block.dataset.paired = 'true';
+      current = { ...current, failed: false, paired: true, ended: false, learner: answer.learner, installation: answer.installation, marked: true };
       leave(LINES.done(answer.learner));
     } else { note.textContent = words(studyPairingLine(answer.code)); block.dataset.refused = answer.code; paint(); }
   });
@@ -447,8 +469,10 @@ export function fillStudyPairingBlock(block, { tx, el, env = globalThis, pairing
     try { await host?.dispose?.(); } catch { /* the page is about to be reopened */ }
     const answer = await pairing.unpair();
     busy = false; sure = false;
-    if (answer.ok) leave(LINES.forgotten);
-    else { note.textContent = words(studyPairingLine(answer.code)); block.append(note); paint(); }
+    if (answer.ok) {
+      current = { ...current, paired: false, ended: false, learner: null, installation: null, marked: false };
+      leave(LINES.forgotten);
+    } else { note.textContent = words(studyPairingLine(answer.code)); block.append(note); paint(); }
   });
   block.replaceChildren(name, state, sync, form, reopen, forgetWhat, forget);
   block.dataset.state = 'loading';

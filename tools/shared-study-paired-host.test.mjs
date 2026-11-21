@@ -2,9 +2,9 @@
 /** The paired study host against a double of the Nihongo Study server (ENGINE-ONE.3).
  *
  * Everything here is synthetic: a test learner, made-up codes and tokens, an in-process server that answers the
- * documented routes (`/v1/pair/redeem`, `/v1/events`, `/v1/permits`), and memory storage. Nothing leaves the process.
- * The second device of the same learner is the engine's own sync client, driven directly, so a grade is proven to
- * cross between Bunki's host and a client that shares none of the host's code.
+ * routes a study device uses (`/v1/pair`, `/v1/events`, `/v1/permits`), and memory storage. Nothing leaves the
+ * process. The second device of the same learner is the engine's own sync client, driven directly, so a grade is
+ * proven to cross between Bunki's host and a client that shares none of the host's code.
  *
  * `BUNKI_PAIRED_HOST_ROOT` points the suite at another copy of prototypes/corridor: the negative controls
  * (tools/shared-study-paired-host-controls.test.mjs) plant one fault per guarantee there and require a red. */
@@ -34,8 +34,14 @@ const root = process.env.BUNKI_PAIRED_HOST_ROOT
   : source;
 const pairingModule = await import(new URL('shared-study-pairing.mjs', root).href);
 const hostModule = await import(new URL('shared-study-paired-host.mjs', root).href);
-const { createStudyPairing, parseStudyPairing, studyMarker, PAIRED_MARKER, studyPairingLine } =
-  pairingModule;
+const {
+  createStudyPairing,
+  parseStudyPairing,
+  isStudyServer,
+  studyMarker,
+  PAIRED_MARKER,
+  studyPairingLine,
+} = pairingModule;
 const { openPairedStudyHost, studyTransportBridge, pairedReplicaName } = hostModule;
 
 const fixture = JSON.parse(
@@ -65,10 +71,15 @@ const content = {
 /** A stand-in on this machine: the only class of plain-http address the product accepts. Nothing listens there. */
 const SERVER = 'http://127.0.0.1:8787';
 const LEARNER = 'test-paired-learner';
-const ENVIRONMENT = 'qa';
+/** What a server on this machine is taken to be when the pairing line names no environment. */
+const ENVIRONMENT = 'dev';
 const hex = (bytes) => randomBytes(bytes).toString('hex');
 const studyInstallation = () => `bunkiweb-${hex(16)}`;
 const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
+const tokenFor = (scope) =>
+  `nsrs_${scope.environment === 'prod' ? 'prod' : 'dev'}_${Buffer.from(
+    JSON.stringify([scope.environment, scope.learner, scope.installation]),
+  ).toString('base64url')}.${hex(32)}`;
 
 /** The server double: one learner's ledger, pairing codes, device tokens and permit grants. */
 function createServer({ now }) {
@@ -81,8 +92,8 @@ function createServer({ now }) {
     unreachable: false,
     loseUploadReply: false,
     reducer: SYNC_COMPATIBILITY.reducerSha256,
-    redeemScope: null,
-    redeemToken: null,
+    answerScope: null,
+    answerToken: null,
     refusePermits: false,
   };
   const answer = (url, status, value) => {
@@ -92,12 +103,6 @@ function createServer({ now }) {
     });
     Object.defineProperty(response, 'url', { value: url, configurable: true });
     return response;
-  };
-  const mint = (scope) => {
-    const tuple = Buffer.from(
-      JSON.stringify([scope.environment, scope.learner, scope.installation]),
-    ).toString('base64url');
-    return `nsrs_${scope.environment === 'prod' ? 'prod' : 'dev'}_${tuple}.${hex(32)}`;
   };
   function grant(installation, count) {
     const seq = rows.length + 1;
@@ -139,31 +144,37 @@ function createServer({ now }) {
       headers['X-NSRS-Reducer-SHA256'] === knobs.reducer
         ? null
         : answer(url, 426, { error: 'update-required' });
-    if (target.pathname === '/v1/pair/redeem' && init.method === 'POST') {
+    if (target.pathname === '/v1/pair' && init.method === 'POST') {
       const mismatch = stale();
       if (mismatch) return mismatch;
       const body = JSON.parse(init.body);
+      const scope = body?.scope;
       if (
-        Object.keys(body).sort().join('|') !== 'code|environment|learner' ||
-        body.environment !== ENVIRONMENT
+        Object.keys(body).sort().join('|') !== 'code|scope' ||
+        Object.keys(scope || {})
+          .sort()
+          .join('|') !== 'environment|installation|learner' ||
+        scope.environment !== ENVIRONMENT
       )
         return answer(url, 400, { error: 'invalid-pairing' });
       const code = codes.get(body.code);
-      if (!code || code.consumed || code.expiresAt <= now() || code.learner !== body.learner)
+      // the code belongs to one installation of one learner: any other scope is refused like a wrong code
+      if (
+        !code ||
+        code.consumed ||
+        code.expiresAt <= now() ||
+        code.learner !== scope.learner ||
+        code.installation !== scope.installation
+      )
         return answer(url, 401, { error: 'authentication-required' });
       if ([...tokens.values()].some((row) => row.scope.installation === code.installation))
         return answer(url, 409, { error: 'installation-exists' });
       code.consumed = true;
-      const scope = {
-        environment: ENVIRONMENT,
-        learner: code.learner,
-        installation: code.installation,
-      };
-      const token = mint(scope);
+      const token = tokenFor(scope);
       tokens.set(token, { scope, revoked: false });
       return answer(url, 200, {
-        scope: knobs.redeemScope ? { ...scope, ...knobs.redeemScope } : scope,
-        token: knobs.redeemToken ?? token,
+        scope: knobs.answerScope ? { ...scope, ...knobs.answerScope } : scope,
+        token: knobs.answerToken ?? token,
       });
     }
     const bearer = /^Bearer (.+)$/.exec(headers.Authorization || '')?.[1];
@@ -226,7 +237,7 @@ function createServer({ now }) {
     log,
     knobs,
     tokens,
-    /** An admin mints a code for one installation of the learner. */
+    /** An admin mints a code for one named installation of the learner. */
     code({ installation = studyInstallation(), learner = LEARNER, lastsMs = 600000 } = {}) {
       const code = hex(6).toUpperCase();
       codes.set(code, { learner, installation, expiresAt: now() + lastsMs, consumed: false });
@@ -316,6 +327,12 @@ function memoryLocalStorage({ refuse = false } = {}) {
   };
 }
 
+/** The line the learner pastes: the code, the learner, the device the code was minted for, and the server. */
+const pairLine = (minted, server = SERVER) => ({
+  learner: `Bunki study code: ${minted.code} (10 minutes) · learner: ${LEARNER} · device: ${minted.installation} · server: ${server}`,
+  code: '',
+});
+
 /** One browser profile: its credential store, flag, replica databases, and a network that can be cut. */
 function createWorld({ voiceServer = null, refuseFlag = false } = {}) {
   let clock = Date.parse('2026-11-21T03:00:00Z');
@@ -327,6 +344,7 @@ function createWorld({ voiceServer = null, refuseFlag = false } = {}) {
   const replicas = new Map();
   const opened = [];
   const state = { online: true };
+  const compatibility = async () => ({ 'X-NSRS-Reducer-SHA256': SYNC_COMPATIBILITY.reducerSha256 });
   const pairing = createStudyPairing({
     env: {},
     fetch: server.fetch,
@@ -334,7 +352,7 @@ function createWorld({ voiceServer = null, refuseFlag = false } = {}) {
     voiceAddress: async () => voiceServer,
     marker,
     now,
-    compatibility: async () => ({ 'X-NSRS-Reducer-SHA256': SYNC_COMPATIBILITY.reducerSha256 }),
+    compatibility,
   });
   const openHost = (overrides = {}) =>
     openPairedStudyHost({
@@ -370,12 +388,13 @@ function createWorld({ voiceServer = null, refuseFlag = false } = {}) {
     opened,
     state,
     pairing,
+    compatibility,
     openHost,
     bind,
     /** Pair this profile with a fresh code, open its host and fetch the record once. */
     async paired() {
       const minted = server.code();
-      const answer = await pairing.pair(pairLine(minted.code));
+      const answer = await pairing.pair(pairLine(minted));
       assert.deepEqual(answer, { ok: true, learner: LEARNER, installation: minted.installation });
       const host = await openHost();
       const adapter = await bind(host);
@@ -383,10 +402,6 @@ function createWorld({ voiceServer = null, refuseFlag = false } = {}) {
     },
   };
 }
-const pairLine = (code, extra = '') => ({
-  learner: `Bunki study code: ${code} (10 minutes) · learner: ${LEARNER} · server: ${SERVER}${extra}`,
-  code: '',
-});
 
 async function grade(backend, key, rating) {
   const attempt = backend.snapshotAttempt(key);
@@ -401,14 +416,17 @@ const reviews = (backend) => backend.readProjection().reviews;
 async function engineDevice(world) {
   const { server, now } = world;
   const minted = server.code({ installation: `iphone-${hex(16)}` });
-  const redeemed = await (
-    await server.fetch(`${SERVER}/v1/pair/redeem`, {
+  const paired = await (
+    await server.fetch(`${SERVER}/v1/pair`, {
       method: 'POST',
       headers: { 'X-NSRS-Reducer-SHA256': SYNC_COMPATIBILITY.reducerSha256 },
-      body: JSON.stringify({ code: minted.code, environment: ENVIRONMENT, learner: LEARNER }),
+      body: JSON.stringify({
+        scope: { environment: ENVIRONMENT, learner: LEARNER, installation: minted.installation },
+        code: minted.code,
+      }),
     })
   ).json();
-  const scope = redeemed.scope;
+  const scope = paired.scope;
   const engine = createStudyEngine({ content, learner: scope.learner, timezone: 'Asia/Tokyo' });
   const store = await engine.createFreshStore({
     adapter: createMemoryAdapter(),
@@ -422,7 +440,7 @@ async function engineDevice(world) {
   const transport = createSyncTransport({
     store,
     origin: alias,
-    getCredential: () => redeemed.token,
+    getCredential: () => paired.token,
     now,
     maxRetries: 0,
     fetch: async (url, init) => {
@@ -431,9 +449,10 @@ async function engineDevice(world) {
       return response;
     },
   });
+  let backend = null;
   const sync = async () => {
     const result = await transport.sync();
-    await backend.refresh();
+    await backend?.refresh();
     return result;
   };
   const reserve = async () => {
@@ -447,7 +466,7 @@ async function engineDevice(world) {
       const response = await server.fetch(`${SERVER}/v1/permits`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${redeemed.token}`,
+          Authorization: `Bearer ${paired.token}`,
           'X-NSRS-Reducer-SHA256': SYNC_COMPATIBILITY.reducerSha256,
         },
         body: JSON.stringify({
@@ -461,26 +480,27 @@ async function engineDevice(world) {
     }
     return sync();
   };
-  const backend = await engine.connect({ store, transport: { reserveNewPermits: reserve }, now });
+  backend = await engine.connect({ store, transport: { reserveNewPermits: reserve }, now });
   return { scope, store, backend, sync, reserve };
 }
 
 test('pair: one request to the configured server, the credential kept, the host bound to the server’s identity', async () => {
   const world = createWorld();
   const minted = world.server.code();
-  const answer = await world.pairing.pair(pairLine(minted.code));
+  const answer = await world.pairing.pair(pairLine(minted));
   assert.deepEqual(answer, { ok: true, learner: LEARNER, installation: minted.installation });
   assert.equal(world.server.log.length, 1);
   const [request] = world.server.log;
-  assert.equal(request.url, `${SERVER}/v1/pair/redeem`);
+  assert.equal(request.url, `${SERVER}/v1/pair`);
   assert.equal(request.method, 'POST');
+  // exactly the two headers the server's preflight allows for this route, and no credential
+  assert.deepEqual(Object.keys(request.headers).sort(), ['Content-Type', 'X-NSRS-Reducer-SHA256']);
   assert.equal(request.headers['Content-Type'], 'application/json');
   assert.equal(request.headers['X-NSRS-Reducer-SHA256'], SYNC_COMPATIBILITY.reducerSha256);
-  assert.equal(request.headers.Authorization, undefined);
+  // the installation is the one the code was minted for: the device sends it, it does not make one
   assert.deepEqual(JSON.parse(request.body), {
+    scope: { environment: ENVIRONMENT, learner: LEARNER, installation: minted.installation },
     code: minted.code,
-    environment: ENVIRONMENT,
-    learner: LEARNER,
   });
   assert.deepEqual(
     [request.credentials, request.redirect, request.cache],
@@ -524,7 +544,93 @@ test('pair: one request to the configured server, the credential kept, the host 
     state: 'up-to-date',
     error: null,
   });
+  // every sync request carries the credential and the replica's capability, and a GET nothing more
+  const pull = world.server.log.find((row) => row.url.startsWith(`${SERVER}/v1/events?`));
+  assert.deepEqual(Object.keys(pull.headers).sort(), ['Authorization', 'X-NSRS-Reducer-SHA256']);
   await host.dispose();
+});
+
+test('the pairing line: the code, the learner and the device in any order, in one box or two; a code alone cannot pair', () => {
+  const code = 'ABCDEF012345';
+  const device = studyInstallation();
+  const whole = { code, learner: LEARNER, installation: device };
+  assert.deepEqual(
+    parseStudyPairing({
+      learner: `Bunki study code: ${code} (10 minutes) · learner: ${LEARNER} · device: ${device} · server: ${SERVER}`,
+      code: '',
+    }),
+    { ...whole, server: SERVER },
+  );
+  // the line without its code in the first box, the code typed with spaces and a hyphen in the second
+  assert.deepEqual(
+    parseStudyPairing({
+      learner: `learner: ${LEARNER} · installation: ${device} · server: ${SERVER}/ · environment: dev`,
+      code: 'abcd ef01-2345',
+    }),
+    { ...whole, server: SERVER, environment: 'dev' },
+  );
+  // the parts with no labels: the learner id, the device by itself, the code in its own box
+  assert.deepEqual(parseStudyPairing({ learner: `${LEARNER} ${device}`, code }), whole);
+  assert.deepEqual(parseStudyPairing({ learner: LEARNER, code: `${device} ${code}` }), whole);
+  // this machine over https is a server address too (the Nihongo Study repository's local server)
+  assert.equal(
+    parseStudyPairing({
+      learner: `learner: ${LEARNER} · device: ${device} · server: https://127.0.0.1:8443`,
+      code,
+    }).server,
+    'https://127.0.0.1:8443',
+  );
+  for (const address of [
+    'https://127.0.0.1:8443',
+    'https://localhost:8443',
+    SERVER,
+    'https://study.example.workers.dev',
+  ])
+    assert.equal(isStudyServer(address), true, address);
+  for (const address of [
+    'https://study.example.invalid',
+    'https://127.0.0.1',
+    'https://127.0.0.1:8443/path',
+    'https://127.0.0.1.evil.example:8443',
+    'http://192.168.1.20:8787',
+    'https://user@127.0.0.1:8443',
+  ])
+    assert.equal(isStudyServer(address), false, address);
+  // a code and a learner with no device: the installation is the admin's to name, never this device's to make up
+  assert.deepEqual(parseStudyPairing({ learner: LEARNER, code }), {
+    error: 'pairing-line-required',
+  });
+  assert.deepEqual(
+    parseStudyPairing({ learner: `learner: ${LEARNER} · server: ${SERVER}`, code }),
+    {
+      error: 'pairing-line-required',
+    },
+  );
+  // a device of another kind is not a study device
+  for (const other of [`bunki-${hex(16)}`, `iphone-${hex(16)}`])
+    assert.deepEqual(
+      parseStudyPairing({ learner: `learner: ${LEARNER} · device: ${other}`, code }),
+      {
+        error: 'not-a-study-device',
+      },
+    );
+  assert.deepEqual(parseStudyPairing({ learner: `${LEARNER} bunki-${hex(16)}`, code }), {
+    error: 'not-a-study-device',
+  });
+  for (const input of [
+    null,
+    {},
+    { learner: `learner: ${LEARNER} · device: ${device}`, code: 'ABCDEF01234' },
+    { learner: `learner: nsrs_x · device: ${device}`, code },
+    {
+      learner: `learner: ${LEARNER} · device: ${device} · server: https://study.example.invalid`,
+      code,
+    },
+    { learner: `learner: ${LEARNER} · device: ${device} · environment: staging`, code },
+  ])
+    assert.deepEqual(parseStudyPairing(input), { error: 'invalid-pairing' });
+  assert.equal(studyPairingLine('pairing-line-required').length, 2);
+  assert.notDeepEqual(studyPairingLine('pairing-line-required'), studyPairingLine('no-such-code'));
 });
 
 test('pair: the two boxes work as well as the pasted line, on a device the voice pairing already set up', async () => {
@@ -532,23 +638,16 @@ test('pair: the two boxes work as well as the pasted line, on a device the voice
   const minted = world.server.code();
   const spaced =
     `${minted.code.slice(0, 4)} ${minted.code.slice(4, 8)}-${minted.code.slice(8)}`.toLowerCase();
-  assert.deepEqual(await world.pairing.pair({ learner: LEARNER, code: spaced }), {
-    ok: true,
-    learner: LEARNER,
-    installation: minted.installation,
-  });
-  assert.equal(world.store.peek().server, SERVER);
-  assert.deepEqual(parseStudyPairing({ learner: `${LEARNER} ${minted.code}`, code: '' }), {
-    code: minted.code,
-    learner: LEARNER,
-  });
+  // no server in what is typed: the address is the one the voice client keeps
   assert.deepEqual(
-    parseStudyPairing({
-      learner: '',
-      code: `environment: dev · server: ${SERVER}/ · learner: ${LEARNER} · code: ${minted.code}`,
+    await world.pairing.pair({
+      learner: `learner: ${LEARNER} · device: ${minted.installation}`,
+      code: spaced,
     }),
-    { code: minted.code, learner: LEARNER, server: SERVER, environment: 'dev' },
+    { ok: true, learner: LEARNER, installation: minted.installation },
   );
+  assert.equal(world.store.peek().server, SERVER);
+  assert.equal(world.server.log[0].url, `${SERVER}/v1/pair`);
 });
 
 for (const [name, arrange, expected] of [
@@ -564,6 +663,11 @@ for (const [name, arrange, expected] of [
       world.advance(2000);
       return minted;
     },
+    'code-invalid-or-expired',
+  ],
+  [
+    'a code presented for another device than the one it was minted for',
+    (world) => ({ ...world.server.code(), installation: studyInstallation() }),
     'code-invalid-or-expired',
   ],
   [
@@ -602,7 +706,11 @@ for (const [name, arrange, expected] of [
   [
     'a token that names another scope',
     (world) => {
-      world.server.knobs.redeemToken = `nsrs_dev_${Buffer.from(JSON.stringify([ENVIRONMENT, 'test-someone-else', studyInstallation()])).toString('base64url')}.${hex(32)}`;
+      world.server.knobs.answerToken = tokenFor({
+        environment: ENVIRONMENT,
+        learner: 'test-someone-else',
+        installation: studyInstallation(),
+      });
       return world.server.code();
     },
     'invalid-response',
@@ -612,8 +720,27 @@ for (const [name, arrange, expected] of [
     (world) => {
       // the answer agrees with itself (scope and token name the same other learner), only not with the question
       const minted = world.server.code();
-      world.server.knobs.redeemScope = { learner: 'test-someone-else' };
-      world.server.knobs.redeemToken = `nsrs_dev_${Buffer.from(JSON.stringify([ENVIRONMENT, 'test-someone-else', minted.installation])).toString('base64url')}.${hex(32)}`;
+      world.server.knobs.answerScope = { learner: 'test-someone-else' };
+      world.server.knobs.answerToken = tokenFor({
+        environment: ENVIRONMENT,
+        learner: 'test-someone-else',
+        installation: minted.installation,
+      });
+      return minted;
+    },
+    'invalid-response',
+  ],
+  [
+    'an answer for another device than the one asked for',
+    (world) => {
+      const minted = world.server.code();
+      const other = studyInstallation();
+      world.server.knobs.answerScope = { installation: other };
+      world.server.knobs.answerToken = tokenFor({
+        environment: ENVIRONMENT,
+        learner: LEARNER,
+        installation: other,
+      });
       return minted;
     },
     'invalid-response',
@@ -622,7 +749,7 @@ for (const [name, arrange, expected] of [
   test(`pair refused: ${name} says ${expected} and keeps nothing`, async () => {
     const world = createWorld();
     const minted = arrange(world);
-    const answer = await world.pairing.pair(pairLine(minted.code));
+    const answer = await world.pairing.pair(pairLine(minted));
     assert.deepEqual(answer, { ok: false, code: expected });
     assert.equal(world.store.peek(), null);
     assert.deepEqual(world.store.calls, []);
@@ -633,6 +760,8 @@ for (const [name, arrange, expected] of [
     if (expected === 'invalid-response')
       assert.deepEqual(studyPairingLine(expected), studyPairingLine('no-such-code'));
     else assert.notDeepEqual(studyPairingLine(expected), studyPairingLine('no-such-code'));
+    // a device of another kind is turned away before anything is sent
+    if (expected === 'not-a-study-device') assert.equal(world.server.log.length, 0);
     await assert.rejects(world.openHost(), /study-pairing-missing/);
   });
 }
@@ -640,7 +769,7 @@ for (const [name, arrange, expected] of [
 test('pair refused: a flag this browser cannot keep undoes the pairing, so nothing is half kept', async () => {
   const world = createWorld({ refuseFlag: true });
   const minted = world.server.code();
-  assert.deepEqual(await world.pairing.pair(pairLine(minted.code)), {
+  assert.deepEqual(await world.pairing.pair(pairLine(minted)), {
     ok: false,
     code: 'storage-unavailable',
   });
@@ -658,12 +787,9 @@ test('pair refused: a flag this browser cannot keep undoes the pairing, so nothi
     store: late.store,
     voiceAddress: async () => null,
     marker: flaky,
-    compatibility: async () => ({ 'X-NSRS-Reducer-SHA256': SYNC_COMPATIBILITY.reducerSha256 }),
+    compatibility: late.compatibility,
   });
-  assert.deepEqual(await pairing.pair(pairLine(again.code)), {
-    ok: false,
-    code: 'storage-unavailable',
-  });
+  assert.deepEqual(await pairing.pair(pairLine(again)), { ok: false, code: 'storage-unavailable' });
   assert.equal(late.store.peek(), null);
   assert.deepEqual(late.store.calls, ['write', 'clear']);
 });
@@ -672,29 +798,21 @@ test('pairing goes to the server this device is set up for, or nowhere', async (
   const other = 'http://127.0.0.1:9999';
   // the voice client keeps one address: a line that names another is refused before anything is sent
   const voice = createWorld({ voiceServer: SERVER });
-  const minted = voice.server.code();
-  const refused = await voice.pairing.pair({
-    learner: `code: ${minted.code} · learner: ${LEARNER} · server: ${other}`,
-    code: '',
-  });
+  const refused = await voice.pairing.pair(pairLine(voice.server.code(), other));
   assert.deepEqual(refused, { ok: false, code: 'server-mismatch' });
   assert.equal(voice.server.log.length, 0);
   assert.equal(voice.store.peek(), null);
 
-  // an address that is not a server address at all never parses (the placeholder host of the brief)
-  assert.deepEqual(
-    parseStudyPairing({
-      learner: `${minted.code} learner: ${LEARNER} server: https://study.example.invalid`,
-      code: '',
-    }),
-    { error: 'invalid-pairing' },
-  );
   // a device that knows no server and is given none asks nobody
   const blank = createWorld();
-  assert.deepEqual(await blank.pairing.pair({ learner: LEARNER, code: blank.server.code().code }), {
-    ok: false,
-    code: 'server-missing',
-  });
+  const unaddressed = blank.server.code();
+  assert.deepEqual(
+    await blank.pairing.pair({
+      learner: `${LEARNER} ${unaddressed.installation}`,
+      code: unaddressed.code,
+    }),
+    { ok: false, code: 'server-missing' },
+  );
   assert.equal(blank.server.log.length, 0);
 
   // after an unpair the address this device paired with is the one it is set up for
@@ -703,18 +821,15 @@ test('pairing goes to the server this device is set up for, or nowhere', async (
   await first.host.dispose();
   assert.deepEqual(await kept.pairing.unpair(), { ok: true });
   const before = kept.server.log.length;
-  assert.deepEqual(
-    await kept.pairing.pair({
-      learner: `code: ${kept.server.code().code} · learner: ${LEARNER} · server: ${other}`,
-      code: '',
-    }),
-    { ok: false, code: 'server-mismatch' },
-  );
+  assert.deepEqual(await kept.pairing.pair(pairLine(kept.server.code(), other)), {
+    ok: false,
+    code: 'server-mismatch',
+  });
   assert.equal(kept.server.log.length, before);
   // a device that is paired does not pair over itself
   const twice = createWorld();
   const held = await twice.paired();
-  assert.deepEqual(await twice.pairing.pair(pairLine(twice.server.code().code)), {
+  assert.deepEqual(await twice.pairing.pair(pairLine(twice.server.code())), {
     ok: false,
     code: 'already-paired',
   });
@@ -728,6 +843,7 @@ test('the transport carries the credential to the one server and refuses every o
     seen.push(url);
     return { status: 200, headers: new Map(), body: null, redirected: false, url, init };
   };
+  // the plain-http stand-in: the engine's https-only client is given the https form and carried to the real one
   const loopback = studyTransportBridge(SERVER, fetchFn);
   assert.equal(loopback.origin, 'https://127.0.0.1:8787');
   const carried = await loopback.fetch('https://127.0.0.1:8787/v1/events?after=0&limit=1000', {});
@@ -752,16 +868,20 @@ test('the transport carries the credential to the one server and refuses every o
   assert.equal(strayed.redirected, true);
   assert.equal(strayed.url, 'http://127.0.0.1:9999/elsewhere');
 
-  const worker = 'https://study.example.workers.dev';
-  const direct = studyTransportBridge(worker, fetchFn);
-  assert.equal(direct.origin, worker);
-  await direct.fetch(`${worker}/v1/events`, {});
-  assert.equal(seen.at(-1), `${worker}/v1/events`);
-  await assert.rejects(
-    direct.fetch('https://study.example.workers.dev.evil.example/v1/events', {}),
-    /study-origin-refused/,
-  );
-  assert.equal(seen.length, 2);
+  // an https server, on this machine or the learner's own, is asked directly, and only it
+  for (const direct of ['https://127.0.0.1:8443', 'https://study.example.workers.dev']) {
+    const before = seen.length;
+    const bridge = studyTransportBridge(direct, fetchFn);
+    assert.equal(bridge.origin, direct);
+    await bridge.fetch(`${direct}/v1/events`, {});
+    assert.equal(seen.at(-1), `${direct}/v1/events`);
+    await assert.rejects(
+      bridge.fetch(`${direct}.evil.example/v1/events`, {}),
+      /study-origin-refused/,
+    );
+    await assert.rejects(bridge.fetch(`${SERVER}/v1/events`, {}), /study-origin-refused/);
+    assert.equal(seen.length, before + 1);
+  }
   assert.throws(
     () => studyTransportBridge('https://study.example.invalid', fetchFn),
     /study-pairing-malformed/,
@@ -773,14 +893,18 @@ test('a grade crosses both ways between Bunki and a second device of the same le
   const bunki = await world.paired();
   const other = await engineDevice(world);
   // new-card permits come from the server, with the device's own credential
-  const permitsBefore = world.server.log.filter((row) => row.url === `${SERVER}/v1/permits`).length;
+  const permits = () => world.server.log.filter((row) => row.url === `${SERVER}/v1/permits`);
+  assert.equal(permits().length, 0);
   const reserved = await bunki.adapter.platform.requestNewCards();
   assert.equal(reserved.error ?? null, null);
-  const permit = world.server.log.filter((row) => row.url === `${SERVER}/v1/permits`).at(-1);
-  assert.equal(
-    world.server.log.filter((row) => row.url === `${SERVER}/v1/permits`).length,
-    permitsBefore + 1,
-  );
+  assert.equal(permits().length, 1);
+  const permit = permits()[0];
+  // the three headers the server's preflight allows for this route
+  assert.deepEqual(Object.keys(permit.headers).sort(), [
+    'Authorization',
+    'Content-Type',
+    'X-NSRS-Reducer-SHA256',
+  ]);
   assert.equal(permit.headers.Authorization, `Bearer ${world.server.tokenOf(bunki.installation)}`);
   assert.equal(permit.headers['X-NSRS-Reducer-SHA256'], SYNC_COMPATIBILITY.reducerSha256);
   assert.deepEqual(JSON.parse(permit.body).scope, {
@@ -898,7 +1022,7 @@ test('a restart keeps the installation and the journal, sent or not', async () =
 test('a first open needs the record: with no connection it is refused, and the next try with one goes through', async () => {
   const world = createWorld();
   const minted = world.server.code();
-  await world.pairing.pair(pairLine(minted.code));
+  await world.pairing.pair(pairLine(minted));
   world.state.online = false;
   const host = await world.openHost();
   await assert.rejects(world.bind(host), (error) => {
@@ -1059,7 +1183,7 @@ test('unpair: the credential and the flag go, sync stops, the copy of the record
   });
   const state = await store.readState();
   assert.ok(Object.values(state.canonical).some((row) => row.event.id === made.result.eventId));
-  // a new pairing is a new installation with a copy of its own
+  // a new pairing is a new installation, the admin's again, with a copy of its own
   const next = await world.paired();
   assert.notEqual(next.installation, bunki.installation);
   assert.equal(world.replicas.size, 2);
@@ -1120,7 +1244,7 @@ test('the credential is nowhere but the Authorization header of requests to its 
 });
 
 /** shared-study-boot.mjs acts once, at import, on the page's globals: each case is a process of its own. */
-function boot({ marked, credential }) {
+function boot({ marked }) {
   const script = `
     const kept = new Map(${marked ? `[[${JSON.stringify(PAIRED_MARKER)}, '1']]` : ''});
     const reloads = [];
@@ -1130,7 +1254,7 @@ function boot({ marked, credential }) {
     await import(${JSON.stringify(new URL('shared-study-boot.mjs', root).href)});
     const host = globalThis.bunkiSharedStudyHost;
     const out = { bound: !!host, kind: host?.kind ?? null, block: typeof globalThis.bunkiStudyPairing?.settingsBlock };
-    if (host && ${JSON.stringify(credential)} === 'none') {
+    if (host) {
       out.status = host.status();
       out.refusal = await host.withAdapter(() => { throw new Error('unreachable'); }).then(() => 'opened', (error) => error.code);
       out.after = { bound: !!globalThis.bunkiSharedStudyHost, marked: kept.has(${JSON.stringify(PAIRED_MARKER)}), reloads: reloads.length };
@@ -1145,15 +1269,253 @@ function boot({ marked, credential }) {
 }
 
 test('page start: no flag binds nothing; a flag binds the host; a flag with no pairing behind it is taken away', () => {
-  assert.deepEqual(boot({ marked: false, credential: 'none' }), {
-    bound: false,
-    kind: null,
-    block: 'function',
-  });
-  const marked = boot({ marked: true, credential: 'none' });
+  assert.deepEqual(boot({ marked: false }), { bound: false, kind: null, block: 'function' });
+  const marked = boot({ marked: true });
   assert.equal(marked.bound, true);
   assert.equal(marked.kind, 'bunki-paired-study/v1');
   assert.deepEqual(marked.status, { started: false, ended: false, state: 'idle', error: null });
   assert.equal(marked.refusal, 'study-pairing-missing');
   assert.deepEqual(marked.after, { bound: false, marked: false, reloads: 1 });
+});
+
+/** As much of a page as the Settings block touches: elements that keep what is set on them, events that can be
+ * fired, a timer that is held and a reload that is counted. The block in a real browser is the browser test's part. */
+function pageDouble({ english = true } = {}) {
+  const element = (tag) => {
+    const handlers = new Map();
+    return {
+      tag,
+      className: '',
+      id: '',
+      textContent: '',
+      value: '',
+      hidden: false,
+      disabled: false,
+      isConnected: true,
+      dataset: {},
+      attributes: {},
+      children: [],
+      parent: null,
+      setAttribute(name, value) {
+        this.attributes[name] = String(value);
+      },
+      append(...nodes) {
+        for (const node of nodes) {
+          if (node.parent)
+            node.parent.children = node.parent.children.filter((kept) => kept !== node);
+          node.parent = this;
+          this.children.push(node);
+        }
+      },
+      replaceChildren(...nodes) {
+        for (const node of this.children) node.parent = null;
+        this.children = [];
+        this.append(...nodes);
+      },
+      addEventListener(type, handler) {
+        handlers.set(type, [...(handlers.get(type) || []), handler]);
+      },
+      fire(type) {
+        return Promise.all(
+          (handlers.get(type) || []).map((handler) => handler({ preventDefault() {} })),
+        );
+      },
+    };
+  };
+  const timers = [];
+  const reloads = [];
+  const find = (node, id) =>
+    node.id === id ? node : node.children.map((child) => find(child, id)).find(Boolean) || null;
+  const said = (node) => [
+    node.textContent,
+    node.value,
+    ...Object.values(node.dataset),
+    ...node.children.flatMap((child) => said(child)),
+  ];
+  return {
+    tx: (ja, en) => (english ? en : ja),
+    el(tag, className, text) {
+      const node = element(tag);
+      node.className = className || '';
+      if (text !== undefined && text !== null) node.textContent = text;
+      return node;
+    },
+    env: {
+      setTimeout: (run, ms) => void timers.push({ run, ms }),
+      location: { reload: () => void reloads.push(1) },
+    },
+    timers,
+    reloads,
+    find,
+    said: (node) => said(node).join('\n'),
+  };
+}
+/** Whether the learner would see `node`: neither it nor anything it stands in is hidden. */
+const seen = (node) => {
+  for (let at = node; at; at = at.parent) if (at.hidden) return false;
+  return true;
+};
+async function settingsBlock(world, host, english = true) {
+  const page = pageDouble({ english });
+  const block = page.el('div', 'settings-study-device');
+  await pairingModule.fillStudyPairingBlock(block, {
+    tx: page.tx,
+    el: page.el,
+    env: page.env,
+    pairing: world.pairing,
+    host,
+  });
+  return { page, block, at: (id) => page.find(block, id) };
+}
+
+test('Settings: the form, a refusal in plain words in the page’s language, and a pairing that says so and reopens the page', async () => {
+  const world = createWorld();
+  const { page, block, at } = await settingsBlock(world, null);
+  assert.equal(block.dataset.state, 'unpaired');
+  assert.equal(block.dataset.paired, 'false');
+  assert.equal(seen(at('study-pair-form')), true);
+  assert.equal(seen(at('study-unpair')), false);
+  assert.equal(seen(at('study-pair-reopen')), false);
+  assert.match(at('study-pair-status').textContent, /not connected to a Nihongo Study record yet/);
+
+  const wrong = pairLine({ ...world.server.code(), code: 'ABCDEF012345' }).learner;
+  at('study-pair-learner').value = wrong;
+  await at('study-pair-form').fire('submit');
+  assert.equal(block.dataset.refused, 'code-invalid-or-expired');
+  assert.equal(at('study-pair-note').textContent, studyPairingLine('code-invalid-or-expired')[1]);
+  assert.equal(block.dataset.state, 'unpaired');
+  assert.equal(seen(at('study-pair-form')), true);
+  assert.equal(world.store.peek(), null);
+  assert.deepEqual(page.timers, []);
+  // a code typed alone, as the form's second box invites: the block says what is missing
+  at('study-pair-learner').value = '';
+  at('study-pair-code').value = 'ABCDEF012345';
+  await at('study-pair-form').fire('submit');
+  assert.equal(block.dataset.refused, 'invalid-pairing');
+  at('study-pair-learner').value = LEARNER;
+  await at('study-pair-form').fire('submit');
+  assert.equal(block.dataset.refused, 'pairing-line-required');
+  assert.match(at('study-pair-note').textContent, /A code alone cannot pair/);
+  at('study-pair-code').value = '';
+
+  const japanese = await settingsBlock(world, null, false);
+  japanese.at('study-pair-learner').value = wrong;
+  await japanese.at('study-pair-form').fire('submit');
+  assert.equal(
+    japanese.at('study-pair-note').textContent,
+    studyPairingLine('code-invalid-or-expired')[0],
+  );
+  assert.match(
+    japanese.at('study-pair-status').textContent,
+    /Nihongo Study の記録につながっていません/,
+  );
+  assert.notEqual(
+    studyPairingLine('code-invalid-or-expired')[0],
+    studyPairingLine('code-invalid-or-expired')[1],
+  );
+
+  const minted = world.server.code();
+  at('study-pair-learner').value = pairLine(minted).learner;
+  await at('study-pair-form').fire('submit');
+  assert.equal(block.dataset.paired, 'true');
+  assert.match(
+    at('study-pair-note').textContent,
+    new RegExp(`now studies on ${LEARNER}’s Nihongo Study record`),
+  );
+  assert.equal(seen(at('study-pair-note')), true);
+  assert.equal(seen(at('study-pair-form')), false);
+  assert.equal(at('study-pair-learner').value, '');
+  assert.equal(world.store.peek().scope.installation, minted.installation);
+  // the page is opened again only after it has said so
+  assert.deepEqual(page.reloads, []);
+  assert.equal(page.timers.length, 1);
+  assert.ok(page.timers[0].ms >= 1000);
+  page.timers[0].run();
+  assert.deepEqual(page.reloads, [1]);
+  // a page that has not been opened again yet says what is left to do
+  const waiting = await settingsBlock(world, null);
+  assert.equal(waiting.block.dataset.state, 'reopen');
+  assert.equal(seen(waiting.at('study-pair-reopen')), true);
+  assert.equal(seen(waiting.at('study-pair-form')), false);
+});
+
+test('Settings on a paired page: whose record, how sync stands, a pairing the server ended, and forgetting in two presses', async () => {
+  const world = createWorld();
+  const bunki = await world.paired();
+  const order = [];
+  const listeners = new Set();
+  bunki.host.subscribe(() => {
+    for (const listener of [...listeners]) listener();
+  });
+  // the shape shared-study-boot.mjs gives Settings for the page's host
+  const host = {
+    kind: 'bunki-paired-study/v1',
+    status: () => bunki.host.status(),
+    subscribe(listener) {
+      listeners.add(listener);
+      return () => void listeners.delete(listener);
+    },
+    async dispose() {
+      order.push(
+        world.store.peek() ? 'sync stopped while the credential was kept' : 'sync stopped late',
+      );
+      await bunki.host.dispose();
+    },
+  };
+  const { page, block, at } = await settingsBlock(world, host);
+  assert.equal(block.dataset.state, 'paired');
+  assert.equal(block.dataset.bound, 'true');
+  assert.equal(
+    at('study-pair-status').textContent,
+    `This device studies on ${LEARNER}’s Nihongo Study record (device …${bunki.installation.slice(-4)}).`,
+  );
+  assert.equal(at('study-pair-sync').textContent, 'Synced.');
+  assert.equal(seen(at('study-pair-sync')), true);
+  assert.equal(seen(at('study-pair-form')), false);
+  assert.equal(seen(at('study-unpair')), true);
+  assert.match(at('study-unpair-what').textContent, /stays on the device, unused/);
+  // nothing the block holds is the credential or the server's address
+  const shown = page.said(block);
+  assert.equal(shown.includes(world.server.tokenOf(bunki.installation)), false);
+  assert.equal(shown.includes(SERVER), false);
+
+  world.state.online = false;
+  await bunki.host.synchronize();
+  assert.match(at('study-pair-sync').textContent, /^Offline\./);
+  world.state.online = true;
+  world.server.knobs.reducer = 'f'.repeat(64);
+  await bunki.host.synchronize();
+  assert.match(at('study-pair-sync').textContent, /needs an update/);
+  world.server.knobs.reducer = SYNC_COMPATIBILITY.reducerSha256;
+  await bunki.host.synchronize();
+  assert.equal(at('study-pair-sync').textContent, 'Synced.');
+
+  // the server refuses the credential (a revocation, or a request from another origin than the one it was paired
+  // from): the block says the pairing has ended, in plain words, and nothing is tried again
+  world.server.revoke(bunki.installation);
+  await bunki.host.synchronize();
+  await tick();
+  assert.equal(block.dataset.state, 'ended');
+  assert.match(at('study-pair-status').textContent, /The server ended this device’s pairing/);
+  assert.equal(seen(at('study-pair-sync')), false);
+  assert.equal(seen(at('study-unpair')), true);
+  const asked = world.server.log.length;
+  await bunki.host.synchronize();
+  assert.equal(world.server.log.length, asked);
+
+  await at('study-unpair').fire('click');
+  assert.match(at('study-unpair').textContent, /Really forget it/);
+  assert.notEqual(world.store.peek(), null);
+  assert.deepEqual(order, []);
+  await at('study-unpair').fire('click');
+  assert.deepEqual(order, ['sync stopped while the credential was kept']);
+  assert.equal(world.store.peek(), null);
+  assert.equal(world.marker.get(), false);
+  assert.match(at('study-pair-note').textContent, /still here, unused/);
+  assert.equal(seen(at('study-pair-note')), true);
+  assert.equal(seen(at('study-unpair')), false);
+  assert.equal(world.replicas.size, 1);
+  assert.equal(page.timers.length, 1);
+  page.timers[0].run();
+  assert.deepEqual(page.reloads, [1]);
 });
