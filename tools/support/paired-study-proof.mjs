@@ -5,8 +5,9 @@
  * (tools/shared-study-paired-browser.test.mjs) and by the local verifier on a built site
  * (scripts/verify-paired-study-browser.mjs). Test learners and made-up codes only. */
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, readFileSync, statSync } from 'node:fs';
+import { createServer } from 'node:http';
+import { extname, join, normalize } from 'node:path';
 import {
   createStudyEngine,
   createMemoryAdapter,
@@ -27,6 +28,76 @@ export function loadStudyContent(corridor) {
     Object.fromEntries(SHARED_DECKS.map((id) => [id, read(`decks/${id}/deck.json`)])),
     read('vendor/shared-study-engine/client/vendor/fsrs-pin.json'),
   );
+}
+
+const TYPES = {
+  '.html': 'text/html; charset=utf-8',
+  '.mjs': 'text/javascript',
+  '.js': 'text/javascript',
+  '.css': 'text/css',
+  '.json': 'application/json',
+  '.woff2': 'font/woff2',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml',
+};
+
+/** The page the source-tree proofs drive, in place of corridor.js: it loads shared-study-boot.mjs exactly as
+ * index.html does, shows the Settings block the boot module hands over (`?view=settings`), and opens a deck through
+ * the product's own gate and shared mount (`?deck=<id>`). */
+export const HARNESS = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>paired study harness</title></head><body><main></main>
+<script type="module" src="shared-study-boot.mjs"></script>
+<script type="module">
+  import { isSharedDeck, isSharedStudyMode } from './shared-study-content.mjs';
+  const params = new URLSearchParams(location.search), main = document.querySelector('main');
+  const english = params.get('ui') !== 'ja';
+  const tx = (ja, en) => (english ? en : ja);
+  const el = (tag, className, text) => { const node = document.createElement(tag); if (className) node.className = className; if (text !== undefined && text !== null) node.textContent = text; return node; };
+  if (params.get('view') === 'settings') main.append(globalThis.bunkiStudyPairing.settingsBlock({ tx, el }));
+  const deck = params.get('deck');
+  if (deck) {
+    if (isSharedStudyMode() && isSharedDeck(deck)) void (await import('./decks/player/shared-mount.mjs')).render(main, { deckId: deck, english, onLeave() {} });
+    else { const old = el('p', '', 'the old player'); old.id = 'old-player'; main.append(old); }
+  }
+  document.documentElement.dataset.ready = '1';
+</script></body></html>`;
+
+/** Serve `/harness.html` and the files of `roots` (folders ending in a slash; the first that holds a path answers)
+ * on loopback. `port` 0 takes any free port. Resolves { origin, close }. */
+export function startHarnessSite(roots, { port = 0 } = {}) {
+  const server = createServer((request, response) => {
+    const path = decodeURIComponent(new URL(request.url, 'http://127.0.0.1').pathname);
+    if (path === '/harness.html') {
+      response.writeHead(200, { 'Content-Type': TYPES['.html'], 'Cache-Control': 'no-store' });
+      response.end(HARNESS);
+      return;
+    }
+    const file = roots
+      .map((root) => ({ root, at: join(root, normalize(path)) }))
+      .find(({ root, at }) => at.startsWith(root) && existsSync(at) && statSync(at).isFile())?.at;
+    if (!file) {
+      response.writeHead(404);
+      response.end();
+      return;
+    }
+    response.writeHead(200, {
+      'Content-Type': TYPES[extname(file)] || 'application/octet-stream',
+      'Cache-Control': 'no-store',
+    });
+    response.end(readFileSync(file));
+  });
+  return new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(port, '127.0.0.1', () =>
+      resolve({
+        origin: `http://127.0.0.1:${server.address().port}`,
+        close: () =>
+          new Promise((done) => {
+            server.close(done);
+            server.closeAllConnections();
+          }),
+      }),
+    );
+  });
 }
 
 /** A second device of the same learner: presents `code` for `installation` (`POST /v1/pair`, as the engine's own

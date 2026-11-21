@@ -1,4 +1,4 @@
-/* global process, URL, Response, EventTarget, Buffer, console, setTimeout, queueMicrotask */
+/* global process, URL, Response, EventTarget, Buffer, console, setTimeout, queueMicrotask, fetch */
 /** The paired study host against a double of the Nihongo Study server (ENGINE-ONE.3).
  *
  * Everything here is synthetic: a test learner, made-up codes and tokens, an in-process server that answers the
@@ -1172,6 +1172,74 @@ test('a first open needs the record: with no connection it is refused, and the n
   assert.equal(world.store.peek().phase, 'ready');
   assert.equal(world.replicas.size, 1);
   await host.dispose();
+});
+
+test('a first open the server refuses ends the pairing: it says so, never “open this again while online”, and asks nothing more', async () => {
+  const world = createWorld();
+  const minted = world.server.code();
+  await world.pairing.pair(pairLine(minted));
+  // refused before the record ever arrived: revoked, or (the real server) a token presented from another origin
+  world.server.revoke(minted.installation);
+  // a browser's store answers a turn after the network does (IndexedDB), as it did when the real server refused a
+  // first open: the refusal must still end the pairing, not wait on the store and report a missing connection
+  const read = world.store.read.bind(world.store);
+  world.store.read = async () => {
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    return read();
+  };
+  const host = await world.openHost();
+  await assert.rejects(world.bind(host), (error) => {
+    assert.equal(error.message, 'study-pairing-ended');
+    assert.equal(error.bunkiLine.length, 2);
+    return true;
+  });
+  assert.equal(host.status().closed, 'study-pairing-ended');
+  await until(() => world.store.peek().ended, 'the row was ended');
+  assert.equal(world.store.peek().ended.by, 'server');
+  assert.deepEqual(world.endedMark.get(), { installation: minted.installation, by: 'server' });
+  const asked = world.server.log.length;
+  await assert.rejects(world.bind(host));
+  await host.dispose();
+  await assert.rejects(world.openHost(), (error) => error.code === 'study-pairing-ended');
+  assert.equal(world.server.log.length, asked);
+});
+
+test('the stand-in answers a page as the server does: a browser-class token paired with no listed origin answers no page', async () => {
+  const { startStudyServerDouble } = await import(
+    process.env.BUNKI_STUDY_DOUBLE
+      ? pathToFileURL(process.env.BUNKI_STUDY_DOUBLE).href
+      : './support/study-server-double.mjs'
+  );
+  const page = 'http://127.0.0.1:9';
+  const double = await startStudyServerDouble({ allowedOrigins: [page] });
+  const sha = SYNC_COMPATIBILITY.reducerSha256;
+  try {
+    // paired by a client that sends no Origin, as a code redeemed outside the page, or a ledger restored, leaves it
+    const pairedWithoutOrigin = async (installation) => {
+      const { code } = double.mint({ installation });
+      const answer = await fetch(`${double.origin}/v1/pair`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-NSRS-Reducer-SHA256': sha },
+        body: JSON.stringify({ scope: { environment: double.environment, learner: double.learner, installation }, code }),
+      });
+      assert.equal(answer.status, 200);
+      return (await answer.json()).token;
+    };
+    const read = async (token, origin) => {
+      const answer = await fetch(`${double.origin}/v1/events?after=0&limit=1`, {
+        headers: { Authorization: `Bearer ${token}`, 'X-NSRS-Reducer-SHA256': sha, ...(origin ? { Origin: origin } : {}) },
+      });
+      return [answer.status, (await answer.json()).error ?? null];
+    };
+    const web = await pairedWithoutOrigin(`bunkiweb-${hex(16)}`);
+    assert.deepEqual(await read(web, page), [401, 'origin-mismatch']);
+    assert.deepEqual(await read(web, null), [200, null]);
+    // other classes paired without an origin are never checked
+    const phone = await pairedWithoutOrigin(`iphone-${hex(16)}`);
+    assert.deepEqual(await read(phone, page), [200, null]);
+  } finally {
+    await double.close();
+  }
 });
 
 test('a copy of the record that has gone missing is not replaced by an empty one', async () => {

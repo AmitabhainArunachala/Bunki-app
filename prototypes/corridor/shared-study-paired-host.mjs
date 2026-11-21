@@ -266,6 +266,9 @@ export async function openPairedStudyHost(options = {}) {
       } else {
         let result = await first;
         for (let round = 0; round < 40 && !result?.error && result?.state === 'pending'; round++) result = await sync.synchronize();
+        // the server refused the credential before the record arrived (revoked, a token from another origin, a ledger
+        // restored without its origin): the pairing has ended, which no new try online can change, and says so
+        if (!closed && result?.error === 'authentication-required') await endPairing();
         if (closed) throw hostError(closed);
         if (result?.state !== 'up-to-date') {
           const cause = result?.error || result?.state || 'unknown';

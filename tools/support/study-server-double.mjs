@@ -5,10 +5,12 @@
  * at a listed study origin: `POST /v1/pair` ({ scope, code } for the installation the code was minted for),
  * `GET` and `POST /v1/events`, `POST /v1/permits`. A preflight is answered for a listed origin only, with exactly
  * the methods and request headers of that route. A token paired from a listed origin belongs to that origin: the
- * same token presented from another origin answers 401 `origin-mismatch`; with no Origin (a client that is no
- * page) it answers as before. It keeps one test learner's ledger in memory, mints its own made-up pairing codes,
- * and can revoke a device, lose one upload reply, or go silent. It is not the server: the proof against the real
- * local server is scripts/verify-paired-study-browser.mjs with that server's start command. Never deployed. */
+ * same token presented from another origin answers 401 `origin-mismatch`; a `bunkiweb-` token paired with no listed
+ * origin answers every page that way (the server fails closed); with no Origin (a client that is no page) a token
+ * answers as before. It keeps one test learner's ledger in memory, mints its own made-up pairing codes, and can
+ * revoke a device, lose one upload reply, or go silent. It is not the server: the proofs against the real local
+ * server are scripts/verify-paired-study-real-server.mjs (this harness page) and scripts/verify-paired-study-browser.mjs
+ * (a built site). Never deployed. */
 import { createServer } from 'node:http';
 import { randomBytes } from 'node:crypto';
 import {
@@ -18,6 +20,7 @@ import {
 } from '../../prototypes/corridor/vendor/shared-study-engine/client/engine.mjs';
 
 const hex = (bytes) => randomBytes(bytes).toString('hex');
+const BROWSER_CLASS = /^bunkiweb-[a-f0-9]{32}$/;
 /** The server's own table: what a page at a listed origin may send to each route, and nothing else. */
 const ROUTES = new Map([
   [
@@ -140,7 +143,9 @@ export async function startStudyServerDouble({
     const device = bearer ? tokens.get(bearer) : null;
     const admit = () => {
       if (!device || device.revoked) return [401, { error: 'authentication-required' }];
-      if (device.origin && origin && origin !== device.origin)
+      // as the server does: a token answers the origin it was paired from, and a browser-class token paired with no
+      // listed origin (or restored without one) answers no page at all; a request with no Origin is not checked
+      if (origin && (device.origin ? origin !== device.origin : BROWSER_CLASS.test(device.scope.installation)))
         return [401, { error: 'origin-mismatch' }];
       return stale();
     };

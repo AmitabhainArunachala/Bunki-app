@@ -7,14 +7,12 @@
  * harness in place of corridor.js: it loads shared-study-boot.mjs exactly as index.html does, shows the Settings
  * block the boot module hands over, and opens a deck through the product's own gate (isSharedStudyMode) and the
  * product's own shared mount. The ordinary routes of the built app, and the Nihongo Study repository's own local
- * server, are the local verifier's part (scripts/verify-paired-study-browser.mjs).
+ * server, are the local verifiers' part: scripts/verify-paired-study-browser.mjs on a built site, and
+ * scripts/verify-paired-study-real-server.mjs, which drives this same harness page against that real server.
  *
  * The first test needs no browser: the stand-in server and the second device over real HTTP. */
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync, statSync } from 'node:fs';
-import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
-import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SYNC_COMPATIBILITY } from '../prototypes/corridor/vendor/shared-study-engine/client/engine.mjs';
 import { startStudyServerDouble } from './support/study-server-double.mjs';
@@ -25,6 +23,7 @@ import {
   loadStudyContent,
   pairInSettings,
   readablePlaces,
+  startHarnessSite,
   studyBlock,
   studyFrame,
   unpairInSettings,
@@ -37,33 +36,6 @@ const { test } = await import(
 );
 const acceptance = Boolean(process.env.CI || process.env.KAIRO_SITE_DIR);
 const corridor = fileURLToPath(new URL('../prototypes/corridor/', import.meta.url));
-const TYPES = {
-  '.html': 'text/html; charset=utf-8',
-  '.mjs': 'text/javascript',
-  '.js': 'text/javascript',
-  '.css': 'text/css',
-  '.json': 'application/json',
-  '.woff2': 'font/woff2',
-  '.png': 'image/png',
-  '.svg': 'image/svg+xml',
-};
-const HARNESS = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>paired study harness</title></head><body><main></main>
-<script type="module" src="shared-study-boot.mjs"></script>
-<script type="module">
-  import { isSharedDeck, isSharedStudyMode } from './shared-study-content.mjs';
-  const params = new URLSearchParams(location.search), main = document.querySelector('main');
-  const english = params.get('ui') !== 'ja';
-  const tx = (ja, en) => (english ? en : ja);
-  const el = (tag, className, text) => { const node = document.createElement(tag); if (className) node.className = className; if (text !== undefined && text !== null) node.textContent = text; return node; };
-  if (params.get('view') === 'settings') main.append(globalThis.bunkiStudyPairing.settingsBlock({ tx, el }));
-  const deck = params.get('deck');
-  if (deck) {
-    if (isSharedStudyMode() && isSharedDeck(deck)) void (await import('./decks/player/shared-mount.mjs')).render(main, { deckId: deck, english, onLeave() {} });
-    else { const old = el('p', '', 'the old player'); old.id = 'old-player'; main.append(old); }
-  }
-  document.documentElement.dataset.ready = '1';
-</script></body></html>`;
-
 /** The two marks localStorage holds of a pairing, as [key, value], in order (the study screen keeps its own
  * appearance settings under the same prefix; they are not marks). */
 const marks = (places) =>
@@ -178,41 +150,7 @@ const roots = [
   corridor,
 ].filter(Boolean);
 
-function startSource() {
-  const server = createServer((request, response) => {
-    const path = decodeURIComponent(new URL(request.url, 'http://127.0.0.1').pathname);
-    if (path === '/harness.html') {
-      response.writeHead(200, { 'Content-Type': TYPES['.html'], 'Cache-Control': 'no-store' });
-      response.end(HARNESS);
-      return;
-    }
-    const file = roots
-      .map((root) => ({ root, at: join(root, normalize(path)) }))
-      .find(({ root, at }) => at.startsWith(root) && existsSync(at) && statSync(at).isFile())?.at;
-    if (!file) {
-      response.writeHead(404);
-      response.end();
-      return;
-    }
-    response.writeHead(200, {
-      'Content-Type': TYPES[extname(file)] || 'application/octet-stream',
-      'Cache-Control': 'no-store',
-    });
-    response.end(readFileSync(file));
-  });
-  return new Promise((resolve) =>
-    server.listen(0, '127.0.0.1', () =>
-      resolve({
-        origin: `http://127.0.0.1:${server.address().port}`,
-        close: () =>
-          new Promise((done) => {
-            server.close(done);
-            server.closeAllConnections();
-          }),
-      }),
-    ),
-  );
-}
+const startSource = () => startHarnessSite(roots);
 
 test(
   'a browser pairs in Settings, studies on the paired record, exchanges a grade both ways, restarts, loses its pairing to the server and to the learner',

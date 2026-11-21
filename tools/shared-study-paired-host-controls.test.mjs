@@ -69,6 +69,10 @@ const T = {
   settingsChanged:
     'Settings in a tab whose pairing was changed elsewhere: it stops saying it is the pairing’s page',
   either: 'the channel and the marks: both tell the other tabs, and either alone is enough',
+  firstRefused:
+    'a first open the server refuses ends the pairing: it says so, never “open this again while online”, and asks nothing more',
+  standInFailsClosed:
+    'the stand-in answers a page as the server does: a browser-class token paired with no listed origin answers no page',
 };
 const refusedFor = (what, code) => `pair refused: ${what} says ${code} and keeps nothing`;
 
@@ -411,6 +415,13 @@ const FAULTS = [
     T.unwritten,
   ],
   [
+    'a first open the server refuses ends the pairing and says so',
+    HOST,
+    "if (!closed && result?.error === 'authentication-required') await endPairing();",
+    '',
+    T.firstRefused,
+  ],
+  [
     'an ended pairing is never bound again, whatever the row still holds',
     HOST,
     'if (!isLiveStudyDevice(device, endedMark.get()) || token === null) {',
@@ -500,6 +511,31 @@ test(
         failed.includes(expected),
         `the fault was not caught by its own test: ${guarantee} (red: ${failed.join(' | ') || 'none'}; green: ${passed.length})`,
       );
+    }
+  },
+);
+
+test(
+  'the stand-in fails closed as the server does: a planted lenient rule turns its test red',
+  { timeout: 300000 },
+  async () => {
+    const original = fileURLToPath(new URL('./support/study-server-double.mjs', import.meta.url));
+    const planted = original.replace(/\.mjs$/, `.planted-${process.pid}.mjs`);
+    const find =
+      'if (origin && (device.origin ? origin !== device.origin : BROWSER_CLASS.test(device.scope.installation)))';
+    const text = readFileSync(original, 'utf8');
+    assert.equal(text.split(find).length - 1, 1, `the fault's text must occur exactly once in the stand-in: ${find}`);
+    // beside the original, so that its own imports resolve; removed whatever happens
+    writeFileSync(planted, text.replace(find, () => 'if (device.origin && origin && origin !== device.origin)'));
+    try {
+      const result = await run(corridor, suite, { BUNKI_STUDY_DOUBLE: planted });
+      assert.notEqual(result.code, 0, 'the lenient stand-in survived');
+      assert.ok(
+        result.failed.includes(T.standInFailsClosed),
+        `not caught by its own test (red: ${result.failed.join(' | ') || 'none'})`,
+      );
+    } finally {
+      rmSync(planted, { force: true });
     }
   },
 );
