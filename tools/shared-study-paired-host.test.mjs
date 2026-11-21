@@ -1220,14 +1220,21 @@ test('the stand-in answers a page as the server does: a browser-class token pair
       const answer = await fetch(`${double.origin}/v1/pair`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-NSRS-Reducer-SHA256': sha },
-        body: JSON.stringify({ scope: { environment: double.environment, learner: double.learner, installation }, code }),
+        body: JSON.stringify({
+          scope: { environment: double.environment, learner: double.learner, installation },
+          code,
+        }),
       });
       assert.equal(answer.status, 200);
       return (await answer.json()).token;
     };
     const read = async (token, origin) => {
       const answer = await fetch(`${double.origin}/v1/events?after=0&limit=1`, {
-        headers: { Authorization: `Bearer ${token}`, 'X-NSRS-Reducer-SHA256': sha, ...(origin ? { Origin: origin } : {}) },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'X-NSRS-Reducer-SHA256': sha,
+          ...(origin ? { Origin: origin } : {}),
+        },
       });
       return [answer.status, (await answer.json()).error ?? null];
     };

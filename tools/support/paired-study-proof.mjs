@@ -8,6 +8,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { extname, join, normalize } from 'node:path';
+import { URL } from 'node:url';
 import {
   createStudyEngine,
   createMemoryAdapter,
@@ -191,8 +192,13 @@ export async function createEngineClient({
     backend,
     sync,
     reviews: () => backend.readProjection().reviews,
-    /** Teach itself one card nobody has met and send the grade. Resolves { eventId, taskKey, rating }. */
-    async gradeNew(module, rating = 3) {
+    /** Teach itself one card nobody has met and send the grade. Resolves { eventId, taskKey, rating }.
+     *
+     * `except` names cards another device graded where this one cannot see it yet (that device is offline). This one
+     * leaves those cards and their word's other cards alone: of two grades of one card made apart, the engine keeps
+     * the first to reach the server and replays the later as an observation, 'stale-parent'
+     * (vendor/shared-study-engine/client/replay.mjs:223), and a word's other cards rest for the day (replay.mjs:199). */
+    async gradeNew(module, rating = 3, { except = [] } = {}) {
       const first = await reserve();
       assert.equal(
         first.state,
@@ -200,9 +206,14 @@ export async function createEngineClient({
         `the second device could not bring its record up to date: ${first.error ?? first.state}`,
       );
       const projection = backend.readProjection();
+      const word = (taskKey) => projection.tasks[taskKey]?.lexicalKey ?? taskKey;
+      const avoided = new Set(except.map(word));
       const entry = backend
         .queue({ module })
-        .find((candidate) => !projection.introductions[candidate.taskKey]);
+        .find(
+          (candidate) =>
+            !projection.introductions[candidate.taskKey] && !avoided.has(word(candidate.taskKey)),
+        );
       assert(entry, 'the second device found no new card');
       const preview = backend.preview(backend.snapshotAttempt(entry.taskKey), 1800);
       const result = await backend.submitCommand(preview.intents[rating]);
@@ -333,7 +344,15 @@ export const frameState = (frame) =>
     };
   });
 
-/** Start (when the screen is not already on a card), reveal, grade. Resolves the review the engine recorded. */
+const UPDATED_ELSEWHERE =
+  /このカードの記録が更新されました。今回の評価は送信していません。|This card’s record was updated\. Your rating was not sent\./;
+
+/** Start (when the screen is not already on a card), reveal, grade. Resolves the review the engine recorded.
+ *
+ * A card that another device graded while it waited in this screen's session is not graded here. After the reveal the
+ * released engine finds that the card's record moved past the open attempt and shows only "This card's record was
+ * updated. Your rating was not sent." with "Next card", no grades (vendor/shared-study-engine/client/app/app.mjs:2361,
+ * the panel at app.mjs:2391). A learner takes the next card, and so does this; `passedOver` counts those cards. */
 export async function gradeInFrame(frame, rating = 3, { timeout = 60000 } = {}) {
   const count = await frame.evaluate(
     () => bunkiSharedStudy.backend.readProjection().reviews.length,
@@ -341,19 +360,35 @@ export async function gradeInFrame(frame, rating = 3, { timeout = 60000 } = {}) 
   // the screen is on a card (its answer still to be shown) or on Today (its start waiting): whichever comes up
   const reveal = frame.locator('[data-reveal]');
   const start = frame.locator('[data-start]:not(:disabled)');
-  await reveal.or(start).first().waitFor({ state: 'visible', timeout });
-  if (!(await reveal.isVisible())) await start.click({ timeout });
-  await reveal.click({ timeout });
-  await frame.locator(`[data-grade="${rating}"]`).click({ timeout });
+  const grade = frame.locator(`[data-grade="${rating}"]`);
+  const updated = frame.locator('[data-stale-attempt]');
+  let passedOver = 0;
+  for (;;) {
+    await reveal.or(start).first().waitFor({ state: 'visible', timeout });
+    if (!(await reveal.isVisible())) await start.click({ timeout });
+    await reveal.click({ timeout });
+    try {
+      await grade.or(updated).first().waitFor({ state: 'visible', timeout });
+    } catch (error) {
+      const screen = (await frame.locator('body').innerText()).slice(0, 400);
+      throw new Error(`${error.message}\nthe study screen showed: ${screen}`, { cause: error });
+    }
+    if (await grade.isVisible()) break;
+    assert.match(await updated.innerText(), UPDATED_ELSEWHERE);
+    assert(++passedOver <= 2, 'the study screen refused three cards in a row as updated elsewhere');
+    await updated.locator('[data-next-card]').click({ timeout });
+  }
+  await grade.click({ timeout });
   await frame.waitForFunction(
     (expected) => bunkiSharedStudy.backend.readProjection().reviews.length === expected + 1,
     count,
     { timeout },
   );
-  return frame.evaluate(() => {
-    const review = bunkiSharedStudy.backend.readProjection().reviews.at(-1);
-    return { eventId: review.id, taskKey: review.taskKey, rating: review.rawRating };
+  const review = await frame.evaluate(() => {
+    const last = bunkiSharedStudy.backend.readProjection().reviews.at(-1);
+    return { eventId: last.id, taskKey: last.taskKey, rating: last.rawRating };
   });
+  return { ...review, passedOver };
 }
 
 /** What a page that comes back to the front does: the host's sync wakes on it. */

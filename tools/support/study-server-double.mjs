@@ -145,7 +145,10 @@ export async function startStudyServerDouble({
       if (!device || device.revoked) return [401, { error: 'authentication-required' }];
       // as the server does: a token answers the origin it was paired from, and a browser-class token paired with no
       // listed origin (or restored without one) answers no page at all; a request with no Origin is not checked
-      if (origin && (device.origin ? origin !== device.origin : BROWSER_CLASS.test(device.scope.installation)))
+      if (
+        origin &&
+        (device.origin ? origin !== device.origin : BROWSER_CLASS.test(device.scope.installation))
+      )
         return [401, { error: 'origin-mismatch' }];
       return stale();
     };

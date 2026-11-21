@@ -481,19 +481,26 @@ async function main() {
             await waitForReview(page, frame, theirs.eventId);
             check(
               `${label}: a grade made in Bunki arrives at the second device, and one made there arrives in Bunki`,
-              { fromBunki: mine.eventId, fromSecondDevice: theirs.eventId },
+              {
+                fromBunki: mine.eventId,
+                fromSecondDevice: theirs.eventId,
+                cardsPassedOver: mine.passedOver,
+              },
             );
           };
           await exchange('online');
           run.shots.push(await shot(page, `${tag}-5-after-exchange`));
 
-          // 5. a time with no connection: both sides grade, and both grades cross when it is back
+          // 5. a time with no connection: both sides grade, and both grades cross when it is back. The card this screen
+          // shows next is the one the second device graded in 4; the engine refuses it and Bunki takes the next card
+          // (see gradeInFrame). The second device grades a card of another word: two grades of one card made apart
+          // keep only the first to reach the server (see gradeNew)
           await context.setOffline(true);
           await page.waitForFunction(() => globalThis.navigator.onLine === false);
           const offline = await gradeInFrame(frame);
           state = await frameState(frame);
           assert.ok(state.pending >= 1);
-          const away = await second.gradeNew('n2', 3);
+          const away = await second.gradeNew('n2', 3, { except: [offline.taskKey] });
           run.shots.push(await shot(page, `${tag}-6-offline`));
           await context.setOffline(false);
           await until(async () => {
@@ -506,6 +513,7 @@ async function main() {
           check('through a time with no connection: both grades cross once it is back', {
             fromBunki: offline.eventId,
             fromSecondDevice: away.eventId,
+            cardsPassedOver: offline.passedOver,
           });
 
           // 6. a restart of the browser keeps the installation and the journal

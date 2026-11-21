@@ -521,12 +521,20 @@ test(
   async () => {
     const original = fileURLToPath(new URL('./support/study-server-double.mjs', import.meta.url));
     const planted = original.replace(/\.mjs$/, `.planted-${process.pid}.mjs`);
+    // the rule for a token with no stored origin; the planted one lets a browser-class token answer any page
     const find =
-      'if (origin && (device.origin ? origin !== device.origin : BROWSER_CLASS.test(device.scope.installation)))';
+      '(device.origin ? origin !== device.origin : BROWSER_CLASS.test(device.scope.installation))';
     const text = readFileSync(original, 'utf8');
-    assert.equal(text.split(find).length - 1, 1, `the fault's text must occur exactly once in the stand-in: ${find}`);
+    assert.equal(
+      text.split(find).length - 1,
+      1,
+      `the fault's text must occur exactly once in the stand-in: ${find}`,
+    );
     // beside the original, so that its own imports resolve; removed whatever happens
-    writeFileSync(planted, text.replace(find, () => 'if (device.origin && origin && origin !== device.origin)'));
+    writeFileSync(
+      planted,
+      text.replace(find, () => '(device.origin ? origin !== device.origin : false)'),
+    );
     try {
       const result = await run(corridor, suite, { BUNKI_STUDY_DOUBLE: planted });
       assert.notEqual(result.code, 0, 'the lenient stand-in survived');

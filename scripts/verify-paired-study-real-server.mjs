@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* global document, localStorage, navigator, window, setTimeout, fetch, URL, Headers, Response */
+/* global navigator, window, setTimeout, fetch, URL, Headers, Response */
 /** The paired-study harness page against the REAL Nihongo Study server on this machine (ENGINE-ONE.3).
  *
  * Local only, never in CI: it needs a checkout of the Nihongo Study repository, which CI does not have, and it builds
@@ -80,8 +80,10 @@ for (let index = 2; index < process.argv.length; index += 2) {
 const out = args.has('--out') ? resolve(args.get('--out')) : null;
 if (!out || !args.has('--server-cwd') || !args.has('--server-command'))
   usage('--out, --server-cwd and --server-command are required.');
-if (!out.startsWith(join(homedir(), '.dharma') + sep)) usage('Evidence goes to a folder under ~/.dharma.');
-if (existsSync(out) && readdirSync(out).length) usage('The evidence folder is not empty: choose a fresh one.');
+if (!out.startsWith(join(homedir(), '.dharma') + sep))
+  usage('Evidence goes to a folder under ~/.dharma.');
+if (existsSync(out) && readdirSync(out).length)
+  usage('The evidence folder is not empty: choose a fresh one.');
 const command = args.get('--server-command');
 if (!command.includes('{origins}') || /[;&|<>`$]|\bcd\b/.test(command))
   usage('The server command is one program with its arguments, and names {origins}.');
@@ -143,7 +145,10 @@ async function startServer(origins) {
     let report = null;
     await until(
       () => {
-        assert(exited === null, `the server ended early: ${scrub(noise.replace(/\s+/g, ' ').slice(-400))}`);
+        assert(
+          exited === null,
+          `the server ended early: ${scrub(noise.replace(/\s+/g, ' ').slice(-400))}`,
+        );
         report = reportIn(text);
         return report !== null;
       },
@@ -187,7 +192,9 @@ function loopbackFetch(base) {
         },
       );
       request.on('error', fail);
-      init.signal?.addEventListener('abort', () => request.destroy(new Error('aborted')), { once: true });
+      init.signal?.addEventListener('abort', () => request.destroy(new Error('aborted')), {
+        once: true,
+      });
       if (init.body !== undefined && init.body !== null) request.write(init.body);
       request.end();
     });
@@ -209,14 +216,23 @@ async function admin(report, path, body) {
 
 async function runEngine(engine, launcher, { report, device, second, siteA, siteB, secrets }) {
   const S = report.baseUrl;
-  const scope = { environment: report.environment, learner: report.learner, installation: device.installation };
+  const scope = {
+    environment: report.environment,
+    learner: report.learner,
+    installation: device.installation,
+  };
   const run = {
     kind: 'bunki-paired-study-real-server-proof/v1',
     engine,
     startedAt: new Date().toISOString(),
-    page: { origin: siteA.origin, secondListedOrigin: siteB.origin, harness: 'HARNESS of tools/support/paired-study-proof.mjs' },
+    page: {
+      origin: siteA.origin,
+      secondListedOrigin: siteB.origin,
+      harness: 'HARNESS of tools/support/paired-study-proof.mjs',
+    },
     server: {
-      program: 'tests/worker/study-origin-server.mjs (Nihongo Study repository): dev Worker on local Wrangler, https front',
+      program:
+        'tests/worker/study-origin-server.mjs (Nihongo Study repository): dev Worker on local Wrangler, https front',
       address: S,
       environment: report.environment,
       learner: report.learner,
@@ -243,10 +259,15 @@ async function runEngine(engine, launcher, { report, device, second, siteA, site
   };
   const browser = await launcher.launch({ headless: true });
   try {
-    const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, ignoreHTTPSErrors: true });
+    const context = await browser.newContext({
+      viewport: { width: 1280, height: 900 },
+      ignoreHTTPSErrors: true,
+    });
     const allowed = [siteA.origin, siteB.origin, S];
     await context.route('**/*', (route) =>
-      allowed.some((origin) => route.request().url().startsWith(`${origin}/`)) ? route.continue() : route.abort(),
+      allowed.some((origin) => route.request().url().startsWith(`${origin}/`))
+        ? route.continue()
+        : route.abort(),
     );
     const toServer = [];
     const printed = [];
@@ -256,12 +277,21 @@ async function runEngine(engine, launcher, { report, device, second, siteA, site
       const path = new URL(request.url()).pathname;
       const key = `${request.method()} ${path}`;
       run.serverRequests[key] = (run.serverRequests[key] ?? 0) + 1;
-      toServer.push({ request, url: request.url(), method: request.method(), authorization: request.headers().authorization ?? null });
+      toServer.push({
+        request,
+        url: request.url(),
+        method: request.method(),
+        authorization: request.headers().authorization ?? null,
+      });
     });
     context.on('response', async (response) => {
       if (!response.url().startsWith(`${S}/`)) return;
       const path = new URL(response.url()).pathname;
-      if (path === '/v1/pair' && response.request().method() === 'POST' && response.status() === 200) {
+      if (
+        path === '/v1/pair' &&
+        response.request().method() === 'POST' &&
+        response.status() === 200
+      ) {
         const body = await response.json().catch(() => null);
         if (typeof body?.token === 'string') {
           tokens.push(body.token);
@@ -269,8 +299,21 @@ async function runEngine(engine, launcher, { report, device, second, siteA, site
         }
       } else if (response.status() >= 400) {
         const body = await response.json().catch(() => null);
-        const from = (await response.request().allHeaders().catch(() => ({}))).origin ?? null;
-        run.serverRefusals.push({ step: current, from, method: response.request().method(), path, status: response.status(), error: body?.error ?? null });
+        const from =
+          (
+            await response
+              .request()
+              .allHeaders()
+              .catch(() => ({}))
+          ).origin ?? null;
+        run.serverRefusals.push({
+          step: current,
+          from,
+          method: response.request().method(),
+          path,
+          status: response.status(),
+          error: body?.error ?? null,
+        });
       }
     });
     const watch = (page) => {
@@ -298,9 +341,17 @@ async function runEngine(engine, launcher, { report, device, second, siteA, site
     assert.equal(block.state, 'paired');
     assert.equal(block.bound, 'true');
     assert.match(block.status, new RegExp(`studies on ${report.learner}’s Nihongo Study record`));
-    assert.equal(tokens.length, 1, 'the page itself got the token: one 200 answer to its POST /v1/pair');
-    const pairRequests = toServer.filter((entry) => entry.method === 'POST' && entry.url === `${S}/v1/pair`);
-    const sentFrom = await Promise.all(pairRequests.map(async (entry) => (await entry.request.allHeaders()).origin ?? null));
+    assert.equal(
+      tokens.length,
+      1,
+      'the page itself got the token: one 200 answer to its POST /v1/pair',
+    );
+    const pairRequests = toServer.filter(
+      (entry) => entry.method === 'POST' && entry.url === `${S}/v1/pair`,
+    );
+    const sentFrom = await Promise.all(
+      pairRequests.map(async (entry) => (await entry.request.allHeaders()).origin ?? null),
+    );
     assert.deepEqual(sentFrom, [siteA.origin, siteA.origin]);
     done('a', {
       wrongCode: { refused: wrong.refused, note: scrub(wrong.note) },
@@ -320,8 +371,17 @@ async function runEngine(engine, launcher, { report, device, second, siteA, site
     assert.equal(state.environment, report.environment);
     assert.equal(/Trial copy/.test(await page.locator('main').innerText()), false);
     assert.equal(/Sync is not set up|同期は未設定/.test(state.text), false);
-    assert.equal(await frame.evaluate(() => window.frameElement.bunkiStudyPort.adapter.platform.isPaired()), true);
-    done('b', { installation: state.installation, learner: state.learner, environment: state.environment, trialCopy: false, syncNotSetUp: false });
+    assert.equal(
+      await frame.evaluate(() => window.frameElement.bunkiStudyPort.adapter.platform.isPaired()),
+      true,
+    );
+    done('b', {
+      installation: state.installation,
+      learner: state.learner,
+      environment: state.environment,
+      trialCopy: false,
+      syncNotSetUp: false,
+    });
     await shot(page, 'b-study');
 
     // c. a grade each way through the server
@@ -362,8 +422,18 @@ async function runEngine(engine, launcher, { report, device, second, siteA, site
     }
     assert.ok(carried >= 3, `requests that carried the credential: ${carried}`);
     done('c', {
-      pageGrade: { eventId: mine.eventId, taskKey: mine.taskKey, rating: 3, pulledBySecondDevice: true },
-      secondDeviceGrade: { eventId: theirs.eventId, taskKey: theirs.taskKey, rating: 4, arrivedInPage: true },
+      pageGrade: {
+        eventId: mine.eventId,
+        taskKey: mine.taskKey,
+        rating: 3,
+        pulledBySecondDevice: true,
+      },
+      secondDeviceGrade: {
+        eventId: theirs.eventId,
+        taskKey: theirs.taskKey,
+        rating: 4,
+        arrivedInPage: true,
+      },
       requestsThatCarriedTheCredential: carried,
       credentialReadableByScriptOrLog: false,
     });
@@ -378,7 +448,11 @@ async function runEngine(engine, launcher, { report, device, second, siteA, site
     state = await frameState(frame);
     assert.equal(state.installation, device.installation);
     assert.ok(state.reviews.includes(mine.eventId) && state.reviews.includes(theirs.eventId));
-    done('d', { installationKept: state.installation, journalHolds: [mine.eventId, theirs.eventId], reviewsInJournal: state.reviews.length });
+    done('d', {
+      installationKept: state.installation,
+      journalHolds: [mine.eventId, theirs.eventId],
+      reviewsInJournal: state.reviews.length,
+    });
     await shot(again, 'd-restart');
 
     // f. the same token from the second listed origin
@@ -412,7 +486,10 @@ async function runEngine(engine, launcher, { report, device, second, siteA, site
     const elsewhereText = await elsewhere.innerText();
     assert.match(elsewhereText, /The server ended this device’s pairing/);
     assert.equal(await there.locator('[data-shared-study-frame]').count(), 0);
-    assert.equal(await there.evaluate(() => globalThis.bunkiSharedStudyHost?.closed()?.code ?? null), 'study-pairing-ended');
+    assert.equal(
+      await there.evaluate(() => globalThis.bunkiSharedStudyHost?.closed()?.code ?? null),
+      'study-pairing-ended',
+    );
     await shot(there, 'f-second-origin-ended');
     const askedThere = toServer.length;
     for (let turn = 0; turn < 3; turn++) {
@@ -421,7 +498,11 @@ async function runEngine(engine, launcher, { report, device, second, siteA, site
     }
     await there.goto(`${siteB.origin}/harness.html?deck=n2`, { waitUntil: 'load' });
     await there.locator('#old-player').waitFor();
-    assert.equal(toServer.length, askedThere, 'the page at the second origin asked again after the refusal');
+    assert.equal(
+      toServer.length,
+      askedThere,
+      'the page at the second origin asked again after the refusal',
+    );
     done('f', {
       directRequestFromSecondOrigin: direct,
       pageAtSecondOrigin: {
@@ -460,10 +541,16 @@ async function runEngine(engine, launcher, { report, device, second, siteA, site
     assert.equal(reason, 'study-pairing-ended');
     assert.match(endedText, /The server ended this device’s pairing/);
     assert.equal(await again.locator('[data-shared-study-frame]').count(), 0);
-    assert.equal(await again.evaluate(() => globalThis.bunkiSharedStudyHost?.closed()?.code ?? null), 'study-pairing-ended');
+    assert.equal(
+      await again.evaluate(() => globalThis.bunkiSharedStudyHost?.closed()?.code ?? null),
+      'study-pairing-ended',
+    );
     await shot(again, 'e-ended');
     await second.sync();
-    assert.equal(second.reviews().some((review) => review.id === stranded.eventId), false);
+    assert.equal(
+      second.reviews().some((review) => review.id === stranded.eventId),
+      false,
+    );
     const quiet = toServer.length;
     for (let turn = 0; turn < 3; turn++) {
       await wake(again);
@@ -517,14 +604,25 @@ async function main() {
   try {
     server = await startServer([siteA.origin, siteB.origin]);
     const { report } = server;
-    for (const value of [report.adminToken, ...(report.devices ?? []).map((device) => device?.code)])
+    for (const value of [
+      report.adminToken,
+      ...(report.devices ?? []).map((device) => device?.code),
+    ])
       if (typeof value === 'string' && value) secrets.add(value);
     assert.match(report.baseUrl ?? '', HTTPS_LOOPBACK, 'the server has no https loopback front');
-    assert.match(report.httpUrl ?? '', PLAIN_LOOPBACK, 'the server has no plain-http loopback address');
+    assert.match(
+      report.httpUrl ?? '',
+      PLAIN_LOOPBACK,
+      'the server has no plain-http loopback address',
+    );
     assert.match(report.learner ?? '', /^test-[A-Za-z0-9][A-Za-z0-9._-]*$/, 'a test- learner only');
     assert.equal(report.environment, 'dev');
-    const phone = report.devices.find((device) => /^iphone-/.test(device.installation) && CODE.test(device.code));
-    let device = report.devices.find((device) => STUDY_DEVICE.test(device.installation) && CODE.test(device.code));
+    const phone = report.devices.find(
+      (device) => /^iphone-/.test(device.installation) && CODE.test(device.code),
+    );
+    let device = report.devices.find(
+      (device) => STUDY_DEVICE.test(device.installation) && CODE.test(device.code),
+    );
     assert(phone && device, 'the server printed no bunkiweb- and iphone- devices');
     const second = await createEngineClient({
       content: loadStudyContent(corridor),
@@ -538,13 +636,24 @@ async function main() {
     for (const engine of engines) {
       if (!device) {
         const minted = await admin(report, '/v1/pair/code', {
-          scope: { environment: report.environment, learner: report.learner, installation: `bunkiweb-${hex(16)}` },
+          scope: {
+            environment: report.environment,
+            learner: report.learner,
+            installation: `bunkiweb-${hex(16)}`,
+          },
         });
         assert.equal(minted.status, 200, `no further code: ${minted.status}`);
         secrets.add(minted.body.code);
         device = { installation: minted.body.scope.installation, code: minted.body.code };
       }
-      const run = await runEngine(engine, launchers[engine], { report, device, second, siteA, siteB, secrets });
+      const run = await runEngine(engine, launchers[engine], {
+        report,
+        device,
+        second,
+        siteA,
+        siteB,
+        secrets,
+      });
       if (run.result !== 'pass') run.serverOutputTail = server.noise();
       runs.push(run);
       device = null;
@@ -567,10 +676,12 @@ async function main() {
     // the fence, checked: nothing written here holds a code, a token or the admin token
     for (const file of readdirSync(out).filter((name) => name.endsWith('.json'))) {
       const text = readFileSync(join(out, file), 'utf8');
-      for (const secret of secrets) assert.equal(text.includes(secret), false, `${file} holds a secret`);
+      for (const secret of secrets)
+        assert.equal(text.includes(secret), false, `${file} holds a secret`);
     }
   }
-  const passed = runs.length === engines.length && runs.every((run) => run.result === 'pass') && !notes.error;
+  const passed =
+    runs.length === engines.length && runs.every((run) => run.result === 'pass') && !notes.error;
   console.log(JSON.stringify(notes.runs.concat(notes.error ? [{ error: notes.error }] : [])));
   process.exitCode = passed ? 0 : 1;
 }
