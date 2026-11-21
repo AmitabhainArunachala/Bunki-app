@@ -100,6 +100,12 @@ export const CORRIDOR_REQUIRED_ROOTS = [
   'shared-study-audio-preparation.mjs',
   'shared-study-audio-packs.mjs',
   'shared-study-presentation.mjs',
+  // study pairing (ENGINE-ONE.3): the page-start module index.html loads, the pairing and its Settings block, the
+  // paired host, and the sync lifecycle over the engine's own transport (under vendor/)
+  'shared-study-boot.mjs',
+  'shared-study-pairing.mjs',
+  'shared-study-paired-host.mjs',
+  'shared-study-sync.mjs',
   'review-caller.mjs',
   'help-relevance.mjs',
   'journey-lifecycle.mjs',

@@ -16,8 +16,13 @@ export async function render(main,{deckId,english=true,onLeave,autoStart}={}) {
   try {adapter=await sharedStudyRuntime();}
   catch(error){
     if(request!==serial||!root.isConnected)return;root.dataset.sharedStudy='blocked';root.replaceChildren();
+    // A paired host says its own refusal in plain words ([ja, en]); every other cause keeps the general line and its code.
+    const line=Array.isArray(error?.bunkiLine)&&error.bunkiLine.length===2?error.bunkiLine:null;
+    if(line){root.dataset.sharedStudyReason=String(error.message);root.append(element('p',english?line[1]:line[0]));}
+    else{
     root.append(element('p',english?'Your previous deck history is preserved. Shared study needs a connected learner profile before grading.':'これまでの記録は保持されています。共通の学習には学習者プロフィールの接続が必要です。'));
     root.append(element('p',String(error.message)));
+    }
     if(error.message==='shared-profile-not-bound'){
       const link=element('a',english?'Open isolated study preview':'記録を分けて学習を試す'),url=new URL(location.href);
       url.searchParams.set('deck',deckId);url.searchParams.set('sharedStudy','preview');link.href=url.href;root.append(link);

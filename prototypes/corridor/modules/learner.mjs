@@ -706,6 +706,10 @@ function renderWritingChoice() {
   // the voice server: paired or not, where the last sentence came from, the budget, and the one-time pairing
   const voiceServer = voiceSettingsBlock();
   if (voiceServer) section.append(voiceServer);
+  // the study record: this device as a study device of a Nihongo Study learner, paired and unpaired here
+  // (shared-study-boot.mjs hands the block over; a build that does not load it, like the single file, shows none)
+  const studyDevice = globalThis.bunkiStudyPairing?.settingsBlock?.({ tx, el });
+  if (studyDevice) section.append(studyDevice);
   return section;
 }
 
