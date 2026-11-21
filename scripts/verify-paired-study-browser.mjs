@@ -133,8 +133,7 @@ const receipt = {
   startedAt: new Date().toISOString(),
   site,
   siteOrigin,
-  server: null,
-  secondDevice: null,
+  servers: [],
   runs: [],
   notRun: [],
   engineEvents: [],
@@ -286,38 +285,50 @@ async function main() {
   const launchers = { chromium, webkit };
   const host = await startStaticHost({ site, port: sitePort });
   let server = null;
+  let second = null;
+  const stopServer = async () => {
+    const stopped = await Promise.resolve(server.stop()).catch(() => false);
+    receipt.servers.at(-1).stopped = stopped !== false;
+    server = null;
+  };
+  const lineFor = (device) =>
+    `Bunki study code: ${device.code} · learner: ${server.learner} · device: ${device.installation} · server: ${server.browserUrl} · environment: ${server.environment}`;
   try {
-    server = await openServer();
-    assert(server.browserUrl !== siteOrigin, 'the server and the site are different addresses');
-    assert(
-      /^test-[A-Za-z0-9][A-Za-z0-9._-]*$/.test(server.learner || ''),
-      'only a test- learner is paired here',
-    );
-    receipt.server = {
-      mode: server.mode,
-      address: server.browserUrl,
-      learner: server.learner,
-      environment: server.environment,
-    };
-    const lineFor = (device) =>
-      `Bunki study code: ${device.code} · learner: ${server.learner} · device: ${device.installation} · server: ${server.browserUrl} · environment: ${server.environment}`;
-
-    // the second device of the same learner: the engine's own client, from Node, a client that is no page
-    assert(server.second, 'the server gave no device for the second client');
-    const second = await createEngineClient({
-      content: loadStudyContent(site),
-      server: server.nodeUrl,
-      learner: server.learner,
-      environment: server.environment,
-      installation: server.second.installation,
-      code: server.second.code,
-    });
-    receipt.secondDevice = {
-      installation: second.scope.installation,
-      kind: 'the engine’s store and sync client, from Node',
-    };
-
     for (const engine of engines) {
+      // A server this starts is started afresh for each engine, with a fresh learner: a learner's new cards are 20 a
+      // day shared by all its devices (past them the server refuses, 'daily-permit-budget'), and one engine's two
+      // widths spend all 20, Bunki and the second device each asking for five at a time as the engine's own app does.
+      // A server given by its report (--server-json) is adopted once.
+      if (server && !args.has('--server-json')) await stopServer();
+      if (!server) {
+        server = await openServer();
+        receipt.servers.push({
+          engine,
+          mode: server.mode,
+          address: server.browserUrl,
+          learner: server.learner,
+          environment: server.environment,
+        });
+        assert(server.browserUrl !== siteOrigin, 'the server and the site are different addresses');
+        assert(
+          /^test-[A-Za-z0-9][A-Za-z0-9._-]*$/.test(server.learner || ''),
+          'only a test- learner is paired here',
+        );
+        // the second device of the same learner: the engine's own client, from Node, a client that is no page
+        assert(server.second, 'the server gave no device for the second client');
+        second = await createEngineClient({
+          content: loadStudyContent(site),
+          server: server.nodeUrl,
+          learner: server.learner,
+          environment: server.environment,
+          installation: server.second.installation,
+          code: server.second.code,
+        });
+        receipt.servers.at(-1).secondDevice = {
+          installation: second.scope.installation,
+          kind: 'the engine’s store and sync client, from Node',
+        };
+      }
       let pairedProfile = null;
       for (const width of widths) {
         const run = { engine, width, checks: [], shots: [], pageErrors: [], result: 'running' };
@@ -568,10 +579,7 @@ async function main() {
     }
     receipt.result = receipt.notRun.length ? 'partial' : 'passed';
   } finally {
-    if (server) {
-      const stopped = await Promise.resolve(server.stop()).catch(() => false);
-      if (receipt.server) receipt.server.stopped = stopped !== false;
-    }
+    if (server) await stopServer();
     await host.close();
   }
 }
@@ -588,7 +596,7 @@ writeFileSync(join(out, 'receipt.json'), `${JSON.stringify(receipt, null, 2)}\n`
 console.log(
   JSON.stringify({
     result: receipt.result,
-    server: receipt.server?.mode ?? null,
+    server: receipt.servers[0]?.mode ?? null,
     runs: receipt.runs.map((run) => `${run.engine}-${run.width}:${run.result}`),
     notRun: receipt.notRun.length,
     receipt: join(out, 'receipt.json'),
