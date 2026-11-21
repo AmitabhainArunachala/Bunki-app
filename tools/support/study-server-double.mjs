@@ -225,6 +225,9 @@ export async function startStudyServerDouble({
       response.writeHead(status, {
         'Content-Type': 'application/json; charset=utf-8',
         'Cache-Control': 'no-store',
+        // One connection per request: a loaded CI runner otherwise lets Node's fetch reuse a kept-alive
+        // socket this server is closing, and the next request fails with ECONNRESET (seen on GitHub).
+        Connection: 'close',
         // errors too: a page must read 401, 409, 426 and 429 to act on them
         ...(listed
           ? {
