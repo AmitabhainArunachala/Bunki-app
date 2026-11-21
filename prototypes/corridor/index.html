@@ -111,6 +111,9 @@
     <script defer src="skip-core.js"></script>
     <script defer src="skip-ui.js"></script>
     <script defer src="maintenance/report-client.js"></script>
+    <!-- study pairing: a browser that holds a study pairing binds the shared study host here, before corridor.js
+         reads it; a browser that holds none gets nothing and the app is as it was (shared-study-boot.mjs) -->
+    <script type="module" src="shared-study-boot.mjs"></script>
     <script type="module" src="corridor.js"></script>
     <!-- the https guard is deliberate: the verification suites drive the app
          over http://127.0.0.1 and must never inherit a worker's cache -->

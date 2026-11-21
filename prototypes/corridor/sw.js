@@ -157,6 +157,10 @@ const SHELL = [
   'decks/player/engine.js',
   'decks/player/mount.js',
   'shared-study-content.mjs',
+  // index.html loads the study pairing's page-start module before corridor.js: a paired device must find it offline
+  // too, or its Learn routes would fall back to the old player unseen. It imports nothing. The paired host, the sync
+  // transport and the engine behind it are verified and kept on first use, like the other shared study modules.
+  'shared-study-boot.mjs',
   'decks/player/player.css',
   'decks/player/host.js',
   // …with what mount.js fetches at load, so a first visit then offline still opens a deck
