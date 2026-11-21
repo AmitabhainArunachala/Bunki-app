@@ -555,7 +555,7 @@ test('pair: one request to the configured server, the credential kept, the host 
 });
 
 test('the pairing line: the code, the learner and the device in any order, in one box or two; a code alone cannot pair', () => {
-  const code = 'ABCDEF012345';
+  const code = 'A0B0A0B0A0B0';
   const device = studyInstallation();
   const whole = { code, learner: LEARNER, installation: device };
   assert.deepEqual(
@@ -569,7 +569,7 @@ test('the pairing line: the code, the learner and the device in any order, in on
   assert.deepEqual(
     parseStudyPairing({
       learner: `learner: ${LEARNER} · installation: ${device} · server: ${SERVER}/ · environment: dev`,
-      code: 'abcd ef01-2345',
+      code: 'a0b0 a0b0-a0b0',
     }),
     { ...whole, server: SERVER, environment: 'dev' },
   );
@@ -588,7 +588,7 @@ test('the pairing line: the code, the learner and the device in any order, in on
     'https://127.0.0.1:8443',
     'https://localhost:8443',
     SERVER,
-    'https://study.example.workers.dev',
+    'https://test.example.workers.dev',
   ])
     assert.equal(isStudyServer(address), true, address);
   for (const address of [
@@ -597,7 +597,7 @@ test('the pairing line: the code, the learner and the device in any order, in on
     'https://127.0.0.1:8443/path',
     'https://127.0.0.1.evil.example:8443',
     'http://192.168.1.20:8787',
-    'https://user@127.0.0.1:8443',
+    'https://user@localhost:8443',
   ])
     assert.equal(isStudyServer(address), false, address);
   // a code and a learner with no device: the installation is the admin's to name, never this device's to make up
@@ -657,7 +657,7 @@ test('pair: the two boxes work as well as the pasted line, on a device the voice
 for (const [name, arrange, expected] of [
   [
     'a wrong code',
-    (world) => ({ ...world.server.code(), code: 'ABCDEF012345' }),
+    (world) => ({ ...world.server.code(), code: 'A0B0A0B0A0B0' }),
     'code-invalid-or-expired',
   ],
   [
@@ -873,7 +873,7 @@ test('the transport carries the credential to the one server and refuses every o
   assert.equal(strayed.url, 'http://127.0.0.1:9999/elsewhere');
 
   // an https server, on this machine or the learner's own, is asked directly, and only it
-  for (const direct of ['https://127.0.0.1:8443', 'https://study.example.workers.dev']) {
+  for (const direct of ['https://127.0.0.1:8443', 'https://test.example.workers.dev']) {
     const before = seen.length;
     const bridge = studyTransportBridge(direct, fetchFn);
     assert.equal(bridge.origin, direct);
@@ -1393,7 +1393,7 @@ test('Settings: the form, a refusal in plain words in the page’s language, and
   assert.equal(seen(at('study-pair-reopen')), false);
   assert.match(at('study-pair-status').textContent, /not connected to a Nihongo Study record yet/);
 
-  const wrong = pairLine({ ...world.server.code(), code: 'ABCDEF012345' }).learner;
+  const wrong = pairLine({ ...world.server.code(), code: 'A0B0A0B0A0B0' }).learner;
   at('study-pair-learner').value = wrong;
   await at('study-pair-form').fire('submit');
   assert.equal(block.dataset.refused, 'code-invalid-or-expired');
@@ -1404,7 +1404,7 @@ test('Settings: the form, a refusal in plain words in the page’s language, and
   assert.deepEqual(page.timers, []);
   // a code typed alone, as the form's second box invites: the block says what is missing
   at('study-pair-learner').value = '';
-  at('study-pair-code').value = 'ABCDEF012345';
+  at('study-pair-code').value = 'A0B0A0B0A0B0';
   await at('study-pair-form').fire('submit');
   assert.equal(block.dataset.refused, 'invalid-pairing');
   at('study-pair-learner').value = LEARNER;

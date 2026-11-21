@@ -262,7 +262,7 @@ test(
       assert.equal(first.unpairShown, false);
       const unused = server.mint();
       const wrong = await pairInSettings(page, {
-        line: unused.line.replace(unused.code, 'ABCDEF012345'),
+        line: unused.line.replace(unused.code, 'A0B0A0B0A0B0'),
       });
       assert.equal(wrong.refused, 'code-invalid-or-expired');
       assert.match(wrong.note, /wrong, already used or expired/);
