@@ -141,6 +141,12 @@ test('the stand-in server over HTTP: preflights for a listed origin alone, a tok
     await phone.sync();
     assert.ok(phone.reviews().some((review) => review.id === graded.eventId));
     assert.notEqual(phone.scope.installation, device.scope.installation);
+    // and teaches itself a card of its own after the first device's grade is in the ledger: its permits are the
+    // server's next grant, numbered along the server's own stream, and the grade reaches the first device
+    const answered = await phone.gradeNew('n2', 4);
+    assert.notEqual(answered.taskKey, graded.taskKey);
+    await device.sync();
+    assert.ok(device.reviews().some((review) => review.id === answered.eventId));
     // a device the server has revoked is refused
     server.revoke(device.scope.installation);
     assert.equal((await ask(pageOrigin)).status, 401);
@@ -150,6 +156,15 @@ test('the stand-in server over HTTP: preflights for a listed origin alone, a tok
   }
 });
 
+/** Where the page's files come from: the source tree; for the negative controls, a folder with a planted fault
+ * first (tools/shared-study-paired-host-controls.test.mjs), and the source tree for everything it does not hold. */
+const roots = [
+  process.env.BUNKI_PAIRED_HOST_ROOT
+    ? `${process.env.BUNKI_PAIRED_HOST_ROOT.replace(/\/+$/, '')}/`
+    : null,
+  corridor,
+].filter(Boolean);
+
 function startSource() {
   const server = createServer((request, response) => {
     const path = decodeURIComponent(new URL(request.url, 'http://127.0.0.1').pathname);
@@ -158,8 +173,10 @@ function startSource() {
       response.end(HARNESS);
       return;
     }
-    const file = join(corridor, normalize(path));
-    if (!file.startsWith(corridor) || !existsSync(file) || !statSync(file).isFile()) {
+    const file = roots
+      .map((root) => ({ root, at: join(root, normalize(path)) }))
+      .find(({ root, at }) => at.startsWith(root) && existsSync(at) && statSync(at).isFile())?.at;
+    if (!file) {
       response.writeHead(404);
       response.end();
       return;
@@ -188,7 +205,7 @@ test(
   'a browser pairs in Settings, studies on the paired record, exchanges a grade both ways, restarts, loses its pairing to the server and to the learner',
   { skip: !acceptance && !process.env.BUNKI_TEST_CHROME, timeout: 420000 },
   async () => {
-    const { chromium } = createRequire(import.meta.url)('playwright-core');
+    const { chromium, webkit } = createRequire(import.meta.url)('playwright-core');
     const executable =
       process.env.CHROMIUM_PATH || (!acceptance && process.env.BUNKI_TEST_CHROME) || '';
     const site = await startSource();
@@ -197,9 +214,12 @@ test(
     const deck = `${site.origin}/harness.html?deck=n2`;
     let browser;
     try {
-      browser = await chromium.launch({
+      // Chromium unless BUNKI_PAIRED_BROWSER_ENGINE=webkit asks for the other engine (a local run: the suite's
+      // runner installs Chromium only)
+      const webkitAsked = process.env.BUNKI_PAIRED_BROWSER_ENGINE === 'webkit';
+      browser = await (webkitAsked ? webkit : chromium).launch({
         headless: true,
-        ...(executable && executable !== '1' ? { executablePath: executable } : {}),
+        ...(!webkitAsked && executable && executable !== '1' ? { executablePath: executable } : {}),
       });
       const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
       // nothing but this machine: the source tree and the stand-in server
@@ -259,21 +279,19 @@ test(
       );
 
       // the server is the one the voice client is set up for: the voice client's own store says which
-      const voice = await page.evaluate(async (address) => {
+      // Handed to the page as text, not as a function: the test runner rewrites `import(...)` inside this file's
+      // own functions into a helper of its own, which no page has. Text reaches the page as written.
+      const voice = await page.evaluate(`(async (address) => {
         const { createDeviceTokenStore } = await import('./modules/voice-client.mjs');
         const { readVoiceServerAddress } = await import('./shared-study-pairing.mjs');
         const before = await readVoiceServerAddress();
         await createDeviceTokenStore(globalThis).write({
           server: address,
-          token: `nsrs_prod_AAAA.${'a'.repeat(64)}`,
-          scope: {
-            environment: 'prod',
-            learner: 'test-voice',
-            installation: `bunki-${'b'.repeat(32)}`,
-          },
+          token: 'nsrs_prod_AAAA.' + 'a'.repeat(64),
+          scope: { environment: 'prod', learner: 'test-voice', installation: 'bunki-' + 'b'.repeat(32) },
         });
         return { before, after: await readVoiceServerAddress() };
-      }, server.origin);
+      })(${JSON.stringify(server.origin)})`);
       assert.deepEqual(voice, { before: null, after: server.origin });
       const asked = server.log.length;
       const elsewhere = await pairInSettings(page, {

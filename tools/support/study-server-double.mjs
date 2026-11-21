@@ -49,14 +49,18 @@ export async function startStudyServerDouble({
     silent: false,
   };
 
+  // the server's own events are numbered along the server's own stream, as every device's are along its own:
+  // a grant that comes after a device's review is still the next server event, not the next row of the ledger
+  let serverEvents = 0;
   function grant(installation, count) {
     const seq = rows.length + 1;
+    const dseq = ++serverEvents;
     const event = {
       v: 4,
-      id: `@server:${seq}`,
+      id: `@server:${dseq}`,
       learner,
       install: '@server',
-      dseq: seq,
+      dseq,
       base: seq - 1,
       ts: now(),
       epoch: 0,

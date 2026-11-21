@@ -237,14 +237,14 @@ function plant(file, find, fault) {
   }
   return folder;
 }
-function run(folder) {
-  const env = { ...process.env, BUNKI_PAIRED_HOST_ROOT: folder };
+function run(folder, file = suite, extra = {}) {
+  const env = { ...process.env, BUNKI_PAIRED_HOST_ROOT: folder, ...extra };
   for (const name of Object.keys(env))
     if (/^(VITEST|NODE_TEST_CONTEXT|NODE_OPTIONS)/.test(name)) delete env[name];
   return new Promise((resolve) => {
     execFile(
       process.execPath,
-      ['--test', '--test-reporter=tap', suite],
+      ['--test', '--test-reporter=tap', file],
       { env, maxBuffer: 32 * 1024 * 1024 },
       (error, stdout) => {
         const failed = [...stdout.matchAll(/^not ok \d+ - (.*)$/gm)].map((match) => match[1]);
@@ -254,14 +254,78 @@ function run(folder) {
     );
   });
 }
-async function control(file, find, fault) {
+async function control(file, find, fault, suiteFile = suite, extra = {}) {
   const folder = plant(file, find, fault);
   try {
-    return await run(folder);
+    return await run(folder, suiteFile, extra);
   } finally {
     rmSync(folder, { recursive: true, force: true });
   }
 }
+
+/** Faults only a browser can see: the credential's place in IndexedDB, the flag a page start reads, the voice
+ * client's own store. Each must turn the browser test red (tools/shared-study-paired-browser.test.mjs, which
+ * serves the planted folder's files to the page). A browser run apiece, so this is asked for by name. */
+const browserSuite = fileURLToPath(
+  new URL('./shared-study-paired-browser.test.mjs', import.meta.url),
+);
+const BROWSER_TEST =
+  'a browser pairs in Settings, studies on the paired record, exchanges a grade both ways, restarts, loses its pairing to the server and to the learner';
+const BROWSER_FAULTS = [
+  [
+    'the credential is sealed with a key the browser will not export',
+    'shared-study-pairing.mjs',
+    "const key = await subtle.generateKey({ name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);",
+    "const key = await subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);",
+  ],
+  [
+    'a pairing leaves the flag the next page start binds the host by',
+    'shared-study-pairing.mjs',
+    "set() { try { storage().setItem(PAIRED_MARKER, '1'); return storage().getItem(PAIRED_MARKER) === '1'; } catch { return false; } },",
+    'set() { return true; },',
+  ],
+  [
+    'the server is the one the voice client keeps',
+    'shared-study-pairing.mjs',
+    'return isStudyServer(address) ? address : null;',
+    'return null;',
+  ],
+  [
+    'a pairing the server ended keeps no credential on the device',
+    'shared-study-pairing.mjs',
+    'async end({ at }) { if (available) await amend((row) => ({ ...row, sealed: null, ended: { at } })); },',
+    'async end({ at }) { if (available) await amend((row) => ({ ...row, ended: { at } })); },',
+  ],
+  [
+    'looking for a database never makes one (an empty `bunki-voice` would break the voice client)',
+    'shared-study-pairing.mjs',
+    'request.onupgradeneeded = () => { absent = true; try { request.transaction.abort(); } catch { /* the open fails below */ } };',
+    'request.onupgradeneeded = () => { absent = true; };',
+  ],
+];
+
+test(
+  'faults only a browser can see turn the browser test red (asked for with BUNKI_PAIRED_BROWSER_CONTROLS=1)',
+  { skip: !process.env.BUNKI_PAIRED_BROWSER_CONTROLS, timeout: 900000 },
+  async () => {
+    const browser = { BUNKI_TEST_CHROME: process.env.BUNKI_TEST_CHROME || '1' };
+    const clean = await control(null, '', '', browserSuite, browser);
+    assert.deepEqual(clean.failed, [], 'the unplanted copy must be green in the browser');
+    assert.ok(clean.passed.includes(BROWSER_TEST), 'the browser test did not run');
+    const outcomes = [];
+    for (const [guarantee, file, find, fault] of BROWSER_FAULTS)
+      outcomes.push({ guarantee, ...(await control(file, find, fault, browserSuite, browser)) });
+    if (process.env.BUNKI_PAIRED_HOST_CONTROLS_REPORT)
+      writeFileSync(
+        `${process.env.BUNKI_PAIRED_HOST_CONTROLS_REPORT}.browser.json`,
+        `${JSON.stringify({ clean: { code: clean.code, passed: clean.passed.length }, faults: outcomes }, null, 2)}\n`,
+      );
+    for (const { guarantee, code, failed } of outcomes) {
+      assert.notEqual(code, 0, `the fault survived the browser test: ${guarantee}`);
+      assert.ok(failed.includes(BROWSER_TEST), `the browser test stayed green: ${guarantee}`);
+    }
+  },
+);
 
 test(
   'every planted fault turns the test of its guarantee red, and the unplanted copy is green',

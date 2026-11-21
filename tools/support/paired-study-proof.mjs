@@ -123,7 +123,11 @@ export async function createEngineClient({
     /** Teach itself one card nobody has met and send the grade. Resolves { eventId, taskKey, rating }. */
     async gradeNew(module, rating = 3) {
       const first = await reserve();
-      assert.equal(first.error ?? null, null, `the second device could not sync: ${first.error}`);
+      assert.equal(
+        first.state,
+        'up-to-date',
+        `the second device could not bring its record up to date: ${first.error ?? first.state}`,
+      );
       const projection = backend.readProjection();
       const entry = backend
         .queue({ module })

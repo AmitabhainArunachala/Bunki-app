@@ -104,14 +104,18 @@ function createServer({ now }) {
     Object.defineProperty(response, 'url', { value: url, configurable: true });
     return response;
   };
+  // the server's own events are numbered along the server's own stream: a grant that comes after a device's
+  // review is still the next server event, not the next row of the ledger
+  let serverEvents = 0;
   function grant(installation, count) {
     const seq = rows.length + 1;
+    const dseq = ++serverEvents;
     const event = {
       v: 4,
-      id: `@server:${seq}`,
+      id: `@server:${dseq}`,
       learner: LEARNER,
       install: '@server',
-      dseq: seq,
+      dseq,
       base: seq - 1,
       ts: now(),
       epoch: 0,
@@ -912,7 +916,6 @@ test('a grade crosses both ways between Bunki and a second device of the same le
     learner: LEARNER,
     installation: bunki.installation,
   });
-  await other.reserve();
   const [first, second] = catalog;
 
   const fromBunki = await grade(bunki.adapter.backend, first.taskKey, 3);
@@ -927,6 +930,18 @@ test('a grade crosses both ways between Bunki and a second device of the same le
     canonicalStringify(fromBunki.preview.cards[3]),
   );
 
+  // the second device takes its permits only now, after Bunki's review is in the ledger: the server's grant is
+  // then the server's second event and the ledger's third row, and both devices must replay it in its place
+  const granted = await other.reserve();
+  assert.equal(granted.state, 'up-to-date');
+  const serverEvents = world.server.rows.filter((row) => row.authority === 'server');
+  assert.deepEqual(
+    serverEvents.map((row) => [row.seq, row.event.dseq, row.event.id]),
+    [
+      [1, 1, '@server:1'],
+      [3, 2, '@server:2'],
+    ],
+  );
   const fromOther = await grade(other.backend, second.taskKey, 4);
   await other.sync();
   assert.equal((await bunki.host.synchronize()).state, 'up-to-date');
