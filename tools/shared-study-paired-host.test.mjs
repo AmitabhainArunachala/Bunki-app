@@ -1,10 +1,11 @@
-/* global process, URL, Response, EventTarget, Buffer, console, setTimeout */
+/* global process, URL, Response, EventTarget, Buffer, console, setTimeout, queueMicrotask */
 /** The paired study host against a double of the Nihongo Study server (ENGINE-ONE.3).
  *
  * Everything here is synthetic: a test learner, made-up codes and tokens, an in-process server that answers the
  * routes a study device uses (`/v1/pair`, `/v1/events`, `/v1/permits`), and memory storage. Nothing leaves the
  * process. The second device of the same learner is the engine's own sync client, driven directly, so a grade is
- * proven to cross between Bunki's host and a client that shares none of the host's code.
+ * proven to cross between Bunki's host and a client that shares none of the host's code. A browser profile is one
+ * credential store, one localStorage and one broadcast channel shared by its tabs; each tab has its own host.
  *
  * `BUNKI_PAIRED_HOST_ROOT` points the suite at another copy of prototypes/corridor: the negative controls
  * (tools/shared-study-paired-host-controls.test.mjs) plant one fault per guarantee there and require a red. */
@@ -38,8 +39,13 @@ const {
   createStudyPairing,
   parseStudyPairing,
   isStudyServer,
+  isStudyRow,
+  studyRowChanges,
   studyMarker,
+  studyEndedMark,
   PAIRED_MARKER,
+  ENDED_MARKER,
+  PAIRING_CHANNEL,
   studyPairingLine,
 } = pairingModule;
 const { openPairedStudyHost, studyTransportBridge, pairedReplicaName } = hostModule;
@@ -73,9 +79,20 @@ const SERVER = 'http://127.0.0.1:8787';
 const LEARNER = 'test-paired-learner';
 /** What a server on this machine is taken to be when the pairing line names no environment. */
 const ENVIRONMENT = 'dev';
+/** A made-up pairing code that no device was given. */
+const NO_SUCH_CODE = 'A0B0A0B0A0B0';
+/** A test that starts a process gets room for a slow runner. */
+const SLOW = { timeout: 30000 };
 const hex = (bytes) => randomBytes(bytes).toString('hex');
 const studyInstallation = () => `bunkiweb-${hex(16)}`;
 const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
+async function until(holds, what) {
+  for (let turn = 0; turn < 200; turn++) {
+    if (holds()) return;
+    await tick();
+  }
+  assert.fail(`did not happen: ${what}`);
+}
 const tokenFor = (scope) =>
   `nsrs_${scope.environment === 'prod' ? 'prod' : 'dev'}_${Buffer.from(
     JSON.stringify([scope.environment, scope.learner, scope.installation]),
@@ -95,6 +112,8 @@ function createServer({ now }) {
     answerScope: null,
     answerToken: null,
     refusePermits: false,
+    /** When set, a request to the event route waits for this before it is answered (a reply still on its way). */
+    gate: null,
   };
   const answer = (url, status, value) => {
     const response = new Response(JSON.stringify(value), {
@@ -182,8 +201,10 @@ function createServer({ now }) {
       });
     }
     const bearer = /^Bearer (.+)$/.exec(headers.Authorization || '')?.[1];
-    const device = bearer ? tokens.get(bearer) : null;
     if (target.pathname === '/v1/events') {
+      if (knobs.gate) await knobs.gate;
+      // looked up when the answer is made: a device may be revoked while its request is on its way
+      const device = bearer ? tokens.get(bearer) : null;
       if (!device || device.revoked) return answer(url, 401, { error: 'authentication-required' });
       const mismatch = stale();
       if (mismatch) return mismatch;
@@ -216,6 +237,7 @@ function createServer({ now }) {
         events: rows.filter((row) => row.seq > after),
       });
     }
+    const device = bearer ? tokens.get(bearer) : null;
     if (target.pathname === '/v1/permits' && init.method === 'POST') {
       if (!device || device.revoked || knobs.refusePermits)
         return answer(url, 401, { error: 'authentication-required' });
@@ -255,17 +277,36 @@ function createServer({ now }) {
       for (const [token, row] of tokens) if (row.scope.installation === installation) return token;
       return null;
     },
+    /** How many requests have carried this credential. */
+    carried: (token) => log.filter((row) => row.headers.Authorization === `Bearer ${token}`).length,
   };
 }
 
-/** The credential store's contract, in memory (the device store itself needs a browser's IndexedDB). */
+/** The device store's contract, in memory (the store itself needs a browser's IndexedDB). It changes its one row
+ * through the product's own row changes, so a fault in those is a fault here too. `failing` makes the next writes
+ * of a kind fail, as a full or broken disk would. */
 function memoryCredentialStore() {
   let row = null;
   let address = null;
+  let made = 0;
   const calls = [];
+  const failing = { markReady: 0, end: 0, forget: 0, remove: 0 };
+  const attempt = (name) => {
+    calls.push(name);
+    if (failing[name] > 0) {
+      failing[name]--;
+      throw new Error(`synthetic-${name}-failed`);
+    }
+  };
+  const change = (name, next) => {
+    attempt(name);
+    if (next) row = next;
+    return !!next;
+  };
   return {
     available: true,
     calls,
+    failing,
     peek: () => row,
     async read() {
       return {
@@ -274,12 +315,13 @@ function memoryCredentialStore() {
           ? Object.freeze({
               server: row.server,
               scope: Object.freeze({ ...row.scope }),
+              generation: row.generation,
               pairedAt: row.pairedAt,
               phase: row.phase,
-              ended: row.ended,
+              ended: row.ended ? Object.freeze({ ...row.ended }) : null,
             })
           : null,
-        token: row && !row.ended ? row.token : null,
+        token: row && !row.ended ? row.sealed : null,
       };
     },
     async probe() {
@@ -288,46 +330,33 @@ function memoryCredentialStore() {
     async write(value) {
       calls.push('write');
       row = {
+        format: 'bunki-study-device/v1',
         server: value.server,
-        token: value.token,
+        sealed: value.token,
         scope: { ...value.scope },
+        generation: `generation-${++made}`,
         pairedAt: value.pairedAt,
         phase: 'allocated',
         ended: null,
       };
       address = value.server;
+      return Object.freeze({ installation: value.scope.installation, generation: row.generation });
     },
-    async markReady() {
-      calls.push('markReady');
-      if (row) row.phase = 'ready';
+    async markReady(ref) {
+      return change('markReady', studyRowChanges.ready(row, ref));
     },
-    async end({ at }) {
-      calls.push('end');
-      if (row) {
-        row.token = null;
-        row.ended = { at };
-      }
+    async end(ref, ending) {
+      return change('end', studyRowChanges.end(row, ref, ending));
     },
-    async clear() {
-      calls.push('clear');
+    async forget(ref, ending) {
+      return change('forget', studyRowChanges.forget(row, ref, ending));
+    },
+    async remove(ref) {
+      attempt('remove');
+      if (!isStudyRow(row, ref)) return false;
       row = null;
+      return true;
     },
-  };
-}
-
-function memoryLocalStorage({ refuse = false } = {}) {
-  const kept = new Map();
-  const writes = [];
-  return {
-    writes,
-    kept,
-    getItem: (key) => (kept.has(key) ? kept.get(key) : null),
-    setItem(key, value) {
-      writes.push([key, String(value)]);
-      if (refuse) throw new Error('synthetic-quota');
-      kept.set(key, String(value));
-    },
-    removeItem: (key) => void kept.delete(key),
   };
 }
 
@@ -337,73 +366,138 @@ const pairLine = (minted, server = SERVER) => ({
   code: '',
 });
 
-/** One browser profile: its credential store, flag, replica databases, and a network that can be cut. */
+/** One browser profile: its credential store, its localStorage, its broadcast channel and its replica databases,
+ * shared by its tabs, and a server. `world.tab()` opens another tab of the same profile; the world itself is the
+ * first tab. A `deaf` tab hears neither the channel nor the storage events, as a tab that missed the message. */
 function createWorld({ voiceServer = null, refuseFlag = false } = {}) {
   let clock = Date.parse('2026-11-21T03:00:00Z');
   const now = () => clock;
   const server = createServer({ now });
   const store = memoryCredentialStore();
-  const localStorage = memoryLocalStorage({ refuse: refuseFlag });
-  const marker = studyMarker({ localStorage });
+  const kept = new Map();
+  const writes = [];
   const replicas = new Map();
   const opened = [];
-  const state = { online: true };
+  const tabs = new Set();
+  const channels = new Set();
   const compatibility = async () => ({ 'X-NSRS-Reducer-SHA256': SYNC_COMPATIBILITY.reducerSha256 });
-  const pairing = createStudyPairing({
-    env: {},
-    fetch: server.fetch,
-    store,
-    voiceAddress: async () => voiceServer,
-    marker,
-    now,
-    compatibility,
-  });
-  const openHost = (overrides = {}) =>
-    openPairedStudyHost({
-      env: {},
-      store,
+
+  function tab({ deaf = false } = {}) {
+    const hearing = new Set();
+    const self = { deaf, hearing };
+    tabs.add(self);
+    // a change of localStorage is told to the other tabs of the profile, never to the tab that made it
+    const changed = (key) => {
+      for (const other of tabs)
+        if (other !== self && !other.deaf)
+          for (const listener of [...other.hearing]) queueMicrotask(() => listener({ key }));
+    };
+    const localStorage = {
+      getItem: (key) => (kept.has(key) ? kept.get(key) : null),
+      setItem(key, value) {
+        writes.push([key, String(value)]);
+        if (refuseFlag) throw new Error('synthetic-quota');
+        const before = kept.get(key);
+        kept.set(key, String(value));
+        if (before !== String(value)) changed(key);
+      },
+      removeItem(key) {
+        if (kept.delete(key)) changed(key);
+      },
+    };
+    class Channel {
+      constructor(name) {
+        this.name = name;
+        this.onmessage = null;
+        channels.add(this);
+      }
+      postMessage(data) {
+        for (const other of channels)
+          if (other !== this && other.name === this.name)
+            queueMicrotask(() => other.onmessage?.({ data }));
+      }
+      close() {
+        channels.delete(this);
+      }
+    }
+    const env = {
+      localStorage,
+      addEventListener: (type, listener) =>
+        void (type === 'storage' && !deaf && hearing.add(listener)),
+      removeEventListener: (type, listener) => void hearing.delete(listener),
+      ...(deaf ? {} : { BroadcastChannel: Channel }),
+    };
+    const marker = studyMarker(env);
+    const endedMark = studyEndedMark(env);
+    const state = { online: true };
+    const pairing = createStudyPairing({
+      env,
       fetch: server.fetch,
+      store,
+      voiceAddress: async () => voiceServer,
       now,
-      presentation: 'desktop',
-      storageFactory: ({ databaseName }) => {
-        opened.push(databaseName);
-        if (!replicas.has(databaseName)) replicas.set(databaseName, createMemoryAdapter());
-        return replicas.get(databaseName);
-      },
-      sync: {
-        online: () => state.online,
-        visible: () => true,
-        automatic: false,
-        eventTarget: new EventTarget(),
-        transportOptions: { maxRetries: 0 },
-      },
-      ...overrides,
+      compatibility,
     });
-  const bind = (host) =>
-    host.withAdapter((binding) => createBunkiStudyAdapter({ ...binding, content }));
+    const openHost = (overrides = {}) =>
+      openPairedStudyHost({
+        env,
+        store,
+        fetch: server.fetch,
+        now,
+        presentation: 'desktop',
+        endRetryMs: [1, 1],
+        storageFactory: ({ databaseName }) => {
+          opened.push(databaseName);
+          if (!replicas.has(databaseName)) replicas.set(databaseName, createMemoryAdapter());
+          return replicas.get(databaseName);
+        },
+        sync: {
+          online: () => state.online,
+          visible: () => true,
+          automatic: false,
+          eventTarget: new EventTarget(),
+          transportOptions: { maxRetries: 0 },
+        },
+        ...overrides,
+      });
+    const bind = (host) =>
+      host.withAdapter((binding) => createBunkiStudyAdapter({ ...binding, content }));
+    return {
+      env,
+      marker,
+      endedMark,
+      state,
+      pairing,
+      openHost,
+      bind,
+      /** This tab opens the pairing the profile holds and fetches the record. */
+      async study() {
+        const host = await openHost();
+        const adapter = await bind(host);
+        return { host, adapter, installation: host.identity.installation };
+      },
+      /** Pair this profile with a fresh code in this tab, open its host and fetch the record once. */
+      async paired() {
+        const minted = server.code();
+        const answer = await pairing.pair(pairLine(minted));
+        assert.deepEqual(answer, { ok: true, learner: LEARNER, installation: minted.installation });
+        const host = await openHost();
+        const adapter = await bind(host);
+        return { host, adapter, installation: minted.installation };
+      },
+    };
+  }
   return {
     now,
     advance: (ms) => void (clock += ms),
     server,
     store,
-    localStorage,
-    marker,
+    localStorage: { kept, writes },
     replicas,
     opened,
-    state,
-    pairing,
     compatibility,
-    openHost,
-    bind,
-    /** Pair this profile with a fresh code, open its host and fetch the record once. */
-    async paired() {
-      const minted = server.code();
-      const answer = await pairing.pair(pairLine(minted));
-      assert.deepEqual(answer, { ok: true, learner: LEARNER, installation: minted.installation });
-      const host = await openHost();
-      const adapter = await bind(host);
-      return { host, adapter, installation: minted.installation };
-    },
+    tab,
+    ...tab(),
   };
 }
 
@@ -414,7 +508,26 @@ async function grade(backend, key, rating) {
   assert.equal(result.kind, 'durable');
   return { result, preview };
 }
+/** An answer ready to be sent in, not yet sent. */
+const intentFor = (backend, key, rating = 3) =>
+  backend.preview(backend.snapshotAttempt(key), 1800).intents[rating];
 const reviews = (backend) => backend.readProjection().reviews;
+/** The refusal of an answer after the pairing has ended: its code and its plain words in both languages. */
+const notSaved = (error) => {
+  assert.equal(error.code, 'study-answer-not-saved');
+  assert.match(error.bunkiLine[1], /no longer paired\. This answer was not saved\./);
+  assert.match(error.bunkiLine[0], /保存されませんでした/);
+  return true;
+};
+/** The engine's own view of a paired copy of the record, opened beside the host. */
+async function replicaOf(world, installation) {
+  const engine = createStudyEngine({ content, learner: LEARNER, timezone: 'Asia/Tokyo' });
+  return engine.openStore({
+    adapter: world.replicas.get(`bunki-shared-study-paired-${installation}`),
+    scope: { learner: LEARNER, environment: ENVIRONMENT, installation },
+    now: world.now,
+  });
+}
 
 /** The second device of the same learner: the engine's own store, backend and sync client, with no Bunki host code. */
 async function engineDevice(world) {
@@ -512,7 +625,7 @@ test('pair: one request to the configured server, the credential kept, the host 
   );
   const kept = world.store.peek();
   assert.equal(kept.server, SERVER);
-  assert.equal(kept.token, world.server.tokenOf(minted.installation));
+  assert.equal(kept.sealed, world.server.tokenOf(minted.installation));
   assert.deepEqual(kept.scope, {
     environment: ENVIRONMENT,
     learner: LEARNER,
@@ -520,6 +633,7 @@ test('pair: one request to the configured server, the credential kept, the host 
   });
   assert.equal(kept.phase, 'allocated');
   assert.equal(world.marker.get(), true);
+  assert.equal(world.endedMark.get(), null);
   assert.deepEqual(world.localStorage.kept.get(PAIRED_MARKER), '1');
 
   const host = await world.openHost();
@@ -545,8 +659,10 @@ test('pair: one request to the configured server, the credential kept, the host 
   assert.deepEqual(host.status(), {
     started: true,
     ended: false,
+    closed: null,
     state: 'up-to-date',
     error: null,
+    unsent: null,
   });
   // every sync request carries the credential and the replica's capability, and a GET nothing more
   const pull = world.server.log.find((row) => row.url.startsWith(`${SERVER}/v1/events?`));
@@ -555,7 +671,7 @@ test('pair: one request to the configured server, the credential kept, the host 
 });
 
 test('the pairing line: the code, the learner and the device in any order, in one box or two; a code alone cannot pair', () => {
-  const code = 'A0B0A0B0A0B0';
+  const code = NO_SUCH_CODE;
   const device = studyInstallation();
   const whole = { code, learner: LEARNER, installation: device };
   assert.deepEqual(
@@ -624,7 +740,7 @@ test('the pairing line: the code, the learner and the device in any order, in on
   for (const input of [
     null,
     {},
-    { learner: `learner: ${LEARNER} · device: ${device}`, code: 'ABCDEF01234' },
+    { learner: `learner: ${LEARNER} · device: ${device}`, code: 'A0B0A0B0A0B' },
     { learner: `learner: nsrs_x · device: ${device}`, code },
     {
       learner: `learner: ${LEARNER} · device: ${device} · server: https://study.example.invalid`,
@@ -657,7 +773,7 @@ test('pair: the two boxes work as well as the pasted line, on a device the voice
 for (const [name, arrange, expected] of [
   [
     'a wrong code',
-    (world) => ({ ...world.server.code(), code: 'A0B0A0B0A0B0' }),
+    (world) => ({ ...world.server.code(), code: NO_SUCH_CODE }),
     'code-invalid-or-expired',
   ],
   [
@@ -786,7 +902,7 @@ test('pair refused: a flag this browser cannot keep undoes the pairing, so nothi
   const again = late.server.code();
   const flaky = { ...late.marker, probe: () => true, set: () => false };
   const pairing = createStudyPairing({
-    env: {},
+    env: late.env,
     fetch: late.server.fetch,
     store: late.store,
     voiceAddress: async () => null,
@@ -795,7 +911,7 @@ test('pair refused: a flag this browser cannot keep undoes the pairing, so nothi
   });
   assert.deepEqual(await pairing.pair(pairLine(again)), { ok: false, code: 'storage-unavailable' });
   assert.equal(late.store.peek(), null);
-  assert.deepEqual(late.store.calls, ['write', 'clear']);
+  assert.deepEqual(late.store.calls, ['write', 'remove']);
 });
 
 test('pairing goes to the server this device is set up for, or nowhere', async () => {
@@ -1047,7 +1163,8 @@ test('a first open needs the record: with no connection it is refused, and the n
     return true;
   });
   assert.equal(world.store.peek().phase, 'allocated');
-  assert.deepEqual(host.status(), { started: false, ended: false, state: 'idle', error: null });
+  assert.equal(host.status().started, false);
+  assert.equal(host.status().closed, null);
   world.state.online = true;
   const adapter = await world.bind(host);
   assert.equal(adapter.identity.installation, minted.installation);
@@ -1080,7 +1197,7 @@ test('426 while syncing: the screen is told an update is needed and the grades s
   assert.equal(stale.state, 'update-required');
   assert.equal(bunki.adapter.platform.getSyncState(), 'update-required');
   assert.equal(bunki.host.status().ended, false);
-  assert.notEqual(world.store.peek().token, null);
+  assert.notEqual(world.store.peek().sealed, null);
   assert.equal((await bunki.adapter.store.status()).pending, 1);
   world.server.knobs.reducer = SYNC_COMPATIBILITY.reducerSha256;
   assert.equal((await bunki.host.synchronize()).state, 'up-to-date');
@@ -1099,14 +1216,16 @@ test('401 after a revocation: sync stops, the credential is dropped, the screen 
   const refused = await bunki.host.synchronize();
   assert.equal(refused.state, 'paused-auth');
   assert.equal(refused.error, 'authentication-required');
-  await tick();
+  await until(() => world.store.peek().ended, 'the row was ended');
   assert.equal(bunki.host.status().ended, true);
-  assert.equal(bunki.adapter.platform.getSyncError(), 'authentication-required');
+  assert.equal(bunki.host.status().closed, 'study-pairing-ended');
   assert.equal(bunki.adapter.platform.isPaired(), false);
   assert.equal(bunki.adapter.platform.canRequestNewCards(), false);
   assert.ok(told > 0);
-  assert.equal(world.store.peek().token, null);
-  assert.ok(world.store.peek().ended);
+  // the row says it ended, by the server, and keeps no credential
+  assert.equal(world.store.peek().sealed, null);
+  assert.equal(world.store.peek().ended.by, 'server');
+  assert.deepEqual(world.endedMark.get(), { installation: bunki.installation, by: 'server' });
   assert.deepEqual(
     world.store.calls.filter((call) => call === 'end'),
     ['end'],
@@ -1121,15 +1240,14 @@ test('401 after a revocation: sync stops, the credential is dropped, the screen 
   await assert.rejects(bunki.adapter.platform.requestNewCards());
   assert.equal(world.server.log.length, asked);
   await bunki.host.dispose();
-  // and none after a restart: the next page finds the pairing ended and asks nobody
-  const again = await world.openHost();
-  assert.equal(again.status().ended, true);
-  const adapter = await world.bind(again);
-  assert.equal(adapter.platform.isPaired(), false);
-  assert.equal((await again.synchronize()).state, 'paused-auth');
+  // and none after a restart: an ended pairing is never bound again, and the server is asked nothing
+  await assert.rejects(
+    world.openHost(),
+    (error) => error.code === 'study-pairing-ended' && error.bunkiLine.length === 2,
+  );
   assert.equal(world.server.log.length, asked);
-  assert.equal((await adapter.store.status()).pending, 1);
-  await again.dispose();
+  const status = await world.pairing.status();
+  assert.deepEqual([status.paired, status.ended], [true, true]);
 });
 
 test('401 on a permit request ends the pairing the same way', async () => {
@@ -1138,9 +1256,9 @@ test('401 on a permit request ends the pairing the same way', async () => {
   world.server.revoke(bunki.installation);
   // the sync inside the request is refused first; the host must not go on to ask for permits
   await bunki.adapter.platform.requestNewCards().catch(() => null);
-  await tick();
-  assert.equal(bunki.host.status().ended, true);
-  assert.equal(world.store.peek().token, null);
+  await until(() => world.store.peek().ended, 'the row was ended');
+  assert.equal(bunki.host.status().closed, 'study-pairing-ended');
+  assert.equal(world.store.peek().sealed, null);
   assert.equal(world.server.log.filter((row) => row.url === `${SERVER}/v1/permits`).length, 0);
   await bunki.host.dispose();
 
@@ -1149,10 +1267,10 @@ test('401 on a permit request ends the pairing the same way', async () => {
   const device = await late.paired();
   late.server.knobs.refusePermits = true;
   await device.adapter.platform.requestNewCards().catch(() => null);
-  await tick();
+  await until(() => late.store.peek().ended, 'the row was ended');
   assert.equal(late.server.log.filter((row) => row.url === `${SERVER}/v1/permits`).length, 1);
-  assert.equal(device.host.status().ended, true);
-  assert.equal(late.store.peek().token, null);
+  assert.equal(device.host.status().closed, 'study-pairing-ended');
+  assert.equal(late.store.peek().sealed, null);
   assert.equal(device.adapter.platform.isPaired(), false);
   const asked = late.server.log.length;
   assert.equal((await device.host.synchronize()).state, 'paused-auth');
@@ -1171,13 +1289,16 @@ test('unpair: the credential and the flag go, sync stops, the copy of the record
   assert.deepEqual(await world.pairing.unpair(), { ok: true });
   assert.equal(world.store.peek(), null);
   assert.equal(world.marker.get(), false);
+  assert.equal(world.endedMark.get(), null);
   assert.equal(world.localStorage.kept.has(PAIRED_MARKER), false);
+  assert.equal(world.localStorage.kept.has(ENDED_MARKER), false);
   assert.equal((await world.store.read()).server, SERVER);
   assert.deepEqual(await world.pairing.status(), {
     available: true,
     failed: false,
     paired: false,
     ended: false,
+    unsent: null,
     learner: null,
     installation: null,
     marked: false,
@@ -1189,14 +1310,7 @@ test('unpair: the credential and the flag go, sync stops, the copy of the record
   assert.equal((await bunki.host.synchronize()).error, 'study-host-not-started');
   assert.equal(world.server.log.length, asked);
   // the copy is still on the device, whole
-  const replica = world.replicas.get(`bunki-shared-study-paired-${bunki.installation}`);
-  const engine = createStudyEngine({ content, learner: LEARNER, timezone: 'Asia/Tokyo' });
-  const store = await engine.openStore({
-    adapter: replica,
-    scope: { learner: LEARNER, environment: ENVIRONMENT, installation: bunki.installation },
-    now: world.now,
-  });
-  const state = await store.readState();
+  const state = await (await replicaOf(world, bunki.installation)).readState();
   assert.ok(Object.values(state.canonical).some((row) => row.event.id === made.result.eventId));
   // a new pairing is a new installation, the admin's again, with a copy of its own
   const next = await world.paired();
@@ -1224,7 +1338,7 @@ test('the credential is nowhere but the Authorization header of requests to its 
     await bunki.host.synchronize();
     world.server.revoke(bunki.installation);
     await bunki.host.synchronize();
-    await tick();
+    await until(() => world.store.peek().ended, 'the row was ended');
     assert.ok(token && token.length > 80);
     let carried = 0;
     for (const request of world.server.log) {
@@ -1239,9 +1353,13 @@ test('the credential is nowhere but the Authorization header of requests to its 
       }
     }
     assert.ok(carried >= 4);
+    // the two marks are all localStorage ever holds of the pairing, and neither is the credential
     assert.deepEqual(
-      world.localStorage.writes.filter(([key]) => key === PAIRED_MARKER),
-      [[PAIRED_MARKER, '1']],
+      world.localStorage.writes.filter(([key]) => !key.endsWith(':probe')),
+      [
+        [PAIRED_MARKER, '1'],
+        [ENDED_MARKER, `${bunki.installation}|server`],
+      ],
     );
     for (const [key, value] of world.localStorage.writes)
       assert.equal(`${key}${value}`.includes(token), false);
@@ -1258,10 +1376,374 @@ test('the credential is nowhere but the Authorization header of requests to its 
   }
 });
 
+test('two tabs: a pairing forgotten in one tab stops the other at once, and a new pairing is out of its reach', async () => {
+  const world = createWorld();
+  const first = await world.paired();
+  const second = await world.tab().study();
+  assert.equal(second.installation, first.installation);
+  await first.adapter.platform.requestNewCards();
+  await second.host.synchronize();
+  const old = world.server.tokenOf(first.installation);
+  const answer = intentFor(second.adapter.backend, catalog[0].taskKey);
+  let told = 0;
+  second.host.subscribe(() => void told++);
+
+  // the first tab forgets the pairing: the second tab hears it and stops, with nothing asked of it
+  await first.host.dispose();
+  assert.deepEqual(await world.pairing.unpair(), { ok: true });
+  await until(() => second.host.status().closed, 'the other tab stopped');
+  assert.equal(second.host.status().closed, 'study-pairing-changed');
+  assert.ok(told > 0);
+  assert.equal(second.adapter.platform.isPaired(), false);
+  const carried = world.server.carried(old);
+  assert.equal((await second.host.synchronize()).state, 'paused-auth');
+  await assert.rejects(second.adapter.platform.requestNewCards());
+  assert.equal(world.server.carried(old), carried);
+  // an answer in the stopped tab is refused in plain words and nothing is saved
+  const before = reviews(second.adapter.backend).length;
+  await assert.rejects(second.adapter.submit(answer), notSaved);
+  await assert.rejects(second.adapter.backend.submitCommand(answer), notSaved);
+  assert.equal(reviews(second.adapter.backend).length, before);
+  assert.equal((await second.adapter.store.status()).pending, 0);
+
+  // the first tab pairs a new installation: the stopped tab cannot touch it
+  const next = await world.paired();
+  assert.notEqual(next.installation, first.installation);
+  await tick();
+  assert.equal(second.host.status().closed, 'study-pairing-changed');
+  await assert.rejects(
+    second.host.withAdapter(() => assert.fail('a stopped host opened')),
+    /study-pairing-changed/,
+  );
+  await assert.rejects(second.adapter.submit(answer), notSaved);
+  assert.equal((await second.host.synchronize()).state, 'paused-auth');
+  assert.equal(world.server.carried(old), carried);
+  const row = world.store.peek();
+  assert.equal(row.scope.installation, next.installation);
+  assert.equal(row.sealed, world.server.tokenOf(next.installation));
+  assert.equal(row.ended, null);
+  assert.equal(row.phase, 'ready');
+  assert.equal(next.host.status().closed, null);
+  assert.equal((await next.host.synchronize()).state, 'up-to-date');
+  await next.host.dispose();
+  await second.host.dispose();
+});
+
+test('a tab that heard nothing finds out before its next request and before its next answer', async () => {
+  const world = createWorld();
+  const first = await world.paired();
+  await first.adapter.platform.requestNewCards();
+  // two tabs that will hear neither the channel nor the marks changing
+  const asking = await world.tab({ deaf: true }).study();
+  const answering = await world.tab({ deaf: true }).study();
+  await asking.host.synchronize();
+  await answering.host.synchronize();
+  const old = world.server.tokenOf(first.installation);
+  const answer = intentFor(answering.adapter.backend, catalog[0].taskKey);
+  await first.host.dispose();
+  assert.deepEqual(await world.pairing.unpair(), { ok: true });
+  const next = await world.paired();
+  await tick();
+  // neither heard a thing; the server would still take the old credential
+  assert.equal(asking.host.status().closed, null);
+  assert.equal(answering.host.status().closed, null);
+  assert.equal(world.server.tokens.get(old).revoked, false);
+  const carried = world.server.carried(old);
+
+  // before a request: the stored row is no longer the pairing this tab opened, so nothing is sent
+  const refused = await asking.host.synchronize();
+  assert.equal(refused.error, 'authentication-required');
+  assert.equal(world.server.carried(old), carried);
+  assert.equal(asking.host.status().closed, 'study-pairing-changed');
+
+  // before an answer: refused in plain words, nothing saved, and the tab stops
+  const before = reviews(answering.adapter.backend).length;
+  await assert.rejects(answering.adapter.submit(answer), notSaved);
+  assert.equal(reviews(answering.adapter.backend).length, before);
+  assert.equal((await answering.adapter.store.status()).pending, 0);
+  assert.equal(answering.host.status().closed, 'study-pairing-changed');
+  assert.equal(world.server.carried(old), carried);
+
+  // the new pairing is as it was made
+  assert.equal(world.store.peek().scope.installation, next.installation);
+  assert.equal(world.store.peek().ended, null);
+  assert.equal(world.marker.get(), true);
+  assert.equal(world.endedMark.get(), null);
+  await next.host.dispose();
+  await asking.host.dispose();
+  await answering.host.dispose();
+});
+
+test('a change to the stored pairing names the row it means: a late refusal and a late first open leave a new pairing alone', async () => {
+  // the row changes themselves
+  const scope = { environment: ENVIRONMENT, learner: LEARNER, installation: studyInstallation() };
+  const row = {
+    format: 'bunki-study-device/v1',
+    server: SERVER,
+    sealed: 'sealed',
+    scope,
+    generation: 'second',
+    pairedAt: 1,
+    phase: 'allocated',
+    ended: null,
+  };
+  const mine = { installation: scope.installation, generation: 'second' };
+  const earlier = { installation: scope.installation, generation: 'first' };
+  const another = { installation: studyInstallation(), generation: 'second' };
+  assert.equal(isStudyRow(row, mine), true);
+  for (const ref of [earlier, another, null]) {
+    assert.equal(isStudyRow(row, ref), false);
+    assert.equal(studyRowChanges.ready(row, ref), null);
+    assert.equal(studyRowChanges.end(row, ref, { at: 2, unsent: 1 }), null);
+    assert.equal(studyRowChanges.forget(row, ref, { at: 2 }), null);
+  }
+  assert.equal(studyRowChanges.ready(row, mine).phase, 'ready');
+  const ended = studyRowChanges.end(row, mine, { at: 2, unsent: 3 });
+  assert.deepEqual([ended.sealed, ended.ended], [null, { at: 2, by: 'server', unsent: 3 }]);
+  // an ended row is not ended again or made ready; forgetting it keeps what it knew
+  assert.equal(studyRowChanges.end(ended, mine, { at: 9 }), null);
+  assert.equal(studyRowChanges.end(ended, mine, { at: 9, unsent: 5 }), null);
+  assert.equal(studyRowChanges.ready(ended, mine), null);
+  // an ending written without a count (by a page that only found the mark) takes the count from the page that knows
+  const uncounted = studyRowChanges.end(row, mine, { at: 2 });
+  assert.deepEqual(uncounted.ended, { at: 2, by: 'server', unsent: null });
+  assert.deepEqual(studyRowChanges.end(uncounted, mine, { at: 9, unsent: 4 }).ended, {
+    at: 2,
+    by: 'server',
+    unsent: 4,
+  });
+  assert.equal(studyRowChanges.end(uncounted, another, { at: 9, unsent: 4 }), null);
+  assert.deepEqual(studyRowChanges.forget(ended, mine, { at: 9 }).ended, {
+    at: 2,
+    by: 'learner',
+    unsent: 3,
+  });
+
+  // a refusal that arrives after the pairing was replaced: the old tab's request was on its way when the first tab
+  // forgot the pairing and made a new one
+  const world = createWorld();
+  const first = await world.paired();
+  const stale = await world.tab({ deaf: true }).study();
+  const old = world.server.tokenOf(first.installation);
+  let release;
+  world.server.knobs.gate = new Promise((resolve) => (release = resolve));
+  const sent = world.server.carried(old);
+  const late = stale.host.synchronize();
+  await until(() => world.server.carried(old) > sent, 'the old tab’s request left');
+  world.server.revoke(first.installation);
+  await first.host.dispose();
+  assert.deepEqual(await world.pairing.unpair(), { ok: true });
+  world.server.knobs.gate = null;
+  const next = await world.paired();
+  release();
+  assert.equal((await late).error, 'authentication-required');
+  await until(() => stale.host.status().closed, 'the old tab stopped');
+  assert.equal(stale.host.status().closed, 'study-pairing-changed');
+  let kept = world.store.peek();
+  assert.equal(kept.scope.installation, next.installation);
+  assert.equal(kept.sealed, world.server.tokenOf(next.installation));
+  assert.equal(kept.ended, null);
+  assert.equal(world.endedMark.get(), null);
+  assert.equal(world.marker.get(), true);
+  assert.equal((await next.host.synchronize()).state, 'up-to-date');
+  await next.host.dispose();
+  await stale.host.dispose();
+
+  // a first open that finishes after the pairing was replaced: the new, unfetched pairing is not marked ready
+  const slow = createWorld();
+  const minted = slow.server.code();
+  await slow.pairing.pair(pairLine(minted));
+  const opening = await slow.tab({ deaf: true }).openHost();
+  const before = slow.server.log.length;
+  let letGo;
+  slow.server.knobs.gate = new Promise((resolve) => (letGo = resolve));
+  const binding = slow.bind(opening);
+  await until(() => slow.server.log.length > before, 'the first fetch left');
+  assert.deepEqual(await slow.pairing.unpair(), { ok: true });
+  const replaced = slow.server.code();
+  slow.server.knobs.gate = null;
+  assert.equal((await slow.pairing.pair(pairLine(replaced))).ok, true);
+  letGo();
+  await assert.rejects(binding, /study-pairing-changed/);
+  kept = slow.store.peek();
+  assert.equal(kept.scope.installation, replaced.installation);
+  assert.equal(kept.phase, 'allocated');
+  assert.equal(kept.ended, null);
+  assert.equal(opening.status().closed, 'study-pairing-changed');
+  await opening.dispose();
+});
+
+test('after the pairing has ended an answer is refused in plain words, nothing is saved, and what was waiting is counted and kept', async () => {
+  const world = createWorld();
+  const bunki = await world.paired();
+  await bunki.adapter.platform.requestNewCards();
+  // two answers given with no connection: they wait on the device
+  world.state.online = false;
+  const waiting = [
+    await grade(bunki.adapter.backend, catalog[0].taskKey, 3),
+    await grade(bunki.adapter.backend, catalog[1].taskKey, 4),
+  ];
+  const next = intentFor(bunki.adapter.backend, catalog[2].taskKey);
+  world.state.online = true;
+  world.server.revoke(bunki.installation);
+  assert.equal((await bunki.host.synchronize()).state, 'paused-auth');
+  await until(() => world.store.peek().ended, 'the row was ended');
+  assert.equal(bunki.host.status().closed, 'study-pairing-ended');
+  assert.equal(bunki.host.status().unsent, 2);
+
+  // every way of giving an answer is refused, with the plain line, and none reports a success
+  const before = canonicalStringify(bunki.adapter.backend.readProjection());
+  for (const give of [
+    () => bunki.adapter.submit(next),
+    () => bunki.adapter.resume(next),
+    () => bunki.adapter.backend.submitCommand(next),
+    () => bunki.adapter.backend.resumeCommand(next),
+    () => bunki.adapter.backend.mutate('review', catalog[2].taskKey),
+  ])
+    await assert.rejects(give(), notSaved);
+  assert.equal(canonicalStringify(bunki.adapter.backend.readProjection()), before);
+  assert.equal((await bunki.adapter.store.status()).pending, 2);
+
+  // what was waiting stays on the device, and the device says how many answers never reached the server
+  assert.deepEqual(world.store.peek().ended, { at: world.now(), by: 'server', unsent: 2 });
+  const status = await world.pairing.status();
+  assert.deepEqual([status.paired, status.ended, status.unsent], [true, true, 2]);
+  const outbox = (await (await replicaOf(world, bunki.installation)).outbox(500)).map(
+    (record) => record.event.id,
+  );
+  for (const made of waiting) assert.ok(outbox.includes(made.result.eventId));
+  await bunki.host.dispose();
+});
+
+test('forgetting is made durable first: a page that closes midway leaves a pairing that is ended, never one that comes back', async () => {
+  // the order, when nothing fails: the mark, the row ended, the row removed, the flag cleared
+  const world = createWorld();
+  const bunki = await world.paired();
+  await bunki.host.dispose();
+  world.store.calls.length = 0;
+  world.localStorage.writes.length = 0;
+  assert.deepEqual(await world.pairing.unpair(), { ok: true });
+  assert.deepEqual(world.store.calls, ['forget', 'remove']);
+  assert.deepEqual(world.localStorage.writes, [[ENDED_MARKER, `${bunki.installation}|learner`]]);
+  assert.equal(world.store.peek(), null);
+
+  // the page closes after the row was ended and before it was removed
+  const cut = createWorld();
+  const held = await cut.paired();
+  await held.host.dispose();
+  cut.store.failing.remove = 1;
+  assert.deepEqual(await cut.pairing.unpair(), { ok: false, code: 'storage-unavailable' });
+  let row = cut.store.peek();
+  assert.equal(row.sealed, null);
+  assert.equal(row.ended.by, 'learner');
+  assert.deepEqual(cut.endedMark.get(), { installation: held.installation, by: 'learner' });
+  assert.equal(cut.marker.get(), true);
+  // nothing brings it back: no host, no request, and no healing
+  const asked = cut.server.log.length;
+  await assert.rejects(cut.openHost(), /study-pairing-ended/);
+  assert.equal(cut.server.log.length, asked);
+  // the next look at the pairing finishes the forgetting
+  assert.equal(await cut.pairing.heal(), false);
+  assert.equal(cut.store.peek(), null);
+  assert.equal(cut.marker.get(), false);
+  assert.equal(cut.endedMark.get(), null);
+  assert.equal((await cut.pairing.status()).paired, false);
+
+  // the first write itself fails: the mark already says the pairing is being forgotten
+  const early = createWorld();
+  const kept = await early.paired();
+  await kept.host.dispose();
+  early.store.failing.forget = 1;
+  assert.deepEqual(await early.pairing.unpair(), { ok: false, code: 'storage-unavailable' });
+  row = early.store.peek();
+  assert.notEqual(row.sealed, null);
+  assert.deepEqual(early.endedMark.get(), { installation: kept.installation, by: 'learner' });
+  const before = early.server.log.length;
+  await assert.rejects(early.openHost(), /study-pairing-ended/);
+  assert.equal(early.server.log.length, before);
+  assert.equal(await early.pairing.heal(), false);
+  assert.equal(early.store.peek(), null);
+
+  // a pairing the server ended is not healed either, even with both its marks gone
+  const refused = createWorld();
+  const ended = await refused.paired();
+  refused.server.revoke(ended.installation);
+  await ended.host.synchronize();
+  await until(() => refused.store.peek().ended, 'the row was ended');
+  await ended.host.dispose();
+  refused.marker.clear();
+  refused.endedMark.clear();
+  assert.equal(await refused.pairing.heal(), false);
+  assert.equal(refused.marker.get(), false);
+  // and the mark page start reads is put back for it
+  assert.deepEqual(refused.endedMark.get(), { installation: ended.installation, by: 'server' });
+  // a pairing that is still one does get its lost flag back
+  const live = createWorld();
+  const whole = await live.paired();
+  live.marker.clear();
+  assert.equal(await live.pairing.heal(), true);
+  assert.equal(live.marker.get(), true);
+  await whole.host.dispose();
+});
+
+test('a refusal the device could not write down stays a refusal: tried again, marked for page start, never asked again', async () => {
+  const world = createWorld();
+  const bunki = await world.paired();
+  world.server.revoke(bunki.installation);
+  world.store.failing.end = 99;
+  assert.equal((await bunki.host.synchronize()).state, 'paused-auth');
+  // this page knows at once, and the mark page start reads is already written
+  await until(() => bunki.host.status().closed, 'the host stopped');
+  assert.equal(bunki.host.status().closed, 'study-pairing-ended');
+  assert.deepEqual(world.endedMark.get(), { installation: bunki.installation, by: 'server' });
+  // the row could not be written: the write is tried again, and again
+  await until(() => world.store.calls.filter((call) => call === 'end').length === 3, 'three tries');
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  assert.equal(world.store.calls.filter((call) => call === 'end').length, 3);
+  assert.notEqual(world.store.peek().sealed, null);
+  assert.equal(world.store.peek().ended, null);
+  const asked = world.server.log.length;
+  assert.equal((await bunki.host.synchronize()).state, 'paused-auth');
+  assert.equal(world.server.log.length, asked);
+  await bunki.host.dispose();
+
+  // a reload: the credential is still in the row, and it is not used; the server is not asked again
+  await assert.rejects(world.openHost(), /study-pairing-ended/);
+  assert.equal(world.server.log.length, asked);
+  assert.equal(world.store.peek().ended, null);
+  let status = await world.pairing.status();
+  assert.deepEqual([status.paired, status.ended], [true, true]);
+  assert.equal(world.server.log.length, asked);
+  // once the device can write again, the row is ended by whoever looks next
+  world.store.failing.end = 0;
+  await assert.rejects(world.openHost(), /study-pairing-ended/);
+  assert.equal(world.store.peek().sealed, null);
+  assert.equal(world.store.peek().ended.by, 'server');
+  status = await world.pairing.status();
+  assert.deepEqual([status.paired, status.ended], [true, true]);
+  assert.equal(world.server.log.length, asked);
+
+  // the same through Settings alone: the mark stands, the row is written when the block looks
+  const later = createWorld();
+  const device = await later.paired();
+  later.server.revoke(device.installation);
+  later.store.failing.end = 99;
+  await device.host.synchronize();
+  await until(() => later.store.calls.filter((call) => call === 'end').length === 3, 'three tries');
+  await device.host.dispose();
+  later.store.failing.end = 0;
+  assert.equal((await later.pairing.status()).ended, true);
+  assert.equal(later.store.peek().sealed, null);
+});
+
 /** shared-study-boot.mjs acts once, at import, on the page's globals: each case is a process of its own. */
-function boot({ marked }) {
+function boot({ marked, ended = false }) {
+  const marks = [
+    ...(marked ? [[PAIRED_MARKER, '1']] : []),
+    ...(ended ? [[ENDED_MARKER, `bunkiweb-${'a'.repeat(32)}|server`]] : []),
+  ];
   const script = `
-    const kept = new Map(${marked ? `[[${JSON.stringify(PAIRED_MARKER)}, '1']]` : ''});
+    const kept = new Map(${JSON.stringify(marks)});
     const reloads = [];
     const define = (name, value) => Object.defineProperty(globalThis, name, { value, configurable: true, writable: true });
     define('localStorage', { getItem: (key) => (kept.has(key) ? kept.get(key) : null), setItem: (key, value) => void kept.set(key, value), removeItem: (key) => void kept.delete(key) });
@@ -1271,31 +1753,64 @@ function boot({ marked }) {
     const out = { bound: !!host, kind: host?.kind ?? null, block: typeof globalThis.bunkiStudyPairing?.settingsBlock };
     if (host) {
       out.status = host.status();
+      out.closed = host.closed();
       out.refusal = await host.withAdapter(() => { throw new Error('unreachable'); }).then(() => 'opened', (error) => error.code);
       out.after = { bound: !!globalThis.bunkiSharedStudyHost, marked: kept.has(${JSON.stringify(PAIRED_MARKER)}), reloads: reloads.length };
     }
     console.log(JSON.stringify(out));
+    // a page keeps its channel open; this process has said what it had to say
+    process.exit(0);
   `;
   const output = execFileSync(process.execPath, ['--input-type=module', '-e', script], {
     encoding: 'utf8',
     env: { PATH: process.env.PATH },
+    timeout: 25000,
   });
   return JSON.parse(output.trim().split('\n').at(-1));
 }
 
-test('page start: no flag binds nothing; a flag binds the host; a flag with no pairing behind it is taken away', () => {
-  assert.deepEqual(boot({ marked: false }), { bound: false, kind: null, block: 'function' });
-  const marked = boot({ marked: true });
-  assert.equal(marked.bound, true);
-  assert.equal(marked.kind, 'bunki-paired-study/v1');
-  assert.deepEqual(marked.status, { started: false, ended: false, state: 'idle', error: null });
-  assert.equal(marked.refusal, 'study-pairing-missing');
-  assert.deepEqual(marked.after, { bound: false, marked: false, reloads: 1 });
-});
+test(
+  'page start: no flag binds nothing; a flag binds the host; a flag with no pairing behind it is taken away',
+  SLOW,
+  () => {
+    assert.deepEqual(boot({ marked: false }), { bound: false, kind: null, block: 'function' });
+    const marked = boot({ marked: true });
+    assert.equal(marked.bound, true);
+    assert.equal(marked.kind, 'bunki-paired-study/v1');
+    assert.deepEqual(marked.status, {
+      started: false,
+      ended: false,
+      closed: null,
+      state: 'idle',
+      error: null,
+      unsent: null,
+    });
+    assert.equal(marked.closed, null);
+    assert.equal(marked.refusal, 'study-pairing-missing');
+    assert.deepEqual(marked.after, { bound: false, marked: false, reloads: 1 });
+  },
+);
+
+test(
+  'page start honours the mark of an ended pairing: the flag alone does not bind it',
+  SLOW,
+  () => {
+    assert.deepEqual(boot({ marked: true, ended: true }), {
+      bound: false,
+      kind: null,
+      block: 'function',
+    });
+    assert.deepEqual(boot({ marked: false, ended: true }), {
+      bound: false,
+      kind: null,
+      block: 'function',
+    });
+  },
+);
 
 /** As much of a page as the Settings block touches: elements that keep what is set on them, events that can be
  * fired, a timer that is held and a reload that is counted. The block in a real browser is the browser test's part. */
-function pageDouble({ english = true } = {}) {
+function pageDouble({ english = true, env = {} } = {}) {
   const element = (tag) => {
     const handlers = new Map();
     return {
@@ -1356,6 +1871,7 @@ function pageDouble({ english = true } = {}) {
       return node;
     },
     env: {
+      ...env,
       setTimeout: (run, ms) => void timers.push({ run, ms }),
       location: { reload: () => void reloads.push(1) },
     },
@@ -1370,22 +1886,43 @@ const seen = (node) => {
   for (let at = node; at; at = at.parent) if (at.hidden) return false;
   return true;
 };
-async function settingsBlock(world, host, english = true) {
-  const page = pageDouble({ english });
+/** The Settings block of one tab: its page, its pairing, and the tab's own channel and storage events. */
+async function settingsBlock(tab, host, english = true) {
+  const page = pageDouble({ english, env: tab.env });
   const block = page.el('div', 'settings-study-device');
   await pairingModule.fillStudyPairingBlock(block, {
     tx: page.tx,
     el: page.el,
     env: page.env,
-    pairing: world.pairing,
+    pairing: tab.pairing,
     host,
   });
   return { page, block, at: (id) => page.find(block, id) };
 }
+/** The shape shared-study-boot.mjs gives Settings for the page's host. */
+function pageHost(study, order = []) {
+  const listeners = new Set();
+  study.host.subscribe(() => {
+    for (const listener of [...listeners]) listener();
+  });
+  return {
+    kind: 'bunki-paired-study/v1',
+    status: () => study.host.status(),
+    subscribe(listener) {
+      listeners.add(listener);
+      return () => void listeners.delete(listener);
+    },
+    async dispose() {
+      order.push('sync stopped');
+      await study.host.dispose();
+    },
+  };
+}
 
 test('Settings: the form, a refusal in plain words in the page’s language, and a pairing that says so and reopens the page', async () => {
   const world = createWorld();
-  const { page, block, at } = await settingsBlock(world, null);
+  // this page hears nothing from the other tabs: what its block shows after a pairing is its own doing
+  const { page, block, at } = await settingsBlock(world.tab({ deaf: true }), null);
   assert.equal(block.dataset.state, 'unpaired');
   assert.equal(block.dataset.paired, 'false');
   assert.equal(seen(at('study-pair-form')), true);
@@ -1393,7 +1930,7 @@ test('Settings: the form, a refusal in plain words in the page’s language, and
   assert.equal(seen(at('study-pair-reopen')), false);
   assert.match(at('study-pair-status').textContent, /not connected to a Nihongo Study record yet/);
 
-  const wrong = pairLine({ ...world.server.code(), code: 'A0B0A0B0A0B0' }).learner;
+  const wrong = pairLine({ ...world.server.code(), code: NO_SUCH_CODE }).learner;
   at('study-pair-learner').value = wrong;
   await at('study-pair-form').fire('submit');
   assert.equal(block.dataset.refused, 'code-invalid-or-expired');
@@ -1404,7 +1941,7 @@ test('Settings: the form, a refusal in plain words in the page’s language, and
   assert.deepEqual(page.timers, []);
   // a code typed alone, as the form's second box invites: the block says what is missing
   at('study-pair-learner').value = '';
-  at('study-pair-code').value = 'A0B0A0B0A0B0';
+  at('study-pair-code').value = NO_SUCH_CODE;
   await at('study-pair-form').fire('submit');
   assert.equal(block.dataset.refused, 'invalid-pairing');
   at('study-pair-learner').value = LEARNER;
@@ -1447,36 +1984,23 @@ test('Settings: the form, a refusal in plain words in the page’s language, and
   assert.ok(page.timers[0].ms >= 1000);
   page.timers[0].run();
   assert.deepEqual(page.reloads, [1]);
-  // a page that has not been opened again yet says what is left to do
+  // a page that has not been opened again yet says what is left to do; so does the other block, told at once
   const waiting = await settingsBlock(world, null);
   assert.equal(waiting.block.dataset.state, 'reopen');
   assert.equal(seen(waiting.at('study-pair-reopen')), true);
   assert.equal(seen(waiting.at('study-pair-form')), false);
+  await until(
+    () => japanese.block.dataset.state === 'reopen',
+    'the other block heard of the pairing',
+  );
 });
 
 test('Settings on a paired page: whose record, how sync stands, a pairing the server ended, and forgetting in two presses', async () => {
   const world = createWorld();
   const bunki = await world.paired();
+  await bunki.adapter.platform.requestNewCards();
   const order = [];
-  const listeners = new Set();
-  bunki.host.subscribe(() => {
-    for (const listener of [...listeners]) listener();
-  });
-  // the shape shared-study-boot.mjs gives Settings for the page's host
-  const host = {
-    kind: 'bunki-paired-study/v1',
-    status: () => bunki.host.status(),
-    subscribe(listener) {
-      listeners.add(listener);
-      return () => void listeners.delete(listener);
-    },
-    async dispose() {
-      order.push(
-        world.store.peek() ? 'sync stopped while the credential was kept' : 'sync stopped late',
-      );
-      await bunki.host.dispose();
-    },
-  };
+  const host = pageHost(bunki, order);
   const { page, block, at } = await settingsBlock(world, host);
   assert.equal(block.dataset.state, 'paired');
   assert.equal(block.dataset.bound, 'true');
@@ -1497,33 +2021,46 @@ test('Settings on a paired page: whose record, how sync stands, a pairing the se
   world.state.online = false;
   await bunki.host.synchronize();
   assert.match(at('study-pair-sync').textContent, /^Offline\./);
+  // one answer given with no connection waits on the device
+  await grade(bunki.adapter.backend, catalog[0].taskKey, 3);
   world.state.online = true;
   world.server.knobs.reducer = 'f'.repeat(64);
   await bunki.host.synchronize();
   assert.match(at('study-pair-sync').textContent, /needs an update/);
   world.server.knobs.reducer = SYNC_COMPATIBILITY.reducerSha256;
-  await bunki.host.synchronize();
-  assert.equal(at('study-pair-sync').textContent, 'Synced.');
 
   // the server refuses the credential (a revocation, or a request from another origin than the one it was paired
-  // from): the block says the pairing has ended, in plain words, and nothing is tried again
+  // from): the block says the pairing has ended and how many answers never reached the server; nothing is tried again
   world.server.revoke(bunki.installation);
   await bunki.host.synchronize();
-  await tick();
+  await until(() => block.dataset.unsent === '1', 'the block counted what was not sent');
   assert.equal(block.dataset.state, 'ended');
   assert.match(at('study-pair-status').textContent, /The server ended this device’s pairing/);
+  assert.match(
+    at('study-pair-status').textContent,
+    /1 answer saved on this device was never uploaded\. It is still on this device\./,
+  );
   assert.equal(seen(at('study-pair-sync')), false);
   assert.equal(seen(at('study-unpair')), true);
   const asked = world.server.log.length;
   await bunki.host.synchronize();
   assert.equal(world.server.log.length, asked);
+  // a page opened afterwards, with no host, says the same from the device's own record
+  await until(() => world.store.peek().ended?.unsent === 1, 'the row was ended, with its count');
+  const reopened = await settingsBlock(world, null);
+  assert.equal(reopened.block.dataset.state, 'ended');
+  assert.equal(reopened.block.dataset.unsent, '1');
+  assert.equal(seen(reopened.at('study-pair-form')), false);
 
   await at('study-unpair').fire('click');
   assert.match(at('study-unpair').textContent, /Really forget it/);
   assert.notEqual(world.store.peek(), null);
   assert.deepEqual(order, []);
+  world.store.calls.length = 0;
   await at('study-unpair').fire('click');
-  assert.deepEqual(order, ['sync stopped while the credential was kept']);
+  // sync is stopped before anything of the pairing is touched
+  assert.deepEqual(order, ['sync stopped']);
+  assert.deepEqual(world.store.calls, ['forget', 'remove']);
   assert.equal(world.store.peek(), null);
   assert.equal(world.marker.get(), false);
   assert.match(at('study-pair-note').textContent, /still here, unused/);
@@ -1533,4 +2070,49 @@ test('Settings on a paired page: whose record, how sync stands, a pairing the se
   assert.equal(page.timers.length, 1);
   page.timers[0].run();
   assert.deepEqual(page.reloads, [1]);
+  // the other block heard it and shows the form again
+  await until(
+    () => reopened.block.dataset.state === 'unpaired',
+    'the other block heard of the forgetting',
+  );
+  assert.equal(seen(reopened.at('study-pair-form')), true);
+});
+
+test('Settings in a tab whose pairing was changed elsewhere: it stops saying it is the pairing’s page', async () => {
+  const world = createWorld();
+  const first = await world.paired();
+  const other = world.tab();
+  const second = await other.study();
+  const { block, at } = await settingsBlock(other, pageHost(second));
+  assert.equal(block.dataset.state, 'paired');
+  // the first tab forgets the pairing and makes another: this tab's block follows the device, not its old host
+  await first.host.dispose();
+  assert.deepEqual(await world.pairing.unpair(), { ok: true });
+  await until(() => block.dataset.state === 'unpaired', 'the block heard of the forgetting');
+  assert.equal(seen(at('study-pair-form')), true);
+  const next = await world.paired();
+  await until(() => block.dataset.state === 'reopen', 'the block heard of the new pairing');
+  assert.equal(block.dataset.bound, 'false');
+  assert.equal(seen(at('study-pair-reopen')), true);
+  assert.equal(seen(at('study-pair-sync')), false);
+  assert.equal(at('study-pair-status').textContent.includes(next.installation.slice(-4)), false);
+  await next.host.dispose();
+  await second.host.dispose();
+});
+
+test('the channel and the marks: both tell the other tabs, and either alone is enough', async () => {
+  assert.equal(PAIRING_CHANNEL, 'bunki-study-pairing');
+  for (const without of ['the channel', 'the marks']) {
+    const world = createWorld();
+    const first = await world.paired();
+    const other = world.tab();
+    if (without === 'the channel') delete other.env.BroadcastChannel;
+    else other.env.addEventListener = () => {};
+    const second = await other.study();
+    await first.host.dispose();
+    assert.deepEqual(await world.pairing.unpair(), { ok: true });
+    await until(() => second.host.status().closed, `the other tab stopped without ${without}`);
+    assert.equal(second.host.status().closed, 'study-pairing-changed');
+    await second.host.dispose();
+  }
 });

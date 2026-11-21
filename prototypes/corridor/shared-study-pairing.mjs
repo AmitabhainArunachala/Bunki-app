@@ -4,9 +4,10 @@
  * for one named installation of one learner (`bunkiweb-<32 hex>` for this app); the device presents the code with
  * that scope (`POST /v1/pair`, the call the engine's own pairing client makes) and is answered with the scope and
  * the credential. The installation is the admin's to name: this device never makes one up. This module is the part
- * that needs no study engine: the credential's place on this device, the pairing and unpairing steps, and the block
- * Settings shows beside the voice pairing. shared-study-paired-host.mjs turns a kept credential into the bound host;
- * shared-study-boot.mjs decides at page start whether there is one.
+ * that needs no study engine: the credential's place on this device, the pairing and unpairing steps, what tells
+ * the other tabs of this browser, and the block Settings shows beside the voice pairing.
+ * shared-study-paired-host.mjs turns a kept credential into the bound host; shared-study-boot.mjs decides at page
+ * start whether there is one.
  *
  * The server's address is not in this code (this repository is public and the server is the learner's own). It is the
  * address the voice client keeps on this device, or, on a device that knows none yet, the one the pasted pairing line
@@ -16,12 +17,22 @@
  * The credential: kept for this origin only, in IndexedDB database `bunki-study-device`, sealed with an AES-GCM key
  * this browser will not export. It is never put in localStorage, a cookie or a URL, never logged, never returned by
  * the Settings block, and sent only as the Authorization header of requests to the server it was redeemed from.
- * localStorage holds one flag and nothing else (`bunki-shared-study:paired:v1` = "1"), because page start needs an
- * answer before IndexedDB can give one. The speak-only voice token is another credential in another database and is
- * never read here. */
+ * The speak-only voice token is another credential in another database and is never read here.
+ *
+ * localStorage holds two marks and no credential, because page start needs an answer before IndexedDB can give one:
+ *   `bunki-shared-study:paired:v1` = "1"                      this device holds a pairing
+ *   `bunki-shared-study:ended:v1`  = "<installation>|<by>"    that pairing has ended: the server refused it
+ *                                                              (`server`) or the learner is forgetting it (`learner`)
+ * A pairing named by the second mark is never bound again, whatever IndexedDB still holds.
+ *
+ * One pairing is one row, named by its installation and a generation made when it is written. Every change to the
+ * row names the row it means and leaves any other row alone: a page that still holds an earlier pairing cannot end,
+ * ready or remove a later one. */
 import { isVoiceServer } from './modules/voice-client.mjs';
 
 export const PAIRED_MARKER = 'bunki-shared-study:paired:v1';
+export const ENDED_MARKER = 'bunki-shared-study:ended:v1';
+export const PAIRING_CHANNEL = 'bunki-study-pairing';
 /** A full study device of the Bunki web app. `bunki-<32 hex>` is a speak-only voice install and is refused. */
 export const STUDY_INSTALLATION = /^bunkiweb-[a-f0-9]{32}$/;
 const LOCAL_HTTPS = /^https:\/\/(?:127\.0\.0\.1|localhost):\d{1,5}$/;
@@ -38,6 +49,7 @@ const TOKEN = /^nsrs_(dev|prod)_([A-Za-z0-9_-]{4,512})\.([a-f0-9]{64})$/;
 const ENVIRONMENTS = new Set(['prod', 'dev', 'qa']);
 const PHASES = new Set(['allocated', 'ready']);
 const FORMAT = 'bunki-study-device/v1';
+const FIRST_GENERATION = 'first';
 const DATABASE = 'bunki-study-device', STORE = 'pairing', DEVICE = 'device', ADDRESS = 'server', PROBE = 'probe';
 const VOICE_DATABASE = 'bunki-voice', VOICE_STORE = 'pairing', VOICE_ADDRESS = 'server';
 
@@ -144,7 +156,7 @@ export async function readVoiceServerAddress(env = globalThis) {
   } catch { return null; } finally { try { db?.close(); } catch { /* closed */ } }
 }
 
-/** The one flag outside IndexedDB: whether this device holds a study pairing. Never the credential. */
+/** The first mark outside IndexedDB: whether this device holds a study pairing. Never the credential. */
 export function studyMarker(env = globalThis) {
   const storage = () => env.localStorage;
   return {
@@ -159,21 +171,80 @@ export function studyMarker(env = globalThis) {
   };
 }
 
+/** The second mark: the pairing that has ended, by installation, and who ended it. It is written before the row in
+ * IndexedDB is changed and does not depend on that write: a refused or forgotten pairing stays ended across a reload
+ * even when the row could not be written. A new pairing takes the mark away. */
+export function studyEndedMark(env = globalThis) {
+  const storage = () => env.localStorage;
+  return {
+    get() {
+      try {
+        const [installation, by] = String(storage()?.getItem(ENDED_MARKER) || '').split('|');
+        return STUDY_INSTALLATION.test(installation) && (by === 'server' || by === 'learner') ? { installation, by } : null;
+      } catch { return null; }
+    },
+    set(installation, by) { try { storage().setItem(ENDED_MARKER, `${installation}|${by}`); return storage().getItem(ENDED_MARKER) === `${installation}|${by}`; } catch { return false; } },
+    clear() { try { storage()?.removeItem(ENDED_MARKER); return !storage()?.getItem(ENDED_MARKER); } catch { return false; } },
+  };
+}
+
+/** Tell the other tabs of this browser that the pairing was made, ended or forgotten. */
+export function announceStudyPairing(env = globalThis) {
+  try { const channel = new env.BroadcastChannel(PAIRING_CHANNEL); channel.postMessage({ at: Date.now() }); channel.close(); } catch { /* the two marks tell them too */ }
+}
+/** Hear it: over the channel, and by the two marks changing (either alone reaches a tab; a browser gets both).
+ * Resolves a function that stops listening. */
+export function watchStudyPairing(env = globalThis, onSignal) {
+  const stops = [];
+  try {
+    const channel = new env.BroadcastChannel(PAIRING_CHANNEL);
+    channel.onmessage = () => onSignal();
+    stops.push(() => channel.close());
+  } catch { /* no channel here */ }
+  try {
+    const changed = (event) => { if (!event || event.key === null || event.key === PAIRED_MARKER || event.key === ENDED_MARKER) onSignal(); };
+    env.addEventListener('storage', changed);
+    stops.push(() => env.removeEventListener('storage', changed));
+  } catch { /* no storage events here */ }
+  return () => { for (const stop of stops.splice(0)) { try { stop(); } catch { /* stopped */ } } };
+}
+
+/** The row a device record names: one pairing, by its installation and the generation made when it was written. */
+export const studyRowRef = (device) => (device ? Object.freeze({ installation: device.scope.installation, generation: device.generation }) : null);
+/** Whether the stored row is the pairing `ref` names. */
+export const isStudyRow = (row, ref) => !!row && !!ref && row.format === FORMAT && row.scope?.installation === ref.installation && (row.generation ?? FIRST_GENERATION) === ref.generation;
+/** Each change to the row, as the row's successor, or null when the stored row is not the one the change names (or
+ * the change no longer applies): then nothing is written. The device store and the tests' store share these. */
+export const studyRowChanges = Object.freeze({
+  /** The paired copy of the record has been fetched once. */
+  ready: (row, ref) => (isStudyRow(row, ref) && !row.ended ? { ...row, phase: 'ready' } : null),
+  /** The server ended the pairing: the credential goes, the rest stays so the page can say why and what was not sent.
+   * An ending already written is left as it is, except that a count of what was unsent fills in one that had none
+   * (the page that saw the refusal knows the count; a page that only found the mark does not). */
+  end: (row, ref, { at, unsent = null }) => (isStudyRow(row, ref) && (!row.ended || (row.ended.by === 'server' && row.ended.unsent === null && unsent !== null))
+    ? { ...row, sealed: null, ended: { at: row.ended?.at ?? at, by: 'server', unsent } } : null),
+  /** The learner is forgetting the pairing: from this write on it is not a pairing any more, whatever comes next. */
+  forget: (row, ref, { at }) => (isStudyRow(row, ref) ? { ...row, sealed: null, ended: { at: row.ended?.at ?? at, by: 'learner', unsent: row.ended?.unsent ?? null } } : null),
+});
+
 const deviceOf = (row) => {
   if (!row || row.format !== FORMAT || !validScope(row.scope) || !STUDY_INSTALLATION.test(row.scope.installation) ||
       !isStudyServer(row.server) || !PHASES.has(row.phase) || !Number.isFinite(row.pairedAt)) return null;
-  const ended = row.ended && Number.isFinite(row.ended.at) ? Object.freeze({ at: row.ended.at }) : null;
+  const ended = row.ended && Number.isFinite(row.ended.at)
+    ? Object.freeze({ at: row.ended.at, by: row.ended.by === 'learner' ? 'learner' : 'server', unsent: Number.isSafeInteger(row.ended.unsent) && row.ended.unsent >= 0 ? row.ended.unsent : null }) : null;
   return Object.freeze({ server: row.server, scope: Object.freeze({ environment: row.scope.environment, learner: row.scope.learner, installation: row.scope.installation }),
-    pairedAt: row.pairedAt, phase: row.phase, ended });
+    generation: typeof row.generation === 'string' && row.generation ? row.generation : FIRST_GENERATION, pairedAt: row.pairedAt, phase: row.phase, ended });
 };
 
 /** The device store. read() answers { server, device, token }: `server` the address this store last paired with,
- * `device` { server, scope, pairedAt, phase, ended } or null, `token` the credential or null (none kept, or the
- * server ended the pairing). read() throws when the browser's storage fails: a failure is never read as "not paired".
- *   write(pairing)  keeps a new pairing, phase `allocated`
- *   markReady()     the paired copy of the record has been fetched once
- *   end({ at })     the server ended the pairing: the credential goes, the rest stays so the page can say why
- *   clear()         the learner removed the pairing: the device record goes, the address stays */
+ * `device` { server, scope, generation, pairedAt, phase, ended } or null, `token` the credential or null (none kept,
+ * or the pairing has ended). read() throws when the browser's storage fails: a failure is never read as "not paired".
+ * Every change names the row it means (`ref`: installation and generation) and answers whether it changed anything:
+ *   write(pairing)       keeps a new pairing, phase `allocated`; answers its ref
+ *   markReady(ref)       the paired copy of the record has been fetched once
+ *   end(ref, ending)     the server ended the pairing
+ *   forget(ref, ending)  the learner is forgetting it
+ *   remove(ref)          the row goes; the address stays */
 export function createStudyCredentialStore(env = globalThis) {
   const idb = env.indexedDB, subtle = env.crypto?.subtle;
   const available = !!idb && !!subtle && typeof env.crypto.getRandomValues === 'function';
@@ -185,19 +256,21 @@ export function createStudyCredentialStore(env = globalThis) {
     request.onblocked = () => reject(new Error('blocked'));
   });
   const using = async (work) => { const db = await open(); try { return await work(db); } finally { db.close(); } };
-  /** Read the device row and write its successor in one transaction. */
+  /** Read the device row and write (or remove) its successor in one transaction. `change(row)` answers
+   * { put: row }, { remove: true }, or null to leave the row as it is. */
   const amend = (change) => using((db) => new Promise((resolve, reject) => {
     const tx = db.transaction(STORE, 'readwrite');
     const store = tx.objectStore(STORE);
     const get = store.get(DEVICE);
     let changed = false;
     get.onsuccess = () => {
-      const next = get.result && get.result.format === FORMAT ? change(get.result) : null;
-      if (next) { store.put(next, DEVICE); changed = true; }
+      const step = get.result ? change(get.result) : null;
+      if (step?.put) { store.put(step.put, DEVICE); changed = true; } else if (step?.remove) { store.delete(DEVICE); changed = true; }
     };
     tx.oncomplete = () => resolve(changed);
     tx.onerror = tx.onabort = () => reject(tx.error || new Error('aborted'));
   }));
+  const put = (next) => (next ? { put: next } : null);
   return {
     available,
     async read() {
@@ -227,26 +300,34 @@ export function createStudyCredentialStore(env = globalThis) {
       const key = await subtle.generateKey({ name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
       const iv = env.crypto.getRandomValues(new Uint8Array(12));
       const data = await subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(token));
+      const generation = Array.from(env.crypto.getRandomValues(new Uint8Array(8)), (byte) => byte.toString(16).padStart(2, '0')).join('');
       const row = { format: FORMAT, server, scope: { environment: scope.environment, learner: scope.learner, installation: scope.installation },
-        pairedAt, phase: 'allocated', ended: null, sealed: { key, iv, data } };
+        generation, pairedAt, phase: 'allocated', ended: null, sealed: { key, iv, data } };
       await using((db) => transact(db, STORE, 'readwrite', (store) => [store.put(row, DEVICE), store.put(server, ADDRESS)]));
+      return Object.freeze({ installation: scope.installation, generation });
     },
-    async markReady() { if (available) await amend((row) => ({ ...row, phase: 'ready' })); },
-    async end({ at }) { if (available) await amend((row) => ({ ...row, sealed: null, ended: { at } })); },
-    async clear() {
-      if (!available || !(await openExisting(idb, DATABASE).then((db) => { db?.close(); return !!db; }))) return;
-      await using((db) => transact(db, STORE, 'readwrite', (store) => store.delete(DEVICE)));
-    },
+    async markReady(ref) { return available ? amend((row) => put(studyRowChanges.ready(row, ref))) : false; },
+    async end(ref, ending) { return available ? amend((row) => put(studyRowChanges.end(row, ref, ending))) : false; },
+    async forget(ref, ending) { return available ? amend((row) => put(studyRowChanges.forget(row, ref, ending))) : false; },
+    async remove(ref) { return available ? amend((row) => (isStudyRow(row, ref) ? { remove: true } : null)) : false; },
   };
 }
 
 const REFUSALS = new Map([[400, 'pairing-refused'], [401, 'code-invalid-or-expired'], [403, 'origin-not-allowed'], [409, 'code-used'],
   [426, 'update-required'], [429, 'too-many-attempts'], [503, 'server-unavailable']]);
 
+/** Whether this device holds a pairing that is still one: a row that has not ended and is not named by the ended mark. */
+export const isLiveStudyDevice = (device, mark) => !!device && !device.ended && mark?.installation !== device.scope.installation;
+/** The same, read from the device now: for a tab that has not opened study and hears that the pairing changed. */
+export async function studyPairingLive(env = globalThis) {
+  return isLiveStudyDevice((await createStudyCredentialStore(env).read()).device, studyEndedMark(env).get());
+}
+
 /** Pairing and unpairing. `voiceAddress` answers the address the voice client keeps (or null); `compatibility` the
  * engine's own header naming the replica it runs, which the server checks before it pairs. */
 export function createStudyPairing({ env = globalThis, fetch: fetchFn = env.fetch?.bind(env), store = createStudyCredentialStore(env),
-  voiceAddress = () => readVoiceServerAddress(env), marker = studyMarker(env), timeoutMs = 20000, now = Date.now,
+  voiceAddress = () => readVoiceServerAddress(env), marker = studyMarker(env), endedMark = studyEndedMark(env),
+  announce = () => announceStudyPairing(env), timeoutMs = 20000, now = Date.now,
   compatibility = async () => (await import('./vendor/shared-study-engine/client/sync-compatibility.mjs')).compatibilityHeaders() } = {}) {
   const refuse = (code) => ({ ok: false, code });
   let flight = null;
@@ -294,12 +375,49 @@ export function createStudyPairing({ env = globalThis, fetch: fetchFn = env.fetc
     const scope = body?.scope;
     if (!validScope(scope) || ['environment', 'learner', 'installation'].some((key) => scope[key] !== asked[key])) return refuse('invalid-response');
     try { checkStudyCredential(body.token, scope); } catch { return refuse('invalid-response'); }
-    try { await store.write({ server, token: body.token, scope, pairedAt: now() }); } catch { return refuse('storage-unavailable'); }
+    let ref;
+    try { ref = await store.write({ server, token: body.token, scope, pairedAt: now() }); } catch { return refuse('storage-unavailable'); }
+    // a new pairing is not the one that ended
+    endedMark.clear();
     if (!marker.set()) {
-      try { await store.clear(); } catch { /* nothing more can be undone */ }
+      try { await store.remove(ref); } catch { /* nothing more can be undone */ }
       return refuse('storage-unavailable');
     }
+    announce();
     return { ok: true, learner: scope.learner, installation: scope.installation };
+  }
+
+  /** Finish a forgetting that was cut short: the row goes, and the marks with it. Answers whether the row is gone. */
+  async function finishForgetting(ref) {
+    try { await store.forget(ref, { at: now() }); await store.remove(ref); } catch { return false; }
+    marker.clear(); endedMark.clear();
+    return true;
+  }
+
+  /** Bring the two marks and the row into step, and answer what Settings may show (never the credential, never
+   * the server's address). A flag is put back only for a row that is still a pairing: never for one that has ended
+   * or is half forgotten; and a flag with no pairing behind it is taken away. */
+  async function status() {
+    let kept;
+    try { kept = await store.read(); } catch {
+      return { available: store.available, failed: true, paired: false, ended: false, unsent: null, learner: null, installation: null, marked: marker.get() };
+    }
+    let device = kept.device;
+    const mark = endedMark.get();
+    const named = !!device && mark?.installation === device.scope.installation;
+    if (device && (device.ended?.by === 'learner' || (named && mark.by === 'learner'))) {
+      // a forgetting that did not finish (the page closed, or a write failed): finish it now
+      if (await finishForgetting(studyRowRef(device))) device = null;
+    } else if (device && named && !device.ended) {
+      // the server refused this pairing and the row could not be written then: write it now
+      try { await store.end(studyRowRef(device), { at: now(), unsent: null }); } catch { /* the mark still stands */ }
+    }
+    if (!device) { if (marker.get()) marker.clear(); if (mark) endedMark.clear(); }
+    else if (!isLiveStudyDevice(device, mark)) { if (device.ended && !mark) endedMark.set(device.scope.installation, device.ended.by); }
+    else if (kept.token !== null && !marker.get()) marker.set();
+    const ended = !!device && (!isLiveStudyDevice(device, mark) || kept.token === null);
+    return { available: store.available, failed: false, paired: !!device, ended, unsent: ended ? device.ended?.unsent ?? null : null,
+      learner: device?.scope.learner ?? null, installation: device?.scope.installation ?? null, marked: marker.get() };
   }
 
   return {
@@ -310,25 +428,41 @@ export function createStudyPairing({ env = globalThis, fetch: fetchFn = env.fetc
       flight = redeem(input).catch(() => refuse('pairing-failed')).finally(() => { flight = null; });
       return flight;
     },
-    /** The learner removes the pairing: the flag and the credential go; the address and the paired copy of the
-     * record stay on the device, the copy unused. */
+    /** The learner removes the pairing. The forgetting is made durable first: the pairing is marked ended (the mark
+     * page start reads, then the row, one write), then the row is removed, then the flag is cleared. A page that
+     * closes anywhere in between leaves a pairing that is already ended, never one that comes back. The address and
+     * the paired copy of the record stay on the device, the copy unused. */
     async unpair() {
+      let kept;
+      try { kept = await store.read(); } catch { return refuse('storage-unavailable'); }
+      if (kept.device) {
+        const ref = studyRowRef(kept.device);
+        endedMark.set(ref.installation, 'learner');
+        try { await store.forget(ref, { at: now() }); await store.remove(ref); } catch { announce(); return refuse('storage-unavailable'); }
+      }
       const cleared = marker.clear();
-      try { await store.clear(); } catch { return refuse('storage-unavailable'); }
+      endedMark.clear();
+      announce();
       return cleared ? { ok: true } : refuse('storage-unavailable');
     },
-    /** What Settings may show. Never the credential, never the server's address. */
-    async status() {
-      let kept;
-      try { kept = await store.read(); } catch { return { available: store.available, failed: true, paired: false, ended: false, learner: null, installation: null, marked: marker.get() }; }
-      const device = kept.device;
-      return { available: store.available, failed: false, paired: !!device, ended: !!device && (!!device.ended || kept.token === null),
-        learner: device?.scope.learner ?? null, installation: device?.scope.installation ?? null, marked: marker.get() };
-    },
-    /** A device that is paired but whose flag was lost gets it back (the next page start then binds the host). */
-    heal() { return marker.set(); },
+    status,
+    /** Put a lost flag back, for a pairing that is still one and for no other row. Answers whether the flag stands. */
+    async heal() { return (await status()).marked; },
   };
 }
+
+/* ------------------------------------------------------------------ what a page says when its pairing is no more */
+
+/** The plain lines for a study surface whose pairing ended under it, [ja, en] by cause. */
+export const STUDY_CLOSED_LINES = Object.freeze({
+  'study-pairing-ended': ['サーバーがこの端末のペアリングを終了しました。この端末はもうペアリングされていません。設定で、新しいコードでもう一度ペアリングしてください。',
+    'The server ended this device’s pairing. This device is no longer paired. Pair it again in Settings with a new code.'],
+  'study-pairing-changed': ['この端末のペアリングが変わりました。ここでの学習は止まりました。Bunki を開き直してください。',
+    'This device’s pairing has changed. Study here has stopped. Reopen Bunki.'],
+  'study-answer-not-saved': ['この端末はもうペアリングされていません。この答えは保存されませんでした。',
+    'This device is no longer paired. This answer was not saved.'],
+});
+export const studyClosedLine = (code) => [...(Object.hasOwn(STUDY_CLOSED_LINES, code) ? STUDY_CLOSED_LINES[code] : STUDY_CLOSED_LINES['study-pairing-changed'])];
 
 /* ------------------------------------------------------------------ Settings: the block beside the voice pairing */
 
@@ -342,6 +476,9 @@ const LINES = Object.freeze({
   reopenNow: ['Bunki を開き直す', 'Reopen Bunki'],
   ended: ['サーバーがこの端末のペアリングを終了しました。同期は止まっています。この端末に残っている記録は送信されません。ペアリングを消してから、新しいコードでもう一度ペアリングしてください。',
     'The server ended this device’s pairing. Sync has stopped, and what is still on this device is not sent. Forget the pairing, then pair again with a new code.'],
+  unsent: (count) => [`この端末で保存された答えのうち ${count} 件は、サーバーに送信されませんでした。その答えはこの端末に残っています。`,
+    count === 1 ? '1 answer saved on this device was never uploaded. It is still on this device.' : `${count} answers saved on this device were never uploaded. They are still on this device.`],
+  unsentNone: ['送信されなかった答えはありません。', 'No answer was left unsent.'],
   failed: ['このブラウザーの保存領域を読めませんでした。ページを読み込み直してください。', 'This browser’s storage could not be read. Reload the page.'],
   how: ['Nihongo Study 側で表示されたペアリングの1行（学習者ID・端末・サーバー・コード）を最初の欄にそのまま貼って「ペアリング」を押してください。12文字のコードだけ別に届いたときは、2つ目の欄に入れます。コードは10分で切れます。',
     'Paste the whole pairing line shown on the Nihongo Study side (learner id, device, server and code) into the first box and press Pair. If the 12-character code came separately, put it in the second box. The code lasts 10 minutes.'],
@@ -421,20 +558,25 @@ export function fillStudyPairingBlock(block, { tx, el, env = globalThis, pairing
   const reopen = el('button', 'chip', words(LINES.reopenNow)); reopen.type = 'button'; reopen.id = 'study-pair-reopen';
   const forgetWhat = el('p', 'teacher-note', words(LINES.forgetWhat)); forgetWhat.id = 'study-unpair-what';
   const forget = el('button', 'btn-tertiary', words(LINES.forget)); forget.type = 'button'; forget.id = 'study-unpair';
-  let busy = false, leaving = false, sure = false, current = null;
+  let busy = false, leaving = false, sure = false, current = null, reading = false;
   const paint = () => {
     if (!current) return;
     const { paired, failed, learner: who, installation } = current;
-    const bound = !!host;
-    const live = paired && bound ? host.status() : null;
-    const ended = current.ended || live?.ended === true;
+    const live = paired && host ? host.status() : null;
+    // a host that was closed under this page (the pairing ended, or was changed in another tab) is not this pairing's
+    const bound = !!host && !live?.closed;
+    const ended = current.ended || live?.closed === 'study-pairing-ended';
     block.dataset.state = failed ? 'failed' : !paired ? 'unpaired' : ended ? 'ended' : bound ? 'paired' : 'reopen';
     block.dataset.paired = String(paired); block.dataset.bound = String(bound);
+    // what was saved here and never reached the server, as far as this device knows
+    const unsent = ended ? current.unsent ?? live?.unsent ?? null : null;
+    block.dataset.unsent = unsent === null ? '' : String(unsent);
+    const endedWords = () => `${words(LINES.ended)}${unsent === null ? '' : ` ${words(unsent > 0 ? LINES.unsent(unsent) : LINES.unsentNone)}`}`;
     state.textContent = failed ? words(LINES.failed) : !paired ? words(LINES.unpaired)
-      : ended ? words(LINES.ended) : bound ? words(LINES.paired(who, installation.slice(-4))) : words(LINES.reopen);
+      : ended ? endedWords() : bound ? words(LINES.paired(who, installation.slice(-4))) : words(LINES.reopen);
     // while the page is about to be opened again, the one note under the block says what happened
     state.hidden = leaving;
-    const line = live?.started && !ended && !leaving ? syncLine(live.state, live.error) : null;
+    const line = live?.started && !ended && bound && !leaving ? syncLine(live.state, live.error) : null;
     sync.textContent = line ? words(line) : ''; sync.hidden = !line; block.dataset.sync = live?.started ? live.state : '';
     form.hidden = paired || failed || leaving;
     reopen.hidden = !(paired && !ended && !bound) || leaving;
@@ -442,7 +584,12 @@ export function fillStudyPairingBlock(block, { tx, el, env = globalThis, pairing
     forget.textContent = words(sure ? LINES.forgetSure : LINES.forget);
     submit.disabled = forget.disabled = busy;
   };
-  const refresh = async () => { current = await pairing.status(); if (current.paired && !current.marked) pairing.heal(); paint(); };
+  const refresh = async () => {
+    if (reading || leaving) return;
+    reading = true;
+    try { current = await pairing.status(); } finally { reading = false; }
+    paint();
+  };
   const leave = (line) => {
     leaving = true; note.textContent = words(line); block.append(note); paint();
     env.setTimeout(() => reload(), reloadDelayMs);
@@ -456,7 +603,7 @@ export function fillStudyPairingBlock(block, { tx, el, env = globalThis, pairing
     busy = false;
     if (answer.ok) {
       learner.input.value = ''; code.input.value = '';
-      current = { ...current, failed: false, paired: true, ended: false, learner: answer.learner, installation: answer.installation, marked: true };
+      current = { ...current, failed: false, paired: true, ended: false, unsent: null, learner: answer.learner, installation: answer.installation, marked: true };
       leave(LINES.done(answer.learner));
     } else { note.textContent = words(studyPairingLine(answer.code)); block.dataset.refused = answer.code; paint(); }
   });
@@ -470,12 +617,19 @@ export function fillStudyPairingBlock(block, { tx, el, env = globalThis, pairing
     const answer = await pairing.unpair();
     busy = false; sure = false;
     if (answer.ok) {
-      current = { ...current, paired: false, ended: false, learner: null, installation: null, marked: false };
+      current = { ...current, paired: false, ended: false, unsent: null, learner: null, installation: null, marked: false };
       leave(LINES.forgotten);
     } else { note.textContent = words(studyPairingLine(answer.code)); block.append(note); paint(); }
   });
   block.replaceChildren(name, state, sync, form, reopen, forgetWhat, forget);
   block.dataset.state = 'loading';
-  const stop = host?.subscribe?.(() => { if (block.isConnected) paint(); else stop?.(); });
+  // this page's host changing, and the pairing changing in another tab, both redraw the block from the device's truth
+  const stopHost = host?.subscribe?.(() => { if (!block.isConnected) { stopHost?.(); return; } paint(); if (host.status().closed) void refresh(); });
+  const stopWatch = watchStudyPairing(env, () => { if (block.isConnected) void refresh(); else stopWatch(); });
+  // Settings is drawn again and again; a page listens for one block, the one it shows now
+  LISTENING.get(env)?.();
+  LISTENING.set(env, () => { stopHost?.(); stopWatch(); });
   return refresh();
 }
+/** Per page: what stops the listening of the Settings block drawn before this one. */
+const LISTENING = new WeakMap();

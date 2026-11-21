@@ -64,6 +64,15 @@ const HARNESS = `<!doctype html><html lang="en"><head><meta charset="utf-8"><tit
   document.documentElement.dataset.ready = '1';
 </script></body></html>`;
 
+/** The two marks localStorage holds of a pairing, as [key, value], in order (the study screen keeps its own
+ * appearance settings under the same prefix; they are not marks). */
+const marks = (places) =>
+  places.localStorage
+    .filter(([key]) =>
+      ['bunki-shared-study:paired:v1', 'bunki-shared-study:ended:v1'].includes(key),
+    )
+    .sort();
+
 async function until(holds, { timeout = 60000, every = 100 } = {}) {
   const deadline = Date.now() + timeout;
   while (!holds()) {
@@ -72,89 +81,93 @@ async function until(holds, { timeout = 60000, every = 100 } = {}) {
   }
 }
 
-test('the stand-in server over HTTP: preflights for a listed origin alone, a token that belongs to its origin, a second device that studies', async () => {
-  // only the names matter: nothing listens at these addresses and nothing is sent to them
-  const pageOrigin = 'http://127.0.0.1:18999';
-  const otherListed = 'http://127.0.0.1:18997';
-  const server = await startStudyServerDouble({ allowedOrigins: [pageOrigin, otherListed] });
-  try {
-    const preflight = (path, origin) =>
-      fetch(`${server.origin}${path}`, {
-        method: 'OPTIONS',
-        headers: { Origin: origin, 'Access-Control-Request-Method': 'POST' },
-      });
-    // each route allows exactly what a study device sends to it
-    for (const [path, headers] of [
-      ['/v1/pair', 'content-type, x-nsrs-reducer-sha256'],
-      ['/v1/events', 'authorization, content-type, x-nsrs-reducer-sha256'],
-      ['/v1/permits', 'authorization, content-type, x-nsrs-reducer-sha256'],
-    ]) {
-      const answer = await preflight(path, pageOrigin);
-      assert.equal(answer.status, 204);
-      assert.equal(answer.headers.get('access-control-allow-origin'), pageOrigin);
-      assert.equal(answer.headers.get('access-control-allow-headers'), headers);
+test(
+  'the stand-in server over HTTP: preflights for a listed origin alone, a token that belongs to its origin, a second device that studies',
+  { timeout: 30000 },
+  async () => {
+    // only the names matter: nothing listens at these addresses and nothing is sent to them
+    const pageOrigin = 'http://127.0.0.1:18999';
+    const otherListed = 'http://127.0.0.1:18997';
+    const server = await startStudyServerDouble({ allowedOrigins: [pageOrigin, otherListed] });
+    try {
+      const preflight = (path, origin) =>
+        fetch(`${server.origin}${path}`, {
+          method: 'OPTIONS',
+          headers: { Origin: origin, 'Access-Control-Request-Method': 'POST' },
+        });
+      // each route allows exactly what a study device sends to it
+      for (const [path, headers] of [
+        ['/v1/pair', 'content-type, x-nsrs-reducer-sha256'],
+        ['/v1/events', 'authorization, content-type, x-nsrs-reducer-sha256'],
+        ['/v1/permits', 'authorization, content-type, x-nsrs-reducer-sha256'],
+      ]) {
+        const answer = await preflight(path, pageOrigin);
+        assert.equal(answer.status, 204);
+        assert.equal(answer.headers.get('access-control-allow-origin'), pageOrigin);
+        assert.equal(answer.headers.get('access-control-allow-headers'), headers);
+      }
+      for (const [path, origin] of [
+        ['/v1/events', 'http://127.0.0.1:18998'],
+        ['/v1/pair/redeem', pageOrigin],
+      ]) {
+        const stranger = await preflight(path, origin);
+        assert.equal(stranger.status, 403);
+        assert.equal(stranger.headers.get('access-control-allow-origin'), null);
+      }
+      const content = loadStudyContent(corridor);
+      const join = (origin) => {
+        const minted = server.mint({ installation: `iphone-${'d'.repeat(31)}${origin ? 1 : 2}` });
+        return createEngineClient({
+          content,
+          server: server.origin,
+          learner: server.learner,
+          environment: server.environment,
+          installation: minted.installation,
+          code: minted.code,
+          pageOrigin: origin,
+        });
+      };
+      // a device paired by a page at a listed origin
+      const device = await join(pageOrigin);
+      const graded = await device.gradeNew('n2', 3);
+      assert.equal(server.rows.filter((row) => row.event.id === graded.eventId).length, 1);
+      const token = server.tokenOf(device.scope.installation);
+      const ask = (origin) =>
+        fetch(`${server.origin}/v1/events?after=0&limit=1000`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'X-NSRS-Reducer-SHA256': SYNC_COMPATIBILITY.reducerSha256,
+            ...(origin ? { Origin: origin } : {}),
+          },
+        });
+      assert.equal((await ask(pageOrigin)).status, 200);
+      // the token belongs to its origin: from another listed origin it is refused, and the page can read why
+      const elsewhere = await ask(otherListed);
+      assert.equal(elsewhere.status, 401);
+      assert.equal(elsewhere.headers.get('access-control-allow-origin'), otherListed);
+      assert.deepEqual(await elsewhere.json(), { error: 'origin-mismatch' });
+      // a client that is no page sends no Origin and is answered as before
+      assert.equal((await ask(null)).status, 200);
+      // a second device that is no page sees the grade
+      const phone = await join(null);
+      await phone.sync();
+      assert.ok(phone.reviews().some((review) => review.id === graded.eventId));
+      assert.notEqual(phone.scope.installation, device.scope.installation);
+      // and teaches itself a card of its own after the first device's grade is in the ledger: its permits are the
+      // server's next grant, numbered along the server's own stream, and the grade reaches the first device
+      const answered = await phone.gradeNew('n2', 4);
+      assert.notEqual(answered.taskKey, graded.taskKey);
+      await device.sync();
+      assert.ok(device.reviews().some((review) => review.id === answered.eventId));
+      // a device the server has revoked is refused
+      server.revoke(device.scope.installation);
+      assert.equal((await ask(pageOrigin)).status, 401);
+      assert.equal((await device.sync()).error, 'authentication-required');
+    } finally {
+      await server.close();
     }
-    for (const [path, origin] of [
-      ['/v1/events', 'http://127.0.0.1:18998'],
-      ['/v1/pair/redeem', pageOrigin],
-    ]) {
-      const stranger = await preflight(path, origin);
-      assert.equal(stranger.status, 403);
-      assert.equal(stranger.headers.get('access-control-allow-origin'), null);
-    }
-    const content = loadStudyContent(corridor);
-    const join = (origin) => {
-      const minted = server.mint({ installation: `iphone-${'d'.repeat(31)}${origin ? 1 : 2}` });
-      return createEngineClient({
-        content,
-        server: server.origin,
-        learner: server.learner,
-        environment: server.environment,
-        installation: minted.installation,
-        code: minted.code,
-        pageOrigin: origin,
-      });
-    };
-    // a device paired by a page at a listed origin
-    const device = await join(pageOrigin);
-    const graded = await device.gradeNew('n2', 3);
-    assert.equal(server.rows.filter((row) => row.event.id === graded.eventId).length, 1);
-    const token = server.tokenOf(device.scope.installation);
-    const ask = (origin) =>
-      fetch(`${server.origin}/v1/events?after=0&limit=1000`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'X-NSRS-Reducer-SHA256': SYNC_COMPATIBILITY.reducerSha256,
-          ...(origin ? { Origin: origin } : {}),
-        },
-      });
-    assert.equal((await ask(pageOrigin)).status, 200);
-    // the token belongs to its origin: from another listed origin it is refused, and the page can read why
-    const elsewhere = await ask(otherListed);
-    assert.equal(elsewhere.status, 401);
-    assert.equal(elsewhere.headers.get('access-control-allow-origin'), otherListed);
-    assert.deepEqual(await elsewhere.json(), { error: 'origin-mismatch' });
-    // a client that is no page sends no Origin and is answered as before
-    assert.equal((await ask(null)).status, 200);
-    // a second device that is no page sees the grade
-    const phone = await join(null);
-    await phone.sync();
-    assert.ok(phone.reviews().some((review) => review.id === graded.eventId));
-    assert.notEqual(phone.scope.installation, device.scope.installation);
-    // and teaches itself a card of its own after the first device's grade is in the ledger: its permits are the
-    // server's next grant, numbered along the server's own stream, and the grade reaches the first device
-    const answered = await phone.gradeNew('n2', 4);
-    assert.notEqual(answered.taskKey, graded.taskKey);
-    await device.sync();
-    assert.ok(device.reviews().some((review) => review.id === answered.eventId));
-    // a device the server has revoked is refused
-    server.revoke(device.scope.installation);
-    assert.equal((await ask(pageOrigin)).status, 401);
-    assert.equal((await device.sync()).error, 'authentication-required');
-  } finally {
-    await server.close();
-  }
-});
+  },
+);
 
 /** Where the page's files come from: the source tree; for the negative controls, a folder with a planted fault
  * first (tools/shared-study-paired-host-controls.test.mjs), and the source tree for everything it does not hold. */
@@ -396,51 +409,162 @@ test(
         }
       }
       assert.ok(carried >= 3);
+      requests.length = 0;
 
-      // a restart keeps the installation and the journal
+      // TWO PAGES OF ONE PROFILE. A second page studies on the same pairing; the first forgets the pairing.
+      const second = await context.newPage();
+      watch(second);
+      const secondAsked = [];
+      second.on('request', (request) => {
+        if (request.headers().authorization) secondAsked.push(request.url());
+      });
+      await second.goto(deck, { waitUntil: 'load' });
+      const secondFrame = await studyFrame(second);
+      assert.equal((await frameState(secondFrame)).installation, minted.installation);
+      await page.goto(settings, { waitUntil: 'load' });
+      const forgotten = await unpairInSettings(page);
+      assert.match(forgotten.what, /stays on the device, unused/);
+      assert.match(forgotten.sure, /Really forget it/);
+      assert.match(forgotten.note, /still here, unused/);
+      assert.equal((await studyBlock(page)).state, 'unpaired');
+      // the second page is told at once, with nothing asked of it: its study screen closes and says why
+      const closedSurface = second.locator('main section[data-shared-study="ended"]');
+      await closedSurface.waitFor({ timeout: 15000 });
+      assert.equal(
+        await closedSurface.getAttribute('data-shared-study-reason'),
+        'study-pairing-changed',
+      );
+      assert.match(
+        await closedSurface.innerText(),
+        /pairing has changed\. Study here has stopped\./,
+      );
+      assert.equal(await second.locator('[data-shared-study-frame]').count(), 0);
+      assert.equal(
+        await second.evaluate(() => globalThis.bunkiSharedStudyHost?.closed()?.code ?? null),
+        'study-pairing-changed',
+      );
+      const secondQuiet = secondAsked.length;
+
+      // the first page pairs a NEW installation; the second page, still open, cannot touch it
+      const renewed = server.mint();
+      const pairedAgain = await pairInSettings(page, {
+        line: `learner: ${server.learner} · device: ${renewed.installation}`,
+        code: renewed.code,
+      });
+      assert.equal(pairedAgain.paired, true, JSON.stringify(pairedAgain));
+      assert.equal((await studyBlock(page)).state, 'paired');
+      const renewedToken = server.tokenOf(renewed.installation);
+      for (let turn = 0; turn < 3; turn++) {
+        await wake(second);
+        await second.waitForTimeout(150);
+      }
+      assert.equal(secondAsked.length, secondQuiet);
+      // a study surface opened again on the stopped page says the same and opens nothing
+      const reopenedThere = await second.evaluate(`(async () => {
+        const main = document.querySelector('main');
+        main.replaceChildren();
+        await (await import('./decks/player/shared-mount.mjs')).render(main, { deckId: 'n2', english: true });
+        const root = main.querySelector('section');
+        return { state: root?.dataset.sharedStudy ?? null, reason: root?.dataset.sharedStudyReason ?? null,
+          frames: document.querySelectorAll('[data-shared-study-frame]').length };
+      })()`);
+      assert.deepEqual(reopenedThere, {
+        state: 'ended',
+        reason: 'study-pairing-changed',
+        frames: 0,
+      });
+      // and a change that names another row than the stored one changes nothing, in the browser's own store:
+      // not the old installation's row, and not this installation's under another generation
+      const strayChanges = await second.evaluate(`(async (refs) => {
+        const { createStudyCredentialStore } = await import('./shared-study-pairing.mjs');
+        const store = createStudyCredentialStore();
+        const done = [];
+        for (const ref of refs) done.push(await store.end(ref, { at: Date.now(), unsent: 0 }), await store.markReady(ref),
+          await store.forget(ref, { at: Date.now() }), await store.remove(ref));
+        return done;
+      })(${JSON.stringify([
+        { installation: minted.installation, generation: 'first' },
+        { installation: renewed.installation, generation: 'not-this-pairing' },
+      ])})`);
+      assert.deepEqual(strayChanges, Array(8).fill(false));
+      assert.equal(secondAsked.length, secondQuiet);
+      places = await readablePlaces(page);
+      assert.equal(places.device.sealed.extractable, false);
+      assert.ok(places.device.plain.includes(renewed.installation));
+      assert.equal(places.device.plain.includes('"ended":null'), true);
+      assert.deepEqual(marks(places), [['bunki-shared-study:paired:v1', '1']]);
+      await second.close();
+
+      // a restart keeps the installation and the journal (the new pairing fetched the learner's whole record)
       await page.close();
       const again = await context.newPage();
       watch(again);
       await again.goto(deck, { waitUntil: 'load' });
       frame = await studyFrame(again);
       state = await frameState(frame);
-      assert.equal(state.installation, minted.installation);
+      assert.equal(state.installation, renewed.installation);
       assert.ok(state.reviews.includes(mine.eventId) && state.reviews.includes(theirs.eventId));
 
-      // the server ends the pairing: sync stops, Settings says so, and the page stops asking
-      server.revoke(minted.installation);
-      await wake(again);
-      await again.waitForFunction(() => globalThis.bunkiSharedStudyHost.status().ended === true);
+      // the server ends the pairing while an answer is being given: the answer waits on the device, sync stops,
+      // the study screen closes and says why, and the page stops asking
+      const sentFirst = await gradeInFrame(frame);
+      await until(() => server.rows.some((row) => row.event.id === sentFirst.eventId));
+      await context.setOffline(true);
+      await again.waitForFunction(() => globalThis.navigator.onLine === false);
+      const stranded = await gradeInFrame(frame);
+      server.revoke(renewed.installation);
+      await context.setOffline(false);
+      const endedSurface = again.locator('main section[data-shared-study="ended"]');
+      await endedSurface.waitFor({ timeout: 30000 });
+      assert.equal(
+        await endedSurface.getAttribute('data-shared-study-reason'),
+        'study-pairing-ended',
+      );
+      assert.match(await endedSurface.innerText(), /The server ended this device’s pairing/);
+      assert.equal(await again.locator('[data-shared-study-frame]').count(), 0);
+      assert.equal(
+        server.rows.some((row) => row.event.id === stranded.eventId),
+        false,
+      );
       const quiet = server.log.length;
       for (let turn = 0; turn < 3; turn++) {
         await wake(again);
         await again.waitForTimeout(150);
       }
       assert.equal(server.log.length, quiet);
+      // a reload: the ended pairing is not bound again, the server is not asked again, and Settings says what
+      // happened and how many answers never reached the server
       await again.goto(settings, { waitUntil: 'load' });
+      assert.equal(await again.evaluate(() => typeof globalThis.bunkiSharedStudyHost), 'undefined');
       const ended = await studyBlock(again);
       assert.equal(ended.state, 'ended');
       assert.match(ended.status, /The server ended this device’s pairing/);
+      assert.match(ended.status, /1 answer saved on this device was never uploaded/);
       assert.equal(ended.unpairShown, true);
-      assert.equal(server.log.length, quiet);
+      assert.equal(ended.formShown, false);
       places = await readablePlaces(again);
       assert.equal(places.device.sealed, null);
+      assert.deepEqual(marks(places), [
+        ['bunki-shared-study:ended:v1', `${renewed.installation}|server`],
+        ['bunki-shared-study:paired:v1', '1'],
+      ]);
+      await again.goto(deck, { waitUntil: 'load' });
+      await again.locator('#old-player').waitFor();
+      assert.equal(server.log.length, quiet);
+      assert.equal(renewedToken === token, false);
+      assert.equal(printed.join('\n').includes(renewedToken), false);
 
-      // the learner forgets the pairing: the flag and the credential go, the copy of the record stays, unused
-      const forgotten = await unpairInSettings(again);
-      assert.match(forgotten.what, /stays on the device, unused/);
-      assert.match(forgotten.sure, /Really forget it/);
-      assert.match(forgotten.note, /still here, unused/);
+      // the learner forgets the ended pairing: both marks and the record of it go, the copies of the record stay
+      await again.goto(settings, { waitUntil: 'load' });
+      await unpairInSettings(again);
       const unpaired = await studyBlock(again);
       assert.equal(unpaired.state, 'unpaired');
       assert.equal(await again.evaluate(() => typeof globalThis.bunkiSharedStudyHost), 'undefined');
       places = await readablePlaces(again);
       assert.equal(places.device, null);
-      assert.deepEqual(
-        places.localStorage.filter(([key]) => key.startsWith('bunki-shared-study:paired')),
-        [],
-      );
-      assert.ok(places.databases.includes(`bunki-shared-study-paired-${minted.installation}`));
+      assert.deepEqual(marks(places), []);
+      for (const installation of [minted.installation, renewed.installation])
+        assert.ok(places.databases.includes(`bunki-shared-study-paired-${installation}`));
       await again.goto(deck, { waitUntil: 'load' });
       await again.locator('#old-player').waitFor();
       assert.equal(await again.locator('[data-shared-study-frame]').count(), 0);

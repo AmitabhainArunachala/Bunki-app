@@ -9,8 +9,20 @@ export function renderSharedFence(main,{english=true,onLeave}={}) {
   main.append(p);if(onLeave){const back=element('button',english?'Back':'戻る');back.type='button';back.onclick=onLeave;main.append(back);}
 }
 
+/** A paired study surface whose pairing is no more (the server refused it, or another tab forgot or changed it):
+ * the engine's screen goes and the page says why in plain words, with the one step that brings study back. */
+function renderClosed(root,notice,{english,onLeave}) {
+  root.dataset.sharedStudy='ended';root.dataset.sharedStudyReason=String(notice.code);root.replaceChildren();
+  root.append(element('p',english?notice.line[1]:notice.line[0]));
+  const again=element('button',english?'Reopen Bunki':'Bunki を開き直す');again.type='button';again.onclick=()=>location.reload();root.append(again);
+  if(onLeave){const back=element('button',english?'Back':'戻る');back.type='button';back.onclick=onLeave;root.append(back);}
+}
+
 export async function render(main,{deckId,english=true,onLeave,autoStart}={}) {
   const request=++serial,root=element('section');root.dataset.sharedStudy='loading';main.append(root);
+  // a paired host that has stopped on this page does not start again here: the page says so and offers to reopen
+  const paired=globalThis.bunkiSharedStudyHost,stopped=paired?.closed?.();
+  if(stopped){renderClosed(root,stopped,{english,onLeave});return;}
   root.append(element('p',english?'Opening shared study…':'共通の学習を開いています…'));
   let adapter;
   try {adapter=await sharedStudyRuntime();}
@@ -55,6 +67,8 @@ export async function render(main,{deckId,english=true,onLeave,autoStart}={}) {
     window.scrollTo({top:Math.max(0,target),behavior:'instant'});
   };
   frame.bunkiStudyPort=Object.freeze({adapter,onCardStart,...(audio?{audio}:{})});frame.src=url.href;root.append(frame);
+  // the pairing ending under an open screen closes the screen: nothing more is answered into a copy that cannot be sent
+  const unhear=paired?.onClosed?.(notice=>{unhear?.();if(request!==serial||!root.isConnected)return;renderClosed(root,notice,{english,onLeave});});
 }
 
 export async function summary(deckId) {

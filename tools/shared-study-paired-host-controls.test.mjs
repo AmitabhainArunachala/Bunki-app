@@ -30,193 +30,399 @@ const LINKED = [
   'modules',
   'vendor',
 ];
+const PAIRING = 'shared-study-pairing.mjs';
+const HOST = 'shared-study-paired-host.mjs';
+const BOOT = 'shared-study-boot.mjs';
+
+const T = {
+  pair: 'pair: one request to the configured server, the credential kept, the host bound to the server’s identity',
+  line: 'the pairing line: the code, the learner and the device in any order, in one box or two; a code alone cannot pair',
+  server: 'pairing goes to the server this device is set up for, or nowhere',
+  transport:
+    'the transport carries the credential to the one server and refuses every other address',
+  crossing: 'a grade crosses both ways between Bunki and a second device of the same learner',
+  firstOpen:
+    'a first open needs the record: with no connection it is refused, and the next try with one goes through',
+  missingCopy: 'a copy of the record that has gone missing is not replaced by an empty one',
+  revoked:
+    '401 after a revocation: sync stops, the credential is dropped, the screen says so, and nothing loops',
+  permit401: '401 on a permit request ends the pairing the same way',
+  unpair: 'unpair: the credential and the flag go, sync stops, the copy of the record stays unused',
+  flag: 'pair refused: a flag this browser cannot keep undoes the pairing, so nothing is half kept',
+  twoTabs:
+    'two tabs: a pairing forgotten in one tab stops the other at once, and a new pairing is out of its reach',
+  deaf: 'a tab that heard nothing finds out before its next request and before its next answer',
+  rows: 'a change to the stored pairing names the row it means: a late refusal and a late first open leave a new pairing alone',
+  ended:
+    'after the pairing has ended an answer is refused in plain words, nothing is saved, and what was waiting is counted and kept',
+  forgetting:
+    'forgetting is made durable first: a page that closes midway leaves a pairing that is ended, never one that comes back',
+  unwritten:
+    'a refusal the device could not write down stays a refusal: tried again, marked for page start, never asked again',
+  start:
+    'page start: no flag binds nothing; a flag binds the host; a flag with no pairing behind it is taken away',
+  startEnded: 'page start honours the mark of an ended pairing: the flag alone does not bind it',
+  settings:
+    'Settings: the form, a refusal in plain words in the page’s language, and a pairing that says so and reopens the page',
+  settingsPaired:
+    'Settings on a paired page: whose record, how sync stands, a pairing the server ended, and forgetting in two presses',
+  settingsChanged:
+    'Settings in a tab whose pairing was changed elsewhere: it stops saying it is the pairing’s page',
+  either: 'the channel and the marks: both tell the other tabs, and either alone is enough',
+};
+const refusedFor = (what, code) => `pair refused: ${what} says ${code} and keeps nothing`;
 
 /** [guarantee, file, the text to find exactly once, the fault, the test that must go red] */
 const FAULTS = [
+  // ---- pairing
   [
     'a pairing line that names another server is refused before anything is sent',
-    'shared-study-pairing.mjs',
+    PAIRING,
     "if (parsed.server && configured && parsed.server !== configured) return refuse('server-mismatch');",
     '',
-    'pairing goes to the server this device is set up for, or nowhere',
+    T.server,
   ],
   [
     'a paired device does not pair over itself',
-    'shared-study-pairing.mjs',
+    PAIRING,
     "if (kept.device) return refuse('already-paired');",
     '',
-    'pairing goes to the server this device is set up for, or nowhere',
+    T.server,
   ],
   [
     'a refusal names its own cause (wrong or expired code)',
-    'shared-study-pairing.mjs',
+    PAIRING,
     'if (response.status !== 200) return refuse(',
     'if (response.status >= 500) return refuse(',
-    'pair refused: a wrong code says code-invalid-or-expired and keeps nothing',
+    refusedFor('a wrong code', 'code-invalid-or-expired'),
   ],
   [
     'a speak-only install is never kept as a study device',
-    'shared-study-pairing.mjs',
+    PAIRING,
     "if (!STUDY_INSTALLATION.test(installation)) return { error: 'not-a-study-device' };",
     '',
-    'pair refused: a code minted for a speak-only install says not-a-study-device and keeps nothing',
+    refusedFor('a code minted for a speak-only install', 'not-a-study-device'),
   ],
   [
     'the identity is what the server said for the learner that was asked for',
-    'shared-study-pairing.mjs',
+    PAIRING,
     "if (!validScope(scope) || ['environment', 'learner', 'installation'].some((key) => scope[key] !== asked[key])) return refuse('invalid-response');",
     "if (!validScope(scope)) return refuse('invalid-response');",
-    'pair refused: an answer for another learner than the one asked for says invalid-response and keeps nothing',
+    refusedFor('an answer for another learner than the one asked for', 'invalid-response'),
+  ],
+  [
+    'the answer must name the device that was asked for',
+    PAIRING,
+    "if (!validScope(scope) || ['environment', 'learner', 'installation'].some((key) => scope[key] !== asked[key])) return refuse('invalid-response');",
+    "if (!validScope(scope) || ['environment', 'learner'].some((key) => scope[key] !== asked[key])) return refuse('invalid-response');",
+    refusedFor('an answer for another device than the one asked for', 'invalid-response'),
   ],
   [
     'a credential that names another scope is not kept',
-    'shared-study-pairing.mjs',
+    PAIRING,
     "try { checkStudyCredential(body.token, scope); } catch { return refuse('invalid-response'); }",
     '',
-    'pair refused: a token that names another scope says invalid-response and keeps nothing',
+    refusedFor('a token that names another scope', 'invalid-response'),
   ],
   [
     'a pairing that cannot be flagged is taken back whole',
-    'shared-study-pairing.mjs',
-    'try { await store.clear(); } catch { /* nothing more can be undone */ }',
+    PAIRING,
+    'try { await store.remove(ref); } catch { /* nothing more can be undone */ }',
     '',
-    'pair refused: a flag this browser cannot keep undoes the pairing, so nothing is half kept',
+    T.flag,
   ],
   [
     'unpairing forgets the credential',
-    'shared-study-pairing.mjs',
-    "try { await store.clear(); } catch { return refuse('storage-unavailable'); }",
+    PAIRING,
+    "try { await store.forget(ref, { at: now() }); await store.remove(ref); } catch { announce(); return refuse('storage-unavailable'); }",
     '',
-    'unpair: the credential and the flag go, sync stops, the copy of the record stays unused',
+    T.unpair,
   ],
   [
+    'a code alone cannot pair: the installation is the admin’s to name and is never made up here',
+    PAIRING,
+    "if (installation === null) return { error: 'pairing-line-required' };",
+    '',
+    T.line,
+  ],
+  [
+    'a server is the learner’s Worker or this machine, and no other https host',
+    PAIRING,
+    'const LOCAL_HTTPS = /^https:\\/\\/(?:127\\.0\\.0\\.1|localhost):\\d{1,5}$/;',
+    'const LOCAL_HTTPS = /^https:\\/\\/[^/]+$/;',
+    T.line,
+  ],
+  // ---- the host
+  [
     'the credential goes to its own server only',
-    'shared-study-paired-host.mjs',
+    HOST,
     "if (typeof url !== 'string' || !url.startsWith(`${alias}/`)) throw new Error('study-origin-refused');",
     '',
-    'the transport carries the credential to the one server and refuses every other address',
+    T.transport,
   ],
   [
     'an answer is handed to the engine under the address it asked for, a stray one as it is',
-    'shared-study-paired-host.mjs',
+    HOST,
     'url: response.url === real ? url : response.url };',
     'url };',
-    'the transport carries the credential to the one server and refuses every other address',
+    T.transport,
   ],
   [
     'paired study has a database of its own, never the preview’s',
-    'shared-study-paired-host.mjs',
+    HOST,
     'export const pairedReplicaName = (installation) => `bunki-shared-study-paired-${installation}`;',
     "export const pairedReplicaName = () => 'bunki-shared-study-preview-v1';",
-    'pair: one request to the configured server, the credential kept, the host bound to the server’s identity',
+    T.pair,
   ],
   [
     'a first open fetches the record before anyone grades',
-    'shared-study-paired-host.mjs',
+    HOST,
     "if (result?.state !== 'up-to-date') {",
     'if (false) {',
-    'a first open needs the record: with no connection it is refused, and the next try with one goes through',
+    T.firstOpen,
   ],
   [
     'a missing copy of the record is not replaced by an empty one',
-    'shared-study-paired-host.mjs',
+    HOST,
     "catch (error) { throw error?.message === 'missing-store' ? hostError('study-replica-missing') : error; }",
     "catch { adapter = await open('fresh'); }",
-    'a copy of the record that has gone missing is not replaced by an empty one',
+    T.missingCopy,
   ],
   [
     'a 401 ends the pairing: the credential is dropped and the screen is told',
-    'shared-study-paired-host.mjs',
-    "if (next.getSyncError() === 'authentication-required') void endPairing();",
+    HOST,
+    "if (next.getSyncError() === 'authentication-required' && closed === null) void endPairing();",
     '',
-    '401 after a revocation: sync stops, the credential is dropped, the screen says so, and nothing loops',
+    T.revoked,
   ],
   [
     'an ended pairing is not reported as paired',
-    'shared-study-paired-host.mjs',
-    'permits: { isPaired: () => !ended, reserve: reservePermits },',
+    HOST,
+    'permits: { isPaired: () => closed === null, reserve: reservePermits },',
     'permits: { isPaired: () => true, reserve: reservePermits },',
-    '401 after a revocation: sync stops, the credential is dropped, the screen says so, and nothing loops',
+    T.revoked,
   ],
   // The fault takes the whole line: a 401 on a permit request is then one more ordinary failure. Dropping only the
   // call to endPairing() from that line is not a fault the suite can see, and rightly: the refusal is still named
   // `authentication-required`, the sync session publishes it, and the host's watcher ends the pairing by that name.
   [
     'a 401 on a permit request ends the pairing too',
-    'shared-study-paired-host.mjs',
+    HOST,
     "if (response.status === 401) { await endPairing(); throw new Error('authentication-required'); }",
     '',
-    '401 on a permit request ends the pairing the same way',
+    T.permit401,
   ],
   [
     'permits are asked of the server with the replica’s own capability',
-    'shared-study-paired-host.mjs',
+    HOST,
     "headers: { 'Content-Type': 'application/json', ...compatibilityHeaders(), Authorization: `Bearer ${token}` },",
     "headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },",
-    'a grade crosses both ways between Bunki and a second device of the same learner',
+    T.crossing,
   ],
   [
+    'a pairing the server ended keeps no credential on the device',
+    PAIRING,
+    "? { ...row, sealed: null, ended: { at: row.ended?.at ?? at, by: 'server', unsent } } : null),",
+    "? { ...row, ended: { at: row.ended?.at ?? at, by: 'server', unsent } } : null),",
+    T.revoked,
+  ],
+  // ---- page start
+  [
     'with no flag, page start binds nothing',
-    'shared-study-boot.mjs',
+    BOOT,
     'if (!env.bunkiSharedStudyHost && marked()) {',
     'if (!env.bunkiSharedStudyHost) {',
-    'page start: no flag binds nothing; a flag binds the host; a flag with no pairing behind it is taken away',
+    T.start,
   ],
   [
     'a flag with no pairing behind it is taken away',
-    'shared-study-boot.mjs',
-    "if (error?.code === 'study-pairing-missing') unbind(lazy);",
+    BOOT,
+    "if (error?.code === 'study-pairing-missing' || error?.code === 'study-pairing-ended') unbind(lazy);",
     '',
-    'page start: no flag binds nothing; a flag binds the host; a flag with no pairing behind it is taken away',
+    T.start,
   ],
-  [
-    'a code alone cannot pair: the installation is the admin’s to name and is never made up here',
-    'shared-study-pairing.mjs',
-    "if (installation === null) return { error: 'pairing-line-required' };",
-    '',
-    'the pairing line: the code, the learner and the device in any order, in one box or two; a code alone cannot pair',
-  ],
-  [
-    'the answer must name the device that was asked for',
-    'shared-study-pairing.mjs',
-    "if (!validScope(scope) || ['environment', 'learner', 'installation'].some((key) => scope[key] !== asked[key])) return refuse('invalid-response');",
-    "if (!validScope(scope) || ['environment', 'learner'].some((key) => scope[key] !== asked[key])) return refuse('invalid-response');",
-    'pair refused: an answer for another device than the one asked for says invalid-response and keeps nothing',
-  ],
-  [
-    'a server is the learner’s Worker or this machine, and no other https host',
-    'shared-study-pairing.mjs',
-    'const LOCAL_HTTPS = /^https:\\/\\/(?:127\\.0\\.0\\.1|localhost):\\d{1,5}$/;',
-    'const LOCAL_HTTPS = /^https:\\/\\/[^/]+$/;',
-    'the pairing line: the code, the learner and the device in any order, in one box or two; a code alone cannot pair',
-  ],
+  // ---- Settings
   [
     'Settings shows a pairing as made at once, before the page is opened again',
-    'shared-study-pairing.mjs',
-    'current = { ...current, failed: false, paired: true, ended: false, learner: answer.learner, installation: answer.installation, marked: true };',
+    PAIRING,
+    'current = { ...current, failed: false, paired: true, ended: false, unsent: null, learner: answer.learner, installation: answer.installation, marked: true };',
     '',
-    'Settings: the form, a refusal in plain words in the page’s language, and a pairing that says so and reopens the page',
+    T.settings,
   ],
   [
     'Settings speaks the page’s language',
-    'shared-study-pairing.mjs',
+    PAIRING,
     'const words = (pair) => tx(pair[0], pair[1]);',
     'const words = (pair) => tx(pair[1], pair[1]);',
-    'Settings: the form, a refusal in plain words in the page’s language, and a pairing that says so and reopens the page',
+    T.settings,
   ],
   [
     'forgetting a pairing stops sync before the credential goes',
-    'shared-study-pairing.mjs',
+    PAIRING,
     'try { await host?.dispose?.(); } catch { /* the page is about to be reopened */ }',
     '',
-    'Settings on a paired page: whose record, how sync stands, a pairing the server ended, and forgetting in two presses',
+    T.settingsPaired,
+  ],
+  // (That the block says "ended" the moment the page's host knows has two legs, the host's own word and the
+  // device's record read again; taking either away is not a fault the suite can see, and rightly. The count has one.)
+  [
+    'Settings counts what was never sent as soon as the page’s host knows',
+    PAIRING,
+    'const unsent = ended ? current.unsent ?? live?.unsent ?? null : null;',
+    'const unsent = ended ? current.unsent ?? null : null;',
+    T.settingsPaired,
+  ],
+  // ---- 1. two tabs
+  [
+    'a tab is told at once when the pairing is forgotten or changed in another tab',
+    HOST,
+    'const stopWatch = watchStudyPairing(env, () => { void verify(); });',
+    'const stopWatch = () => {};',
+    T.twoTabs,
   ],
   [
-    'Settings says a pairing has ended as soon as the page’s host knows',
-    'shared-study-pairing.mjs',
-    'const ended = current.ended || live?.ended === true;',
-    'const ended = current.ended;',
-    'Settings on a paired page: whose record, how sync stands, a pairing the server ended, and forgetting in two presses',
+    'the channel alone tells the other tabs',
+    PAIRING,
+    'channel.onmessage = () => onSignal();',
+    '',
+    T.either,
+  ],
+  [
+    'the marks changing alone tells the other tabs',
+    PAIRING,
+    "env.addEventListener('storage', changed);",
+    '',
+    T.either,
+  ],
+  [
+    'a tab that heard nothing checks the stored row before every request',
+    HOST,
+    'getCredential: async () => ((await verify()) ? token : null),',
+    'getCredential: async () => token,',
+    T.deaf,
+  ],
+  [
+    'a tab that heard nothing checks the stored row before every answer',
+    HOST,
+    "if (!(await verify())) throw hostError('study-answer-not-saved');",
+    "if (closed) throw hostError('study-answer-not-saved');",
+    T.deaf,
+  ],
+  [
+    'Settings in another tab follows the device, not the host it was drawn with',
+    PAIRING,
+    'const bound = !!host && !live?.closed;',
+    'const bound = !!host;',
+    T.settingsChanged,
+  ],
+  // ---- 2. a change names its row
+  [
+    'ending a pairing names the row it means',
+    PAIRING,
+    "end: (row, ref, { at, unsent = null }) => (isStudyRow(row, ref) && (!row.ended || (row.ended.by === 'server' && row.ended.unsent === null && unsent !== null))",
+    "end: (row, ref, { at, unsent = null }) => (row && (!row.ended || (row.ended.by === 'server' && row.ended.unsent === null && unsent !== null))",
+    T.rows,
+  ],
+  [
+    'marking a pairing ready names the row it means',
+    PAIRING,
+    "ready: (row, ref) => (isStudyRow(row, ref) && !row.ended ? { ...row, phase: 'ready' } : null),",
+    "ready: (row, ref) => (row && !row.ended ? { ...row, phase: 'ready' } : null),",
+    T.rows,
+  ],
+  [
+    'a row is one pairing: the same installation written again is another row',
+    PAIRING,
+    'row.scope?.installation === ref.installation && (row.generation ?? FIRST_GENERATION) === ref.generation;',
+    'row.scope?.installation === ref.installation;',
+    T.rows,
+  ],
+  [
+    'a refusal that arrives after the pairing was replaced ends nothing',
+    HOST,
+    "if (current !== undefined && !(current && current.scope.installation === ref.installation && current.generation === ref.generation)) { shut('study-pairing-changed'); return; }",
+    '',
+    T.rows,
+  ],
+  // ---- 3. answers after the pairing has ended
+  [
+    'an answer after the pairing has ended is refused, not saved',
+    HOST,
+    'return guarded(adapter);',
+    'return adapter;',
+    T.ended,
+  ],
+  [
+    'every way of writing an answer is refused, not only the first',
+    HOST,
+    "const WRITES = ['submitCommand', 'resumeCommand', 'mutate', 'capture', 'practice', 'addNewToday', 'setNewTodayTotal', 'createManualCard'];",
+    "const WRITES = ['submitCommand'];",
+    T.ended,
+  ],
+  [
+    'what was still waiting when the pairing ended is counted',
+    HOST,
+    "try { unsent = adapter ? (await adapter.store.outbox(500)).filter((record) => record?.event?.type === 'review').length : 0; } catch { unsent = null; }",
+    'unsent = null;',
+    T.ended,
+  ],
+  // ---- 4. the order of forgetting
+  [
+    'forgetting is made durable before the row is removed',
+    PAIRING,
+    "try { await store.forget(ref, { at: now() }); await store.remove(ref); } catch { announce(); return refuse('storage-unavailable'); }",
+    "try { await store.remove(ref); } catch { announce(); return refuse('storage-unavailable'); }",
+    T.forgetting,
+  ],
+  [
+    'the mark page start reads is written before the row is touched',
+    PAIRING,
+    "endedMark.set(ref.installation, 'learner');",
+    '',
+    T.forgetting,
+  ],
+  [
+    'a flag is never put back for a pairing that has ended',
+    PAIRING,
+    'else if (kept.token !== null && !marker.get()) marker.set();',
+    'if (device && !marker.get()) marker.set();',
+    T.forgetting,
+  ],
+  [
+    'a forgetting that was cut short is finished, not undone',
+    PAIRING,
+    'if (await finishForgetting(studyRowRef(device))) device = null;',
+    '',
+    T.forgetting,
+  ],
+  // ---- 5. a refusal that could not be written down
+  [
+    'the mark page start reads is written as soon as the server refuses',
+    HOST,
+    "endedMark.set(ref.installation, 'server');",
+    '',
+    T.unwritten,
+  ],
+  [
+    'the write of an ended pairing is tried again',
+    HOST,
+    'for (const pause of [0, ...endRetryMs]) {',
+    'for (const pause of [0]) {',
+    T.unwritten,
+  ],
+  [
+    'an ended pairing is never bound again, whatever the row still holds',
+    HOST,
+    'if (!isLiveStudyDevice(device, endedMark.get()) || token === null) {',
+    'if (device.ended || token === null) {',
+    T.unwritten,
+  ],
+  [
+    'page start honours the mark of an ended pairing',
+    BOOT,
+    "const marked = () => kept(MARKER) === '1' && kept(ENDED) === '';",
+    "const marked = () => kept(MARKER) === '1';",
+    T.startEnded,
   ],
 ];
 
@@ -263,78 +469,14 @@ async function control(file, find, fault, suiteFile = suite, extra = {}) {
   }
 }
 
-/** Faults only a browser can see: the credential's place in IndexedDB, the flag a page start reads, the voice
- * client's own store. Each must turn the browser test red (tools/shared-study-paired-browser.test.mjs, which
- * serves the planted folder's files to the page). A browser run apiece, so this is asked for by name. */
-const browserSuite = fileURLToPath(
-  new URL('./shared-study-paired-browser.test.mjs', import.meta.url),
-);
-const BROWSER_TEST =
-  'a browser pairs in Settings, studies on the paired record, exchanges a grade both ways, restarts, loses its pairing to the server and to the learner';
-const BROWSER_FAULTS = [
-  [
-    'the credential is sealed with a key the browser will not export',
-    'shared-study-pairing.mjs',
-    "const key = await subtle.generateKey({ name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);",
-    "const key = await subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);",
-  ],
-  [
-    'a pairing leaves the flag the next page start binds the host by',
-    'shared-study-pairing.mjs',
-    "set() { try { storage().setItem(PAIRED_MARKER, '1'); return storage().getItem(PAIRED_MARKER) === '1'; } catch { return false; } },",
-    'set() { return true; },',
-  ],
-  [
-    'the server is the one the voice client keeps',
-    'shared-study-pairing.mjs',
-    'return isStudyServer(address) ? address : null;',
-    'return null;',
-  ],
-  [
-    'a pairing the server ended keeps no credential on the device',
-    'shared-study-pairing.mjs',
-    'async end({ at }) { if (available) await amend((row) => ({ ...row, sealed: null, ended: { at } })); },',
-    'async end({ at }) { if (available) await amend((row) => ({ ...row, ended: { at } })); },',
-  ],
-  [
-    'looking for a database never makes one (an empty `bunki-voice` would break the voice client)',
-    'shared-study-pairing.mjs',
-    'request.onupgradeneeded = () => { absent = true; try { request.transaction.abort(); } catch { /* the open fails below */ } };',
-    'request.onupgradeneeded = () => { absent = true; };',
-  ],
-];
-
-test(
-  'faults only a browser can see turn the browser test red (asked for with BUNKI_PAIRED_BROWSER_CONTROLS=1)',
-  { skip: !process.env.BUNKI_PAIRED_BROWSER_CONTROLS, timeout: 900000 },
-  async () => {
-    const browser = { BUNKI_TEST_CHROME: process.env.BUNKI_TEST_CHROME || '1' };
-    const clean = await control(null, '', '', browserSuite, browser);
-    assert.deepEqual(clean.failed, [], 'the unplanted copy must be green in the browser');
-    assert.ok(clean.passed.includes(BROWSER_TEST), 'the browser test did not run');
-    const outcomes = [];
-    for (const [guarantee, file, find, fault] of BROWSER_FAULTS)
-      outcomes.push({ guarantee, ...(await control(file, find, fault, browserSuite, browser)) });
-    if (process.env.BUNKI_PAIRED_HOST_CONTROLS_REPORT)
-      writeFileSync(
-        `${process.env.BUNKI_PAIRED_HOST_CONTROLS_REPORT}.browser.json`,
-        `${JSON.stringify({ clean: { code: clean.code, passed: clean.passed.length }, faults: outcomes }, null, 2)}\n`,
-      );
-    for (const { guarantee, code, failed } of outcomes) {
-      assert.notEqual(code, 0, `the fault survived the browser test: ${guarantee}`);
-      assert.ok(failed.includes(BROWSER_TEST), `the browser test stayed green: ${guarantee}`);
-    }
-  },
-);
-
 test(
   'every planted fault turns the test of its guarantee red, and the unplanted copy is green',
-  { timeout: 300000 },
+  { timeout: 600000 },
   async () => {
     const clean = await control(null, '', '');
     assert.deepEqual(clean.failed, [], 'the unplanted copy must be green');
     assert.equal(clean.code, 0);
-    assert.ok(clean.passed.length >= 25);
+    assert.ok(clean.passed.length >= 39);
     const outcomes = [];
     const queue = FAULTS.map((fault, index) => ({ fault, index }));
     await Promise.all(
@@ -358,6 +500,86 @@ test(
         failed.includes(expected),
         `the fault was not caught by its own test: ${guarantee} (red: ${failed.join(' | ') || 'none'}; green: ${passed.length})`,
       );
+    }
+  },
+);
+
+/** Faults only a browser can see: the credential's place in IndexedDB, the flag a page start reads, the voice
+ * client's own store, a second page of the same profile. Each must turn the browser test red
+ * (tools/shared-study-paired-browser.test.mjs, which serves the planted folder's files to the page). A browser run
+ * apiece, so this is asked for by name. */
+const browserSuite = fileURLToPath(
+  new URL('./shared-study-paired-browser.test.mjs', import.meta.url),
+);
+const BROWSER_TEST =
+  'a browser pairs in Settings, studies on the paired record, exchanges a grade both ways, restarts, loses its pairing to the server and to the learner';
+const BROWSER_FAULTS = [
+  [
+    'the credential is sealed with a key the browser will not export',
+    PAIRING,
+    "const key = await subtle.generateKey({ name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);",
+    "const key = await subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);",
+  ],
+  [
+    'a pairing leaves the flag the next page start binds the host by',
+    PAIRING,
+    "set() { try { storage().setItem(PAIRED_MARKER, '1'); return storage().getItem(PAIRED_MARKER) === '1'; } catch { return false; } },",
+    'set() { return true; },',
+  ],
+  [
+    'the server is the one the voice client keeps',
+    PAIRING,
+    'return isStudyServer(address) ? address : null;',
+    'return null;',
+  ],
+  [
+    'a pairing the server ended keeps no credential on the device',
+    PAIRING,
+    "? { ...row, sealed: null, ended: { at: row.ended?.at ?? at, by: 'server', unsent } } : null),",
+    "? { ...row, ended: { at: row.ended?.at ?? at, by: 'server', unsent } } : null),",
+  ],
+  [
+    'looking for a database never makes one (an empty `bunki-voice` would break the voice client)',
+    PAIRING,
+    'request.onupgradeneeded = () => { absent = true; try { request.transaction.abort(); } catch { /* the open fails below */ } };',
+    'request.onupgradeneeded = () => { absent = true; };',
+  ],
+  // In a page the word reaches an open host by two ways (the host listens itself, and the page-start module tells
+  // it), so taking the host's own listening away is a fault only the unit suite sees. Both ways end in the host
+  // asking the device whether its row is still the stored one: that question answered wrongly is the fault here.
+  [
+    'a second page of the same profile stops when the pairing is forgotten in the first',
+    HOST,
+    'if (mine && isLiveStudyDevice(current, mark)) return true;',
+    'return true;',
+  ],
+  [
+    'a stored pairing is changed only by the page that means it, in the browser’s own store too',
+    PAIRING,
+    'row.scope?.installation === ref.installation && (row.generation ?? FIRST_GENERATION) === ref.generation;',
+    'true;',
+  ],
+];
+
+test(
+  'faults only a browser can see turn the browser test red (asked for with BUNKI_PAIRED_BROWSER_CONTROLS=1)',
+  { skip: !process.env.BUNKI_PAIRED_BROWSER_CONTROLS, timeout: 1200000 },
+  async () => {
+    const browser = { BUNKI_TEST_CHROME: process.env.BUNKI_TEST_CHROME || '1' };
+    const clean = await control(null, '', '', browserSuite, browser);
+    assert.deepEqual(clean.failed, [], 'the unplanted copy must be green in the browser');
+    assert.ok(clean.passed.includes(BROWSER_TEST), 'the browser test did not run');
+    const outcomes = [];
+    for (const [guarantee, file, find, fault] of BROWSER_FAULTS)
+      outcomes.push({ guarantee, ...(await control(file, find, fault, browserSuite, browser)) });
+    if (process.env.BUNKI_PAIRED_HOST_CONTROLS_REPORT)
+      writeFileSync(
+        `${process.env.BUNKI_PAIRED_HOST_CONTROLS_REPORT}.browser.json`,
+        `${JSON.stringify({ clean: { code: clean.code, passed: clean.passed.length }, faults: outcomes }, null, 2)}\n`,
+      );
+    for (const { guarantee, code, failed } of outcomes) {
+      assert.notEqual(code, 0, `the fault survived the browser test: ${guarantee}`);
+      assert.ok(failed.includes(BROWSER_TEST), `the browser test stayed green: ${guarantee}`);
     }
   },
 );
