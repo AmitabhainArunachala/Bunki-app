@@ -1120,11 +1120,22 @@ export function installVoiceLayer(host) {
     }
     return { state: blocked && status.paired ? `${state} ${blocked}` : state, last, budget, today };
   }
-  /** The block under Settings, 筆と声: paired or not, where the last sentence came from, the budget, and the pairing form. */
+  /** The block under Settings, 筆と声: one row (Voice, connected or not, and one control), and behind it the pairing form
+   * (Connect) or, once paired, the status, the last sentence, the budget, Refresh and Disconnect (Details). LEAN,
+   * 2026-11-22: the same lines and controls with the same ids, shown when asked for; every behaviour is unchanged. */
   function settingsBlock() {
     const block = el('div', 'settings-voice-server');
     block.id = 'settings-voice-server';
     const name = el('p', 'settings-writing-name', tx(...VOICE_SETTINGS.heading));
+    const short = el('span', 'settings-row-value'); short.id = 'voice-state';
+    const connect = el('button', 'chip', tx(...VOICE_SETTINGS.connect)); connect.type = 'button'; connect.id = 'voice-connect';
+    const details = el('button', 'grammar-link', tx(...VOICE_SETTINGS.details)); details.type = 'button'; details.id = 'voice-details';
+    const head = el('div', 'settings-row settings-voice-row');
+    const end = el('span', 'settings-row-end');
+    end.append(short, connect, details);
+    head.append(name, end);
+    const more = el('div', 'settings-voice-more'); more.id = 'voice-more';
+    connect.setAttribute('aria-controls', more.id); details.setAttribute('aria-controls', more.id);
     const state = el('p', 'teacher-note'); state.id = 'voice-status'; state.setAttribute('role', 'status');
     const last = el('p', 'teacher-note'); last.id = 'voice-last';
     const budget = el('p', 'teacher-note'); budget.id = 'voice-budget';
@@ -1149,15 +1160,22 @@ export function installVoiceLayer(host) {
     form.append(how, learner.wrap, code.wrap, submit, note);
     const forget = el('button', 'btn-tertiary', tx(...VOICE_PAIRING.forget)); forget.type = 'button'; forget.id = 'voice-unpair';
     const refresh = el('button', 'btn-tertiary', tx(...VOICE_PAIRING.refresh)); refresh.type = 'button'; refresh.id = 'voice-budget-refresh';
-    let busy = false;
+    let busy = false, open = false;
     const paint = (status = seam.status()) => {
       if (!block.isConnected && block.dataset.mounted) { listeners.delete(paint); return; }
       const lines = statusLines(status);
       state.textContent = lines.state; last.textContent = lines.last; budget.textContent = lines.budget;
-      today.textContent = lines.today; today.hidden = !lines.today;
+      today.textContent = lines.today;
       block.dataset.paired = String(status.paired); block.dataset.configured = String(status.configured);
       block.dataset.lastSource = status.last.source;
       block.dataset.silent = status.silent?.reason || '';
+      short.textContent = tx(...(status.paired ? VOICE_SETTINGS.connected : VOICE_SETTINGS.notConnected));
+      connect.hidden = status.paired; details.hidden = !status.paired;
+      for (const button of [connect, details]) button.setAttribute('aria-expanded', String(open));
+      more.hidden = !open;
+      // not connected: the pairing form alone, whose own line says what to do; connected: the lines and their two controls
+      state.hidden = !status.paired; last.hidden = !status.paired; budget.hidden = !status.paired;
+      today.hidden = !lines.today || !status.paired;
       form.hidden = status.paired;
       forget.hidden = !status.paired; refresh.hidden = !status.paired;
       submit.disabled = busy;
@@ -1180,7 +1198,10 @@ export function installVoiceLayer(host) {
     });
     forget.addEventListener('click', async () => { seam.stop(); await client.forget(); seam.repaired(); note.textContent = ''; paint(); host.refreshListenRow?.(); });
     refresh.addEventListener('click', () => { budget.textContent = tx('音声の予算：確認中…', 'Voice budget: checking…'); void seam.refreshBudget(); });
-    block.append(name, state, last, budget, today, form, refresh, forget);
+    const toggle = () => { open = !open; paint(); if (open && !client.paired()) learner.input.focus({ preventScroll: true }); };
+    connect.addEventListener('click', toggle); details.addEventListener('click', toggle);
+    more.append(state, last, budget, today, form, refresh, forget);
+    block.append(head, more);
     listeners.add(paint);
     paint();
     doc.defaultView.setTimeout(() => { block.dataset.mounted = '1'; }, 0);

@@ -129,7 +129,12 @@ const VOICE_LINE_STANDS_MS = 4000;
 /** Settings, Writing and voice: the state of the pairing, the last tap or sentence, and the limits' lines with the
  * figure the server sent (the owner's rule 7: Bunki keeps the dollar figure beside the limit lines here). */
 const VOICE_SETTINGS = Object.freeze({
-  heading: voiceLinePair('音声サーバー — 収録音声、次に音声サーバー。ほかの声は使いません', 'Voice server — a recorded clip first, then the voice server. No other voice is used'),
+  // the row in Settings (LEAN, 2026-11-22); in Japanese the voice's own word stays ペアリング
+  heading: voiceLinePair('声', 'Voice'),
+  notConnected: voiceLinePair('未ペアリング', 'Not connected'),
+  connected: voiceLinePair('ペアリング済み', 'Connected'),
+  connect: voiceLinePair('ペアリングする', 'Connect'),
+  details: voiceLinePair('詳細', 'Details'),
   paired: (tail) => [`この端末はペアリング済みです（インストール …${tail}）。`, `This device is paired (install …${tail}).`],
   notKept: voiceLinePair('このブラウザはペアリングを保存できないため、今回の利用だけ有効です。', 'This browser could not keep the pairing, so it lasts for this visit only.'),
   lastTap: (short, time) => [`最後のタップ：声なし（${short[0]}、${time}）`, `Last tap: no voice (${short[1]}), at ${time}.`],
@@ -158,7 +163,7 @@ const VOICE_PAIRING = Object.freeze({
   pairing: voiceLinePair('ペアリング中…', 'Pairing…'),
   how: voiceLinePair('デスクトップの「Bunki Voice」を実行すると「Bunki voice code:」で始まる1行が出ます。その1行をそのまま最初の欄に貼って「ペアリング」を押してください。コードは10分で切れます。',
     'Run “Bunki Voice” on the Desktop. It prints one line that starts “Bunki voice code:”. Paste that whole line into the first box and press Pair. The code lasts 10 minutes.'),
-  forget: voiceLinePair('この端末のペアリングを消す', 'Forget the pairing on this device'),
+  forget: voiceLinePair('ペアリングを解除', 'Disconnect'),
   refresh: voiceLinePair('予算を更新', 'Refresh the budget'),
   errors: Object.freeze({
     'invalid-pairing': voiceLinePair('コードか学習者IDの形が違います。確かめて、もう一度お試しください。', 'That does not look like a pairing code and learner id. Check them and try again.'),

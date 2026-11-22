@@ -169,6 +169,7 @@ try {
   await tab('me');
   await page.locator('#me-settings').first().click();
   await page.locator('#settings-voice-server').waitFor();
+  await page.locator('#voice-connect').click(); // LEAN (2026-11-22): the pairing form stands behind Connect
   await page
     .locator('#voice-pair-learner')
     .fill(

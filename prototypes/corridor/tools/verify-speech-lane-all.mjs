@@ -128,6 +128,7 @@ async function freshPage({ net = {} } = {}) {
   await ready();
   await press('#home-review'); await page.locator('#tab-me').waitFor(); await press('#tab-me'); await sleep(900);
   await page.locator('#me-settings').scrollIntoViewIfNeeded(); await press('#me-settings'); await sleep(700);
+  await page.locator('#voice-connect').click(); // LEAN (2026-11-22): the pairing form stands behind Connect
   await page.locator('#voice-pair-learner').scrollIntoViewIfNeeded();
   await page.locator('#voice-pair-learner').fill(`Bunki voice code: ${fake.issue({ learner: 'test-learner' })} (10 minutes) · learner: test-learner · server: ${fake.origin}`);
   await press('#voice-pair-submit');

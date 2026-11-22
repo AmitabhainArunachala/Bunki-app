@@ -412,7 +412,8 @@ async function main() {
           const page = await visit(context, `${siteOrigin}/?room=me&ui=en`);
           await page.locator('#me-settings').first().click({ timeout: 30000 });
           const block = await studyBlock(page);
-          await page.locator('#settings-study-device').scrollIntoViewIfNeeded();
+          // LEAN (2026-11-22): Settings shows Nihongo Study only while this device is connected
+          if (block.state !== 'unpaired') await page.locator('#settings-study-device').scrollIntoViewIfNeeded();
           return { page, block };
         };
         const deck = `${siteOrigin}/?deck=n2&ui=en`;

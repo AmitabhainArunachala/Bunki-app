@@ -1686,9 +1686,9 @@ function recordKeepLine() {
   if (recordSize) line.dataset.share = String(Math.round(recordSize.share * 1000) / 1000);
   if (recordKeep.persisted === null) { line.hidden = true; return line; }
   // each clause holds together; a narrow line breaks only between them
-  if (kept) line.textContent = tx('この端末に保存：保護されている', 'Saved on this device: protected');
-  else line.append(tx('この端末に保存：保護されていない — ', 'Saved on this device: not protected — '),
-    el('span', 'record-kept-clause', tx('書き出すと控えが残る', 'Export keeps a copy')));
+  if (kept) line.textContent = tx('この端末に保存されている。', 'Saved on this device.');
+  else line.append(tx('この端末だけに保存。', 'Saved on this device only. '),
+    el('span', 'record-kept-clause', tx('書き出すと控えが残る。', 'Export keeps a copy.')));
   if (share !== null) line.append(el('span', 'record-kept-share record-kept-clause', share >= 100
     ? tx(' · 容量いっぱい', ' · full') : tx(` · 容量の ${share} %`, ` · ${share} % full`)));
   return line;
@@ -14580,7 +14580,7 @@ async function chooseSrsPreset(id) {
     if (recordReady(epoch) && (S.view === 'tray' || S.view === 'settings')) render();
   }
 }
-function renderSrsPrefs(main, { open = false } = {}) {
+function renderSrsPrefs(main, { open = false, presetsOnly = false } = {}) {
   // `open`: the layout under test sets the pace in Settings, where it stands open, without a fold
   const places = open;
   if (!open) {
@@ -14623,6 +14623,8 @@ function renderSrsPrefs(main, { open = false } = {}) {
     ? tx(`いま — カスタム（${base.ja}から）`, places ? `Now: Custom (from ${base.en})` : `now — Custom (from ${base.en})`)
     : tx(`いま — ${base.ja}`, places ? `Now: ${base.en}` : `now — ${base.en}`);
   rows.append(now);
+  // Settings draws the presets alone; the hand-set numbers stay in Today → Decks
+  if (presetsOnly) { main.append(rows); return; }
   const stepper = (labelJa, labelEn, key) => {
     const value = srsPrefValue(S.srsPrefs, key);
     const row = el('div', 'srs-pref-row');
@@ -37065,109 +37067,65 @@ function meSealsPart(days, first) {
   sec.append(head, dow, grid, foot);
   return sec;
 }
-/** 奥付: the back of the book — the two everyday switches, then every setting */
-function meBackPart() {
-  const sec = meSection('back', '設定', 'Settings');
-  const row = (ja, en, seg) => {
-    const r = el('div', 'me-set');
-    r.append(el('span', 'me-set-l', tx(ja, en)), seg);
-    return r;
-  };
-  const seg = (ja, en) => {
-    const s = el('div', 'me-seg');
-    s.setAttribute('role', 'group');
-    s.setAttribute('aria-label', tx(ja, en));
-    return s;
-  };
-  const language = seg('表示言語', 'Interface language');
-  for (const [id, label] of [['bi', tx('英語', 'English')], ['ja', '日本語']]) {
-    const b = el('button', '', label);
-    b.type = 'button';
-    b.dataset.lang = id;
-    if (id === 'ja') b.lang = 'ja';
-    b.setAttribute('aria-pressed', String(S.lang === id));
-    b.addEventListener('click', () => {
-      if (S.lang === id) return;
-      roomTransition(() => { S.lang = id; render(); });
-    });
-    language.append(b);
-  }
-  const light = seg('明かり', 'Light');
-  const lights = [];
-  const paintLight = () => {
-    const night = ME_NIGHT_WORLDS.includes(themeId());
-    for (const b of lights) b.setAttribute('aria-pressed', String((b.dataset.light === 'night') === night));
-  };
-  for (const [id, ja, en] of [['day', '昼', 'Day'], ['night', '夜', 'Night']]) {
-    const b = el('button', '', tx(ja, en));
-    b.type = 'button';
-    b.dataset.light = id;
-    b.addEventListener('click', () => {
-      if ((id === 'night') === ME_NIGHT_WORLDS.includes(themeId())) return;
-      roomTransition(() => {
-        setKairoTheme(id === 'night' ? 'yoru' : 'hokusai');
-        S.sealWake = true;
-        applyWorldSwap();
-        paintLight();
-      });
-    });
-    lights.push(b);
-    light.append(b);
-  }
-  paintLight();
-  const doors = el('div', 'foundation-doors me-back-doors');
-  doors.append(foundationDoor('me-settings', '設定', 'Settings', 'settings'));
-  sec.append(row('表示言語', 'Interface language', language), row('明かり', 'Light', light), doors);
-  return sec;
-}
 /** Settings → Layout: the current layout, or the one under test. Two visible states, the active one
  * lit, and one plain line of what changes and what does not. The choice re-renders where it stands. */
 /** Settings → 筆 and 声 (G4): when a word he brings closer writes itself (first meeting · always · never) and whether a
  * card's answer and an opened word say themselves once (on · off). Device choices, never the learner record. The writing's speed is not here: it
- * is his one 書く速さ slider, in one place — the writing room — and this note says where. */
+ * is his one 書く速さ slider, in one place: the writing room. */
 function renderSettings(main) {
   const places = placesLayout();
   main.append(el('p', 'eyebrow me-kicker', places ? tx('記録', 'Progress') : tx('私', 'Me')));
   main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.settings)));
-  const language = el('section', 'foundation-section');
-  language.append(el('h2', 'eyebrow', tx('表示言語', 'Interface language')));
+  // LEAN (2026-11-22): one line per setting, in the Me page's own ruled row: its name, then its control
+  const row = (ja, en, ...controls) => {
+    const line = el('div', 'settings-row');
+    line.append(el('span', 'settings-row-name', tx(ja, en)), ...controls);
+    return line;
+  };
   const choices = el('div', 'lang-seg settings-language');
   choices.setAttribute('role', 'group'); choices.setAttribute('aria-label', tx('表示言語', 'Interface language'));
-  for (const [id, ja, en] of [['bi', '英語', 'English'], ['ja', '日本語', 'Japanese']]) {
-    const button = el('button', '', tx(ja, en)); button.type = 'button'; button.dataset.lang = id;
+  for (const [id, label] of [['bi', tx('英語', 'English')], ['ja', '日本語']]) {
+    const button = el('button', '', label); button.type = 'button'; button.dataset.lang = id;
+    if (id === 'ja') button.lang = 'ja';
     button.setAttribute('aria-pressed', String(S.lang === id));
     button.addEventListener('click', () => {
       if (S.lang !== id) roomTransition(() => { S.lang = id; render(); });
     }); choices.append(button);
   }
-  language.append(choices);
-  // in the layout under test the colour theme is named as the picker names it (LABELS.md)
-  const world = places
-    ? biLabel('button', 'grammar-link foundation-door', '配色', 'Colour theme')
-    : biLabel('button', 'grammar-link foundation-door', '世界を選ぶ', 'Choose a world');
+  const language = el('section', 'foundation-section settings-rows settings-general');
+  language.id = 'settings-general';
+  language.append(row('表示言語', 'Interface language', choices));
+  // a door with its value: the name at the left, what it is now at the right
+  const valued = (door, value) => {
+    const text = el('span', 'settings-world-text');
+    text.append(...door.childNodes, el('span', 'settings-world-value', value));
+    door.append(text);
+    return door;
+  };
+  // the look, as the gate and the seal name it; the same chooser as the seal
+  const world = biLabel('button', 'grammar-link foundation-door', '配色', 'Look');
   world.type = 'button'; world.id = 'settings-world'; attachWorldPicker(world);
-  const worldText = el('span', 'settings-world-text');
-  worldText.append(...world.childNodes, el('span', 'settings-world-value', worldName(THEME_UI[themeIx()])));
-  world.append(worldText);
-  const doors = el('div', 'foundation-doors');
-  const about = el('section', 'foundation-section');
+  valued(world, worldName(THEME_UI[themeIx()]));
+  // Nihongo Study: a row while this device is connected (shared-study-boot.mjs hands the panel over; a build that does
+  // not load it, like the single file, shows none); a connect link from Nihongo Study is the one way in
+  const studyDevice = () => globalThis.bunkiStudyPairing?.settingsBlock?.({ tx, el }) || null;
+  const about = el('section', 'foundation-section settings-about');
   about.id = 'settings-release';
-  about.append(el('h2', 'eyebrow', tx('このアプリについて', 'About this app')));
-  const version = el('p', '', `Bunki / KAIRO ${APP_RELEASE.version}`);
+  about.append(el('h2', 'eyebrow', tx('このアプリについて', 'About')));
+  const version = el('span', '', `Bunki ${APP_RELEASE.version}`);
   version.id = 'settings-release-version';
   version.dataset.version = APP_RELEASE.version;
-  about.append(version, el('p', 'card-kind', APP_RELEASE.channel === 'stable'
-    ? tx('通常版', 'Stable release') : tx('試作版', 'Early build')));
-  const notes = el('a', 'grammar-link', tx('この版の変更点', 'Changes in this release'));
+  const notes = el('a', 'grammar-link', tx('この版の変更点', 'What’s new'));
   notes.id = 'settings-release-notes';
   notes.href = `https://github.com/Amitabhainarunachala/Bunki-app/releases/tag/v${APP_RELEASE.version}`;
   notes.target = '_blank'; notes.rel = 'noopener noreferrer';
-  about.append(notes, el('p', 'card-kind', tx(
-    '更新するには、オンラインで開いた後、このアプリの画面をすべて閉じて、もう一度開いてください。保存データは消さないでください。',
-    'To update, open online, then close all app windows and reopen. Keep your saved website data.')));
+  const release = el('p', 'settings-release-line');
+  release.append(version, ' · ', el('span', '', APP_RELEASE.channel === 'stable' ? tx('通常版', 'Stable release') : tx('試作版', 'Early build')), ' · ', notes);
+  about.append(release);
   if (places) {
     // the layout under test keeps here what the old Today held below its cards: the pace, the
     // record's sync and backup, and the note to the builder, each with its controls and ids unchanged
+    const doors = el('div', 'foundation-doors');
     doors.append(world,
       foundationDoor('settings-reading', '読み物の好み', 'Reading preferences', 'airead'),
       foundationDoor('settings-tutor', '先生との接続', 'Tutor connection', 'ai'),
@@ -37185,23 +37143,36 @@ function renderSettings(main) {
     renderPortRow(record);
     const builder = el('section', 'foundation-section settings-builder');
     renderNoteDoor(builder);
-    main.append(language, renderLayoutChoice(), renderWritingChoice(), doors, pace, record, renderReportRelaySettings(), builder, about);
+    main.append(...[language, renderLayoutChoice(), renderWritingChoice(), studyDevice(), doors, pace, record, renderReportRelaySettings(), builder, about].filter(Boolean));
     return;
   }
-  doors.append(world,
-    foundationDoor('settings-pace', '復習のペース', 'Review pace', 'tray', () => {
-      S.srsPrefsOpen = true;
-      S.todayDetailHeld = true;
-      requestAnimationFrame(() => document.getElementById('srs-prefs-toggle')?.scrollIntoView({ block: 'start' }));
-    }),
-    foundationDoor('settings-reading', '読み物の好み', 'Reading preferences', 'airead'),
-    foundationDoor('settings-tutor', '先生との接続', 'Tutor connection', 'ai'),
-    foundationDoor('settings-backup', 'バックアップ', 'Backup', 'tray', showRecordBackup),
-  );
-  // K · one plain line under the Backup door: is this device keeping the record, and how full is it
-  // Hfix-1B (H-hokusai-07): the layout under test is a second skin, so the learner's Settings does not offer it; a device
-  // already in it (the places branch above) keeps Layout as its way back
-  main.append(language, renderWritingChoice(), doors, recordKeepLine(), renderReportRelaySettings(), about);
+  const lookDoor = el('div', 'foundation-doors');
+  lookDoor.append(world);
+  language.append(lookDoor);
+  // Study: the pace's presets drawn here (the hand-set numbers stay in Today → Decks), Nihongo Study while connected,
+  // and the tutor's door with its state
+  const study = el('section', 'foundation-section settings-rows settings-study');
+  study.id = 'settings-study';
+  study.append(el('h2', 'eyebrow', tx('学習', 'Study')));
+  const pace = row('復習のペース', 'Review pace');
+  pace.classList.add('settings-pace');
+  pace.id = 'settings-pace';
+  renderSrsPrefs(pace, { open: true, presetsOnly: true });
+  study.append(pace);
+  const device = studyDevice();
+  if (device) study.append(device);
+  const tutorDoor = el('div', 'foundation-doors');
+  tutorDoor.append(valued(foundationDoor('settings-tutor', '先生', 'Tutor', 'ai'), aiKey() ? tx('接続済み', 'Connected') : tx('未接続', 'Not connected')));
+  study.append(tutorDoor);
+  // Backup: one line (is this device keeping the record, and how full is it) with Export and Import beside it
+  const record = el('section', 'foundation-section settings-rows settings-record');
+  record.id = 'settings-record';
+  record.append(el('h2', 'eyebrow', tx('バックアップ', 'Backup')));
+  const backup = el('div', 'settings-row settings-backup');
+  backup.append(recordKeepLine());
+  renderPortRow(backup);
+  record.append(backup);
+  main.append(...[language, renderWritingChoice(), study, record, renderReportRelaySettings(), about].filter(Boolean));
 }
 function renderWordsDoors(main) {
   // SAVE · what he saved, first under the search field (renderSavedShelf)
@@ -37718,7 +37689,8 @@ function render() {
   // no vertical room sign (John, 2026-11-10): the tab and the bar already name the room, Today's heading its date
   // after the room, never inside its stage: the focused stage keeps its composition and every
   // state (probe, unavailable card, error) keeps a report entry one scroll away
-  if (maintenanceReports && S.view !== 'drift') root.append(reportEntries('report-line-page'));
+  // LEAN (2026-11-22): Me and Settings carry no footer line; the bug rail opens the same sheet
+  if (maintenanceReports && !['drift', 'me', 'settings'].includes(S.view)) root.append(reportEntries('report-line-page'));
 
   renderSheet(root);
   renderStrokePage(root);
@@ -37851,7 +37823,7 @@ function reportEntries(className) {
  * from the address bar and offered in Me → Settings → Bug reports, naming the host
  * the reports would go to, and only Set up stores it — so a link from someone else
  * cannot quietly send this device's reports and screenshots elsewhere. A home-screen
- * app keeps its own storage, so the same link can be pasted there. Both stay on
+ * app keeps its own storage, so the same link can be pasted in My reports. Both stay on
  * this device only. */
 const REPORT_RELAY_STORE = 'kairo-report-relay-v1';
 function relayServiceUrl(address, key) {
@@ -37886,21 +37858,41 @@ const REPORT_RELAY_URL = (() => {
     return typeof saved?.url === 'string' ? saved.url : '';
   } catch { return ''; }
 })();
+/** LEAN (2026-11-22): the setup link is pasted in My reports (the report sheet asks for these words and hands the pasted
+ * text back to save); Settings shows its block only while a link opened in the browser waits there. */
+function reportRelaySetup() {
+  const host = () => { try { return REPORT_RELAY_URL ? new URL(REPORT_RELAY_URL).host : ''; } catch { return ''; } };
+  return {
+    waiting: () => !!reportRelayOffer,
+    words: () => ({
+      // Q · in his words (the developer's GitHub and its prefilled page stay inside the report's own Details)
+      status: host()
+        ? tx(`この端末の報告は、直す人に自動で届く（${host()}）。`, `Reports from this device reach the app's makers automatically (${host()}).`)
+        : tx('この端末では、報告を送ると開くページで、送信を仕上げる。', 'On this device, sending a report opens a page where you finish sending it.'),
+      label: tx('報告用リンクを貼り付ける', 'Paste your report setup link'),
+      save: host() ? tx('リンクを変更する', 'Change link') : tx('設定する', 'Set up'),
+    }),
+    save: (text) => {
+      if (saveReportRelayLink(text) !== 'saved') return { ok: false, note: tx('報告用リンクとして読めない。リンク全体を貼り付ける。', 'That is not a report setup link. Paste the whole link.') };
+      // The report client reads its service once, when the app starts.
+      reportRelayOffer = null;
+      setTimeout(() => location.reload(), 0);
+      return { ok: true, note: tx('設定した。再読み込みする。', 'Set up. Reloading.') };
+    },
+  };
+}
 function renderReportRelaySettings() {
+  if (!reportRelayOffer) return null;
   const section = el('section', 'foundation-section');
   section.id = 'settings-reports';
   section.append(el('h2', 'eyebrow', tx('不具合の報告', 'Bug reports')));
-  let host;
-  try { host = REPORT_RELAY_URL ? new URL(REPORT_RELAY_URL).host : ''; } catch { host = ''; }
-  // Q · in his words (the developer's GitHub and its prefilled page stay inside the report's own Details)
-  const status = el('p', 'teacher-note', host
-    ? tx(`この端末の報告は、直す人に自動で届く（${host}）。`, `Reports from this device reach the app's makers automatically (${host}).`)
-    : tx('この端末では、報告を送ると開くページで、送信を仕上げる。', 'On this device, sending a report opens a page where you finish sending it.'));
+  const words = reportRelaySetup().words();
+  const status = el('p', 'teacher-note', words.status);
   status.id = 'settings-reports-status';
   const form = el('form', 'listening-form settings-report-form'); form.id = 'settings-report-form';
-  const field = listeningField(form, 'settings-report-link', tx('報告用リンクを貼り付ける', 'Paste your report setup link'));
+  const field = listeningField(form, 'settings-report-link', words.label);
   field.type = 'url'; field.spellcheck = false; field.autocapitalize = 'off'; field.inputMode = 'url';
-  const save = el('button', 'chip', host ? tx('リンクを変更する', 'Change link') : tx('設定する', 'Set up')); save.type = 'submit'; save.id = 'settings-report-save';
+  const save = el('button', 'chip', words.save); save.type = 'submit'; save.id = 'settings-report-save';
   const note = el('p', 'teacher-note'); note.id = 'settings-report-note'; note.setAttribute('role', 'status');
   form.append(save, note);
   if (reportRelayOffer) {
@@ -37938,6 +37930,8 @@ function mountMaintenanceReports() {
   if (!window.BunkiReports) return;
   maintenanceReports = window.BunkiReports.mount({
     rail: true,
+    // My reports takes the pasted setup link (a home-screen app keeps its own storage)
+    relay: reportRelaySetup(),
     locale: S.lang === 'ja' ? 'ja' : 'en',
     // Hfix-1B (H0-4): the sheet asks a report service only when it has one: the maintenance service the page declares, or
     // the relay this device was set up with (Settings › Bug reports). It no longer guesses its own address: a host with no
@@ -38035,4 +38029,4 @@ function deckHost() {
   return deckHostAdapter;
 }
 
-export { $, barSavedVerb, savedInParts, savedPlace, voiceSettingsBlock, AI_DEFAULT_BASE_URL, AI_DEFAULT_MODEL, AI_DEVICE_STORE, AI_EVIDENCE_ROLES, AI_KEY_STORE, AI_MINE_MAX_ROWS, AI_READING_TIMEOUT_CAP_MS, AI_READING_TOKENS_PER_SECOND, AI_TIMEOUT_MS, ANNOTATION_DIGITS, BEYOND_JOYO, D, DEPTH_NAMES, DEPTH_OWNED_S, DEPTH_RECALLED_S, DEPTH_RECALL_R, DICTIONARY_INDEX_PATH, DICTIONARY_SHARD_PATH, DOJO_DECKS, DRAFT_KEY, DRIFT_THEME_BY_WORLD, EXAMPLE_DIR, FRAMES_CAP, FRAMES_STORE, GESTURE, GLOSS_LEAD, GLOSS_MESSY, GLUE_STROKE, GODAN_ROW, GODAN_TE, GRAMMAR, INK_DEPTH, INK_TEMPO, INK_WORLDS, ISO_DAY, JOYO_JUDGEABLE, JOYO_MARKS, KAGAMI_BAND_NAMES, KAGAMI_CLEAR, KAGAMI_CODE_BAND, KAGAMI_LEVELS, KAGAMI_MIN_SEEN, KAGAMI_MODEL_VERSION, KAGAMI_OOV, KANJI_QUEST_FAILED, KANJI_QUEST_STRUCTURAL, KATA_TO_HIRA_OFFSET, LEADING_DROP_DAYS, LEARN_STAGE_DECKS, LEMMA_NIDAN, LEMMA_ONBIN, LESSON_SIZE, LOOKUP_HELPER_POS, M4_COPY, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, MINI_INK, MONTHS_EN, NARRATION_VOICES, NEW_PER_DAY_DEFAULT, NODE_KIND, NOTE_TEXT, PARTICLES, PARTICLE_BY_SURFACE, PART_STROKES, PART_WRITTEN, PLACES_TABS, POS_FAMILY, POS_PLAIN, POS_SEGMENT_CODE, PRIMARY_TABS, READER_KANA, READER_KANJI, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, REL, REPORT_RELAY_STORE, REVIEWS_PER_DAY_DEFAULT, ROMAJI, ROOM_IDS, ROOM_NAMES, S, SAVE_PRESS_MS, SENSEI_OBS_CODES, SENSE_BY_ANCHOR, SENSE_CLASS, SENSE_GAVE_UP, SENSE_LATE, SENSE_MUST_END, SENSE_MUST_NOT, SENSE_NUMBER, SENSE_NUMBER_WORD, SENSE_TAG_EN, SENSE_TAG_JA, SENSE_WAIT_MS, SENSE_WEEKDAY, SHORT_EXAMPLE_CHARS, SLIP_NODE, SLIP_OWN_MEANING, SOUND_PLAIN, SOUND_VOICED, SPEAK_JA, SRS_KINDS, SRS_PREF_LADDERS, SRS_PRESETS, STROKE_SPEED_DEFAULT, STROKE_VIEWBOX, SVG_NS, TE_FORM_AUXILIARY, TE_FORM_NOTE, THEME_STORE, THEME_UI, THES_RELS, TODAY_JA_WORD, TODAY_SKY_CAP, TODAY_SKY_MISS_DAYS, TODAY_SKY_WORD, TOKEN_CONTEXT, TOPIC_BLOCKS, TOPIC_KICKERS, TOPIC_ORDER, TOUCH_READING_FADES, TOUCH_READING_GAP, TOUCH_READING_MOTION, TOUCH_READING_ROWS, TOUCH_ROW_PINS, TRAIL_KINDS, VOICE_LOCK, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, WW_CX, WW_CY, WW_KANJI_ANGLES, WW_REL, WW_RING2_ORDER, WW_RING2_SLOTS, WW_TRAIL_MAX, WW_WALK_KEY, YOMI_DAKUTEN, YOMI_HANDAKU, _KDX_NPTS, _compsCache, _kdxDist, _kdxNorm, _kdxResample, _kdxTemplates, activateWordLadder, afterPressLands, aiChatLog, aiConverse, aiLogAll, aiSheetNotes, aiSheetTurns, allAssessmentEvidence, anchorBox, animcjkApproved, animcjkShards, annotationKana, applyAssessmentV2, assertLearningSource, assessmentClockSession, back, bi, biLabel, boxLeadGloss, buildListenRow, buildTeacherChatLog, cacheDictionaryFormRows, cacheDictionaryRow, cancelExcerptPlayback, canonicalRecordJson, capturePending, captureScaleVisit, cardRecall, chipsFor, clearReaderReadings, clearReaderSummons, clearWordLadder, closeSealStrip, closeWorldPicker, commitCapture, commitStorePatch, confusablesFor, contrastOf, controlsUnder, copyRecordWith, currentAssessmentV2, currentJoyoKunNote, currentRecordNoteView, currentSentenceListeningCue, deckSummaries, deeperDepth, depthIndexMemo, depthNodeCache, depthRank, depthRetrievability, dictionaryQueryOpening, dictionaryReadingSummaries, dictionaryRowBySeq, dictionaryWorkerRequest, diveFromMini, diveFromSlip, el, encounterKey, enhanceJapaneseProse, ensureArchiveIndex, ensureArticle, ensureDictionaryIndex, ensureDictionaryShard, ensureReadingPositionModule, ensureSenseSidecar, ensureSentenceListeningCatalog, entryKanaIndex, explicitWordSnapshot, fetchData, fieldsDeckHome, findLookupOccurrence, finishPageTransition, finiteNumber, fitChromeKeep, flowText, focusKanjiItem, foundationDoor, frameFoot, gateFrame, glyphBox, go, guidedTaken, heldWordCardNode, heroSource, hideReaderToast, holdPageUnderDrawer, inkGroundFor, installProseWordRoving, installScaleBridge, interaction, invalidateRecordNoteViews, isLeech, jaGroupSegments, jlptRank, kagamiBandFor, kagamiLevel, kagamiLevelOf, kagamiMockBand, kanaReadingKey, kanjiAnswerAvailable, kanjiCourseApplyHelp, kanjiCourseRememberHelp, kanjiDisplayRecord, kanjiFamilyExposures, kanjiFamilyMounts, kanjiFamilyResolveExample, kanjiFamilyStamp, kanjiFamilyStampCurrent, kanjiFamilyTicket, kanjiFamilyTicketCurrent, kanjiFamilyViews, kanjiQuestFor, kanjiQuestLoading, kanjiQuestOwner, kanjiReadingsState, kanjiReferenceRows, kanjiStructureMounts, kanjiWorldEligible, kankenGradeLabel, kataToHira, keepNavigationReturn, laneMembers, layersMarkTop, learnDeckSummary, learnStageFace, loadReferenceExtra, logicalArchiveRows, lookupWordKey, meBackPart, meDeckIndex, meNum, meSealsPart, metReadable, mockFailed, motionEase, motionMs, narrationVoiceName, nonEmptyString, notYetReleased, noteEncounter, openAssessmentQuestionReview, openDeck, openGuidedRoom, openJapaneseLookup, openKanjiCourseUnit, openKanjiWorldEncounter, openPassage, openPersonalCollection, openPlainSaveMenu, openReferenceCollection, openSealStrip, openSentencePractice, openSpeakRoom, openStrokePage, openVocabularyListPopover, openWordWeb, optional, ownSentenceExample, owns, pageCutAllowed, paintKeptCount, paintMiniPath, passage, performAssessmentReconciliation, placeFloating, placeKinsoku, placesLayout, plainRecord, proseWordRovers, protectStore, queueAssessmentWork, quietUsageTags, readAloud, readFrameRows, readHelpPatch, readHelpReadable, readerReadingFits, readerSummaryFor, readerTokenLead, recordReady, recordWritable, refreshStrokeReadings, refreshWordSheet, relayServiceUrl, removeMini, render, renderFamilyExampleNode, renderKanjiCourseDoor, renderKanjiFamily, renderKanjiStructure, renderKdxGrid, renderReferenceConnections, renderReviewHall, renderSentenceTokens, renderSourceInboxEntries, renderSourceKanjiDoor, renderStudyFold, renderStudyHall, renderTeacherDoor, renderTextSourceContextSelection, renderWordWeb, resolveReaderChoice, resolveTeacherSource, retainedKanjiRecord, retireScaleReturn, returnToScaleBead, revalidateTutorRequests, revealFloatingFocus, roomName, roomTransition, rubyNode, safeJsonValue, sameItem, sameWordIdentity, saveWord, savedAnswerFor, scaleIn, scaleNavigationAllowed, scaleOut, scalePassage, scaleThreadPath, scaleTokenFingerprint, senseGlosses, senseLed, senseNumberBefore, sensePatch, senseWeekdayBracket, sentenceDraftBindings, sentenceDraftInputErrors, sentenceDraftWindowEdits, setGlossLine, setJaWords, setLayout, setLookupStop, setOwnRecordValue, setWordPref, shallowerDepth, sheetActionLine, sheetActionLineKeys, shelfDay, showMini, skipState, sourceInboxShelf, speakAvailable, srsDueItems, srsKey, srsParamsProblem, srsRoomBack, srsSchedulePolicy, stopPassageRead, stopSentenceListening, strokePathsFor, strokeReduced, strokeSpeed, studyHallDoors, suppressAssessmentCards, syncChromeKeep, syncStrokeNumbers, teacherDraftInputErrors, teacherDraftWindowEdits, teacherSourceProcessingUnavailable, teacherWindowDraftPrefix, todayQueue, todaySky, transcriptTime, trayItemPending, tx, uiIcon, updateReaderPlaceSave, updateReadingPlaces, validInstant, validNewPerDay, validPauseEvery, validPreset, validRetention, validReviewsPerDay, validStoreEnvelope, waitForLookupNameReadings, wireReaderWordMenu, withEn, wordBrush, wordCardIdentity, wordNodeIdentity, wordStudied, setReadHighlight, wordHighlight, wordVoice, wordWeb, writtenFormNote, wwP, wwPartMembers, wwReduced, wwShort, wwSpread, wwTokenIndex, wwTrail, yomiVariantCache };
+export { $, barSavedVerb, savedInParts, savedPlace, voiceSettingsBlock, AI_DEFAULT_BASE_URL, AI_DEFAULT_MODEL, AI_DEVICE_STORE, AI_EVIDENCE_ROLES, AI_KEY_STORE, AI_MINE_MAX_ROWS, AI_READING_TIMEOUT_CAP_MS, AI_READING_TOKENS_PER_SECOND, AI_TIMEOUT_MS, ANNOTATION_DIGITS, BEYOND_JOYO, D, DEPTH_NAMES, DEPTH_OWNED_S, DEPTH_RECALLED_S, DEPTH_RECALL_R, DICTIONARY_INDEX_PATH, DICTIONARY_SHARD_PATH, DOJO_DECKS, DRAFT_KEY, DRIFT_THEME_BY_WORLD, EXAMPLE_DIR, FRAMES_CAP, FRAMES_STORE, GESTURE, GLOSS_LEAD, GLOSS_MESSY, GLUE_STROKE, GODAN_ROW, GODAN_TE, GRAMMAR, INK_DEPTH, INK_TEMPO, INK_WORLDS, ISO_DAY, JOYO_JUDGEABLE, JOYO_MARKS, KAGAMI_BAND_NAMES, KAGAMI_CLEAR, KAGAMI_CODE_BAND, KAGAMI_LEVELS, KAGAMI_MIN_SEEN, KAGAMI_MODEL_VERSION, KAGAMI_OOV, KANJI_QUEST_FAILED, KANJI_QUEST_STRUCTURAL, KATA_TO_HIRA_OFFSET, LEADING_DROP_DAYS, LEARN_STAGE_DECKS, LEMMA_NIDAN, LEMMA_ONBIN, LESSON_SIZE, LOOKUP_HELPER_POS, M4_COPY, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, MINI_INK, MONTHS_EN, NARRATION_VOICES, NEW_PER_DAY_DEFAULT, NODE_KIND, NOTE_TEXT, PARTICLES, PARTICLE_BY_SURFACE, PART_STROKES, PART_WRITTEN, PLACES_TABS, POS_FAMILY, POS_PLAIN, POS_SEGMENT_CODE, PRIMARY_TABS, READER_KANA, READER_KANJI, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, REL, REPORT_RELAY_STORE, REVIEWS_PER_DAY_DEFAULT, ROMAJI, ROOM_IDS, ROOM_NAMES, S, SAVE_PRESS_MS, SENSEI_OBS_CODES, SENSE_BY_ANCHOR, SENSE_CLASS, SENSE_GAVE_UP, SENSE_LATE, SENSE_MUST_END, SENSE_MUST_NOT, SENSE_NUMBER, SENSE_NUMBER_WORD, SENSE_TAG_EN, SENSE_TAG_JA, SENSE_WAIT_MS, SENSE_WEEKDAY, SHORT_EXAMPLE_CHARS, SLIP_NODE, SLIP_OWN_MEANING, SOUND_PLAIN, SOUND_VOICED, SPEAK_JA, SRS_KINDS, SRS_PREF_LADDERS, SRS_PRESETS, STROKE_SPEED_DEFAULT, STROKE_VIEWBOX, SVG_NS, TE_FORM_AUXILIARY, TE_FORM_NOTE, THEME_STORE, THEME_UI, THES_RELS, TODAY_JA_WORD, TODAY_SKY_CAP, TODAY_SKY_MISS_DAYS, TODAY_SKY_WORD, TOKEN_CONTEXT, TOPIC_BLOCKS, TOPIC_KICKERS, TOPIC_ORDER, TOUCH_READING_FADES, TOUCH_READING_GAP, TOUCH_READING_MOTION, TOUCH_READING_ROWS, TOUCH_ROW_PINS, TRAIL_KINDS, VOICE_LOCK, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, WW_CX, WW_CY, WW_KANJI_ANGLES, WW_REL, WW_RING2_ORDER, WW_RING2_SLOTS, WW_TRAIL_MAX, WW_WALK_KEY, YOMI_DAKUTEN, YOMI_HANDAKU, _KDX_NPTS, _compsCache, _kdxDist, _kdxNorm, _kdxResample, _kdxTemplates, activateWordLadder, afterPressLands, aiChatLog, aiConverse, aiLogAll, aiSheetNotes, aiSheetTurns, allAssessmentEvidence, anchorBox, animcjkApproved, animcjkShards, annotationKana, applyAssessmentV2, assertLearningSource, assessmentClockSession, back, bi, biLabel, boxLeadGloss, buildListenRow, buildTeacherChatLog, cacheDictionaryFormRows, cacheDictionaryRow, cancelExcerptPlayback, canonicalRecordJson, capturePending, captureScaleVisit, cardRecall, chipsFor, clearReaderReadings, clearReaderSummons, clearWordLadder, closeSealStrip, closeWorldPicker, commitCapture, commitStorePatch, confusablesFor, contrastOf, controlsUnder, copyRecordWith, currentAssessmentV2, currentJoyoKunNote, currentRecordNoteView, currentSentenceListeningCue, deckSummaries, deeperDepth, depthIndexMemo, depthNodeCache, depthRank, depthRetrievability, dictionaryQueryOpening, dictionaryReadingSummaries, dictionaryRowBySeq, dictionaryWorkerRequest, diveFromMini, diveFromSlip, el, encounterKey, enhanceJapaneseProse, ensureArchiveIndex, ensureArticle, ensureDictionaryIndex, ensureDictionaryShard, ensureReadingPositionModule, ensureSenseSidecar, ensureSentenceListeningCatalog, entryKanaIndex, explicitWordSnapshot, fetchData, fieldsDeckHome, findLookupOccurrence, finishPageTransition, finiteNumber, fitChromeKeep, flowText, focusKanjiItem, foundationDoor, frameFoot, gateFrame, glyphBox, go, guidedTaken, heldWordCardNode, heroSource, hideReaderToast, holdPageUnderDrawer, inkGroundFor, installProseWordRoving, installScaleBridge, interaction, invalidateRecordNoteViews, isLeech, jaGroupSegments, jlptRank, kagamiBandFor, kagamiLevel, kagamiLevelOf, kagamiMockBand, kanaReadingKey, kanjiAnswerAvailable, kanjiCourseApplyHelp, kanjiCourseRememberHelp, kanjiDisplayRecord, kanjiFamilyExposures, kanjiFamilyMounts, kanjiFamilyResolveExample, kanjiFamilyStamp, kanjiFamilyStampCurrent, kanjiFamilyTicket, kanjiFamilyTicketCurrent, kanjiFamilyViews, kanjiQuestFor, kanjiQuestLoading, kanjiQuestOwner, kanjiReadingsState, kanjiReferenceRows, kanjiStructureMounts, kanjiWorldEligible, kankenGradeLabel, kataToHira, keepNavigationReturn, laneMembers, layersMarkTop, learnDeckSummary, learnStageFace, loadReferenceExtra, logicalArchiveRows, lookupWordKey, meDeckIndex, meNum, meSealsPart, metReadable, mockFailed, motionEase, motionMs, narrationVoiceName, nonEmptyString, notYetReleased, noteEncounter, openAssessmentQuestionReview, openDeck, openGuidedRoom, openJapaneseLookup, openKanjiCourseUnit, openKanjiWorldEncounter, openPassage, openPersonalCollection, openPlainSaveMenu, openReferenceCollection, openSealStrip, openSentencePractice, openSpeakRoom, openStrokePage, openVocabularyListPopover, openWordWeb, optional, ownSentenceExample, owns, pageCutAllowed, paintKeptCount, paintMiniPath, passage, performAssessmentReconciliation, placeFloating, placeKinsoku, placesLayout, plainRecord, proseWordRovers, protectStore, queueAssessmentWork, quietUsageTags, readAloud, readFrameRows, readHelpPatch, readHelpReadable, readerReadingFits, readerSummaryFor, readerTokenLead, recordReady, recordWritable, refreshStrokeReadings, refreshWordSheet, relayServiceUrl, removeMini, render, renderFamilyExampleNode, renderKanjiCourseDoor, renderKanjiFamily, renderKanjiStructure, renderKdxGrid, renderReferenceConnections, renderReviewHall, renderSentenceTokens, renderSourceInboxEntries, renderSourceKanjiDoor, renderStudyFold, renderStudyHall, renderTeacherDoor, renderTextSourceContextSelection, renderWordWeb, resolveReaderChoice, resolveTeacherSource, retainedKanjiRecord, retireScaleReturn, returnToScaleBead, revalidateTutorRequests, revealFloatingFocus, roomName, roomTransition, rubyNode, safeJsonValue, sameItem, sameWordIdentity, saveWord, savedAnswerFor, scaleIn, scaleNavigationAllowed, scaleOut, scalePassage, scaleThreadPath, scaleTokenFingerprint, senseGlosses, senseLed, senseNumberBefore, sensePatch, senseWeekdayBracket, sentenceDraftBindings, sentenceDraftInputErrors, sentenceDraftWindowEdits, setGlossLine, setJaWords, setLayout, setLookupStop, setOwnRecordValue, setWordPref, shallowerDepth, sheetActionLine, sheetActionLineKeys, shelfDay, showMini, skipState, sourceInboxShelf, speakAvailable, srsDueItems, srsKey, srsParamsProblem, srsRoomBack, srsSchedulePolicy, stopPassageRead, stopSentenceListening, strokePathsFor, strokeReduced, strokeSpeed, studyHallDoors, suppressAssessmentCards, syncChromeKeep, syncStrokeNumbers, teacherDraftInputErrors, teacherDraftWindowEdits, teacherSourceProcessingUnavailable, teacherWindowDraftPrefix, todayQueue, todaySky, transcriptTime, trayItemPending, tx, uiIcon, updateReaderPlaceSave, updateReadingPlaces, validInstant, validNewPerDay, validPauseEvery, validPreset, validRetention, validReviewsPerDay, validStoreEnvelope, waitForLookupNameReadings, wireReaderWordMenu, withEn, wordBrush, wordCardIdentity, wordNodeIdentity, wordStudied, setReadHighlight, wordHighlight, wordVoice, wordWeb, writtenFormNote, wwP, wwPartMembers, wwReduced, wwShort, wwSpread, wwTokenIndex, wwTrail, yomiVariantCache };

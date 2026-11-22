@@ -363,24 +363,22 @@ try {
         await page.locator('#br-actual').fill('Saved before the relay was set up.');
         await page.locator('#br-form .br-primary').click();
         await page.waitForFunction(() => document.querySelector('#br-title')?.textContent === 'Your report');
-        // A home-screen app keeps its own storage, so the link is pasted in Settings.
-        await page.locator('.br-sheet .br-close').click();
-        await page.locator('#tab-me').click();
-        await page.locator('#me-settings').click();
-        await page.waitForFunction(() => document.documentElement.dataset.room === 'settings');
-        const before = await page.locator('#settings-reports-status').textContent();
-        await page.locator('#settings-report-link').fill('https://example.com/not-a-setup-link');
-        await page.locator('#settings-report-save').click();
-        const refused = await page.locator('#settings-report-note').textContent();
-        check(`${engine} · Settings refuses text that is not a setup link`, /not a report setup link/.test(refused) && !(await page.evaluate(() => localStorage.getItem('kairo-report-relay-v1'))), refused);
+        // A home-screen app keeps its own storage, so the link is pasted in My reports (LEAN, 2026-11-22: no longer Settings).
+        await page.locator('.br-sheet [data-br="list"]').first().click();
+        await page.locator('#br-relay-link').waitFor();
+        const before = await page.locator('#br-relay-status').textContent();
+        await page.locator('#br-relay-link').fill('https://example.com/not-a-setup-link');
+        await page.locator('#br-relay-save').click();
+        const refused = await page.locator('#br-relay-note').textContent();
+        check(`${engine} · My reports refuses text that is not a setup link`, /not a report setup link/.test(refused) && !(await page.evaluate(() => localStorage.getItem('kairo-report-relay-v1'))), refused);
         // GitHub is down for the adopted report's first delivery: it must stay listed and be retried
         github.state.failCreate = true;
         const errorsBefore = errors.length;
-        await page.locator('#settings-report-link').fill(setupLink());
-        await Promise.all([page.waitForEvent('load'), page.locator('#settings-report-save').click()]);
+        await page.locator('#br-relay-link').fill(setupLink());
+        await Promise.all([page.waitForEvent('load'), page.locator('#br-relay-save').click()]);
         await page.waitForFunction(() => document.body.dataset.ready === '1', null, { timeout: 30_000 });
         const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('kairo-report-relay-v1') || 'null')?.url);
-        check(`${engine} · pasting the setup link in Settings sets up this device`,
+        check(`${engine} · pasting the setup link in My reports sets up this device`,
           before === 'On this device, sending a report opens a page where you finish sending it.' && stored === `${relay.origin}/k/${RELAY_KEY}`, `${before} → ${stored}`);
         let failed = null;
         for (const deadline = Date.now() + 20_000; !failed && Date.now() < deadline; await page.waitForTimeout(250))
@@ -535,9 +533,13 @@ try {
           address === '?entry=shelf' && stored === `${relay.origin}/k/${RELAY_KEY}`, `${address} · ${stored}`);
         await page.locator('#tab-me').click();
         await page.locator('#me-settings').click();
-        const status = await page.locator('#settings-reports-status').textContent();
+        await page.waitForFunction(() => document.documentElement.dataset.room === 'settings');
         const offerAgain = await page.locator('#settings-report-offer').count();
-        check(`${engine} · Settings says reports go to GitHub automatically, with no link waiting`, status.includes('automatically') && status.includes(new URL(relay.origin).host) && offerAgain === 0, `${status} · offers ${offerAgain}`);
+        // LEAN (2026-11-22): the relay's status line lives in My reports
+        await page.locator('#bunki-report-bug').click();
+        await page.locator('.br-sheet [data-br="list"]').first().click();
+        const status = await page.locator('#br-relay-status').textContent();
+        check(`${engine} · My reports says reports go to GitHub automatically, and Settings holds no link waiting`, status.includes('automatically') && status.includes(new URL(relay.origin).host) && offerAgain === 0, `${status} · offers ${offerAgain}`);
         check(`${engine} · no console errors (setup link)`, errors.length === 0, errors.join(' | '));
         await context.close();
       });
