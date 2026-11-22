@@ -1,0 +1,145 @@
+# Scratch run for pull request 152, never merged: verify-places-layout on the head 2cc8c99ea (its gate-menu
+# expectation updated to the lean chrome cut). A push to this branch starts it; the branch is deleted once read.
+#
+name: lean tip sweep (scratch)
+on:
+  push:
+    branches: ['sweep/lean-tip4-20261122']
+permissions:
+  contents: read
+concurrency:
+  group: lean-tip-sweep
+  cancel-in-progress: false
+env:
+  BASE_SHA: 5f98afcc04a30a707dfdee0ae7110e7ca9936212
+  TIP_SHA: 2cc8c99ea10fc3d28cebeb32ad99f9031875b88f
+jobs:
+  build:
+    name: build ${{ matrix.side }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        side: [tip]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.side == 'base' && env.BASE_SHA || env.TIP_SHA }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Build the site once for this side
+        run: |
+          node scripts/build-corridor-site.mjs --out "$RUNNER_TEMP/site" > "$RUNNER_TEMP/build.json"
+          node -e "const j=require(process.argv[1]); console.log('gitSha', j.gitSha, 'artifactSha256', j.artifactSha256)" "$RUNNER_TEMP/site/build-identity.json"
+          tar -cf "$RUNNER_TEMP/site.tar" -C "$RUNNER_TEMP/site" .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site-${{ matrix.side }}
+          path: ${{ runner.temp }}/site.tar
+          retention-days: 3
+          if-no-files-found: error
+  tools:
+    name: ${{ matrix.side }} · ${{ matrix.job.tag }}
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        side: [tip]
+        job:
+          - { mode: E, tag: verify-places-layout, tool: prototypes/corridor/tools/verify-places-layout.mjs }
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.side == 'base' && env.BASE_SHA || env.TIP_SHA }}
+          fetch-depth: 0
+      - uses: ./.github/actions/ci-setup
+        with:
+          browsers: chromium webkit
+      - uses: actions/download-artifact@v4
+        with:
+          name: site-${{ matrix.side }}
+          path: ${{ runner.temp }}/dl
+      - name: Unpack the site and the sweep's static server
+        run: |
+          mkdir -p "$RUNNER_TEMP/site" "$RUNNER_TEMP/out" "$RUNNER_TEMP/ev"
+          tar -xf "$RUNNER_TEMP/dl/site.tar" -C "$RUNNER_TEMP/site"
+          git fetch -q origin "$GITHUB_SHA"
+          git show "$GITHUB_SHA:.github/sweep/serve.mjs" > "$RUNNER_TEMP/serve.mjs"
+      - name: Run ${{ matrix.job.tag }}
+        env:
+          SIDE: ${{ matrix.side }}
+          MODE: ${{ matrix.job.mode }}
+          TOOL: ${{ matrix.job.tool }}
+          TAG: ${{ matrix.job.tag }}
+        run: |
+          set +e
+          SITE="$RUNNER_TEMP/site"; EV="$RUNNER_TEMP/ev/$TAG"; OUT="$RUNNER_TEMP/out"; mkdir -p "$EV"
+          export KAIRO_SITE_DIR="$SITE" KAIRO_EVIDENCE_DIR="$EV" BUNKI_REPORT_PROOF_DIR="$EV"
+          export KAIRO_EXPECT_GITSHA="$(node -p "require('$SITE/build-identity.json').gitSha")"
+          export KAIRO_ARTIFACT_SHA256="$(node -p "require('$SITE/build-identity.json').artifactSha256")"
+          LOG="$OUT/$SIDE.$TAG.log"
+          case "$MODE" in
+            A)  timeout 1500 node "$TOOL" --site "$SITE" --evidence-out "$EV/out" > "$LOG" 2>&1; rc=$? ;;
+            HC) KAIRO_BROWSER=chromium timeout 1500 node "$TOOL" > "$LOG" 2>&1; rc=$? ;;
+            HW) KAIRO_BROWSER=webkit timeout 1500 node "$TOOL" > "$LOG" 2>&1; rc=$? ;;
+            E)  timeout 1500 node "$TOOL" > "$LOG" 2>&1; rc=$? ;;
+            S)  timeout 1500 node "$TOOL" --site "$SITE" > "$LOG" 2>&1; rc=$? ;;
+            N)  timeout 1500 node --test "$TOOL" > "$LOG" 2>&1; rc=$? ;;
+            B)  node "$RUNNER_TEMP/serve.mjs" --root "$SITE" --host 127.0.0.1 --port 19800 > "$LOG.serve" 2>&1 &
+                sp=$!
+                for i in $(seq 1 50); do curl -fsS -m 2 http://127.0.0.1:19800/__health > /dev/null 2>&1 && break; sleep 0.2; done
+                if [ "$TAG" = verify-voice-legibility ]; then
+                  REVIEW_BASE=http://127.0.0.1:19800/ timeout 1500 node "$TOOL" --look sumi --out "$EV" > "$LOG" 2>&1; rc=$?
+                else
+                  timeout 1500 node "$TOOL" --base http://127.0.0.1:19800/ --shots "$EV" > "$LOG" 2>&1; rc=$?
+                fi
+                kill "$sp" 2>/dev/null ;;
+            *)  echo "unknown mode $MODE" > "$LOG"; rc=2 ;;
+          esac
+          echo "$rc" > "$OUT/$SIDE.$TAG.exit"
+          echo "exit $rc"; tail -n 60 "$LOG"
+          if [ "$rc" != 0 ] && [ "$(du -sm "$EV" | cut -f1)" -lt 300 ]; then tar -czf "$OUT/$SIDE.$TAG.evidence.tgz" -C "$RUNNER_TEMP/ev" "$TAG"; fi
+          exit "$rc"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: out-${{ matrix.side }}-${{ matrix.job.tag }}
+          path: ${{ runner.temp }}/out
+          retention-days: 3
+          if-no-files-found: warn
+  summary:
+    name: summary
+    needs: tools
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: out-*
+          path: ${{ runner.temp }}/all
+          merge-multiple: true
+      - name: Compare base and tip per tool
+        run: |
+          cd "$RUNNER_TEMP/all"
+          {
+            echo "| tool | base | tip | reading |"
+            echo "|---|---|---|---|"
+            for tag in $(ls *.exit 2>/dev/null | sed -E 's/^(base|tip)\.//; s/\.exit$//' | sort -u); do
+              b=$(cat "base.$tag.exit" 2>/dev/null || echo '?'); t=$(cat "tip.$tag.exit" 2>/dev/null || echo '?')
+              if [ "$t" = 0 ]; then r=green; elif [ "$t" = '?' ]; then r='no result'; elif [ "$b" = 0 ]; then r=REGRESSION; else r='red on both'; fi
+              echo "| $tag | $b | $t | $r |"
+            done
+          } | tee summary.md >> "$GITHUB_STEP_SUMMARY"
+          cat summary.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: summary
+          path: ${{ runner.temp }}/all/summary.md
+          retention-days: 3
