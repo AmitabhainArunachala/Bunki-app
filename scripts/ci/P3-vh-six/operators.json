@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "sourceOnly": true,
-  "sourceHead": "275779c331d15f4479fe5c39621a53e4f4b92a3a",
-  "sourceSha256": "e1d03073af8034cf1fd6b6d6675f2d211ab2e2383fa525af975ea6ae695e2a7d",
+  "sourceHead": "1c40171a6b2e3d18870dc6b8b51eeb6346ad5461",
+  "sourceSha256": "68e08993ffe4f19771871a7f42141f4d3b68373885135ca1becb373683733e26",
   "sourcePins": {
-    "prototypes/corridor/corridor.js": "e1d03073af8034cf1fd6b6d6675f2d211ab2e2383fa525af975ea6ae695e2a7d",
+    "prototypes/corridor/corridor.js": "68e08993ffe4f19771871a7f42141f4d3b68373885135ca1becb373683733e26",
     "prototypes/corridor/modules/voice.mjs": "0f23f72c745899f9e2f85a3b27bf7d497d13668911731f4a89da23676e75cb57",
     "prototypes/corridor/modules/word-entry.mjs": "0786bdac67fe7c924030f5a6dcb6bc00493fff01c3eabaf72d209f8728c20746",
     "prototypes/corridor/device-voice.mjs": "1ec444fbd02b45498ecbfd13dce244bb193895e438f9a52a06881a2b1599d436",
-    "prototypes/corridor/modules/voice-lines.mjs": "367c8d3327491770814eb58371f2f48b3dd374ffe5106d033d4f4c93e21ddee2",
+    "prototypes/corridor/modules/voice-lines.mjs": "22f2408f458858888aa533afdb540eadec02cd2e7657bf4572e2b03bc4a3ce04",
     "prototypes/corridor/modules/card-audio.mjs": "87a3f4d1857f3ca24075d1bbd7063c4e54da2095fec3d5eecddc71c5ee130ed4",
     "prototypes/corridor/tools/voice-lock.mjs": "78616a4d51de657feb3d5639baddb6c502c6b7c8f751e2ba6e6c8732e40dc5a8",
     "prototypes/corridor/audio/voice-lock.json": "16c2ea339ad6bbe6dd19fe1266bae9b6686a8cac92fe713a67b3245a039e074e",
@@ -27,7 +27,7 @@
       "to": "cardVoiceStatus(btn, '', 'current-source-required');",
       "originalOperatorRetained": false,
       "semantics": "Explicit currentC18 cause supersession",
-      "expectedMutationSha256": "d1b67d6e7b276812b11398068f8117a387bb1595584294cbc89a866636249776"
+      "expectedMutationSha256": "4f37030e58d13b82a942a64e9835030bf32cc3cbba933ee1a0c79048f070829e"
     },
     {
       "id": "missing-word-copy-loses-locked-voice",
@@ -38,7 +38,7 @@
       "to": "cardVoiceStatus(btn, tx(...voiceLineOf('failed')), 'current-source-required');",
       "originalOperatorRetained": false,
       "semantics": "Explicit currentC18 cause supersession",
-      "expectedMutationSha256": "177ca602ce2d1741b08254d0c3c5626b652dcfe418bdb450edd3a5a71e7cb7c2"
+      "expectedMutationSha256": "a7de2e4f3fcfb15f17f3bec085bc4a3270b6aed3620f33cbece46779c938eafc"
     },
     {
       "id": "card-unavailable-title-omitted",
@@ -49,7 +49,7 @@
       "to": "  void reason;",
       "originalOperatorRetained": true,
       "semantics": "Original behavior/operator retained",
-      "expectedMutationSha256": "264bc48c16afbfabc176b0fbafefd8a6dd438f10f7f3afc1681cc2c3c62b3d26"
+      "expectedMutationSha256": "1a0e0a81ffd82096051cbca1461a79bff995421bb15a660ce6c0896f10c3efa1"
     },
     {
       "id": "card-retry-retains-error-title",
@@ -60,7 +60,7 @@
       "to": "  if (reason) btn.title = reason;",
       "originalOperatorRetained": false,
       "semantics": "Current live title behavior; redundant old operator superseded",
-      "expectedMutationSha256": "c03384c6330aa9b2b3a16dd7367f2e053e0bfae81307a15c2d4599ac1cadbe47"
+      "expectedMutationSha256": "e55cb31c3ea23ac45c0ae43bc7cb955b2c5b88555038fa8e7e0a8f0ef2585be5"
     },
     {
       "id": "card-subsequent-error-title-stale",
@@ -71,7 +71,7 @@
       "to": "  if (btn.title !== 'stale failure sentinel') btn.title = reason;",
       "originalOperatorRetained": true,
       "semantics": "Original behavior/operator retained",
-      "expectedMutationSha256": "37b5797f98c592c39743af463e668bc8451a074176cf932305aaed88bed5eb14"
+      "expectedMutationSha256": "b743f5ca31b53576709867e1ec9810bbbec791ac86b3f19913c096bb20505f51"
     },
     {
       "id": "pending-quote-creates-listen-control",
@@ -82,7 +82,7 @@
       "to": "for (const quote of root.querySelectorAll('blockquote.sentence-original'))",
       "originalOperatorRetained": true,
       "semantics": "Original behavior/operator retained",
-      "expectedMutationSha256": "503f1ea49221f7f3a94993e0b2ae28c331474d60b0597136b6d04f77b7ac69ac"
+      "expectedMutationSha256": "7a73f4b8e825c23592a274ee95b1ff496e9fa8551697d181ac7e092c8cce964b"
     }
   ],
   "fixture": "prototypes/corridor/tools/test-vh-voice-current-controls.mjs",
