@@ -5878,7 +5878,7 @@ try {
         return { entries: document.querySelectorAll('#sheet .report-line [data-report-entry="open"]').length,
           rail: !!rail && style.display !== 'none' && style.visibility !== 'hidden' && box.width > 0 && box.bottom <= innerHeight + 1 };
       });
-      check('P10.report', 'the bug-report door is reachable from the page: its own entry, and the rail above it', report.entries === 1 && report.rail, report);
+      check('P10.report', 'the bug-report door is reachable from the page: its own entry, and the rail above it', report.entries === 0 && report.rail, report); // lean pass (2026-11-22): the rail is the page's one report door
       const examples = await page.evaluate(() => {
         const list = [...document.querySelectorAll('#sheet .example')];
         const fold = document.querySelector('#sheet details.more-examples');

@@ -312,8 +312,7 @@ async function toTab(session, tab) {
 async function openFirstArticle(session) {
   const { page, press } = session;
   await toSky(session);
-  await press('#ginga-symbol');
-  await press('.bubble-shelf');
+  await press('#tab-read');
   await page.locator('.shelf-open').first().waitFor();
 }
 // A fresh record gets the app's own one-time demonstration: the first word's box opens by itself after 650 ms.

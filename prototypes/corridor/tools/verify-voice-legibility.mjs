@@ -224,7 +224,7 @@ const row = () => page.evaluate(() => document.querySelector('.listen-row')?.dat
 const tokAt = async (i) => { const t = page.locator('.reader .tok.content').nth(i); await t.evaluate((el) => el.scrollIntoView({ block: 'center' })); await settle(500); return t.boundingBox(); };
 await step('reader-ear', async () => {
   await s.ready(); await dismissFirstLine(s);
-  await s.press('#ginga-symbol'); await s.press('.bubble-shelf'); await page.locator('.shelf-open').first().waitFor();
+  await s.press('#tab-read'); await page.locator('.shelf-open').first().waitFor();
   await s.press(page.locator('.shelf-open').first()); await page.locator('.reader .tok.content').first().waitFor(); await settle(1500);
   for (let i = 0; i < 3 && (await page.locator('#mini').isVisible().catch(() => false)); i += 1) { await page.keyboard.press('Escape'); await settle(400); }
   await dismissFirstLine(s);
@@ -278,7 +278,7 @@ async function boxFor(indexes) {
 await step('word-box', async () => {
   if (!(await page.locator('.reader .tok.content').first().isVisible().catch(() => false))) {
     await s.ready(); await dismissFirstLine(s);
-    await s.press('#ginga-symbol'); await s.press('.bubble-shelf'); await page.locator('.shelf-open').first().waitFor();
+    await s.press('#tab-read'); await page.locator('.shelf-open').first().waitFor();
     await s.press(page.locator('.shelf-open').first()); await page.locator('.reader .tok.content').first().waitFor(); await settle(1500);
     await dismissFirstLine(s);
   }
@@ -338,7 +338,7 @@ await step('kanji-practice', async () => {
 // sentence (429), on a second article (nothing of it kept on the device) and on the sky
 await step('refusals', async () => {
   await s.ready(); await dismissFirstLine(s);
-  await s.press('#ginga-symbol'); await s.press('.bubble-shelf'); await page.locator('.shelf-open').nth(1).waitFor();
+  await s.press('#tab-read'); await page.locator('.shelf-open').nth(1).waitFor();
   await s.press(page.locator('.shelf-open').nth(1)); await page.locator('.reader .tok.content').first().waitFor(); await settle(1500);
   for (let i = 0; i < 3 && (await page.locator('#mini').isVisible().catch(() => false)); i += 1) { await page.keyboard.press('Escape'); await settle(400); }
   await dismissFirstLine(s);

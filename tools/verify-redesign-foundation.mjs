@@ -53,8 +53,7 @@ try {
             0,
             'The front door keeps its word sky',
           );
-          await page.locator('#ginga-symbol').click();
-          await page.locator('.bubble-shelf').click();
+          await page.locator('#tab-read').click();
           await page.locator('#shelf-body').waitFor();
           const tabs = page.locator('#primary-tabs');
           await tabs.waitFor();

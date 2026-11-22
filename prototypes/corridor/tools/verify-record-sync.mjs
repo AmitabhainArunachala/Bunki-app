@@ -272,7 +272,7 @@ try {
     // Hfix-1B (L-7): nor any dead button drawn, nor the line of what it would carry; the status line stays
     assert.equal(await page.locator('#record-sync button:visible').count(), 0, 'no sync button is drawn where sync cannot run');
     assert.equal(await page.locator('#record-sync .record-sync-scope').isVisible(), false);
-    assert.equal(await page.locator('#record-sync .record-sync-status').isVisible(), true);
+    assert.equal(await page.locator('#record-sync').isVisible(), false, 'where sync cannot run the group says nothing (lean pass, 2026-11-22)');
   });
   await check('connect and sync require separate user actions; disconnect wins a late cycle', async () => {
     await page.evaluate(() => window.setupSync());

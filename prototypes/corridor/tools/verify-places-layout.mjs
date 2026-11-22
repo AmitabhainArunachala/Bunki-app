@@ -302,9 +302,10 @@ try {
       if (tab === 'review') {
         const rows = await page.locator('.gate-panel .nav-stations:not(.nav-more) .nav-station').evaluateAll((ns) => ns.map((n) => `${n.querySelector('.nav-station-t').textContent} | ${n.querySelector('.nav-station-sub').textContent}`));
         check('door · the menu: each place with a line saying what is inside', rows.length === 5 && rows.every((r) => r.split(' | ')[1].length > 5), rows.join(' ; '));
-        // the gate's one panel (frame, 2026-11-10): after the places, the doors that are not places; Review is a place here
+        // the gate's one panel (frame, 2026-11-10): after the places, the doors that are not places; Review is a place here.
+        // No Language row since the lean pass (2026-11-22): the language is set in Settings and by the top bar's EN
         const more = await page.locator('.gate-panel .nav-more .nav-station .nav-station-t').allTextContents();
-        check('door · then Focus, Tutor, Orbit, Look and Language, and no second Review', more.join() === 'Focus,Tutor,Orbit,Look,Language', more.join());
+        check('door · then Focus, Tutor, Orbit and Look, and no second Review', more.join() === 'Focus,Tutor,Orbit,Look', more.join());
       }
       await page.locator(`#nav-${tab}`).click();
       await wait(900);

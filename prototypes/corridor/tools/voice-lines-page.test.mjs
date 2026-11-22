@@ -58,6 +58,7 @@ before(async () => {
   // paired once, through the app's own Settings: the pairing outlives each page of this context
   const page = await open('?ui=bi&room=me', '#me-settings');
   await page.locator('#me-settings').click();
+  await page.locator('#voice-connect').click(); // LEAN (2026-11-22): the pairing form stands behind Connect
   await page.locator('#voice-pair-learner').fill(`Bunki voice code: ${fake.issue({ learner: 'test-learner' })} (10 minutes) · learner: test-learner · server: ${fake.origin}`);
   await page.locator('#voice-pair-submit').click();
   await page.waitForFunction(() => document.getElementById('settings-voice-server')?.dataset.paired === 'true', null, { timeout: 60000 });

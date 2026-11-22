@@ -76,3 +76,58 @@ for (const { width, height, bug } of [
     }
   });
 }
+
+// The writing room's palette open at 390 px (2026-11-22, the lean sweep on GitHub: 試 stood on the 殻 stone and its
+// first-open note's OK on 金): the stones fill the top beside the report bug, so every step left lands on another stone.
+// 試 then stands at the foot and covers no stone. Geometry from the sweep's screenshot of the open palette.
+const stones = (top, xs, names) =>
+  xs
+    .map(
+      (x, i) =>
+        `<button class="world-stone" style="position: fixed; top: ${top}px; left: ${x}px; width: 44px; height: 44px">${names[i]}</button>`,
+    )
+    .join('');
+const palette = `(() => {
+  document.body.innerHTML = \`
+    <div class="world-picker" style="position: fixed; top: 62px; left: 25px; width: 355px; height: 213px; background: #fdf8ee; z-index: 7">
+      ${stones(95, [45, 95, 145, 195, 245, 295], [...'墨朱柿藍赤板'])}
+      ${stones(173, [45, 95, 145, 195, 245], [...'漆金殻浪雷'])}
+    </div>
+    <div id="bunki-reports-root"><button class="br-rail" style="position: fixed; top: 86px; left: 342px; width: 44px; height: 44px; z-index: 8">虫</button></div>
+    <div id="bunki-prototype-root"><div class="pl-rail"><button class="pl-open" id="prototype-open">試</button></div></div>\`;
+  const root = document.getElementById('bunki-prototype-root');
+  const rail = root.querySelector('.pl-rail');
+  const opener = root.querySelector('.pl-open');
+  ${source}
+  place();
+  const pl = opener.getBoundingClientRect();
+  const controls = [];
+  for (const fy of [0.2, 0.5, 0.8]) for (const fx of [0.2, 0.5, 0.8]) {
+    for (const n of document.elementsFromPoint(pl.left + pl.width * fx, pl.top + pl.height * fy)) {
+      if (root.contains(n)) continue;
+      const control = n.closest('button, a[href], [role="button"], input, select, textarea, summary');
+      if (control) controls.push(control.textContent);
+    }
+  }
+  return { at: rail.dataset.plAt || '', pl: { top: pl.top, bottom: pl.bottom }, height: innerHeight, controls: [...new Set(controls)] };
+})()`;
+
+describe('the 試 button beside an open chooser that fills the top (the writing room palette, 390 px)', () => {
+  let host;
+  beforeAll(async () => {
+    host = await openCorridorSourcePage({
+      stylesheets: ['prototype-layer.css'],
+      viewport: { width: 390, height: 844 },
+    });
+  }, 60000);
+  afterAll(async () => {
+    await host?.close();
+  });
+  test('three steps left still land on stones, so 試 stands at the foot and covers no stone', async () => {
+    const seen = await host.page.evaluate(palette);
+    expect(seen.controls).toEqual([]);
+    expect(seen.at).toBe('');
+    expect(seen.pl.top).toBeGreaterThan(seen.height / 2);
+    expect(seen.pl.bottom).toBeLessThanOrEqual(seen.height);
+  }, 60000);
+});

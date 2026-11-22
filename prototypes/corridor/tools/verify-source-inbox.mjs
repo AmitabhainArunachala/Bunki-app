@@ -91,8 +91,7 @@ async function shelf(page) {
       return;
     }
     if (await page.locator('#ginga-symbol').isVisible()) {
-      await page.locator('#ginga-symbol').click();
-      await page.locator('.bubble-shelf').click();
+      await page.locator('#tab-read').click();
       await page.waitForFunction(() => document.body.dataset.view === 'shelf');
       continue;
     }

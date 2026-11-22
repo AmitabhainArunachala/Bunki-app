@@ -128,6 +128,7 @@ async function freshPage({ net = {} } = {}) {
   await ready();
   await press('#home-review'); await page.locator('#tab-me').waitFor(); await press('#tab-me'); await sleep(900);
   await page.locator('#me-settings').scrollIntoViewIfNeeded(); await press('#me-settings'); await sleep(700);
+  await page.locator('#voice-connect').click(); // LEAN (2026-11-22): the pairing form stands behind Connect
   await page.locator('#voice-pair-learner').scrollIntoViewIfNeeded();
   await page.locator('#voice-pair-learner').fill(`Bunki voice code: ${fake.issue({ learner: 'test-learner' })} (10 minutes) · learner: test-learner · server: ${fake.origin}`);
   await press('#voice-pair-submit');
@@ -164,7 +165,7 @@ const reviewFace = (page) => page.evaluate(async () => {
 async function saveWords(p, indexes) {
   const { page, press, sleep } = p;
   await p.ready();
-  await press('#ginga-symbol'); await press('.bubble-shelf'); await page.locator('.shelf-open').first().waitFor();
+  await press('#tab-read'); await page.locator('.shelf-open').first().waitFor();
   await press(page.locator('.shelf-open').first()); await page.locator('.reader .tok.content').first().waitFor(); await sleep(1500);
   for (let i = 0; i < 4 && (await page.locator('#mini').isVisible().catch(() => false)); i += 1) { await page.keyboard.press('Escape'); await sleep(400); }
   const file = await page.evaluate(async () => { const m = await import('/corridor.js'); return m.D.passages.find((x) => x.id === m.S.passageId)?.file || null; });
@@ -245,7 +246,7 @@ try {
     const p = await freshPage();
     const { page } = p;
     await p.ready();
-    await p.press('#ginga-symbol'); await p.press('.bubble-shelf'); await page.locator('.shelf-open').first().waitFor();
+    await p.press('#tab-read'); await page.locator('.shelf-open').first().waitFor();
     await p.press(page.locator('.shelf-open').first()); await page.locator('.reader .tok.content').first().waitFor(); await p.sleep(1500);
     for (let i = 0; i < 4 && (await page.locator('#mini').isVisible().catch(() => false)); i += 1) { await page.keyboard.press('Escape'); await p.sleep(400); }
     const word = page.locator('.reader .tok.content').nth(6);

@@ -77,7 +77,7 @@ async function ready(page) {
 async function frontDoor(page) {
   await page.goto(`${ORIGIN}/index.html?ui=bi`); await ready(page);
   if (await page.locator('body').getAttribute('data-view') !== 'shelf') {
-    await page.locator('#ginga-symbol').click(); await page.locator('.bubble-shelf').click();
+    await page.locator('#tab-read').click();
   }
   await openShelfDoor(page, '#source-inbox-link'); await page.locator('#source-capture-text').waitFor();
 }
@@ -123,7 +123,7 @@ async function assertSourceReadable(page) {
 }
 async function openLists(page) {
   if (!await page.locator('#tray').count()) {
-    await page.locator('#ginga-symbol').click(); await page.locator('.bubble-shelf').click();
+    await page.locator('#tab-read').click();
   }
   await page.locator('#tray').click();
 }

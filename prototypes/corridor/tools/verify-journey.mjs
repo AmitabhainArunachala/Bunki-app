@@ -230,9 +230,7 @@ try {
   await step('2 shelf', async () => {
     // the galaxy's one symbol opens the bar; the 本棚 bubble is the one door
     // (the old #enter-shelf-door predates the 銀河 front door and is gone)
-    await page.tap('.nav-symbol');
-    await page.waitForTimeout(400);
-    await page.tap('.bubble-shelf');
+    await page.tap('#tab-read');
     await page.waitForSelector('.shelf-item', { timeout: 10000 });
   });
 
@@ -440,9 +438,7 @@ try {
   });
   await step('13 offline kanji sheet names its Kodansha entry', async () => {
     // every request is aborted here: the Kodansha table must come from the file
-    await page.tap('.nav-symbol');
-    await page.waitForTimeout(400);
-    await page.tap('.bubble-shelf');
+    await page.tap('#tab-read');
     await page.waitForSelector('.shelf-item', { timeout: 10000 });
     await openShelfDoor(page, '#kanjidex-link');
     await page.waitForSelector('.kdx-row', { timeout: 5000 });

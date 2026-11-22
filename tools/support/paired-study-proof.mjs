@@ -233,9 +233,13 @@ export async function createEngineClient({
 
 const settings = '#settings-study-device';
 
-/** The Settings block as it stands: its state and the words it shows. */
+/** The Settings block as it stands: its state, whether the page shows it, and the words it holds. In the app,
+ * Settings shows the Nihongo Study row only while the device is connected (LEAN, 2026-11-22), so the block is
+ * awaited as present and loaded, not as visible. */
 export async function studyBlock(page, { timeout = 60000 } = {}) {
-  await page.locator(`${settings}:not([data-state="loading"])`).waitFor({ timeout });
+  await page
+    .locator(`${settings}:not([data-state="loading"])`)
+    .waitFor({ state: 'attached', timeout });
   return page.evaluate((selector) => {
     const block = document.querySelector(selector);
     const text = (id) => document.getElementById(id)?.textContent || '';
@@ -245,6 +249,7 @@ export async function studyBlock(page, { timeout = 60000 } = {}) {
     };
     return {
       state: block.dataset.state,
+      shown: !block.hidden && block.getClientRects().length > 0,
       paired: block.dataset.paired,
       bound: block.dataset.bound,
       sync: block.dataset.sync || '',

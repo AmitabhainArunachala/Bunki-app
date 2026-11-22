@@ -1,5 +1,5 @@
 /** learner seam: split out of corridor.js (G3); now edited here directly. */
-import { $, voiceSettingsBlock, AI_EVIDENCE_ROLES, D, DRAFT_KEY, GRAMMAR, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, PLACES_TABS, PRIMARY_TABS, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, ROOM_IDS, ROOM_NAMES, S, SVG_NS, THEME_STORE, THEME_UI, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, bi, biLabel, contrastOf, el, fieldsDeckHome, finiteNumber, flowText, foundationDoor, logicalArchiveRows, meBackPart, meDeckIndex, meNum, meSealsPart, nonEmptyString, openPersonalCollection, optional, owns, passage, paintKeptCount, placesLayout, plainRecord, render, roomTransition, safeJsonValue, savedAnswerFor, setLayout, setWordPref, srsKey, tx, validStoreEnvelope, wordBrush, setReadHighlight, wordHighlight, wordVoice } from '../corridor.js';
+import { $, voiceSettingsBlock, AI_EVIDENCE_ROLES, D, DRAFT_KEY, GRAMMAR, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, PLACES_TABS, PRIMARY_TABS, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, ROOM_IDS, ROOM_NAMES, S, SVG_NS, THEME_STORE, THEME_UI, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, bi, biLabel, contrastOf, el, fieldsDeckHome, finiteNumber, flowText, foundationDoor, logicalArchiveRows, meDeckIndex, meNum, meSealsPart, nonEmptyString, optional, owns, passage, paintKeptCount, placesLayout, plainRecord, render, roomTransition, safeJsonValue, savedAnswerFor, setLayout, setWordPref, srsKey, tx, validStoreEnvelope, wordBrush, setReadHighlight, wordHighlight, wordVoice } from '../corridor.js';
 import { dayKey, helpByMonth } from './drift.mjs';
 import { articleReadChars } from './library.mjs';
 import { VOICE_WORDS } from './voice-lines.mjs';
@@ -552,7 +552,6 @@ function renderMe(main) {
   const { days, first } = meDays(decks);
   const now = new Date();
   const head = el('header', 'me-head');
-  head.append(el('p', 'eyebrow me-kicker', tx('一年の帳', 'The book of your year')));
   head.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.me)));
   const dateline = el('p', 'me-dateline');
   if (first) {
@@ -593,18 +592,18 @@ function renderMe(main) {
   if (line) book.append(line);
   const contents = meSection('contents', 'もっと見る', 'More');
   const doors = el('div', 'foundation-doors me-doors');
+  // LEAN (2026-11-22): four doors. The interface language and the look are set in Settings (and in the top bar and the
+  // seal), and your own texts are in Learn
   doors.append(
-    foundationDoor('me-progress', '学びの足跡', 'Your progress', 'kagami'),
+    foundationDoor('me-progress', '学びの足跡', 'Progress', 'kagami'),
     foundationDoor('me-statistics', '復習の統計', 'Review statistics', 'srs-stats'),
-    placesLayout() ? foundationDoor('me-collections', '保存した語とリスト', 'Saved words & lists', 'saved') : foundationDoor('me-collections', '集めた言葉', 'Saved words & lists', 'tray'),
+    // what he saved: Words → Saved, the shelf first under the search field (the layout under test has its own place)
+    placesLayout() ? foundationDoor('me-collections', '保存した語とリスト', 'Saved words & lists', 'saved')
+      : foundationDoor('me-collections', '保存した語とリスト', 'Saved words & lists', 'search', () => { S.listOpen = false; }),
+    foundationDoor('me-settings', '設定', 'Settings', 'settings'),
   );
-  if (window.__CORRIDOR_STANDALONE__ !== true) {
-    const personal = biLabel('button', 'grammar-link foundation-door', '自分の文章', 'Your own texts');
-    personal.type = 'button'; personal.id = 'me-personal';
-    personal.addEventListener('click', openPersonalCollection); doors.append(personal);
-  }
   contents.append(doors);
-  book.append(contents, meBackPart());
+  book.append(contents);
   main.append(book);
   // a deck the learner has opened brings its words: the horizon's whole, its kanji, its mended words
   for (const d of decks) {
@@ -700,15 +699,8 @@ function renderWritingChoice() {
     // sentence being read, anywhere; the reading goes on as it was and the page still follows it
     row('settings-highlight', '読んでいる文をハイライト', 'Highlight what is being read',
       [['on', 'オン', 'On'], ['off', 'オフ', 'Off']],
-      wordHighlight(), (value) => setReadHighlight(value)),
-    el('p', 'settings-layout-note', tx('書く速さは、書の間のスライダー一つで決まります。',
-      'The writing speed is set in one place: the writing room’s slider.')));
-  // Nihongo Study, a section of its own above the voice server: connected or not, when it last synced, and
-  // Disconnect; a device is connected by the one-time connect link, never here (shared-study-boot.mjs hands the
-  // panel over; a build that does not load it, like the single file, shows none)
-  const studyDevice = globalThis.bunkiStudyPairing?.settingsBlock?.({ tx, el });
-  if (studyDevice) section.append(studyDevice);
-  // the voice server: paired or not, where the last sentence came from, the budget, and the one-time pairing
+      wordHighlight(), (value) => setReadHighlight(value)));
+  // Voice: one row, connected or not; the pairing form (Connect) or the status and budget (Details) stand behind it
   const voiceServer = voiceSettingsBlock();
   if (voiceServer) section.append(voiceServer);
   return section;

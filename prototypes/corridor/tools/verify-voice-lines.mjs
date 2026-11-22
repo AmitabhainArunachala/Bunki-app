@@ -98,6 +98,7 @@ async function freshPage({ paired = true } = {}) {
   p.pair = async () => {
     await p.open('room=me', '#me-settings');
     await p.press('#me-settings');
+    await page.locator('#voice-connect').click(); // LEAN (2026-11-22): the pairing form stands behind Connect
     await page.locator('#voice-pair-learner').waitFor();
     await page.locator('#voice-pair-learner').fill(`Bunki voice code: ${fake.issue({ learner: 'test-learner' })} (10 minutes) · learner: test-learner · server: ${fake.origin}`);
     await p.press('#voice-pair-submit');

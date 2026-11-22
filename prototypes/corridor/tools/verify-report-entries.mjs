@@ -74,7 +74,8 @@ async function closeReport(page) {
   await page.waitForFunction(() => !document.querySelector('#bunki-reports-root dialog.br-sheet[open]'), null, { timeout: 5_000 });
 }
 const focusedIs = (page, selector) => page.evaluate((sel) => !!document.activeElement?.matches(sel), selector);
-const PAGE_ENTRY = '#app > .report-line-page [data-report-entry="open"]';
+// lean pass (2026-11-22): the report line under the rooms and the word sheet is gone; the bug rail is the entry everywhere
+const PAGE_ENTRY = '#bunki-report-bug';
 // The focused stage breathes (a slow continuous transform), so an actionability
 // "stable box" wait never settles there. A finger does not wait for stillness:
 // centre the control, prove the topmost element at that point IS the control
@@ -91,7 +92,7 @@ async function fingerClick(page, selector) {
   if (hit.found && hit.uncovered) await page.mouse.click(hit.x, hit.y);
   return hit;
 }
-const PAGE_LIST = '#app > .report-line-page [data-report-entry="list"]';
+const PAGE_LIST = '#bunki-report-bug'; // then the sheet's own My reports tab
 
 try {
   // R0
@@ -137,6 +138,7 @@ try {
       await closeReport(page);
       check(`R7 ${w}px shelf: closing returns focus to the entry that opened it`, await focusedIs(page, PAGE_ENTRY));
       await page.locator(PAGE_LIST).click();
+      await page.locator('#bunki-reports-root [data-br="list"]').first().click();
       check(`R7 ${w}px shelf: 'My reports' opens the report list`, await reportOpen(page) &&
         await page.evaluate(() => /report/i.test(document.querySelector('#bunki-reports-root .br-body')?.innerText || '')));
       await closeReport(page);
@@ -163,7 +165,7 @@ try {
       await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
       const opened = await page.waitForSelector('#sheet', { timeout: 10_000 }).then(() => true, () => false);
       check(`R3 ${w}px sheet: the word's Full entry opens the word sheet`, opened);
-      const sheetEntry = page.locator('#sheet .report-line [data-report-entry="open"]');
+      const sheetEntry = page.locator(PAGE_ENTRY);
       check(`R1 ${w}px sheet: the permanent bug entry is visible`, (await railVisible(page)));
       check(`R3 ${w}px sheet: the entry sits at the end of the sheet`, (await sheetEntry.count()) === 1);
       if (await sheetEntry.count()) {

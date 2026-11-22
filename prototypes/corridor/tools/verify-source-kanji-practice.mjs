@@ -267,7 +267,7 @@ async function shelf(fixture) {
     if (await page.locator('#sheet').count()) { await page.locator('#sheet-back').click(); continue; }
     const view = await page.locator('body').getAttribute('data-view'); if (view === 'shelf') return;
     if (view === 'drift') {
-      await page.locator('#ginga-symbol').focus(); await page.keyboard.press('Enter'); await page.locator('.bubble-shelf').click();
+      await page.locator('#tab-read').click();
     } else if (view === 'review') {
       if (await page.locator('.review-summary').count()) await page.locator('.close-doors .take').click();
       else await page.locator('#zen-exit').click();

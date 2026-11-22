@@ -273,6 +273,15 @@
   pointer-events: none;
 }
 
+/* a row a page script hands the sheet (the design layer's 深 Depth): its name, then On | Off, at the head of "New in this
+ * build" (pageRows in prototype-layer.mjs) */
+#bunki-prototype-root .pl-page-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: 0 0 18px; padding: 0 0 16px; border-bottom: 1px solid var(--pl-line); }
+#bunki-prototype-root .pl-page-row .pl-item-name { margin: 0; }
+#bunki-prototype-root .pl-seg { display: flex; flex: none; border: 1px solid var(--pl-ink); border-radius: 8px; overflow: hidden; }
+#bunki-prototype-root .pl-seg button { min-width: 56px; min-height: 44px; padding: 0 14px; border: 0; background: transparent; }
+#bunki-prototype-root .pl-seg button + button { border-left: 1px solid var(--pl-ink); }
+#bunki-prototype-root .pl-seg button[aria-pressed='true'] { background: var(--pl-ink); color: var(--pl-paper); }
+
 /* ------------------------------------------------------------------------------------------------- 糸 depth · a trial
  * Off until its switch in the sheet is on (prototype-layer.mjs sets data-pl-ito='on' on the root; nothing below applies
  * without it, except the switch's own drawing). */

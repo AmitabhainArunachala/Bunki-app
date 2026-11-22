@@ -23,17 +23,24 @@
  *
  * A one-time connect link (`#study-connect=<payload>`, see shared-study-pairing.mjs) carries a pairing code. It is
  * taken out of the address first of all, before this page reads anything else, whether or not the payload is any
- * good; the payload is then held in memory only and handed to the confirmation the pairing module shows. */
+ * good; the payload is then held in memory only and handed to the confirmation the pairing module shows. A voice link
+ * (`#voice-connect=<payload>`, see modules/voice-connect.mjs) is taken out in the same place and the same way, and its
+ * payload goes to the voice's own question. */
 const LINK = '#study-connect=';
+const VOICE_LINK = '#voice-connect=';
 const env = globalThis;
-/** The link's payload, or null. Nothing else in this file runs before these lines. */
-let offered = null;
+/** The links' payloads, or null. Nothing else in this file runs before these lines. */
+let offered = null, offeredVoice = null;
 {
   let address = '';
   try { address = String(env.location?.hash || ''); } catch { address = ''; }
   if (address.startsWith(LINK)) {
     try { env.history.replaceState(env.history.state, '', `${env.location.pathname}${env.location.search}`); offered = address.slice(LINK.length); } catch {
       // an address that cannot be rewritten in place is left by loading the page again without the link
+      try { env.location.replace(`${env.location.pathname}${env.location.search}`); } catch { /* nothing more can be done */ }
+    }
+  } else if (address.startsWith(VOICE_LINK)) {
+    try { env.history.replaceState(env.history.state, '', `${env.location.pathname}${env.location.search}`); offeredVoice = address.slice(VOICE_LINK.length); } catch {
       try { env.location.replace(`${env.location.pathname}${env.location.search}`); } catch { /* nothing more can be done */ }
     }
   }
@@ -136,6 +143,12 @@ if (offered !== null) {
   const payload = offered;
   offered = null;
   void loadPairing().then((module) => module.offerStudyConnect(payload, { env })).catch(() => { /* no question, nothing kept */ });
+}
+// the voice link's one question, the same way
+if (offeredVoice !== null) {
+  const payload = offeredVoice;
+  offeredVoice = null;
+  void import('./modules/voice-connect.mjs').then((module) => module.offerVoiceConnect(payload, { env })).catch(() => { /* no question, nothing kept */ });
 }
 
 env.bunkiStudyPairing = Object.freeze({

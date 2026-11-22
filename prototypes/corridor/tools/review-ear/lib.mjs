@@ -61,6 +61,7 @@ export async function open({ engine = 'chromium', width = 390, clipSeconds = () 
   await page.locator('#tab-me').waitFor();
   await press('#tab-me'); await s.sleep(1000);
   await page.locator('#me-settings').scrollIntoViewIfNeeded(); await press('#me-settings'); await s.sleep(800);
+  await page.locator('#voice-connect').click(); // LEAN (2026-11-22): the pairing form stands behind Connect
   await page.locator('#voice-pair-learner').scrollIntoViewIfNeeded();
   await page.locator('#voice-pair-learner').fill(`Bunki voice code: ${fake.issue({ learner: 'test-learner' })} (10 minutes) · learner: test-learner · server: ${fake.origin}`);
   await press('#voice-pair-submit');
@@ -72,7 +73,7 @@ export async function open({ engine = 'chromium', width = 390, clipSeconds = () 
 export async function openArticle(s, { start = true, index = 0 } = {}) {
   const { page, press } = s;
   await s.ready();
-  await press('#ginga-symbol'); await press('.bubble-shelf');
+  await press('#tab-read');
   await page.locator('.shelf-open').first().waitFor();
   await press(page.locator('.shelf-open').nth(index));
   await page.locator('.reader .tok.content').first().waitFor();

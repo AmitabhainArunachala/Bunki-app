@@ -219,7 +219,7 @@ try {
           assert.equal(await page.evaluate(() => window.__keepSpy.persistCalls), 1, 'asked once per boot, not per gesture');
           const line = page.locator('#record-kept');
           await line.waitFor({ state: 'visible' });
-          const expected = answer ? 'Saved on this device: protected' : 'Saved on this device: not protected — Export keeps a copy';
+          const expected = answer ? 'Saved on this device.' : 'Saved on this device only. Export keeps a copy.';
           assert.equal((await line.textContent()).trim(), expected);
           assert.equal(await line.getAttribute('data-kept'), answer ? 'yes' : 'no');
           assert.equal((await safety(page)).keep.persisted, answer);
@@ -302,7 +302,7 @@ try {
           await openSettings(page);
           const line = page.locator('#record-kept');
           await line.waitFor({ state: 'visible' });
-          assert.match(await line.textContent(), new RegExp(`^Saved on this device: (protected|not protected — Export keeps a copy) · ${percent} % full$`));
+          assert.match(await line.textContent(), new RegExp(`^Saved on this device( only[.] Export keeps a copy[.]|[.]) · ${percent} % full$`));
           await line.evaluate((node) => node.scrollIntoView({ block: 'center' }));
           await page.screenshot({ path: resolve(directory, 'me-line-share.png') });
           await room(page, 'today', 'tray');

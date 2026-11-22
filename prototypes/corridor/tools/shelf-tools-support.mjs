@@ -21,8 +21,15 @@ export async function closeShelfTools(page) {
   await page.locator(SHELF_TOOLS_PANEL).waitFor({ state: 'hidden' });
 }
 
-/** Open the panel, then press one of its doors. */
+/** Open the panel, then press one of its doors. The tutor's door stands there only once a key is kept (lean pass,
+ * 2026-11-22); before that a learner reaches the tutor's room, its setup, from the gate's Tutor row. */
 export async function openShelfDoor(page, selector) {
   await openShelfTools(page);
+  if (selector === '#ai-link' && !(await page.locator('#ai-link').count())) {
+    await page.locator('#bar-gate').click();
+    await page.locator('#gate-menu .bubble-sensei').click();
+    await page.locator('body[data-view="ai"]').waitFor();
+    return;
+  }
   await page.locator(selector).click();
 }

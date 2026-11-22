@@ -98,6 +98,7 @@ try {
     'modules/voice-lines.mjs',
     'modules/voice-seam.mjs',
     'modules/voice-client.mjs',
+    'modules/voice-connect.mjs',
     'modules/voice-clip-store.mjs',
     'modules/reader-pocket.mjs',
     'modules/learner.mjs',

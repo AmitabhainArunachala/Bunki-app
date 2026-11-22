@@ -173,6 +173,20 @@ const transact = (db, store, mode, work) => new Promise((resolve, reject) => {
   tx.onerror = tx.onabort = () => reject(tx.error || new Error('aborted'));
 });
 
+/** The study server's address this device keeps (the store's key `server`), or null: what a voice link is held to
+ * (modules/voice-connect.mjs). An address, not a credential: the study credential beside it is not read. */
+export async function readStudyServerAddress(env = globalThis) {
+  const idb = env.indexedDB;
+  if (!idb) return null;
+  let db = null;
+  try {
+    db = await openExisting(idb, DATABASE);
+    if (!db || !db.objectStoreNames.contains(STORE)) return null;
+    const address = await transact(db, STORE, 'readonly', (store) => store.get(ADDRESS));
+    return isStudyServer(address) ? address : null;
+  } catch { return null; } finally { try { db?.close(); } catch { /* closed */ } }
+}
+
 /** The voice server's address as the voice client keeps it on this device (modules/voice-client.mjs: database
  * `bunki-voice`, store `pairing`, key `server`). An address, not a credential: the voice token beside it is not read. */
 export async function readVoiceServerAddress(env = globalThis) {
