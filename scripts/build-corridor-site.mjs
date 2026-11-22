@@ -100,6 +100,7 @@ try {
     'modules/voice-client.mjs',
     'modules/voice-connect.mjs',
     'modules/voice-clip-store.mjs',
+    'modules/shared-study-voice.mjs',
     'modules/reader-pocket.mjs',
     'modules/learner.mjs',
     'modules/drift.mjs',

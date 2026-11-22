@@ -15,7 +15,8 @@ const json=async(path,hash,withDigest=false)=>{
   return withDigest?{value,sha256:digest}:value;
 };
 try {
-  const adapter=window.frameElement?.bunkiStudyPort?.adapter;
+  const port=window.frameElement?.bunkiStudyPort;
+  const adapter=port?.adapter;
   if(!adapter)throw Error('shared-host-frame-binding-required');
   const binding=await json('../../data/shared-study-content.json');
   if(!/^[a-f0-9]{64}$/.test(binding.dictionary?.buildSha256??''))throw Error('shared-dictionary-binding-required');
@@ -46,14 +47,28 @@ try {
   // existing stamped SW verifies and lazily caches its compressed asset.
   const dictionary=await prepareOfflineDictionary(await loadOfflineDictionary({build:sharedDictionaryBuild(binding,build),base:new URL('../../data/shared-study/',import.meta.url).href}),catalog);
   const params=new URLSearchParams(location.search),prefix='bunki-shared-study:appearance:';
-  const preferences={getItem:key=>key==='nihongo.interface-language.v1'?localStorage.getItem(prefix+key)||params.get('ui'):localStorage.getItem(prefix+key),setItem:(key,value)=>localStorage.setItem(prefix+key,value)};
+  const initialAppearance=typeof port.readAppearance==='function'?port.readAppearance():null;
+  let sessionLanguage=initialAppearance?.language||params.get('ui')||null;
+  let sessionTheme=initialAppearance?.baseTheme||null;
+  const preferences={
+    getItem:key=>{
+      if(key==='nihongo.interface-language.v1')return sessionLanguage||localStorage.getItem(prefix+key);
+      if(key==='nihongo.qa.appearance.v1')return sessionTheme||localStorage.getItem(prefix+key);
+      return localStorage.getItem(prefix+key);
+    },
+    setItem:(key,value)=>{
+      if(key==='nihongo.interface-language.v1')sessionLanguage=value;
+      if(key==='nihongo.qa.appearance.v1')sessionTheme=value;
+      localStorage.setItem(prefix+key,value);
+    },
+  };
   const corpus={release3FullCorpus:true,vocabularyCount:binding.counts.vocabulary,grammarTasks:binding.counts.grammar,personalVocabularyCount:catalog.filter(e=>e.module==='kotoba').length};
   const backend=bindStudyPresentation(adapter.backend,catalog);
   const initialModule=moduleForSharedDeck(params.get('deck'));
   const audioPort=packsConfigured?(packHost?.audio?{
     protocol:packHost.audio.protocol,release:packHost.audio.release,
     read:(...args)=>packHost.audio.resources.read(...args),
-    packState:(...args)=>packHost.audio.resources.packState(...args)}:null):window.frameElement.bunkiStudyPort.audio;
+    packState:(...args)=>packHost.audio.resources.packState(...args)}:null):port.audio;
   const audioDownloads=packHost?.audioDownloads;
   const basePlatform=packsConfigured?{...adapter.platform,audio:null,
     audioDownloads:audioDownloads?{...audioDownloads,async readSource({taskKeys,signal}={}) {
@@ -70,16 +85,69 @@ try {
       // Copy only the returned view, never padding outside byteOffset/length.
       return new Uint8Array(bytes);
     },packState:packId=>audioPort.packState(packId)}}}:basePlatform;
+  // ENGINE-ONE.6: Bridge Bunki's paired voice client into window.nihongoSpeak BEFORE mountStudyApp reads it.
+  // When unpaired, voicePort is absent so window.nihongoSpeak stays undefined and the screen stays 100% silent.
+  const voicePort=port.voice&&typeof port.voice.speak==='function'?port.voice:null;
+  if(voicePort){
+    Object.defineProperty(window,'nihongoSpeak',{
+      value:Object.freeze({
+        web:true,
+        speak:(target,speechInput)=>voicePort.speak(target,structuredClone(speechInput)),
+        forget:(target,speechInput)=>voicePort.forget?.(target,structuredClone(speechInput)),
+      }),
+      writable:false,
+      configurable:true,
+    });
+  }
   // Bunki's origin serves none of Nihongo Study's Kore trial clips. A canonical screen whose host gives it no
   // voice looks for their manifest on its page origin at every mount. Naming an origin that is none keeps that
   // screen silent and asks the network nothing; a host that brings a voice never reaches the trial player.
-  const app=mountStudyApp(root,{backend,catalog,themes,grammar,dictionary,preferences,platform:{audioOrigin:'about:blank',...platform},now:adapter.now,initialModule,corpus});
-  const disposeViewport=bindSharedStudyViewport({app,root,onCardStart:window.frameElement.bunkiStudyPort.onCardStart});
+  const app=mountStudyApp(root,{backend,catalog,themes,grammar,dictionary,preferences,platform:{audioOrigin:'about:blank',...platform,embedded:true},now:adapter.now,initialModule,corpus});
+  function applyHostAppearance(next,{syncLanguage=false}={}) {
+    if(!next||!document.documentElement?.style)return;
+    const base=themes?.themes?.[next.baseTheme];
+    if(base?.tokens){
+      for(const [key,value] of Object.entries(base.tokens))document.documentElement.style.setProperty(`--${key}`,value);
+      document.documentElement.dataset.theme=next.baseTheme;
+      document.documentElement.style.colorScheme=base.scheme;
+      sessionTheme=next.baseTheme;
+    }
+    if(next.tokens){
+      for(const [key,value] of Object.entries(next.tokens)){
+        if(typeof value==='string'&&value)document.documentElement.style.setProperty(`--${key}`,value);
+      }
+    }
+    if(next.look)document.documentElement.dataset.bunkiTheme=next.look;
+    if(syncLanguage&&next.language&&next.language!==sessionLanguage){
+      sessionLanguage=next.language;
+      const cur=app.read?.();
+      if(cur&&cur.interfaceLanguage!==next.language){
+        const applySelect=()=>{
+          const select=root.querySelector('select[data-interface-language]');
+          if(!select)return false;
+          select.value=next.language;
+          select.dispatchEvent(new Event('change',{bubbles:true}));
+          return true;
+        };
+        if(!applySelect()&&cur.screen!=='study'&&cur.screen!=='finish'&&!cur.busy&&!cur.current){
+          const prev=cur.screen;
+          app.navigate?.('settings');
+          applySelect();
+          if(prev&&prev!=='settings')app.navigate?.(prev);
+        }
+      }
+    }
+  }
+  applyHostAppearance(initialAppearance);
+  const disposeAppearance=typeof port.subscribeAppearance==='function'?port.subscribeAppearance(next=>applyHostAppearance(next,{syncLanguage:true})):()=>{};
+  const disposeViewport=bindSharedStudyViewport({app,root,onCardStart:port.onCardStart});
   if(params.get('start')==='1')root.querySelector('[data-start]')?.click();
   window.bunkiSharedStudy=Object.freeze({app,backend:adapter.backend,store:adapter.store,catalog,dictionary});
   function onPagehide(event) {
     if (event?.persisted === true) return;
     window.removeEventListener('pagehide', onPagehide);
+    disposeAppearance();
+    voicePort?.abortAll?.();
     disposeViewport();
     app.dispose();
   }

@@ -203,8 +203,21 @@ try {
         );
       };
       await assertWidth();
+      // Embedded single-chrome mode: host owns masthead, banner, outer nav and footer; ear stays mounted.
+      assert.deepEqual(
+        await narrowFrame.evaluate(() => ({
+          embedded: document.documentElement.dataset.embedded,
+          headers: document.querySelectorAll('.app-header').length,
+          banners: document.querySelectorAll('.qa-banner').length,
+          navs: document.querySelectorAll('nav').length,
+          footers: document.querySelectorAll('footer').length,
+          ears: document.querySelectorAll('.ear-mark').length,
+        })),
+        { embedded: '1', headers: 0, banners: 0, navs: 0, footers: 0, ears: 1 },
+      );
       // Use the shipped Words -> Extra practice -> Reveal flow in all labels.
       for (const language of ['ja', 'en', 'both']) {
+        await narrowFrame.evaluate(() => bunkiSharedStudy.app.navigate('settings'));
         await narrowFrame.locator('select[data-interface-language]').first().selectOption(language);
         const practiceState = () =>
           narrowFrame.evaluate(async () => ({
@@ -212,7 +225,7 @@ try {
             stored: await bunkiSharedStudy.store.readState(),
           }));
         const beforePractice = await practiceState();
-        await narrowFrame.locator('[data-nav=words]').click();
+        await narrowFrame.evaluate(() => bunkiSharedStudy.app.navigate('words'));
         await narrowFrame
           .locator('.word-row')
           .first()
@@ -302,7 +315,9 @@ try {
       await narrowFrame.waitForFunction(() => !!window.bunkiSharedStudy, null, {
         timeout: 60000,
       });
+      await narrowFrame.evaluate(() => bunkiSharedStudy.app.navigate('settings'));
       await narrowFrame.locator('select[data-interface-language]').first().selectOption('en');
+      await narrowFrame.evaluate(() => bunkiSharedStudy.app.navigate('today'));
       await narrowFrame.locator('[data-start]').tap();
       await narrowFrame.locator('[data-reveal]').tap();
       await narrowFrame.locator('[data-study=back]').waitFor();

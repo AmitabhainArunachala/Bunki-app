@@ -26,6 +26,11 @@ import { VOICE_LINE_STANDS_MS, VOICE_PAIRING, VOICE_SETTINGS, VOICE_SOURCES, VOI
 import { SPEEDS, createVoiceSeam, sentencesOf, voiceKeyOf } from './voice-seam.mjs';
 
 export const READER_RATES = Object.freeze([1, 1.25, 0.75]);
+let activeRuntime = null;
+/** Active Bunki voice runtime for single-voice arbitration and shared clip caching with embedded study. */
+export function activeVoiceLayer() {
+  return activeRuntime;
+}
 const SKIP = new Set(['RT', 'RP', 'BUTTON', 'SCRIPT', 'STYLE', 'SVG', 'INPUT', 'TEXTAREA', 'SELECT']);
 const QUOTES = /[\s「」『』“”"']/gu;
 /** 50 ms of silence: played inside the learner's own tap, so the one audio element may speak after the clip arrives. */
@@ -1210,6 +1215,24 @@ export function installVoiceLayer(host) {
     return block;
   }
 
+  const stopLayer = ({ keepReader = false } = {}) => {
+    if (!keepReader) readerApi.stop();
+    if (spoken) { const was = spoken; spoken = null; if (was.session && !was.session.ended) was.session.stop(); }
+    else if (!keepReader || !readerActive()) seam.stop();
+  };
+  activeRuntime = {
+    client,
+    clips,
+    stopAll() {
+      stopLayer({ keepReader: false });
+      try { host.quiet?.(); } catch { /* another lane's fault */ }
+    },
+    authEnded() {
+      stopLayer({ keepReader: false });
+      void seam.refreshBudget().catch(() => {});
+    },
+  };
+
   return {
     reader: readerApi,
     settingsBlock,
@@ -1263,11 +1286,7 @@ export function installVoiceLayer(host) {
     /** A word page opened by the learner's own act: its headword says itself once when the page stands (mountMarks). */
     opened(node) { openedPage = node?.t && node.id != null ? { node: `${node.t}:${node.id}`, at: Date.now() } : null; },
     /** Every sound of the layer ends: the screen changed. `keepReader` leaves an article's read to the reader's own rule. */
-    stop({ keepReader = false } = {}) {
-      if (!keepReader) readerApi.stop();
-      if (spoken) { const was = spoken; spoken = null; if (was.session && !was.session.ended) was.session.stop(); }
-      else if (!keepReader || !readerActive()) seam.stop();
-    },
+    stop: stopLayer,
     speaking: () => !!seam.active(),
     mount: mountMarks,
     rates: SPEEDS,
