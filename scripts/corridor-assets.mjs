@@ -104,8 +104,6 @@ export const CORRIDOR_REQUIRED_ROOTS = [
   // paired host, and the sync lifecycle over the engine's own transport (under vendor/)
   'shared-study-boot.mjs',
   'shared-study-pairing.mjs',
-  // the voice link's one question (LEAN, 2026-11-22), loaded by the page-start module when a link opens the page
-  'modules/voice-connect.mjs',
   'shared-study-paired-host.mjs',
   'shared-study-sync.mjs',
   'review-caller.mjs',
