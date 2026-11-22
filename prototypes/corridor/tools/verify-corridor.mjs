@@ -980,9 +980,7 @@ async function main() {
     driftBoot.symbol && driftBoot.chromeGone, 'symbol present, top chrome receded');
   await shoot(page, shotsDir, '17-phase2-drift-entry');
   // the shelf is reached through the symbol → 本棚 bubble
-  await page.tap('.nav-symbol');
-  await page.waitForTimeout(300);
-  await page.tap('.bubble-shelf');
+  await page.tap('#tab-read');
   await page.waitForTimeout(600);
   const afterDoor = await page.evaluate(`({
     layerActive: document.getElementById('drift-layer')?.classList.contains('active'),

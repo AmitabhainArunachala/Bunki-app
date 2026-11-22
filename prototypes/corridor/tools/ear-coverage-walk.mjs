@@ -246,7 +246,7 @@ async function toTab(tab) {
   await press(`#tab-${tab}`);
   await sleep(1400);
 }
-async function openShelf() { await toSky(); await press('#ginga-symbol'); await press('.bubble-shelf'); await page.locator('.shelf-open').first().waitFor(); }
+async function openShelf() { await toSky(); await press('#tab-read'); await page.locator('.shelf-open').first().waitFor(); }
 async function openArticle() {
   await openShelf();
   await press(page.locator('.shelf-open').first());

@@ -4709,7 +4709,7 @@ function ensureArchiveIndex() {
 }
 
 function renderArchive(main) {
-  main.append(withEn(el('p', 'eyebrow', '回廊 · 図書館'), 'KAIRO · the library', 'en-inline'));
+  main.append(withEn(el('p', 'eyebrow', 'Bunki · 図書館'), 'Bunki · the library', 'en-inline'));
   main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.archive)));
   if (!D.archive) {
     main.append(el('p', 'gloss', tx('棚をひらいています…', 'Opening the stack…')));
@@ -6338,7 +6338,7 @@ function openBeginnerStudy() {
 }
 
 function renderShelf(main) {
-  main.append(withEn(el('p', 'eyebrow', '回廊 · 図書館'), 'KAIRO · the library', 'en-inline'));
+  main.append(withEn(el('p', 'eyebrow', 'Bunki · 図書館'), 'Bunki · the library', 'en-inline'));
   renderScaleArticleReturn(main);
 
   // the quiet field — kanji, kana, romaji, or English; four doors, one box
@@ -6630,17 +6630,21 @@ function renderShelfBody(search = null) {
     window.scrollTo(0, 0);
   });
   referenceTools.append(kdx);
-  const ai = el('button', 'grammar-link');
-  ai.type = 'button';
-  ai.id = 'ai-link';
-  ai.append(el('span', 'l-ja', tx(aiKey() ? '先生' : '先生を招く', aiKey() ? 'tutor' : 'set up the tutor')));
-  ai.addEventListener('click', () => {
-    keepScroll();
-    S.view = 'ai';
-    render();
-    window.scrollTo(0, 0);
-  });
-  (aiKey() ? practiceTools : settingTools).append(ai);
+  // the tutor, once a key is kept, is a practice door here; its setup has one home, Settings → Tutor (lean pass,
+  // 2026-11-22: "set up the tutor" no longer stands among the reading tools)
+  if (aiKey()) {
+    const ai = el('button', 'grammar-link');
+    ai.type = 'button';
+    ai.id = 'ai-link';
+    ai.append(el('span', 'l-ja', tx('先生', 'tutor')));
+    ai.addEventListener('click', () => {
+      keepScroll();
+      S.view = 'ai';
+      render();
+      window.scrollTo(0, 0);
+    });
+    practiceTools.append(ai);
+  }
 
   // Starting preferences are local choices. They remain reachable before a
   // provider is connected, as do readings already accepted on another device.
@@ -7924,8 +7928,8 @@ function renderPublisherLibrary(body) {
   }
   const readings = [...publisherModule.parsePublisherLibrary(S.publisherLibrary).readings].reverse();
   body.append(el('p', 'feed-meta', tx(`保存した原文 ${readings.length} 件`, `${readings.length} saved article versions`)));
-  if (!readings.length) body.append(el('p', 'intro', tx('「KAIRO で読む」から保存した原文がここに並ぶ。オフラインでも読み返せる。',
-    'Articles saved with “Read in KAIRO” appear here and reopen offline.')));
+  if (!readings.length) body.append(el('p', 'intro', tx('「Bunki で読む」から保存した原文がここに並ぶ。オフラインでも読み返せる。',
+    'Articles saved with “Read in Bunki” appear here and reopen offline.')));
   const shown = S.feedShown || 40;
   for (const reading of readings.slice(0, shown)) {
     const article = reading.candidate.article;
@@ -8130,10 +8134,10 @@ function renderFeedEntry(entry, reference = null) {
     try { selection = publisherModule.publisherSelection(entry); } catch { /* This source opens on its own site. */ }
     if (selection) {
       const read = el('button', 'chip feed-read', publisherReader.busy(entry)
-        ? tx('記事を取得中…', 'Loading article…') : tx('KAIRO で読む', 'Read in KAIRO'));
+        ? tx('記事を取得中…', 'Loading article…') : tx('Bunki で読む', 'Read in Bunki'));
       read.type = 'button'; read.dataset.feedRead = entry.id; read.id = `feed-read-${entry.id}`;
       read.disabled = publisherReader.busy(entry) || publisherReadingPending.has(JSON.stringify(selection)) || !recordWritable();
-      read.setAttribute('aria-label', `${tx('KAIRO で読む', 'Read in KAIRO')}: ${title}`);
+      read.setAttribute('aria-label', `${tx('Bunki で読む', 'Read in Bunki')}: ${title}`);
       read.addEventListener('click', async () => { await readPublisherEntry(entry); });
       row.append(read);
       row.append(el('p', 'feed-meta', tx('本文と出典を保存して、オフラインでも読む。', 'Saves the article and credits for offline reading.')));
@@ -8211,7 +8215,7 @@ function renderFeedResults() {
 }
 
 function renderFeed(main) {
-  main.append(withEn(el('p', 'eyebrow', '回廊 · いまの日本'), 'KAIRO · Japan now', 'en-inline'));
+  main.append(withEn(el('p', 'eyebrow', 'Bunki · いまの日本'), 'Bunki · Japan now', 'en-inline'));
   main.append(el('h1', 'view-title', tx(...ROOM_NAMES.rooms.feed)));
   if (!feedModule) {
     main.append(el('p', 'intro', tx('出典一覧を読み込めなかった。接続して、もう一度試す。', 'The source list could not load. Reconnect and try again.')));
@@ -8224,8 +8228,8 @@ function renderFeed(main) {
   const library = feedModule.parseFeedLibrary(S.feedLibrary);
   const followed = feedModule.SOURCE_REGISTRY.filter((source) => !library.mutedSourceIds.includes(source.id));
   const publishers = new Set(followed.map((source) => source.publisherId)).size;
-  main.append(el('p', 'intro', tx(`${publishers} の出版社・機関から。出典のサイトで読むほか、対応する原文は KAIRO に保存できる。`,
-    `${publishers} publishers and institutions. Read on the original site, or save supported originals in KAIRO.`)));
+  main.append(el('p', 'intro', tx(`${publishers} の出版社・機関から。出典のサイトで読むほか、対応する原文は Bunki に保存できる。`,
+    `${publishers} publishers and institutions. Read on the original site, or save supported originals in Bunki.`)));
   const toolbar = el('div', 'feed-toolbar');
   for (const [id, ja, en] of [['latest', '見出し', 'Headlines'], ['articles', '保存記事', 'Saved articles'], ['saved', '保存リンク', 'Saved links'], ['sources', '出典', 'Sources']]) {
     const button = el('button', 'chip', tx(ja, en)); button.type = 'button'; button.id = `feed-panel-${id}`;
@@ -15152,8 +15156,10 @@ function updateRecordSyncSurface(container) {
   const sync = container.querySelector('#record-sync-now');
   const disconnect = container.querySelector('#record-sync-disconnect');
   // Hfix-1B (L-7): where syncing cannot run here, its three buttons and the line of what it carries are not drawn at all
-  // (three greyed buttons under "isn't available here" were dead controls); the status line says why and points to export
+  // (three greyed buttons under "isn't available here" were dead controls). Lean pass (2026-11-22): nor is the group, so
+  // no line says sync is missing (a browser does share its study with Nihongo Study); Backup sits just below it
   const idle = state === 'unavailable' && slot?.pending !== 'register';
+  container.hidden = idle;
   for (const part of container.querySelectorAll('.record-sync-actions, .record-sync-scope')) part.hidden = idle;
   connect.disabled = !writable || !slot || !!slot.pending || ['unavailable', 'ready', 'syncing', 'connecting'].includes(state);
   sync.disabled = !writable || !slot?.registrationId || !!slot.pending || state !== 'ready';
@@ -33688,15 +33694,6 @@ function renderStrokePage(root) {
     setStrokeChrome(page, S.strokeChromeAwake);
   }
 
-  // the writing room is its own opaque, focus-trapped layer: its report entry lives inside
-  // it — in the quiet room, with the other waking controls (the ensō opens it); otherwise
-  // at the end of the room, in flow
-  if (maintenanceReports) {
-    const line = reportEntries('report-line-stroke');
-    const field = page.querySelector('#stroke-awake-field');
-    if (S.strokeMinimal && field) field.append(line); else page.append(line);
-  }
-
   page.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       event.preventDefault();
@@ -34360,7 +34357,6 @@ function composePage(node, path) {
   // the page's one Sources disclosure stands at its foot, under everything the page drew after its body
   const sources = sheet.querySelector(':scope > .entry-sources');
   if (sources) sheet.append(sources);
-  if (maintenanceReports) sheet.append(reportEntries('report-line-sheet'));
   if (!node.familyExample) enhanceJapaneseProse(sheet);
   return sheet;
 }
@@ -36295,10 +36291,10 @@ function buildGingaChrome(root) {
 }
 
 /** The gate's menu, one composed panel in both layouts (frame, 2026-11-10): ‹ › at its top edge beside the look-up
- * field; the five places of the layout's tab bar, one row each with a plain line of what is inside, the one you are in
- * marked; then the doors that are not places: Review (its count when cards wait), Focus, Tutor, Orbit, the look and the
- * language. The first screen draws it with its own chrome; over any other screen a bar's gate lays it on its own layer
- * (`over`: the layer, openGateMenu). */
+ * field; the five places of the layout's tab bar where those tabs do not stand, one row each with a plain line of what is
+ * inside, the one you are in marked; then the doors that are not places: Review (its count when cards wait), Focus,
+ * Tutor, Orbit and the look. The first screen draws it with its own chrome; over any other screen a bar's gate lays it on
+ * its own layer (`over`: the layer, openGateMenu). */
 function buildGateMenu(root, over = false) {
   const scrim = el('div', 'nav-scrim');
   scrim.addEventListener('click', () => closeGateMenu());
@@ -36333,10 +36329,13 @@ function buildGateMenu(root, over = false) {
       void saveReaderPosition(S.passageId, Math.round(window.scrollY));
     }
   };
-  // the five places of the layout in use, as its tab bar names them, each with a plain line of what is inside
+  // the five places of the layout in use, as its tab bar names them, each with a plain line of what is inside, only where
+  // the tabs do not stand under the menu (a word's own page, the sky with a word open, a focused stage): where they stand
+  // (on the first screen, once the menu closes) the menu does not name them a second time (lean pass, 2026-11-22)
   const due = S.taken.length && scheduler ? todayQueue().order.length : 0;
   const places = el('div', 'nav-stations');
-  for (const tab of primaryTabs()) {
+  const tabsStand = over ? primaryTabsShown() : S.ready && !S.stack.length && S.variants.nav === 'tabs' && !placesLayout();
+  for (const tab of tabsStand ? [] : primaryTabs()) {
     const row = navStation(`nav-${tab.id}`, [tab.ja, tab.en], placeLines(due)[tab.id], () => {
       if (S.view === tab.view && !S.stack.length) { closeGateMenu(); return; }
       const go = () => enterTab(tab, row, !over);
@@ -36395,15 +36394,10 @@ function buildGateMenu(root, over = false) {
   const look = navStation('nav-look', ['配色', 'Look'], ['アプリの色と紙', "The app's colours and paper"], () => {}, { end: seal });
   look.setAttribute('aria-label', `${tx('配色', 'Look')} — ${worldName(THEME_UI[themeIx()])}`);
   attachWorldPicker(look);
-  // the language: one row, the language in use, one tap changes it (the redraw keeps the menu open)
-  const ja = S.lang === 'ja';
-  const language = navStation('nav-lang', ['表示言語', 'Language'], ['英語か日本語', 'English or 日本語'], () => {
-    S.lang = ja ? 'bi' : 'ja';
-    render();
-  }, { end: el('span', 'nav-station-v', ja ? '日本語' : 'EN'), door: false });
-  language.setAttribute('aria-label', `${tx('表示言語', 'Language')} — ${ja ? '日本語' : 'English'}`);
-  more.append(look, language);
-  bar.append(places, more);
+  // no language row: the bar's EN switch and Settings hold it (lean pass, 2026-11-22)
+  more.append(look);
+  if (places.childElementCount) bar.append(places);
+  bar.append(more);
   root.append(bar);
 }
 /** One row of the gate's menu: its name, a plain line of what is inside (or a value at its end), a chevron for a door. */
@@ -37687,10 +37681,8 @@ function render() {
   }
   reviewExitUi(() => renderReviewExitNotice(main));
   // no vertical room sign (John, 2026-11-10): the tab and the bar already name the room, Today's heading its date
-  // after the room, never inside its stage: the focused stage keeps its composition and every
-  // state (probe, unavailable card, error) keeps a report entry one scroll away
-  // LEAN (2026-11-22): Me and Settings carry no footer line; the bug rail opens the same sheet
-  if (maintenanceReports && !['drift', 'me', 'settings'].includes(S.view)) root.append(reportEntries('report-line-page'));
+  // no report line under the rooms (lean pass, 2026-11-22): the bug rail stands on every screen, the focused stage, an
+  // unavailable card and a word's page included, and opens the same sheet with My reports beside it
 
   renderSheet(root);
   renderStrokePage(root);

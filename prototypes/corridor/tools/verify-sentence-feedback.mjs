@@ -77,8 +77,7 @@ async function shelf(page) {
     const view = await page.locator('body').getAttribute('data-view');
     if (view === 'shelf') return;
     if (view === 'drift') {
-      await page.locator('#ginga-symbol').focus(); await page.keyboard.press('Enter');
-      await page.locator('.bubble-shelf').click();
+      await page.locator('#tab-read').click();
     } else await page.locator('#back').click();
     await page.waitForFunction(previous => document.body.dataset.view !== previous, view);
   }

@@ -197,7 +197,7 @@ async function freshPage() {
 async function openArticle(s, { id = null, start = true } = {}) {
   const { page, press } = s;
   await s.ready();
-  await press('#ginga-symbol'); await press('.bubble-shelf');
+  await press('#tab-read');
   await page.locator('.shelf-open').first().waitFor();
   const door = id ? page.locator(`[data-passage="${id}"]:not([data-recommendation]) .shelf-open`).first() : page.locator('.shelf-open').first();
   await door.scrollIntoViewIfNeeded();

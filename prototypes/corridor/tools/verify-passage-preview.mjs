@@ -261,8 +261,7 @@ async function fromReading(browser, engine, size) {
   const session = await open(browser, size);
   const { page, problems, press } = session;
   await firstScreen(session);
-  await press('#ginga-symbol');
-  await press('.bubble-shelf');
+  await press('#tab-read');
   const article = page.locator('.shelf-open', { hasText: '都市の匿名性と言語' }).first();
   await article.waitFor();
   await article.scrollIntoViewIfNeeded();

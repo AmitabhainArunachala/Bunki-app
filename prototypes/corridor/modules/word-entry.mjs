@@ -814,7 +814,7 @@ function listGloss(item) {
 }
 
 function listToMarkdown(name, items) {
-  const lines = [`# ${name} — 回廊 KAIRO`, '', `${items.length} 件 · ${dayKey()}`, ''];
+  const lines = [`# ${name} — Bunki`, '', `${items.length} 件 · ${dayKey()}`, ''];
   for (const item of items) {
     const r = listReading(item);
     const g = listGloss(item);

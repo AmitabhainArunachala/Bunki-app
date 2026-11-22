@@ -183,7 +183,7 @@ async function startKanjiBlock(p) {
 async function saveWords(p, indexes) {
   const { page, press, sleep } = p;
   await p.ready();
-  await press('#ginga-symbol'); await press('.bubble-shelf'); await page.locator('.shelf-open').first().waitFor();
+  await press('#tab-read'); await page.locator('.shelf-open').first().waitFor();
   await press(page.locator('.shelf-open').first()); await page.locator('.reader .tok.content').first().waitFor(); await sleep(1500);
   for (let i = 0; i < 4 && (await page.locator('#mini').isVisible().catch(() => false)); i += 1) { await page.keyboard.press('Escape'); await sleep(400); }
   for (const index of indexes) {

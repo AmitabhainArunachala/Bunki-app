@@ -165,7 +165,7 @@ const reviewFace = (page) => page.evaluate(async () => {
 async function saveWords(p, indexes) {
   const { page, press, sleep } = p;
   await p.ready();
-  await press('#ginga-symbol'); await press('.bubble-shelf'); await page.locator('.shelf-open').first().waitFor();
+  await press('#tab-read'); await page.locator('.shelf-open').first().waitFor();
   await press(page.locator('.shelf-open').first()); await page.locator('.reader .tok.content').first().waitFor(); await sleep(1500);
   for (let i = 0; i < 4 && (await page.locator('#mini').isVisible().catch(() => false)); i += 1) { await page.keyboard.press('Escape'); await sleep(400); }
   const file = await page.evaluate(async () => { const m = await import('/corridor.js'); return m.D.passages.find((x) => x.id === m.S.passageId)?.file || null; });
@@ -246,7 +246,7 @@ try {
     const p = await freshPage();
     const { page } = p;
     await p.ready();
-    await p.press('#ginga-symbol'); await p.press('.bubble-shelf'); await page.locator('.shelf-open').first().waitFor();
+    await p.press('#tab-read'); await page.locator('.shelf-open').first().waitFor();
     await p.press(page.locator('.shelf-open').first()); await page.locator('.reader .tok.content').first().waitFor(); await p.sleep(1500);
     for (let i = 0; i < 4 && (await page.locator('#mini').isVisible().catch(() => false)); i += 1) { await page.keyboard.press('Escape'); await p.sleep(400); }
     const word = page.locator('.reader .tok.content').nth(6);

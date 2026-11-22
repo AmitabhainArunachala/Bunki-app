@@ -215,7 +215,7 @@ test('the gate opens the same menu over an article, and closing it keeps the pla
   const menu = await page.evaluate(() => ({
     expanded: document.getElementById('bar-gate').getAttribute('aria-expanded'),
     label: document.getElementById('bar-gate').getAttribute('aria-label'),
-    controls: ['#nav-search-door', '#nav-review', '#gate-menu .nav-dojo', '#gate-menu .bubble-shelf', '#gate-menu .bubble-sensei', '#nav-look']
+    controls: ['#nav-search-door', '#nav-review', '#gate-menu .nav-dojo', '#gate-menu .bubble-sensei', '#nav-look']
       .filter((sel) => document.querySelector(sel)?.getClientRects().length),
     rows: [...document.querySelectorAll('#gate-menu .gate-panel .nav-station')].map((row) => row.id || row.className.replace('nav-station ', '')),
     current: document.querySelector('#gate-menu .nav-station[aria-current="page"]')?.id,
@@ -226,11 +226,11 @@ test('the gate opens the same menu over an article, and closing it keeps the pla
   }));
   assert.equal(menu.expanded, 'true');
   assert.match(menu.label, /close navigation/);
-  assert.deepEqual(menu.controls, ['#nav-search-door', '#nav-review', '#gate-menu .nav-dojo', '#gate-menu .bubble-shelf', '#gate-menu .bubble-sensei', '#nav-look']);
-  // one panel: the five places, then Review, Focus, Tutor, Orbit, the look and the language; nothing loose in the corners
-  assert.deepEqual(menu.rows, ['nav-today', 'nav-read', 'nav-learn', 'nav-words', 'nav-me',
-    'nav-review', 'nav-dojo', 'bubble-sensei', 'orbit-preview-door', 'nav-look', 'nav-lang']);
-  assert.equal(menu.current, 'nav-read', 'an article is in Read');
+  assert.deepEqual(menu.controls, ['#nav-search-door', '#nav-review', '#gate-menu .nav-dojo', '#gate-menu .bubble-sensei', '#nav-look']);
+  // one panel: Review, Focus, Tutor, Orbit and the look; over a room the tabs name the five places and the menu does not
+  // repeat them, nor the language the bar's EN holds (lean pass, 2026-11-22); nothing loose in the corners
+  assert.deepEqual(menu.rows, ['nav-review', 'nav-dojo', 'bubble-sensei', 'orbit-preview-door', 'nav-look']);
+  assert.equal(menu.current, undefined, 'the tabs mark the place you are in');
   assert.equal(menu.loose, 0);
   assert.equal(menu.langs, 1, 'one #lang on the screen');
   assert.equal(menu.focus, 'nav-search-door', 'opened from the keyboard, the look-up field takes the keys');
@@ -269,7 +269,7 @@ test('the menu is one panel: at most 560 px and centred under the gate on a wide
       return { l: panel.left, r: panel.right, t: panel.top, b: panel.bottom, gx: (gate.left + gate.right) / 2, barB: bar.bottom, h: innerHeight,
         current: document.querySelector('#gate-menu .nav-station[aria-current="page"]')?.id };
     });
-    assert.equal(box.current, 'nav-me', `${device}: Me is marked as the place you are in`);
+    assert.equal(box.current, undefined, `${device}: over Me the tabs mark the place; the menu names no place`);
     assert.ok(box.b <= box.h + 0.5, `${device}: the panel ends on the screen`);
     if (device === '390') {
       assert.ok(box.l <= 0.5 && box.r >= 389.5, `${device}: the full width (${box.l}..${box.r})`);
@@ -279,15 +279,8 @@ test('the menu is one panel: at most 560 px and centred under the gate on a wide
       assert.ok(Math.abs((box.l + box.r) / 2 - box.gx) <= 1, `${device}: centred under the gate`);
       assert.ok(box.t >= box.barB, `${device}: under the bar`);
     }
-    if (device === '1440') {
-      // the language row changes the language and the menu stays where it stood
-      await page.locator('#nav-lang').click();
-      await page.waitForFunction(() => !document.body.classList.contains('ui-bi'));
-      assert.equal(await page.locator('#gate-menu #nav-lang .nav-station-v').innerText(), '日本語');
-      await page.locator('#nav-lang').click();
-      await page.waitForFunction(() => document.body.classList.contains('ui-bi'));
-      assert.equal(await page.locator('#gate-menu').count(), 1);
-    }
+    // no language row: the bar's EN switch and Settings hold it
+    assert.equal(await page.locator('#nav-lang').count(), 0, `${device}: no language row in the menu`);
     await page.keyboard.press('Escape');
     await page.locator('#gate-menu').waitFor({ state: 'detached' });
   }
@@ -299,7 +292,7 @@ test('the menu is one panel: at most 560 px and centred under the gate on a wide
     rows: document.querySelectorAll('.gate-panel .nav-station').length, loose: document.querySelectorAll('#app .corner-bubble').length,
     shelf: !!document.querySelector('.gate-panel .bubble-shelf'),
   }));
-  assert.deepEqual(sky, { rows: 11, loose: 0, shelf: true });
+  assert.deepEqual(sky, { rows: 5, loose: 0, shelf: false });
   await page.keyboard.press('Escape');
   await page.locator('.gate-panel').waitFor({ state: 'detached' });
   assert.equal(await page.locator('#ginga-symbol').getAttribute('aria-expanded'), 'false');
@@ -451,7 +444,7 @@ test('the layout under test: the gate on every bar, the same panel with its own 
     await page.locator('.gate-panel').waitFor();
     const rows = await page.evaluate(() => [...document.querySelectorAll('.gate-panel .nav-station')].map((row) => row.id || row.className.replace('nav-station ', '')));
     assert.deepEqual(rows, ['nav-review', 'nav-bookshelf', 'nav-dictionary', 'nav-tests', 'nav-progress',
-      'nav-dojo', 'bubble-sensei', 'orbit-preview-door', 'nav-look', 'nav-lang'], `${device}: the places, then the doors that are not places`);
+      'nav-dojo', 'bubble-sensei', 'orbit-preview-door', 'nav-look'], `${device}: the places, then the doors that are not places`);
     assert.equal(await page.locator('#app .corner-bubble').count(), 0, `${device}: nothing loose in the corners`);
     await page.keyboard.press('Escape');
     await page.locator('.gate-panel').waitFor({ state: 'detached' });
@@ -474,7 +467,7 @@ test('the layout under test: the gate on every bar, the same panel with its own 
     const y = await page.evaluate(() => window.scrollY);
     await page.locator('#bar-gate').click();
     await page.locator('#gate-menu .gate-panel').waitFor();
-    assert.equal(await page.locator('#gate-menu .nav-station[aria-current="page"]').getAttribute('id'), 'nav-bookshelf');
+    assert.equal(await page.locator('#gate-menu .nav-station[aria-current="page"]').count(), 0, 'over a room the tab bar marks the place');
     await page.keyboard.press('Escape');
     await page.locator('#gate-menu').waitFor({ state: 'detached' });
     const after = await page.evaluate(() => ({ y: window.scrollY, view: document.body.dataset.view, focus: document.activeElement?.id }));

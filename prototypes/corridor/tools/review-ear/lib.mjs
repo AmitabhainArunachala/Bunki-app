@@ -73,7 +73,7 @@ export async function open({ engine = 'chromium', width = 390, clipSeconds = () 
 export async function openArticle(s, { start = true, index = 0 } = {}) {
   const { page, press } = s;
   await s.ready();
-  await press('#ginga-symbol'); await press('.bubble-shelf');
+  await press('#tab-read');
   await page.locator('.shelf-open').first().waitFor();
   await press(page.locator('.shelf-open').nth(index));
   await page.locator('.reader .tok.content').first().waitFor();

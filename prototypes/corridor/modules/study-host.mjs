@@ -667,7 +667,7 @@ function guidedCardStatus(node) {
   if (word && !D.dict?.[node.id]) return { state: 'held', reason: readerCaptureReasonText(node.id) };
   if (word && state !== 'take') return { state: 'held', reason: wordCaptureHeldText(node, { route: false }) };
   if (node.t === 'grammar' && !GRAMMARS().some((g) => g.id === node.id))
-    return { state: 'held', reason: tx('この文法はまだ一覧にないため、札にできない。', 'This grammar pattern isn’t in KAIRO’s grammar list yet, so it can’t become a card.') };
+    return { state: 'held', reason: tx('この文法はまだ一覧にないため、札にできない。', 'This grammar pattern isn’t in Bunki’s grammar list yet, so it can’t become a card.') };
   if (!word && node.t !== 'grammar') return { state: 'held', reason: tx('この種類の札は、ここでは覚えられない。', 'This kind of card can’t be memorized here.') };
   return { state: 'take' };
 }

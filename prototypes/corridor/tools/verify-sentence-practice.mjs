@@ -71,8 +71,7 @@ async function ready(page) {
 }
 async function shelf(page) {
   if (await page.locator('body').getAttribute('data-view') === 'shelf') return;
-  await page.locator('#ginga-symbol').focus(); await page.keyboard.press('Enter');
-  await page.locator('.bubble-shelf').click();
+  await page.locator('#tab-read').click();
 }
 async function lists(page) {
   if (!await page.locator('#tray').count()) await shelf(page);

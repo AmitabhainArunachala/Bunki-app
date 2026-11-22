@@ -187,8 +187,7 @@ async function snapshot(fixture, name) {
 async function shelf(page) {
   const view = await page.locator('body').getAttribute('data-view');
   if (view === 'drift') {
-    await page.locator('#ginga-symbol').click();
-    await page.locator('.bubble-shelf').click();
+    await page.locator('#tab-read').click();
   } else if (view !== 'shelf') {
     assert.notEqual(view, 'review', 'Leave review with its explicit session control');
     for (
@@ -198,8 +197,7 @@ async function shelf(page) {
     ) {
       await page.locator('#back').click();
       if ((await page.locator('body').getAttribute('data-view')) === 'drift') {
-        await page.locator('#ginga-symbol').click();
-        await page.locator('.bubble-shelf').click();
+        await page.locator('#tab-read').click();
       }
     }
   }

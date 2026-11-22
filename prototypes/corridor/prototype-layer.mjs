@@ -294,8 +294,35 @@ function render() {
   if (active === 'new') renderNew(); else renderNotes();
 }
 function mark() { const seal = h('span', 'pl-new', t('新', 'new')); seal.setAttribute('aria-hidden', 'true'); return seal; }
+/** Rows a page script hands the sheet (lean pass, 2026-11-22): the design layer's 深 depth switch, once a button floating
+ * over the page, stands here. A script pushes { id, name: [ja, en], on(), set(on) } onto window.__bunkiPrototypeRows; the
+ * root's data-pl-rows says this layer draws them. With no such script, as on the phone copy, nothing is drawn. */
+function pageRows() {
+  const rows = Array.isArray(window.__bunkiPrototypeRows) ? window.__bunkiPrototypeRows : [];
+  return rows.filter((row) => row && row.id && Array.isArray(row.name) && typeof row.on === 'function' && typeof row.set === 'function')
+    .map((row) => {
+      const line = h('div', 'pl-page-row');
+      line.id = `pl-row-${row.id}`;
+      const name = h('p', 'pl-item-name', t(...row.name));
+      name.id = `pl-row-${row.id}-name`;
+      const pair = h('div', 'pl-seg');
+      pair.setAttribute('role', 'group');
+      pair.setAttribute('aria-labelledby', name.id);
+      const paint = () => {
+        for (const choice of pair.children) choice.setAttribute('aria-pressed', String((choice.dataset.plValue === 'on') === !!row.on()));
+      };
+      for (const [value, ja, en] of [['on', 'オン', 'On'], ['off', 'オフ', 'Off']]) {
+        const choice = button('', t(ja, en), () => { row.set(value === 'on'); paint(); });
+        choice.dataset.plValue = value;
+        pair.append(choice);
+      }
+      paint();
+      line.append(name, pair);
+      return line;
+    });
+}
 function renderNew() {
-  body.append(renderTrial(), h('p', 'pl-note', t('今日つくられた、またはつながったものです。アプリの中では「新」の印がついています。',
+  body.append(renderTrial(), ...pageRows(), h('p', 'pl-note', t('今日つくられた、またはつながったものです。アプリの中では「新」の印がついています。',
     'Built or connected today. In the app each one carries the mark.')));
   const list = h('ul', 'pl-list');
   for (const item of NEW) {
@@ -951,6 +978,7 @@ function renderTrial() {
 function build() {
   root = h('div');
   root.id = ROOT_ID;
+  root.dataset.plRows = '1';
   rail = h('div', 'pl-rail');
   if (typeof rail.showPopover === 'function') rail.setAttribute('popover', 'manual');
   intro = h('div', 'pl-intro');
@@ -999,8 +1027,8 @@ function build() {
 /** the words that follow the interface language outside the sheet */
 function paintWords() {
   intro.querySelector('.pl-intro-text').textContent = t(
-    'これは試作版です。新しいものには「新」の印があります。このボタンで一覧を見て、気になるところを書けます。',
-    'This is the prototype. New things carry the mark “new”. This button lists them and takes your notes.');
+    '試作版：「試」で新しいものの一覧を見て、気になるところを書けます。',
+    'Prototype: 試 lists what is new and takes your notes.');
   intro.querySelector('.pl-intro-ok').textContent = t('わかった', 'OK');
   opener.setAttribute('aria-label', t('試作版：新しいものの一覧と、気になるところのメモ', 'Prototype: what is new, and your notes'));
   opener.title = t('試作版', 'Prototype');

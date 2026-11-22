@@ -320,7 +320,7 @@ async function openArticle(s, { start = true, id = null } = {}) {
   const { page, press } = s;
   await s.ready();
   await s.module(); // a fresh load: the handle on the app's module is taken again
-  await press('#ginga-symbol'); await press('.bubble-shelf');
+  await press('#tab-read');
   await page.locator('.shelf-open').first().waitFor();
   const door = id ? page.locator(`[data-passage="${id}"]:not([data-recommendation]) .shelf-open`).first() : page.locator('.shelf-open').first();
   if (id) await door.scrollIntoViewIfNeeded();

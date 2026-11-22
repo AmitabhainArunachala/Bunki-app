@@ -819,7 +819,7 @@ try {
           practice: JSON.stringify(recordApp.current().snapshot.record.assessmentQuestionPractice),
           controls: document.querySelectorAll('.grade, #assessment-question-check').length }));
         const before = await snapshot();
-        const entry = '#app > .report-line-page [data-report-entry="open"]';
+        const entry = '#bunki-report-bug'; // lean pass (2026-11-22): the bug rail is the report entry
         assert.equal(await page.locator(entry).count(), 1, 'The page report entry exists in the unavailable-question state');
         const hit = await page.evaluate(sel => {
           const el = document.querySelector(sel); el.scrollIntoView({ block: 'center' });
