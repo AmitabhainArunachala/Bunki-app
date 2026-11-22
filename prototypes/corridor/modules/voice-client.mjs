@@ -76,6 +76,38 @@ export function parsePairing(input) {
   return server ? { code, learner, server } : { code, learner };
 }
 
+/** The voice link (LEAN, 2026-11-22): `<bunki origin>/#voice-connect=<payload>`, the payload base64url of the JSON
+ * {"v":1,"code","learner","server"}. The learner's own "Bunki Voice" opens it or hands it to him; nobody types it.
+ * shared-study-boot.mjs takes it out of the address before anything else runs, and the payload is held in memory only. */
+export const VOICE_CONNECT_FRAGMENT = 'voice-connect';
+const LINK_FIELDS = 'code,learner,server,v';
+/** Read a voice link's payload under the pairing line's own rules: the code's form, the learner id and the server's
+ * form. Resolves { code, learner, server } or { error: 'invalid-link' } for anything that is not a whole payload of
+ * version 1. */
+export function parseVoiceConnect(text) {
+  const bad = { error: 'invalid-link' };
+  if (typeof text !== 'string' || text.length > 2000 || !/^[A-Za-z0-9_-]+={0,2}$/.test(text)) return bad;
+  let value;
+  try {
+    const plain = text.replace(/=+$/u, '').replace(/-/g, '+').replace(/_/g, '/');
+    value = JSON.parse(atob(plain.padEnd(Math.ceil(plain.length / 4) * 4, '=')));
+  } catch { return bad; }
+  if (!value || typeof value !== 'object' || Array.isArray(value) || value.v !== 1 || Object.keys(value).sort().join() !== LINK_FIELDS) return bad;
+  const code = typeof value.code === 'string' ? value.code.replace(/[\s-]+/gu, '').toUpperCase() : '';
+  const { learner } = value;
+  const server = typeof value.server === 'string' ? value.server.replace(/\/+$/u, '') : '';
+  if (!CODE.test(code) || typeof learner !== 'string' || !LEARNER.test(learner) || /^nsrs_/i.test(learner) || !isVoiceServer(server)) return bad;
+  return { code, learner, server };
+}
+/** What the one field under Settings takes: a voice link, for the home-screen app, which cannot be handed one (the
+ * whole address, or anything from `#voice-connect=` on); or the line an older "Bunki Voice" prints. */
+export function voicePairingInput(text) {
+  const value = typeof text === 'string' ? text.trim() : '';
+  const mark = `#${VOICE_CONNECT_FRAGMENT}=`;
+  const at = value.indexOf(mark);
+  return at >= 0 ? { link: value.slice(at + mark.length) } : { learner: value, code: '' };
+}
+
 /** A store that lasts as long as the page: for tests, and for a browser that offers nothing better.
  * read() answers { server, token, scope, ended } with nulls for what is not kept; write() keeps a pairing; clear() drops
  * the token (he removed it) and keeps the address; end(marker) drops the token because the server ended the pairing and
@@ -229,6 +261,22 @@ export function createVoiceClient({ fetch: fetchFn = globalThis.fetch?.bind(glob
     return { code, figures };
   };
   const errorCode = async (response, known, fallback) => (await refusal(response, known, fallback)).code;
+  /** The checks that send nothing: the input's form and, for a voice link, this device. A link is refused on a device
+   * that is paired already (a new pairing would replace this one and never revoke its install), and when it names
+   * another server than the one this device is set up for: its own voice server, else `known` (the study server it
+   * keeps). The code is a secret for ten minutes: it goes to that server, or nowhere. */
+  async function vet(input, known) {
+    const link = !!input && typeof input === 'object' && Object.hasOwn(input, 'link');
+    const parsed = link ? parseVoiceConnect(input.link) : parsePairing(input);
+    if (parsed.error) return { ok: false, code: parsed.error };
+    await ready();
+    if (link && pairing) return { ok: false, code: 'already-paired' };
+    const configured = server || (typeof known === 'string' ? known : '');
+    if (link && configured && parsed.server !== configured) return { ok: false, code: 'server-mismatch' };
+    const target = parsed.server || server;
+    if (!target) return { ok: false, code: 'server-missing' };
+    return { ok: true, parsed, target };
+  }
 
   return {
     /** True once this device has been given a voice server's address. */
@@ -242,13 +290,18 @@ export function createVoiceClient({ fetch: fetchFn = globalThis.fetch?.bind(glob
     durable: () => store.durable !== false,
     forget,
 
-    /** Redeem a pairing code. Resolves { ok: true, installation } or { ok: false, code }. */
-    async pair(input) {
-      const parsed = parsePairing(input);
-      if (parsed.error) return { ok: false, code: parsed.error };
-      await ready();
-      const target = parsed.server || server;
-      if (!target) return { ok: false, code: 'server-missing' };
+    /** Whether a pairing could go ahead, with nothing sent and nothing kept. Resolves { ok: true, host } (the server's
+     * host name, to show) or { ok: false, code }. */
+    async check(input, { known = null } = {}) {
+      const vetted = await vet(input, known);
+      return vetted.ok ? { ok: true, host: new URL(vetted.target).host } : { ok: false, code: vetted.code };
+    },
+    /** Redeem a pairing code: the pairing line ({ learner, code }) or a voice link's payload ({ link }), each checked
+     * as check() does first. Resolves { ok: true, installation } or { ok: false, code }. */
+    async pair(input, { known = null } = {}) {
+      const vetted = await vet(input, known);
+      if (!vetted.ok) return { ok: false, code: vetted.code };
+      const { parsed, target } = vetted;
       let response;
       try {
         response = await ask(target, '/v1/pair/redeem-speak', { method: 'POST', headers: { 'Content-Type': 'application/json' },

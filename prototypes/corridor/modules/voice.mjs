@@ -16,8 +16,8 @@ function recordSyncStatus(raw) {
 function recordUnavailable() {
   invalidateRecordNoteViews();
   protectStore(
-    'この窓は読み取り専用。ほかの KAIRO の窓を閉じ、再読み込みして続ける。未送信のメモと質問はこの窓に残る。',
-    'This window is read-only. Close other KAIRO windows, then reload to continue. Unsent note and chat drafts stay in this window.',
+    'この窓は読み取り専用。ほかの Bunki の窓を閉じ、再読み込みして続ける。未送信のメモと質問はこの窓に残る。',
+    'This window is read-only. Close other Bunki windows, then reload to continue. Unsent note and chat drafts stay in this window.',
   );
 }
 

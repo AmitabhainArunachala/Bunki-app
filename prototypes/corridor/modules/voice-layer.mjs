@@ -20,7 +20,7 @@ import { answerReads, deckFrontVoice, reviewFrontVoice } from './card-audio.mjs'
 import { EAR_SLOW, FLOOR, applyTone, contrast, groundUp, installEar, over, rgbaOf, toneFor } from './ear.mjs';
 import { baseBoxes, createBands } from './voice-bands.mjs';
 import { createClipStore, createIndexedDbClipStorage } from './voice-clip-store.mjs';
-import { createDeviceTokenStore, createVoiceClient } from './voice-client.mjs';
+import { createDeviceTokenStore, createVoiceClient, voicePairingInput } from './voice-client.mjs';
 import { createPocketPlayer, createReaderMediaSession, gapSleep, pageTimer } from './reader-pocket.mjs';
 import { VOICE_LINE_STANDS_MS, VOICE_PAIRING, VOICE_SETTINGS, VOICE_SOURCES, VOICE_WORDS, voiceLineOf, voicePairingLine, voiceSettingsLine, voiceShortOf } from './voice-lines.mjs';
 import { SPEEDS, createVoiceSeam, sentencesOf, voiceKeyOf } from './voice-seam.mjs';
@@ -1120,9 +1120,10 @@ export function installVoiceLayer(host) {
     }
     return { state: blocked && status.paired ? `${state} ${blocked}` : state, last, budget, today };
   }
-  /** The block under Settings, 筆と声: one row (Voice, connected or not, and one control), and behind it the pairing form
-   * (Connect) or, once paired, the status, the last sentence, the budget, Refresh and Disconnect (Details). LEAN,
-   * 2026-11-22: the same lines and controls with the same ids, shown when asked for; every behaviour is unchanged. */
+  /** The block under Settings, 筆と声: one row (Voice, connected or not, and one control), and behind it one field for a
+   * voice link (Connect) or, once paired, the status, the last sentence, the budget, Refresh and Disconnect (Details).
+   * LEAN, 2026-11-22: a link "Bunki Voice" opens turns the voice on with one click (voice-connect.mjs); the field is for
+   * the home-screen app, which cannot be handed a link, and still takes the line an older "Bunki Voice" prints. */
   function settingsBlock() {
     const block = el('div', 'settings-voice-server');
     block.id = 'settings-voice-server';
@@ -1150,14 +1151,13 @@ export function installVoiceLayer(host) {
       wrap.append(label, input);
       return { wrap, input };
     };
-    const learner = field('voice-pair-learner', VOICE_PAIRING.learner, { maxLength: 400 });
-    const code = field('voice-pair-code', VOICE_PAIRING.code, { maxLength: 24 });
-    const submit = el('button', 'chip', tx(...VOICE_PAIRING.submit)); submit.type = 'submit'; submit.id = 'voice-pair-submit';
+    // the one field keeps the id the walks have always filled with the printed line
+    const pasted = field('voice-pair-learner', VOICE_PAIRING.link, { maxLength: 2400 });
+    const submit = el('button', 'chip', tx(...VOICE_PAIRING.turnOn)); submit.type = 'submit'; submit.id = 'voice-pair-submit';
     const note = el('p', 'teacher-note'); note.id = 'voice-pair-note'; note.setAttribute('role', 'status');
-    // the speech team's launcher on John's Desktop is "Bunki Voice"; its pairing step prints the one line (release, 22:25)
-    const how = el('p', 'teacher-note', tx(...VOICE_PAIRING.how));
-    how.id = 'voice-pair-how';
-    form.append(how, learner.wrap, code.wrap, submit, note);
+    form.append(pasted.wrap, submit, note);
+    // a link is held to the study server this device keeps, as the link's own question holds it (voice-connect.mjs)
+    const studyServer = () => import('../shared-study-pairing.mjs').then((module) => module.readStudyServerAddress(globalThis), () => null);
     const forget = el('button', 'btn-tertiary', tx(...VOICE_PAIRING.forget)); forget.type = 'button'; forget.id = 'voice-unpair';
     const refresh = el('button', 'btn-tertiary', tx(...VOICE_PAIRING.refresh)); refresh.type = 'button'; refresh.id = 'voice-budget-refresh';
     let busy = false, open = false;
@@ -1185,10 +1185,11 @@ export function installVoiceLayer(host) {
       if (busy) return;
       busy = true; paint();
       note.textContent = tx(...VOICE_PAIRING.pairing);
-      const answer = await client.pair({ learner: learner.input.value, code: code.input.value });
+      const input = voicePairingInput(pasted.input.value);
+      const answer = await client.pair(input, { known: Object.hasOwn(input, 'link') ? await studyServer() : null });
       busy = false;
       if (answer.ok) {
-        learner.input.value = ''; code.input.value = '';
+        pasted.input.value = '';
         note.textContent = '';
         seam.repaired();
         void seam.refreshBudget();
@@ -1198,7 +1199,7 @@ export function installVoiceLayer(host) {
     });
     forget.addEventListener('click', async () => { seam.stop(); await client.forget(); seam.repaired(); note.textContent = ''; paint(); host.refreshListenRow?.(); });
     refresh.addEventListener('click', () => { budget.textContent = tx('音声の予算：確認中…', 'Voice budget: checking…'); void seam.refreshBudget(); });
-    const toggle = () => { open = !open; paint(); if (open && !client.paired()) learner.input.focus({ preventScroll: true }); };
+    const toggle = () => { open = !open; paint(); if (open && !client.paired()) pasted.input.focus({ preventScroll: true }); };
     connect.addEventListener('click', toggle); details.addEventListener('click', toggle);
     more.append(state, last, budget, today, form, refresh, forget);
     block.append(head, more);

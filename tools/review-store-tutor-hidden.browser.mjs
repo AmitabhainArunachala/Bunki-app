@@ -175,7 +175,6 @@ try {
     .fill(
       `Bunki voice code: ${fake.issue({ learner: 'test-learner' })} (10 minutes) · learner: test-learner · server: ${fake.origin}`,
     );
-  await page.locator('#voice-pair-code').fill('');
   await page.locator('#voice-pair-submit').click();
   await page.waitForFunction(
     () => document.getElementById('settings-voice-server')?.dataset.paired === 'true',

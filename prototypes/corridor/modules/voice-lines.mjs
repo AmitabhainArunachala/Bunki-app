@@ -155,26 +155,38 @@ function voiceSettingsLine(code, { time = null, dayCapCents = null, capCents = n
   return cause === 'day-limit' ? [`${ja}（1日${n.ja}）`, `${en} (${n.en} a day)`] : [`${ja}（合計${n.ja}）`, `${en} (${n.en} in all)`];
 }
 
-/** The pairing form under Settings, its lines in the same words (a lost connection and a slow answer read as C3 and C5). */
+/** Turning the voice on (LEAN, 2026-11-22): the one question a voice link asks (modules/voice-connect.mjs) and the one
+ * field under Settings, in the same words (a lost connection and a slow answer read as C3 and C5). */
 const VOICE_PAIRING = Object.freeze({
-  learner: voiceLinePair('学習者ID（または表示された1行）', 'Learner id (or the whole pairing line)'),
-  code: voiceLinePair('ペアリングコード（12文字）', 'Pairing code (12 characters)'),
-  submit: voiceLinePair('ペアリング', 'Pair'),
-  pairing: voiceLinePair('ペアリング中…', 'Pairing…'),
-  how: voiceLinePair('デスクトップの「Bunki Voice」を実行すると「Bunki voice code:」で始まる1行が出ます。その1行をそのまま最初の欄に貼って「ペアリング」を押してください。コードは10分で切れます。',
-    'Run “Bunki Voice” on the Desktop. It prints one line that starts “Bunki voice code:”. Paste that whole line into the first box and press Pair. The code lasts 10 minutes.'),
+  link: voiceLinePair('声のリンクを貼り付け', 'Paste your voice link'),
+  turnOn: voiceLinePair('オンにする', 'Turn on'),
+  pairing: voiceLinePair('ペアリング中…', 'Turning on…'),
+  ask: voiceLinePair('このブラウザーで Bunki の声をオンにしますか？', 'Turn on Bunki’s voice in this browser?'),
+  askServer: (host) => [`音声サーバー：${host}`, `Voice server: ${host}`],
+  askWhat: voiceLinePair('タップした語や文を、あなたの音声サーバーが上限の範囲で読み上げます。', 'Words and sentences you tap are read aloud by your voice server, within its spending limit.'),
+  notNow: voiceLinePair('今はしない', 'Not now'),
+  close: voiceLinePair('閉じる', 'Close'),
+  on: voiceLinePair('声がオンになりました', 'Voice is on'),
+  reopening: voiceLinePair('Bunki を開き直しています…', 'Reopening Bunki…'),
+  held: voiceLinePair('声はすでにオンです', 'Voice is already on'),
+  refused: voiceLinePair('声はオンになりませんでした', 'Voice was not turned on'),
   forget: voiceLinePair('ペアリングを解除', 'Disconnect'),
   refresh: voiceLinePair('予算を更新', 'Refresh the budget'),
   errors: Object.freeze({
-    'invalid-pairing': voiceLinePair('コードか学習者IDの形が違います。確かめて、もう一度お試しください。', 'That does not look like a pairing code and learner id. Check them and try again.'),
+    'invalid-pairing': voiceLinePair('声のリンクではないようです。「Bunki Voice」のリンクをそのまま貼ってください。', 'That does not look like a voice link. Paste the whole link from “Bunki Voice”.'),
+    'invalid-link': voiceLinePair('この声のリンクは完全ではありません。「Bunki Voice」で新しいリンクを作ってください。', 'This voice link is not complete. Make a new one with “Bunki Voice”.'),
+    'server-mismatch': voiceLinePair('このリンクの音声サーバーは、このブラウザーに設定されているサーバーと違います。何も送っていません。',
+      'This link names another server than the one this browser is set up for. Nothing was sent.'),
+    'already-paired': voiceLinePair('このブラウザーはすでにペアリング済みです。別のサーバーにするには、先に設定の「声」で解除してください。',
+      'This browser already has its voice. To change it, disconnect in Settings › Voice first.'),
     'authentication-required': voiceLinePair('コードが違うか、使用済みか、期限切れです。デスクトップの「Bunki Voice」をもう一度実行してください。', 'That code is wrong, already used or expired. Run “Bunki Voice” on the Desktop again for a new one.'),
     'installation-exists': voiceLinePair('このコードの端末はすでにペアリング済みです。デスクトップの「Bunki Voice」をもう一度実行してください。', 'That code belongs to an install that is already paired. Run “Bunki Voice” on the Desktop again for a new one.'),
     'authentication-rate-limit': voiceLinePair('試行が多すぎます。1分待ってください。', 'Too many tries. Wait one minute.'),
     'pairing-unavailable': voiceLinePair('いまはペアリングできません。数分後にもう一度お試しください。', "Pairing isn't available right now. Try again in a few minutes."),
     'network-failed': voiceLinePair(VOICE_CAUSES['no-connection'].ja, VOICE_CAUSES['no-connection'].en),
     'voice-timeout': voiceLinePair(VOICE_CAUSES['too-slow'].ja, VOICE_CAUSES['too-slow'].en),
-    'server-missing': voiceLinePair('この端末はまだ音声サーバーの住所を知りません。「Bunki voice code:」で始まる1行をそのまま貼ってください。',
-      'This device does not know the voice server’s address yet. Paste the whole line that starts “Bunki voice code:”.'),
+    'server-missing': voiceLinePair('この端末はまだ音声サーバーの住所を知りません。「Bunki Voice」のリンクをそのまま貼ってください。',
+      'This device does not know the voice server’s address yet. Paste the whole link from “Bunki Voice”.'),
   }),
   failed: voiceLinePair('ペアリングできませんでした。もう一度お試しください。', 'Pairing did not work. Try again.'),
 });
