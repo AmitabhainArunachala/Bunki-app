@@ -180,6 +180,20 @@ export function createClipMemo({limit = 48} = {}) {
   });
 }
 
-/** "The option to have no highlighting at all": on unless switched off on this device. */
 export const READING_LIGHT_KEY = 'nihongo.highlight-reading.v1';
-export function readingLightOn(stored) {return stored !== 'false';}
+export const READING_LIGHT_COLORS = Object.freeze({
+  off: ['なし', 'Off'],
+  gold: ['金色', 'Gold'],
+  blue: ['青', 'Blue'],
+  green: ['緑', 'Green'],
+  rose: ['バラ色', 'Rose'],
+});
+
+export function readingLightColor(stored) {
+  if (stored === 'true') return 'gold';
+  return typeof stored === 'string' && Object.hasOwn(READING_LIGHT_COLORS, stored) ? stored : 'off';
+}
+
+export function readingLightOn(stored) {
+  return readingLightColor(stored) !== 'off';
+}

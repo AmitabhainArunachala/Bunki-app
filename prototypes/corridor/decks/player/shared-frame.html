@@ -4,4 +4,18 @@
 <link rel="stylesheet" href="../../vendor/shared-study-engine/client/app/fonts.css">
 <link rel="stylesheet" href="../../vendor/shared-study-engine/client/app/app.css">
 <link rel="stylesheet" href="../../vendor/shared-study-engine/client/grammar/grammar.css">
+<style>
+:root[data-embedded="1"],:root[data-embedded="1"] body{background:transparent;background-image:none}
+:root[data-embedded="1"] .shared-status{width:min(calc(100% - 40px),920px);max-width:920px;margin:6px auto 0;padding:8px 16px;border:1px solid var(--line);border-radius:10px;background:color-mix(in srgb,var(--surface) 94%,transparent);font-size:12px;color:var(--secondary)}
+:root[data-embedded="1"] main{max-width:960px;padding:12px 20px 36px;min-height:0}
+:root[data-embedded="1"] .screen-head{background:color-mix(in srgb,var(--surface) 94%,transparent);padding:14px 20px;border:1px solid var(--line);border-radius:12px;margin-bottom:14px}
+:root[data-embedded="1"] .daily-intro.sheet{margin-top:0}
+:root[data-embedded="1"] #app:has([data-focus]),:root[data-embedded="1"] #app:has([data-finish]){height:var(--nsrs-embedded-height,100dvh);background:transparent}
+:root[data-embedded="1"] #app [data-focus] .study-heading{background:color-mix(in srgb,var(--surface) 94%,transparent);border:1px solid var(--line);border-radius:10px}
+@media(max-width:640px){
+  :root[data-embedded="1"] .shared-status{width:auto;margin:4px 12px 0;padding:6px 12px}
+  :root[data-embedded="1"] main{padding:10px 12px 28px}
+  :root[data-embedded="1"] .screen-head{padding:12px 14px;margin-bottom:12px}
+}
+</style>
 </head><body><main id="app"><p role="status">学習を開いています…</p></main><script type="module" src="./shared-frame.mjs"></script></body></html>

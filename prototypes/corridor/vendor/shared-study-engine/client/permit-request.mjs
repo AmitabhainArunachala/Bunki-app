@@ -1,16 +1,26 @@
 /** Server grant intent from one fully applied shared prefix; never an issuer. */
 import {studyDayAllowance,payloadHash} from './replay.mjs';
+function permitBudget(p,installation,at){
+ const {limit,...bounds}=studyDayAllowance(p,at);
+ const allocated=(p.permitGrants||[]).filter(g=>g.startsAt<bounds.endsAt&&g.endsAt>bounds.startsAt).reduce((sum,g)=>sum+g.count,0);
+ if(!Number.isSafeInteger(limit)||limit<0||limit>200||!Number.isSafeInteger(allocated)||allocated<0)throw Error('native-sync-replay-blocked');
+ const hasUnused=Object.values(p.permits||{}).some(permit=>permit.install===installation&&!permit.usedBy&&permit.startsAt<=at&&permit.endsAt>at);
+ return {limit,bounds,allocated,hasUnused};
+}
+export function checkPairedNewPermits(state,at){
+ if(state.blocked||state.appliedSeq!==state.head)return 'new-permits-sync-required';
+ const {limit,allocated,hasUnused}=permitBudget(state.projection,state.scope.installation,at);
+ if(hasUnused)return null;
+ return allocated<limit?'new-permits-sync-required':'new-permits-budget-exhausted';
+}
 export function sharedPermitRequest(state,{now=Date.now,prefix='permit',batchSize=null}={}){
  const p=state?.projection,scope=state?.scope;
  if(!p||!Number.isSafeInteger(state.head)||state.head!==state.appliedSeq||state.blocked||p.error||p.updateRequired||Object.keys(state.local||{}).length)throw Error('native-sync-replay-blocked');
  const at=Math.max(now(),0,...Object.values(state.canonical||{}).map(row=>row.rt));
- const {limit,...bounds}=studyDayAllowance(p,at);
- const allocated=(p.permitGrants||[]).filter(g=>g.startsAt<bounds.endsAt&&g.endsAt>bounds.startsAt).reduce((sum,g)=>sum+g.count,0);
- if(!Number.isSafeInteger(limit)||limit<0||limit>200||!Number.isSafeInteger(allocated)||allocated<0)throw Error('native-sync-replay-blocked');
+ const {limit,bounds,allocated,hasUnused}=permitBudget(p,scope.installation,at);
  if(batchSize!==null&&(!Number.isSafeInteger(batchSize)||batchSize<1||batchSize>200))throw Error('invalid-permit-batch');
  // Automatic sync must not reserve the whole shared day for whichever device
  // happens to wake first. Keep a small offline batch and replenish when spent.
- const hasUnused=Object.values(p.permits||{}).some(permit=>permit.install===scope.installation&&!permit.usedBy&&permit.startsAt<=at&&permit.endsAt>at);
  const remaining=Math.max(0,limit-allocated);
  const count=batchSize===null?remaining:hasUnused?0:Math.min(batchSize,remaining);
  const policy=Object.freeze({version:2,head:state.head,day:bounds.day,timezone:bounds.timezone,limit,allocated});

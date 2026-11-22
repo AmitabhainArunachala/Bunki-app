@@ -484,6 +484,7 @@ small{font-size:max(12px,.833333em)}
 .passage{font-weight:400;font-feature-settings:"chws" 1;line-break:strict;text-autospace:normal}
 :root[data-theme=dark] .passage,:root[data-theme=ai] .passage,:root[data-theme=matcha] .passage,:root[data-theme=kokuban] .passage,:root[data-theme=contrast] .passage{font-weight:500}
 :root{--reading:var(--muted)}
+:root[data-theme=light]{--reading:color-mix(in srgb,var(--muted) 96%,var(--ink))}
 :root:is([data-theme=dark],[data-theme=ai],[data-theme=matcha],[data-theme=kokuban],[data-theme=contrast]){--reading:var(--secondary)}
 :root[data-theme=kokuban]{--reading:var(--ink)}
 :root[data-theme=contrast]{--reading:var(--ink)}
@@ -580,6 +581,18 @@ dialog.key-sheet kbd{font:500 12px/1 system-ui;border:1px solid var(--line-stron
 .term-block .speak-word.card-audio{display:inline-grid;place-items:center;min-width:44px;min-height:44px;padding:0 8px;border-color:transparent;background:transparent;color:var(--secondary);align-self:center}
 .term-block .speak-word.card-audio[aria-busy="true"]{color:var(--accent)}
 :root[data-reading-light=off] :is(.speech-light,.ear-bands){display:none!important}
+:root[data-reading-light=gold]{--reading-highlight:#eab844}
+:root[data-reading-light=blue]{--reading-highlight:#60a5fa}
+:root[data-reading-light=green]{--reading-highlight:#58c68b}
+:root[data-reading-light=rose]{--reading-highlight:#ec80aa}
+:root[data-theme=dark]{--reading-highlight-opacity:28%}
+:root[data-theme=kokuban]{--reading-highlight-opacity:30%}
+:root:is([data-reading-light=gold],[data-reading-light=blue],[data-reading-light=green],[data-reading-light=rose]){
+  --reading-highlight-wash:color-mix(in srgb,var(--reading-highlight) var(--reading-highlight-opacity,18%),transparent)
+}
+:root[data-reading-light]:not([data-reading-light=off]) .speech-light-band{background:var(--reading-highlight-wash)}
+:root[data-reading-light][data-ear=armed] .ear-band[data-band=line]{background:var(--reading-highlight)}
+:root[data-reading-light][data-ear=held] .ear-band[data-band=wash]{background:var(--reading-highlight-wash)}
 
 /* The ear (voice plan N2): the Bunki design lead's seal (design/ear/ear-states.html) in this app's colours. The red is the
    look's --vermilion; dark looks mix the seal with --ground for legibility against --ink. One mark in the top
@@ -588,7 +601,7 @@ dialog.key-sheet kbd{font:500 12px/1 system-ui;border:1px solid var(--line-stron
 :root:is([data-theme=dark],[data-theme=ai],[data-theme=matcha],[data-theme=kokuban],[data-theme=contrast]){--ear-paper:var(--ink);--ear-seal-red:color-mix(in srgb,var(--vermilion) 55%,var(--ground))}
 .ear{position:relative;display:inline-flex;align-items:center;gap:6px;flex:none;vertical-align:middle;padding-inline-end:26px}
 /* The 44 px button grows rightward and vertically; its 30 px seal and layout footprint stay put. */
-.ear-mark{position:relative;display:inline-grid;place-items:center;flex:none;width:44px;height:44px;min-width:44px;min-height:44px;margin:-7px -14px -7px 0;padding:7px 14px 7px 0;border:0;border-radius:3px;background:transparent;color:color-mix(in srgb,var(--ink) 58%,transparent);font:500 16px/1 'Hiragino Mincho ProN',var(--passageFont);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+.ear-mark{position:relative;display:inline-grid;place-items:center;flex:none;width:44px;height:44px;min-width:44px;min-height:44px;margin:-7px -14px -7px 0;padding:7px 14px 7px 0;border:0;border-radius:3px;background:transparent;color:color-mix(in srgb,var(--ink) 65%,transparent);font:500 16px/1 'Hiragino Mincho ProN',var(--passageFont);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
 .ear-mark:hover:not(:disabled){background:transparent}
 .ear-mark:hover:not(:disabled) .ear-glyph{border-color:color-mix(in srgb,var(--ink) 46%,transparent)}
 .ear-glyph{position:relative;display:inline-grid;place-items:center;width:30px;height:30px;border:1px solid color-mix(in srgb,var(--ink) 30%,transparent);border-radius:3px;pointer-events:none;transition:color 120ms linear,background-color 120ms linear,border-color 120ms linear,box-shadow 120ms linear}
@@ -612,16 +625,14 @@ dialog.key-sheet kbd{font:500 12px/1 system-ui;border:1px solid var(--line-stron
 @keyframes ear-arc-2{0%,25%{stroke-dashoffset:1}55%,100%{stroke-dashoffset:0}}
 @keyframes ear-arc-3{0%,50%{stroke-dashoffset:1}80%,100%{stroke-dashoffset:0}}
 /* no voice: the mark struck once, like a cancelled stamp, and one plain line says why */
-:root[data-ear=novoice] .ear-glyph{color:color-mix(in srgb,var(--ink) 40%,transparent);border-color:color-mix(in srgb,var(--ink) 26%,transparent)}
+:root[data-ear=novoice] .ear-glyph{border-color:color-mix(in srgb,var(--ink) 26%,transparent)}
 :root[data-ear=novoice] .ear-glyph::after{content:'';position:absolute;left:-3px;right:-3px;top:50%;height:1.4px;background:color-mix(in srgb,var(--ink) 70%,transparent);transform:rotate(-38deg);pointer-events:none}
 .ear-why{margin-inline-start:14px;font:12px/1.2 var(--uiFont);white-space:nowrap;color:color-mix(in srgb,var(--ink) 82%,transparent)}
 .ear-why[hidden]{display:none}
 /* N7 (rule 6): the one line a pressed speaker shows beside itself when it stays silent, for about four seconds. */
 .voice-why{margin-inline-start:6px;font:12px/1.3 var(--uiFont);color:color-mix(in srgb,var(--ink) 82%,transparent)}
-/* what the page shows: bands in the ear's own layer (fix round 2; WebKit paints neither custom highlights nor inline
-   backgrounds inside a word button). Armed: a red underline under the unit; held on: a wash of the seal's red along its
-   foot (22%). The layer is fixed, takes no pointer and moves no layout. Speaking (N5): the unit is lit by the shared
-   reading light, one even band per line, in the seal's red while the ear speaks. */
+/* Ear bands underline the target when armed and wash its foot when held. During playback the shared speech layer takes
+   over. The seal colors below are fallbacks for pages without data-reading-light. */
 .ear-bands{position:fixed;inset:0;z-index:2;pointer-events:none;overflow:hidden}
 .ear-band{position:absolute;display:none;pointer-events:none}
 :root[data-ear=armed] .ear-band[data-band=line]{display:block;background:var(--ear-red)}
@@ -636,3 +647,11 @@ dialog.key-sheet kbd{font:500 12px/1 system-ui;border:1px solid var(--line-stron
 #app [data-focus] .study-heading>.ear>.ear-why{display:none}
 .finish-screen>.ear{display:flex;justify-content:flex-end}
 @media(max-width:640px){.ear-why{white-space:normal;max-width:14em}}
+
+/* Single-chrome embed mode (platform.embedded): host owns masthead, banner, footer and outer navigation. */
+:root[data-embedded="1"] .shared-status{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+:root[data-embedded="1"] .shared-status .embedded-ear-slot{margin-inline-start:auto;display:inline-flex;align-items:center}
+:root[data-embedded="1"] .shared-status .embedded-ear-slot:empty{display:none}
+:root[data-embedded="1"] .shared-status [data-shared-activity]{flex-basis:100%}
+:root[data-embedded="1"] main{padding-top:16px}
+:root[data-embedded="1"] #app:has([data-focus]),:root[data-embedded="1"] #app:has([data-finish]){height:var(--nsrs-embedded-height,100dvh)}

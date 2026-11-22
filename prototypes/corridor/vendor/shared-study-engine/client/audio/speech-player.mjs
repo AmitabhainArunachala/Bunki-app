@@ -5,6 +5,15 @@
  */
 
 const MEDIA_ERR_DECODE = 3, MEDIA_ERR_SRC_NOT_SUPPORTED = 4, HAVE_FUTURE_DATA = 3;
+const SILENT_WAV = new Uint8Array(44 + 320);
+// A PCM WAV header followed by 20 ms of zero samples at 8 kHz, 16-bit mono.
+SILENT_WAV.set([
+  82, 73, 70, 70, 100, 1, 0, 0, // RIFF, chunk size 356
+  87, 65, 86, 69, 102, 109, 116, 32, // WAVE, fmt
+  16, 0, 0, 0, 1, 0, 1, 0, // PCM format, one channel
+  64, 31, 0, 0, 128, 62, 0, 0, // sample and byte rates
+  2, 0, 16, 0, 100, 97, 116, 97, 64, 1, 0, 0, // sample sizes, data bytes
+]);
 /** N7 fix 4 (the lane proof of 232729f, item 2): how long an element that should sound, and has its data, may keep its time
  * still before the player calls it a stall (looked at every STALL_POLL_MS; held within about 6.4 s). The lead's ruling: 6 s,
  * not 2. WebKit's ordinary restart after a resume keeps the time still for about 1.1 s in the lane, and a real start can be
@@ -61,6 +70,7 @@ export function createAudioPlayer(document, {onOutsideStart = null} = {}) {
   // the clip's: its refusal is not told, its success is not a new start.
   let latestStart = null;
   let disposed = false, lastUrl = null;  // fix 4: disposed; the object URL this player last gave the element
+  let unlocked = false, priming = null;
   // Fix 4 (the lane proof's item 2): in WebKit, the platform's play, pause and play 30 ms apart sometimes left the element
   // playing (not paused, its data there, its 'playing' event fired) with its time frozen: nothing sounded under "Pause (P)"
   // and the read never ended; a seek to the same time did not move it. A start that does not sound is held as rule F3
@@ -98,6 +108,19 @@ export function createAudioPlayer(document, {onOutsideStart = null} = {}) {
       try { win.URL.revokeObjectURL(handle.url); } catch { /* already revoked */ }
       handle.url = null;
     }
+  };
+
+  const clearPrime = () => {
+    const prime = priming;
+    if (!prime) return;
+    priming = null;
+    if (audio.src === prime.url) {
+      try { audio.pause(); } catch { /* nothing to pause */ }
+      audio.removeAttribute('src');
+      lastUrl = null;
+      try { audio.load(); } catch { /* nothing to reset */ }
+    }
+    cleanup(prime);
   };
 
   const finish = (outcome, error) => {
@@ -138,7 +161,7 @@ export function createAudioPlayer(document, {onOutsideStart = null} = {}) {
     }
     const ours = () => current === handle && latestStart === start;
     Promise.resolve(pending).then(
-      () => { if (ours()) { if (wanted) watch(handle); call(handle, 'started'); } },
+      () => { if (ours()) { unlocked = true; if (wanted) watch(handle); call(handle, 'started'); } },
       error => { if (ours()) startFailed(handle, error, pausesAtStart); },
     );
   };
@@ -150,6 +173,7 @@ export function createAudioPlayer(document, {onOutsideStart = null} = {}) {
     // clip is paused, his pause or an outside one, or with nothing in flight, is paused again at once: nothing sounds for
     // more than an instant and nothing starts by itself. His own press resumes (begin, a start of its own).
     ['play', () => {
+      if (priming) return;
       if (current && wanted) return;
       wanted = false; ownPauses++; heldByUs = true;
       audio.pause();
@@ -178,6 +202,7 @@ export function createAudioPlayer(document, {onOutsideStart = null} = {}) {
       } catch (error) {
         return Promise.reject(error);
       }
+      clearPrime();
       audio.preservesPitch = true;
       audio.defaultPlaybackRate = rate;
       audio.playbackRate = rate;
@@ -197,8 +222,30 @@ export function createAudioPlayer(document, {onOutsideStart = null} = {}) {
 
     pause() {
       if (disposed) return;
+      if (priming) { clearPrime(); return; }
       ownPauses++; heldByUs = true; wanted = false; unwatch();
       audio.pause();
+    },
+
+    // Start the same element inside the user's press while the speech clip is
+    // being resolved. The published CSP admits the WAV through a Blob URL.
+    prime() {
+      if (disposed || unlocked || priming || current) return;
+      let prime;
+      try {
+        prime = {url: win.URL.createObjectURL(new win.Blob([SILENT_WAV], {type: 'audio/wav'}))};
+        priming = prime;
+        audio.src = prime.url;
+        lastUrl = prime.url;
+        const pending = audio.play();
+        Promise.resolve(pending).then(() => {
+          if (priming !== prime) return;
+          unlocked = true;
+          clearPrime();
+        }, () => { if (priming === prime) clearPrime(); });
+      } catch {
+        clearPrime();
+      }
     },
 
     // Fix 1 (F3): a resume the browser refuses is told (held), not swallowed; an ended or stopped clip has nothing to resume.
@@ -210,6 +257,7 @@ export function createAudioPlayer(document, {onOutsideStart = null} = {}) {
 
     stop() {
       if (disposed) return;
+      if (priming) { clearPrime(); return; }
       ownPauses++; heldByUs = true; wanted = false; unwatch();
       audio.pause();
       finish('stopped');
@@ -227,6 +275,7 @@ export function createAudioPlayer(document, {onOutsideStart = null} = {}) {
     // it only found is left without this player's clip. Afterwards every function does nothing; a play() is a stop.
     dispose() {
       if (disposed) return;
+      clearPrime();
       const mine = lastUrl !== null && audio.src === lastUrl;
       ownPauses++; heldByUs = true; wanted = false; unwatch();
       if (mine) audio.pause();

@@ -404,8 +404,7 @@ export function aimEarHighlight(unit,{highlights=globalThis.CSS?.highlights,High
 /** The ear's own layer (fix round 2; the painter is speech-bands.mjs since N5, shared with the reading light): WebKit
  * paints neither custom highlights nor inline backgrounds inside a word button, so the aim marks are bands in a fixed
  * layer above the page, placed from the unit's client rects, taking no pointer and moving no layout. set('aim', range|null)
- * draws per line an underline (armed) and a wash along its foot (held); the page's data-ear picks the band. The sentence
- * the ear speaks is lit by the shared reading light, in the seal's red while the ear speaks (app.css). */
+ * produces aim geometry per line. See app.css for how the ear state and reading highlight preference style it. */
 export function createEarBands(document,{enabled=()=>true}={}){
  return createBandLayer(document,{enabled,className:'ear-bands',bandClass:'ear-band',attribute:'data-ear-bands',
   draw:(name,range)=>name==='aim'?footBands([...range.getClientRects()],scrollClip(range.commonAncestorContainer)):[]});

@@ -29,3 +29,86 @@ html[data-room='deckplay'] #app > main > .kp { margin-top: 0; }
 /* ---- Fix round 3: the chrome is opaque over the deck. Nothing of the card shows through it, and with
    the reveal no longer scrolling the page (decks/player windowPassage) it never moves. ---- */
 html[data-room='deckplay'] body:not(.zen) #app > .chrome { background: var(--color-glass-solid, var(--color-page)); -webkit-backdrop-filter: none; backdrop-filter: none; }
+
+/* ---- Embedded Nihongo Study (ENGINE-ONE.2 / Slice 2): seamless single-chrome surface harmonized
+   with all 11 Bunki looks. Scoped strictly to #app > main:has(> [data-shared-study]) so ordinary
+   legacy deck routes keep their exact gutters and frame. ---- */
+html[data-room='deckplay'] body:not(.zen):not([data-view='entry']):not([data-view='drift']) #app > main:has(> [data-shared-study]) {
+  width: min(980px, 100%);
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 0 16px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+[data-shared-study='ready'] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  width: 100%;
+  padding-top: 8px;
+}
+[data-shared-study='ready'] > .shared-study-back {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin-inline-start: 20px;
+  padding: 6px 14px;
+  border: 1px solid var(--line, transparent);
+  border-radius: var(--radius-control, 10px);
+  background: color-mix(in srgb, var(--ground-0, var(--ground)) 88%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--color-ink, var(--ink));
+  font: 500 var(--type-label, 13px) / 1.3 var(--sans, system-ui, sans-serif);
+  letter-spacing: 0.01em;
+  cursor: pointer;
+}
+[data-shared-study='ready'] > .shared-study-back:hover {
+  background: var(--ground-0, var(--ground));
+  border-color: var(--color-edge-strong, var(--line, transparent));
+}
+[data-shared-study='ready'] > .shared-study-back:focus-visible {
+  outline: 2px solid var(--red, var(--ink));
+  outline-offset: 2px;
+}
+[data-shared-study='ready'] > p {
+  margin: 0;
+  margin-inline-start: auto;
+  margin-inline-end: 20px;
+  padding: 6px 12px;
+  border: 1px solid var(--line-soft, var(--line, transparent));
+  border-radius: var(--radius-control, 8px);
+  background: color-mix(in srgb, var(--ground-0, var(--ground)) 88%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--color-ink-2, var(--ink-2, var(--ink)));
+  font-size: var(--type-caption, 12px);
+  line-height: 1.4;
+}
+[data-shared-study='ready'] > iframe[data-shared-study-frame] {
+  flex: 1 0 100%;
+  display: block;
+  width: 100%;
+  height: calc(100dvh - 7rem);
+  min-height: 28rem;
+  border: 0;
+  background: transparent;
+}
+/* Avoid duplicate outer chrome ear mark while embedded Nihongo Study owns its own working ear inside the frame. */
+html[data-room='deckplay'] body:has(#app > main > [data-shared-study='ready']) #app > .chrome > .ear-spot {
+  display: none;
+}
+@media (max-width: 640px) {
+  [data-shared-study='ready'] > .shared-study-back { margin-inline-start: 12px; padding-inline: 12px; }
+  [data-shared-study='ready'] > p { margin-inline-end: 12px; padding: 5px 10px; }
+  /* Prevent the floating look seal from overlapping the embedded study heading's top-right menu on phones. */
+  html[data-room='deckplay'] body:has(#app > main > [data-shared-study='ready']) #bunki-look-seal {
+    display: none;
+  }
+}

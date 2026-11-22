@@ -1,5 +1,5 @@
 import {SYNC_COMPATIBILITY,compatibilityHeaders} from './sync-compatibility.mjs';
-/** Foreground-only single-flight transport. Credentials never enter persistent state. */
+/** Foreground sync and best-effort close upload share admission to the event endpoint. */
 const ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/;
 const copy = value => structuredClone(value);
 const scopeKey = scope => JSON.stringify([scope?.environment, scope?.learner, scope?.installation]);
@@ -12,20 +12,22 @@ class SyncError extends Error {
 const check = (ok, code) => { if (!ok) throw new SyncError(code); };
 export function createSyncTransport({ store, origin, getCredential, compatibility=SYNC_COMPATIBILITY, fetch: request = globalThis.fetch,
   now = Date.now, wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds)),
-  canContinue = () => true, yieldTurn = () => new Promise(resolve => setTimeout(resolve, 50)),
+  canContinue = () => true, canFlushOnClose = () => false, yieldTurn = () => new Promise(resolve => setTimeout(resolve, 50)),
   maxRetries = 2, maxPasses = 8, maxDelayMs = 30000, maxResponseBytes = 1024 * 1024,
   requestTimeoutMs = 15000, maxRequestBytes = 256 * 1024 } = {}) {
   try { const parsed = new URL(origin); check(parsed.protocol === 'https:' && parsed.origin === origin && !parsed.username && !parsed.password, 'invalid-config'); }
   catch { throw new SyncError('invalid-config'); }
-  check(store && typeof getCredential === 'function' && typeof request === 'function' && typeof canContinue === 'function' && typeof yieldTurn === 'function' && integer(maxRetries) && maxRetries <= 5 &&
+  check(store && typeof getCredential === 'function' && typeof request === 'function' && typeof canContinue === 'function' && typeof canFlushOnClose === 'function' && typeof yieldTurn === 'function' && integer(maxRetries) && maxRetries <= 5 &&
     integer(maxPasses) && maxPasses > 0 && maxPasses <= 100 && integer(maxDelayMs) && maxDelayMs > 0 && integer(maxResponseBytes) && maxResponseBytes > 0 &&
     integer(requestTimeoutMs) && requestTimeoutMs > 0 && requestTimeoutMs <= 30000 && integer(maxRequestBytes) && maxRequestBytes > 0, 'invalid-config');
   let capability;try{capability=compatibilityHeaders(compatibility);}catch{throw new SyncError('invalid-config');}
   const scope = copy(store.scope);
   check(scope && Object.keys(scope).length === 3 && ['environment', 'learner', 'installation'].every(k => typeof scope[k] === 'string' && ID.test(scope[k]) && !/^nsrs_/i.test(scope[k])), 'invalid-config');
-  let flight = null;
+  let flight = null, closeFlight = null;
+  let closeGeneration = 0, foregroundUploadDispatched = false;
+  let reconciling = false;
   let authPaused = false;
-  let retryAt = 0;
+  let retryAt = 0, serverRetryAt = 0;
   let state = { state: 'idle', error: null, retryAt: null };
   const parseBody = async response => {
     check(response.body && typeof response.body.getReader === 'function', 'invalid-response');
@@ -51,39 +53,55 @@ export function createSyncTransport({ store, origin, getCredential, compatibilit
     try { return JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes)); }
     catch { throw new SyncError('invalid-response'); }
   };
-  const retryDelay = (response, attemptIndex) => {
-    const header = response?.headers?.get('Retry-After');
-    if (header) {
-      if (/^\d+$/.test(header)) return Number(header) * 1000;
-      const timestamp = Date.parse(header);
-      if (Number.isFinite(timestamp)) return Math.max(0, timestamp - now());
-    }
-    return Math.min(1000 * 2 ** attemptIndex, maxDelayMs);
+  const retryDelay = attemptIndex => Math.min(1000 * 2 ** attemptIndex, maxDelayMs);
+  const retryDeadline = (response, receivedAt) => {
+    const header = response.headers?.get('Retry-After');
+    if (!header) return null;
+    if (/^\d+$/.test(header)) return receivedAt + Number(header) * 1000;
+    const timestamp = Date.parse(header);
+    return Number.isFinite(timestamp) ? Math.max(receivedAt, timestamp) : null;
   };
-  const send = async (url, body = null) => {
+  const send = async (url, body = null, { keepalive = false, uploadGeneration = closeGeneration, prefixCurrent, onDispatch } = {}) => {
     const encodedBody = body === null ? undefined : JSON.stringify(body);
-    for (let attemptIndex = 0; attemptIndex <= maxRetries; attemptIndex++) {
-      check(canContinue(), 'host-paused');
+    const retries = keepalive ? 0 : maxRetries;
+    const allowed = keepalive ? canFlushOnClose : canContinue;
+    for (let attemptIndex = 0; attemptIndex <= retries; attemptIndex++) {
+      check(allowed(), 'host-paused');
       let response;
       let delay;
       try {
         const credential = await getCredential();
         check(typeof credential === 'string' && /^[\x21-\x7e]{1,2048}$/.test(credential), 'authentication-required');
+        check(allowed(), 'host-paused');
         const controller = new AbortController();
         let timer;
         const init = { method: body === null ? 'GET' : 'POST', body: encodedBody,
           headers: { ...capability, Authorization: 'Bearer ' + credential, ...(body === null ? {} : { 'Content-Type': 'application/json' }) },
-          redirect: 'error', cache: 'no-store', credentials: 'omit', signal: controller.signal };
+          redirect: 'error', cache: 'no-store', credentials: 'omit', signal: controller.signal, ...(keepalive ? { keepalive: true } : {}) };
         try {
           response = await new Promise((resolve, reject) => {
             timer = setTimeout(() => { controller.abort(); reject(Error('request-timeout')); }, requestTimeoutMs);
-            Promise.resolve().then(() => request(url, init)).then(resolve, reject);
+            Promise.resolve().then(() => {
+              check(allowed(), 'host-paused');
+              if (retryAt > now()) throw new SyncError('retry-later', retryAt);
+              if (keepalive) {
+                check(!authPaused && !reconciling && prefixCurrent(), 'host-paused');
+                closeGeneration++;
+                onDispatch?.();
+              }
+              else if (body !== null) {
+                check(!closeFlight && uploadGeneration === closeGeneration, 'host-paused');
+                foregroundUploadDispatched = true;
+              }
+              return request(url, init);
+            }).then(resolve, reject);
           });
         } finally { clearTimeout(timer); }
       } catch (error) {
         if (error instanceof SyncError) throw error;
-        if (attemptIndex === maxRetries) throw new SyncError('network-failed');
-        delay = retryDelay(null, attemptIndex);
+        if (attemptIndex === retries) throw new SyncError('network-failed');
+        if (body !== null && !keepalive) foregroundUploadDispatched = false;
+        delay = retryDelay(attemptIndex);
       }
       if (response) {
         check(!response.redirected && response.url === url, 'invalid-response');
@@ -91,9 +109,18 @@ export function createSyncTransport({ store, origin, getCredential, compatibilit
         if (response.status === 426) throw new SyncError('update-required');
         if (response.status === 409) throw new SyncError('conflict');
         if (response.status === 429 || response.status >= 500) {
-          delay = retryDelay(response, attemptIndex);
-          check(Number.isFinite(delay) && delay >= 0 && delay <= Number.MAX_SAFE_INTEGER - now(), 'invalid-response');
-          if (attemptIndex === maxRetries || delay > maxDelayMs) throw new SyncError('retry-later', now() + delay);
+          const receivedAt = now();
+          const deadline = retryDeadline(response, receivedAt);
+          delay = deadline === null ? retryDelay(attemptIndex) : deadline - receivedAt;
+          check(Number.isFinite(delay) && delay >= 0 && delay <= Number.MAX_SAFE_INTEGER - receivedAt, 'invalid-response');
+          if (deadline !== null) {
+            serverRetryAt = Math.max(serverRetryAt, deadline);
+            retryAt = Math.max(retryAt, serverRetryAt);
+          }
+          if (attemptIndex === retries || delay > maxDelayMs) {
+            throw new SyncError('retry-later', receivedAt + delay);
+          }
+          if (body !== null && !keepalive) foregroundUploadDispatched = false;
         } else {
           check(response.status === 200, 'server-failed');
           const result = await parseBody(response);
@@ -113,7 +140,11 @@ export function createSyncTransport({ store, origin, getCredential, compatibilit
       const reply = await send(origin + '/v1/events?after=' + before.applied + '&limit=1000');
       check(Array.isArray(reply.events) && integer(reply.head), 'invalid-response');
       targetHead ??= reply.head;
-      await store.reconcile({ events: reply.events, head: reply.head });
+      if (reply.events.length || reply.head !== before.head || before.blocked) {
+        reconciling = true;
+        try { await store.reconcile({ events: reply.events, head: reply.head }); }
+        finally { reconciling = false; }
+      }
       const after = await store.status();
       if (after.blocked?.reason !== 'gap' || after.applied === before.applied) return {kind:'settled'};
       if (after.applied >= reply.head) return {kind:'settled'};
@@ -133,7 +164,36 @@ export function createSyncTransport({ store, origin, getCredential, compatibilit
   };
   const pendingPull = result => ({state:'pending',error:null,retryAt:null,
     catchUp:{reason:result.kind,targetHead:result.targetHead ?? null}});
+  function selectBatch(available, limit) {
+    const batch = [];
+    const encode = new TextEncoder();
+    let bytes = encode.encode(JSON.stringify({ scope, events: [] })).byteLength;
+    for (const record of available) {
+      const size = encode.encode(JSON.stringify(record)).byteLength + (batch.length ? 1 : 0);
+      if (bytes + size > limit) break;
+      bytes += size;
+      batch.push(record);
+    }
+    return batch;
+  }
+  async function sendBeforeClose(onDispatch) {
+    if (reconciling || typeof store.subscribe !== 'function') return false;
+    let changed = false;
+    const unsubscribe = store.subscribe(() => { changed = true; });
+    // Let normal sync pull and verify the durable IDs after reopening. A
+    // closing tab may stop before it sees the response or can write to IDB.
+    try {
+      const available = await store.outbox(500, { requireCurrentPrefix: true });
+      const batch = selectBatch(available, Math.min(maxRequestBytes, 60 * 1024));
+      if (!batch.length || changed) return false;
+      await send(origin + '/v1/events', { scope, events: batch }, { keepalive: true, prefixCurrent: () => !changed, onDispatch });
+    }
+    catch (error) { if (error?.code === 'host-paused') return false; throw error; }
+    finally { unsubscribe(); }
+    return true;
+  }
   const run = async () => {
+    const uploadGeneration = closeGeneration;
     if (authPaused) return { state: 'paused-auth', error: 'authentication-required', retryAt: null };
     if (retryAt > now()) return { state: 'backoff', error: 'retry-later', retryAt };
     state = { state: 'syncing', error: null, retryAt: null };
@@ -151,18 +211,16 @@ export function createSyncTransport({ store, origin, getCredential, compatibilit
         return copy(state);
       }
       const available = await store.outbox(500);
-      const batch = [];
-      for (const record of available) {
-        if (new TextEncoder().encode(JSON.stringify({ scope, events: [...batch, record] })).byteLength > maxRequestBytes) break;
-        batch.push(record);
-      }
+      const batch = selectBatch(available, maxRequestBytes);
       check(available.length === 0 || batch.length > 0, 'request-limit');
       if (batch.length) {
-        const reply = await send(origin + '/v1/events', { scope, events: batch });
-        check(Array.isArray(reply.acks) && reply.acks.length === batch.length && integer(reply.head), 'invalid-response');
-        const expected = new Map(batch.map(record => [record.event.id, record.bodyHash]));
-        check(reply.acks.every(ack => expected.get(ack.id) === ack.bodyHash) && new Set(reply.acks.map(ack => ack.id)).size === batch.length, 'invalid-response');
-        await store.acknowledge({ acks: reply.acks, head: reply.head });
+        try {
+          const reply = await send(origin + '/v1/events', { scope, events: batch }, { uploadGeneration });
+          check(Array.isArray(reply.acks) && reply.acks.length === batch.length && integer(reply.head), 'invalid-response');
+          const expected = new Map(batch.map(record => [record.event.id, record.bodyHash]));
+          check(reply.acks.every(ack => expected.get(ack.id) === ack.bodyHash) && new Set(reply.acks.map(ack => ack.id)).size === batch.length, 'invalid-response');
+          await store.acknowledge({ acks: reply.acks, head: reply.head });
+        } finally { foregroundUploadDispatched = false; }
         // Ack is not applied. Pull from the actual contiguous cursor, never reply.head.
         const pulled = await pull();
         if (pulled.kind !== 'settled') { state = pendingPull(pulled); return copy(state); }
@@ -173,16 +231,25 @@ export function createSyncTransport({ store, origin, getCredential, compatibilit
       const code = error instanceof SyncError ? error.code : 'store-failed';
       if (code === 'host-paused') { state = pendingPull({kind:'paused'}); return copy(state); }
       if (code === 'authentication-required') authPaused = true;
-      retryAt = error instanceof SyncError && error.retryAt !== null ? error.retryAt : 0;
+      retryAt = Math.max(retryAt > now() ? retryAt : 0, error instanceof SyncError ? error.retryAt ?? 0 : 0);
       state = { state: code === 'update-required' ? 'update-required' : authPaused ? 'paused-auth' : retryAt > now() ? 'backoff' : 'error', error: code, retryAt: retryAt || null };
     }
     return copy(state);
   };
+  function sync() {
+    if (closeFlight) return closeFlight.catch(() => {}).then(sync);
+    if (!flight) flight = run().then(result => { state = result; return copy(result); }).finally(() => { flight = null; });
+    return flight;
+  }
   return Object.freeze({
-    sync() {
-      if (!flight) flight = run().then(result => { state = result; return copy(result); }).finally(() => { flight = null; });
-      return flight;
+    sync,
+    flushOnClose(onDispatch) {
+      if (closeFlight) return closeFlight;
+      if (!canFlushOnClose() || foregroundUploadDispatched || authPaused || retryAt > now()) return Promise.resolve(false);
+      closeFlight = sendBeforeClose(onDispatch).finally(() => { closeFlight = null; });
+      return closeFlight;
     },
+    canCheckContent() { return !authPaused && serverRetryAt <= now(); },
     status() { return copy(state); },
     resumeAfterPairing() { authPaused = false; state = { state: 'idle', error: null, retryAt: null }; },
   });

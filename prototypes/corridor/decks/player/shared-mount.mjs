@@ -1,8 +1,89 @@
 /** Host the exact canonical study UI in a same-origin frame. No second player,
  * admission policy, or legacy-ledger writer is implemented in this module. */
 import {sharedStudyRuntime} from '../../shared-study-runtime.mjs';
+import {openBunkiStudyVoice} from '../../modules/shared-study-voice.mjs';
 let serial=0;
 const element=(tag,text)=>{const node=document.createElement(tag);if(text)node.textContent=text;return node;};
+
+const NIGHT_LOOKS=new Set(['rokusho','yoru','kin','nami','hakuu','kaku','kara']);
+const INDIGO_NIGHT_LOOKS=new Set(['yoru','kin','nami']);
+const cssVar=(style,name)=>style?.getPropertyValue(name)?.trim()||'';
+
+/** Read Bunki's active 11-look theme and language so the embedded study frame sits seamlessly
+ * on the parent paper/night surface without double chrome or contrast clashes. */
+export function readHostAppearance({english=true}={}) {
+  const html=document.documentElement;
+  const raw=(html?.getAttribute('data-theme')||'').trim().toLowerCase();
+  const look=raw||'hokusai';
+  const isNight=NIGHT_LOOKS.has(look);
+  const baseTheme=isNight?(INDIGO_NIGHT_LOOKS.has(look)?'ai':'dark'):'washi';
+  const rootStyle=typeof getComputedStyle==='function'&&html?getComputedStyle(html):null;
+  const bodyStyle=typeof getComputedStyle==='function'&&document.body?getComputedStyle(document.body):null;
+  const pick=(...names)=>{
+    for(const name of names){
+      const fromBody=cssVar(bodyStyle,name);
+      if(fromBody)return fromBody;
+      const fromRoot=cssVar(rootStyle,name);
+      if(fromRoot)return fromRoot;
+    }
+    return '';
+  };
+  const ground=pick('--ground')||(isNight?'#131a30':'#f1e9d3');
+  const ink=pick('--ink')||(isNight?'#f4ecd9':'#1c2f42');
+  const ink2=pick('--ink-2')||(isNight?`color-mix(in srgb, ${ink} 82%, ${ground})`:`color-mix(in srgb, ${ink} 78%, ${ground})`);
+  const surface=pick('--ground-0')||(isNight?`color-mix(in srgb, ${ground} 88%, ${ink})`:`color-mix(in srgb, ${ground} 58%, #ffffff)`);
+  const raised=isNight?`color-mix(in srgb, ${surface} 90%, ${ink})`:(pick('--ground-2')||`color-mix(in srgb, ${ground} 86%, ${ink})`);
+  const overlay=isNight?`color-mix(in srgb, ${surface} 84%, ${ink})`:surface;
+  const line=pick('--line')||(isNight?`color-mix(in srgb, ${ink} 20%, transparent)`:`color-mix(in srgb, ${ink} 16%, transparent)`);
+  const lineStrong=`color-mix(in srgb, ${ink} 42%, transparent)`;
+  const muted=isNight?`color-mix(in srgb, ${ink} 74%, ${ground})`:ink2;
+  const red=pick('--red')||(isNight?'#ef8079':'#b03a2e');
+  const ai=pick('--ai')||(isNight?'#d9b25f':'#2a4f6f');
+  const accent=isNight?ai:red;
+  const onAccent=isNight?ground:'#ffffff';
+  const hasUiClass=!!document.body&&(document.body.classList.contains('ui-bi')||document.body.dataset.ready==='1');
+  const htmlLang=(html?.getAttribute('lang')||'').toLowerCase();
+  const language=hasUiClass?(document.body.classList.contains('ui-bi')?'en':'ja'):(htmlLang==='ja'?'ja':htmlLang==='en'?'en':(english?'en':'ja'));
+  return Object.freeze({
+    look,
+    baseTheme,
+    scheme:isNight?'dark':'light',
+    language,
+    tokens:Object.freeze({
+      ground,
+      surface,
+      raised,
+      overlay,
+      ink,
+      secondary:ink2,
+      muted,
+      line,
+      'line-strong':lineStrong,
+      accent,
+      'on-accent':onAccent,
+      vermilion:red,
+      texture:'none',
+    }),
+  });
+}
+
+function subscribeHostAppearance(listener,{english=true}={}) {
+  if(typeof MutationObserver!=='function'||!document.documentElement)return ()=>{};
+  let disposed=false;
+  const push=()=>{if(!disposed)listener(readHostAppearance({english}));};
+  const rootObserver=new MutationObserver(push);
+  rootObserver.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','data-live-depth','lang']});
+  let bodyObserver=null;
+  if(document.body){
+    bodyObserver=new MutationObserver(push);
+    bodyObserver.observe(document.body,{attributes:true,attributeFilter:['class']});
+  }
+  return ()=>{
+    disposed=true;
+    rootObserver.disconnect();
+    bodyObserver?.disconnect();
+  };
+}
 
 export function renderSharedFence(main,{english=true,onLeave}={}) {
   const p=element('p',english?'This practice contract is not mapped to shared study. Its existing history is preserved; grading is unavailable here.':'この練習は共通の学習にまだ対応していません。記録は保持され、ここでは採点しません。');
@@ -24,8 +105,8 @@ export async function render(main,{deckId,english=true,onLeave,autoStart}={}) {
   const paired=globalThis.bunkiSharedStudyHost,stopped=paired?.closed?.();
   if(stopped){renderClosed(root,stopped,{english,onLeave});return;}
   root.append(element('p',english?'Opening shared study…':'共通の学習を開いています…'));
-  let adapter;
-  try {adapter=await sharedStudyRuntime();}
+  let adapter,voice=null;
+  try {[adapter,voice]=await Promise.all([sharedStudyRuntime(),openBunkiStudyVoice().catch(()=>null)]);}
   catch(error){
     if(request!==serial||!root.isConnected)return;root.dataset.sharedStudy='blocked';root.replaceChildren();
     // A paired host says its own refusal in plain words ([ja, en]); every other cause keeps the general line and its code.
@@ -41,11 +122,23 @@ export async function render(main,{deckId,english=true,onLeave,autoStart}={}) {
     }
     if(onLeave){const back=element('button',english?'Back':'戻る');back.onclick=onLeave;root.append(back);}return;
   }
-  if(request!==serial||!root.isConnected)return;root.replaceChildren();root.dataset.sharedStudy='ready';
-  const back=element('button',english?'Back to Bunki':'Bunkiに戻る');back.type='button';back.onclick=onLeave;root.append(back);
+  if(request!==serial||!root.isConnected){voice?.abortAll?.();return;}
+  root.replaceChildren();root.dataset.sharedStudy='ready';
+  const disposers=new Set();
+  const cleanup=()=>{
+    for(const stop of [...disposers]){try{stop();}catch{/* ignore */}}
+    disposers.clear();
+    voice?.abortAll?.();
+    try{frame.contentWindow?.bunkiSharedStudy?.app?.dispose?.();}catch{/* frame already gone */}
+  };
+  const back=element('button',english?'← Back to Bunki':'← Bunkiに戻る');
+  back.type='button';back.className='shared-study-back';
+  back.onclick=()=>{cleanup();onLeave?.();};
+  root.append(back);
   if(adapter.identity.environment==='test-bunki-shared-preview')root.append(element('p',english?'Trial copy. Your real study record stays as it is.':'試しの写し。実際の学習記録はそのままです。'));
   const frame=element('iframe');frame.title=english?'Shared study':'共通の学習';frame.dataset.sharedStudyFrame='';
-  frame.style.cssText='display:block;width:100%;height:calc(100dvh - 9rem);min-height:38rem;border:0';
+  frame.allow='autoplay';
+  frame.style.cssText='display:block;width:100%;height:calc(100dvh - 7rem);min-height:28rem;border:0;background:transparent';
   const url=new URL('./shared-frame.html',import.meta.url);url.searchParams.set('deck',deckId);url.searchParams.set('ui',english?'en':'ja');if(autoStart)url.searchParams.set('start','1');
   // The child receives the already bound backend, never credentials or a new
   // independent learner identity. This port is same-origin and frame-specific.
@@ -66,9 +159,17 @@ export async function render(main,{deckId,english=true,onLeave,autoStart}={}) {
     const target=window.scrollY+frame.getBoundingClientRect().top-chromeBottom;
     window.scrollTo({top:Math.max(0,target),behavior:'instant'});
   };
-  frame.bunkiStudyPort=Object.freeze({adapter,onCardStart,...(audio?{audio}:{})});frame.src=url.href;root.append(frame);
+  const readAppearance=()=>readHostAppearance({english});
+  const subscribeAppearance=(listener)=>{
+    const stop=subscribeHostAppearance(listener,{english});
+    disposers.add(stop);
+    return ()=>{disposers.delete(stop);stop();};
+  };
+  frame.bunkiStudyPort=Object.freeze({adapter,onCardStart,readAppearance,subscribeAppearance,...(audio?{audio}:{}),...(voice?{voice}:{})});
+  frame.src=url.href;root.append(frame);
   // the pairing ending under an open screen closes the screen: nothing more is answered into a copy that cannot be sent
-  const unhear=paired?.onClosed?.(notice=>{unhear?.();if(request!==serial||!root.isConnected)return;renderClosed(root,notice,{english,onLeave});});
+  const unhear=paired?.onClosed?.(notice=>{unhear?.();if(request!==serial||!root.isConnected)return;cleanup();renderClosed(root,notice,{english,onLeave});});
+  if(unhear)disposers.add(unhear);
 }
 
 export async function summary(deckId) {
