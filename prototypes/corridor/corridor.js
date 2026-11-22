@@ -14600,6 +14600,33 @@ function renderSrsPrefs(main, { open = false, presetsOnly = false } = {}) {
     main.append(toggle);
     if (!S.srsPrefsOpen) return;
   }
+  // Settings: the presets as one segmented control, like 筆's, and under the row one line on what the pressed one
+  // means, from its own numbers; the hand-set numbers stay in Today → Decks
+  if (presetsOnly) {
+    const chosen = srsPresetState();
+    const choice = el('div', 'lang-seg settings-layout-choice srs-pace-choice');
+    choice.setAttribute('role', 'group');
+    choice.setAttribute('aria-label', tx('復習のペース', 'Review pace'));
+    for (const id of SRS_PRESET_IDS) {
+      const btn = el('button', '', tx(SRS_PRESETS[id].ja, SRS_PRESETS[id].en));
+      btn.type = 'button';
+      btn.dataset.preset = id;
+      btn.setAttribute('aria-pressed', String(chosen.base === id && !chosen.custom));
+      btn.disabled = srsPrefsPending.size > 0 || !recordWritable();
+      btn.title = tx(...SRS_PRESET_DETAIL[id]);
+      btn.addEventListener('click', () => chooseSrsPreset(id));
+      choice.append(btn);
+    }
+    const numbers = chosen.custom ? S.srsPrefs : SRS_PRESETS[chosen.base];
+    const fresh = srsPrefValue(numbers, 'newPerDay');
+    const due = srsPrefValue(numbers, 'reviewsPerDay');
+    const means = el('p', 'settings-row-note srs-pace-means', (chosen.custom ? tx('カスタム：', 'Custom: ') : '') + (due === REVIEWS_PER_DAY_MAX
+      ? tx(`1日に新しい語 ${fresh}、期日の復習はすべて。`, `${fresh} new words a day and every review that is due.`)
+      : tx(`1日に新しい語 ${fresh}、復習は ${due} まで。`, `${fresh} new words and up to ${due} reviews a day.`)));
+    means.id = 'srs-pace-means';
+    main.append(choice, means);
+    return;
+  }
   const rows = el('div', 'srs-prefs');
   rows.id = 'srs-prefs';
   const state = srsPresetState();
@@ -14627,8 +14654,6 @@ function renderSrsPrefs(main, { open = false, presetsOnly = false } = {}) {
     ? tx(`いま — カスタム（${base.ja}から）`, places ? `Now: Custom (from ${base.en})` : `now — Custom (from ${base.en})`)
     : tx(`いま — ${base.ja}`, places ? `Now: ${base.en}` : `now — ${base.en}`);
   rows.append(now);
-  // Settings draws the presets alone; the hand-set numbers stay in Today → Decks
-  if (presetsOnly) { main.append(rows); return; }
   const stepper = (labelJa, labelEn, key) => {
     const value = srsPrefValue(S.srsPrefs, key);
     const row = el('div', 'srs-pref-row');
@@ -16657,7 +16682,7 @@ async function emptyRecordForAdoption(snapshot) {
   catch { return false; }
 }
 
-function renderPortRow(main) {
+function renderPortRow(main, { importNote = true } = {}) {
   const port = el('div', 'port-row');
   port.id = 'record-backup';
   const exp = biLabel('button', 'chip', '書き出す', 'Export a backup');
@@ -16872,7 +16897,8 @@ function renderPortRow(main) {
   });
   port.append(exp, imp, file);
   main.append(port, portNote);
-  main.append(el('p', 'teacher-note', tx('読み込む前に下書きを保存し、今の文を残す。消した下書きや回答を保存した後の欄は、空のままにする。',
+  // Settings' Backup row holds its line and the two buttons alone; the import keeps the drafts the same either way
+  if (importNote) main.append(el('p', 'teacher-note', tx('読み込む前に下書きを保存し、今の文を残す。消した下書きや回答を保存した後の欄は、空のままにする。',
     'Import saves your drafts first and keeps your current text. Drafts you cleared or submitted stay empty.')));
   const unavailable = el('section', 'teacher-unavailable-drafts'); unavailable.id = 'sentence-unavailable-drafts';
   renderUnavailableSentenceDrafts(unavailable); main.append(unavailable);
@@ -37164,7 +37190,7 @@ function renderSettings(main) {
   record.append(el('h2', 'eyebrow', tx('バックアップ', 'Backup')));
   const backup = el('div', 'settings-row settings-backup');
   backup.append(recordKeepLine());
-  renderPortRow(backup);
+  renderPortRow(backup, { importNote: false });
   record.append(backup);
   main.append(...[language, renderWritingChoice(), study, record, renderReportRelaySettings(), about].filter(Boolean));
 }

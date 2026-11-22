@@ -23,8 +23,8 @@ const ENGINE_CHECKS = Object.freeze([
   ' · My reports lists it as opened on GitHub',
   " · with no service set up, the sheet asked this host's /api/ nothing (open, save, send, list)",
   ' · no console errors (blocked window)',
-  ' · Settings refuses text that is not a setup link',
-  ' · pasting the setup link in Settings sets up this device',
+  ' · My reports refuses text that is not a setup link',
+  ' · pasting the setup link in My reports sets up this device',
   ' · a report from before setup whose first delivery fails stays listed, bound to the relay',
   ' · the report saved before setup is filed once GitHub answers',
   ' · with the relay set up, the sheet sends reports itself',
@@ -45,7 +45,7 @@ const ENGINE_CHECKS = Object.freeze([
   ' · an opened setup link changes nothing by itself: it leaves the address and waits in Settings, naming its host',
   ' · Set up is focused, one tap away',
   ' · Set up stores the opened link on the device, and the address stays clean',
-  ' · Settings says reports go to GitHub automatically, with no link waiting',
+  ' · My reports says reports go to GitHub automatically, and Settings holds no link waiting',
   ' · no console errors (setup link)',
 ]);
 const CHROMIUM_ONLY_CHECKS = Object.freeze([
