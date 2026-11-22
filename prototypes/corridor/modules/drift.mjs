@@ -1,5 +1,6 @@
 /** drift seam: split out of corridor.js (G3); now edited here directly. */
 import { D, DEPTH_NAMES, DRIFT_THEME_BY_WORLD, ISO_DAY, KAGAMI_BAND_NAMES, KAGAMI_CLEAR, KAGAMI_LEVELS, KAGAMI_MIN_SEEN, KAGAMI_OOV, LEADING_DROP_DAYS, LEARN_STAGE_DECKS, MONTHS_EN, NODE_KIND, PART_WRITTEN, ROOM_NAMES, S, TODAY_JA_WORD, TODAY_SKY_CAP, TODAY_SKY_WORD, allAssessmentEvidence, bi, commitStorePatch, depthIndexMemo, depthNodeCache, el, finiteNumber, go, installScaleBridge, isLeech, kanaReadingKey, metReadable, nonEmptyString, notYetReleased, openAssessmentQuestionReview, openPassage, openSentencePractice, owns, plainRecord, readFrameRows, readHelpReadable, recordWritable, render, savedAnswerFor, setJaWords, setOwnRecordValue, shelfDay, srsKey, todaySky, trayItemPending, tx, uiIcon, withEn, wordCardIdentity } from '../corridor.js';
+import { declineWrite, recordEpoch, sameItem } from '../corridor.js';
 import { dictionaryAnsweredForm, dictionaryEpoch, dictionaryRowsReadAs, lookup, partMeaning, readerTokenAt, readerTokenNode } from './dictionary.mjs';
 import { themeId } from './learner.mjs';
 import { articleReadChars, shelfDateLabel, shelfStories } from './library.mjs';
@@ -546,12 +547,13 @@ function landOnKeptWords() {
   row.focus({ preventScroll: true });
 }
 
-function trayLine(item, dueKeys) {
+function trayLine(item, dueKeys, captured) {
   const currentSurface = recordViewSurface();
   const line = el('div', 'tray-line');
   line.tabIndex = 0;
   line.setAttribute('role', 'button');
   const key = srsKey(item.t, item.id);
+  const same = sameItem(item);
   line.dataset.keptKey = key;
   line.append(el('span', 'w', item.label));
   // G2 · the saved word's dot, for the entry and reading it was saved as
@@ -568,11 +570,11 @@ function trayLine(item, dueKeys) {
   // provenance, not authority: the tutor made this row, and saying so is
   // what keeps its autonomy honest (operator's word, 2026-08-24)
   if (item.by === 'sensei') line.append(el('span', 'pool-tag', tx('先生', 'tutor-made')));
-  const when = el('span', 'when', srsWhen(item));
+  const when = el('span', 'when', srsWhen(captured || item));
   // red is for NOW — a whole column of red "due" was noise wearing urgency
   if (dueKeys.has(key)) when.classList.add('due-now');
   line.append(when);
-  if (!S.srs[key] && !finiteNumber(item.started) && !S.suspended[key]) {
+  if (captured && !S.srs[key] && !finiteNumber(captured.started) && !S.suspended[key]) {
     // a no-debt row (legacy or imported) wakes by hand: one quiet
     // affordance in the row itself, and only this press mints the card
     // into the review cycle — 始める is the explicit promotion
@@ -580,29 +582,34 @@ function trayLine(item, dueKeys) {
     start.type = 'button';
     start.dataset.srsStart = key;
     start.setAttribute('aria-label', tx(`「${item.label}」の復習を始める`, `start learning ${item.label}`));
-    start.disabled = trayItemPending.has(key) || !recordWritable();
+    const epoch = recordEpoch;
+    const { ts, entrySeq, cueReading } = captured;
+    start.disabled = trayItemPending.has(key) || !recordWritable(epoch);
     start.addEventListener('click', async (ev) => {
       ev.stopPropagation();
-      if (trayItemPending.has(key) || !recordWritable()) return;
-      // matched by identity ON THE DECK ROW: a named list carries copies,
-      // so the promotion must find the deck row by t/id, not by reference
+      if (trayItemPending.has(key) || !recordWritable(epoch)) return;
       const now = Date.now();
       trayItemPending.add(key);
       start.disabled = true;
       let saved;
       try {
-        saved = await commitStorePatch((latest) => ({
-          taken: latest.taken.map((row) => row.t === item.t && row.id === item.id && !finiteNumber(row.started)
-            ? { ...row, started: now } : row),
-        }));
+        saved = await commitStorePatch((latest) => {
+          const index = latest.taken.findIndex(same);
+          const row = latest.taken[index];
+          if (!recordWritable(epoch) || !row || row.ts !== ts || row.entrySeq !== entrySeq || row.cueReading !== cueReading ||
+              finiteNumber(row.started) || latest.srs[key] || latest.suspended[key]) throw declineWrite('start-card-changed');
+          const taken = latest.taken.slice();
+          taken[index] = { ...row, started: now };
+          return { taken };
+        });
       } finally {
         trayItemPending.delete(key);
-        start.disabled = !recordWritable();
+        start.disabled = !recordWritable(epoch);
       }
       if (saved && currentSurface()) render();
     });
     line.append(start);
-  } else {
+  } else if (captured) {
     // rest / wake — the card stays on the list, reviews skip it
     const rest = el('button', S.suspended[key] ? 'rest-toggle resting' : 'rest-toggle', S.suspended[key] ? '▶' : '');
     if (!S.suspended[key]) rest.append(uiIcon('pause', 'rest-icon'));
