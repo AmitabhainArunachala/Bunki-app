@@ -222,23 +222,29 @@ function place() {
   const bug = document.querySelector('#bunki-reports-root .br-rail')?.getBoundingClientRect();
   // where a screen keeps the report entry at its top (the writing room, the orbit bar, the study card) this button stands
   // to its left; where that spot covers the app's own text or a control (the study card's count, 試 over "1/15"), it
-  // steps left past it, its left edge less a small gap, at most three times
+  // steps left past it, its left edge less a small gap, at most three times. Where the third step still covers the app
+  // (an open chooser fills the top: the writing room's palette, where 試 stood on a stone and its first-open note's OK on
+  // another), it stands at the foot instead, until the top is clear again.
   if (bug && bug.height && bug.top < innerHeight / 2) {
-    rail.dataset.plAt = 'top';
     const size = opener.getBoundingClientRect().width || 44;
+    const spot = (right) => ({ left: innerWidth - right - size, top: Math.max(0, bug.top), width: size, height: size });
     let right = Math.max(4, innerWidth - bug.left + 4);
-    for (let step = 0; step < 3; step += 1) {
-      const hit = appUnder({ left: innerWidth - right - size, top: Math.max(0, bug.top), width: size, height: size });
-      if (!hit) break;
+    let hit = appUnder(spot(right));
+    for (let step = 0; step < 3 && hit; step += 1) {
       right = Math.min(innerWidth - size - 4, Math.max(right + 1, innerWidth - hit.left + 4));
+      hit = appUnder(spot(right));
     }
-    rail.style.setProperty('--pl-top', `${Math.round(Math.max(0, bug.top))}px`);
-    rail.style.setProperty('--pl-right', `${Math.round(right)}px`);
-    return;
+    if (!hit) {
+      rail.dataset.plAt = 'top';
+      rail.style.setProperty('--pl-top', `${Math.round(Math.max(0, bug.top))}px`);
+      rail.style.setProperty('--pl-right', `${Math.round(right)}px`);
+      return;
+    }
   }
   delete rail.dataset.plAt;
-  const base = bug && bug.height ? Math.max(8, innerHeight - bug.top + 6) : 64;
-  const right = bug && bug.height ? Math.max(4, innerWidth - bug.right) : 14;
+  const low = bug && bug.height && bug.top >= innerHeight / 2;
+  const base = low ? Math.max(8, innerHeight - bug.top + 6) : 64;
+  const right = low ? Math.max(4, innerWidth - bug.right) : 14;
   let bottom = base;
   for (let step = 0; step < 4; step += 1) {
     const x = innerWidth - right - 22, y = innerHeight - bottom - 22;
