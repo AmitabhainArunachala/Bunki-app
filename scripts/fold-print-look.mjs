@@ -12,11 +12,12 @@
  *   <design folder>/depth/kanji.css     a character's page (a stub since 2026-11-10, folded as it stands)
  *   <design folder>/depth/lead.css      the lead's trials
  *   <design folder>/depth/print.css     the print look
- *   <design folder>/depth/art/<plate>   every plate the four sheets or prototypes/corridor/print-look.mjs name
+ *   <design folder>/theme/integrity.css look-wide colour integrity across every room and study card
+ *   <design folder>/depth/art/<plate>   every plate the five sheets or prototypes/corridor/print-look.mjs name
  *   <design folder>/depth/version.txt   the design version, recorded in the folded sheet's head (may be absent)
  * WRITES:
- *   prototypes/corridor/depth.css       the four sheets in one, in the order the design layer attaches them (depth,
- *                                       kanji, lead, print), so the cascade is the preview's; blocks between
+ *   prototypes/corridor/depth.css       the five sheets in one, in the order the design layer attaches them (depth,
+ *                                       kanji, lead, print, integrity), so the cascade is the preview's; blocks between
  *                                       "@no-fold-start" and "@no-fold-end" are left out (live trials only)
  *   prototypes/corridor/print/<plate>   each named plate, byte for byte; any other file in that folder is removed
  * Every plate address of the design layer (/design/depth/art/<plate>, served only by the preview) becomes print/<plate>,
@@ -47,7 +48,13 @@ const CORRIDOR = join(REPO, 'prototypes/corridor');
 const OUT_SHEET = join(CORRIDOR, 'depth.css');
 const OUT_PLATES = join(CORRIDOR, 'print');
 const MODULE = join(CORRIDOR, 'print-look.mjs');
-const SHEETS = ['depth/depth.css', 'depth/kanji.css', 'depth/lead.css', 'depth/print.css'];
+const SHEETS = [
+  'depth/depth.css',
+  'depth/kanji.css',
+  'depth/lead.css',
+  'depth/print.css',
+  'theme/integrity.css',
+];
 const LIVE_ART = /\/design\/depth\/art\/([A-Za-z0-9_-]+\.webp)/g;
 const MODULE_ART = /plate\('([A-Za-z0-9_-]+\.webp)'\)/g;
 const SCOPE = "html[data-live-depth='1']";
@@ -111,7 +118,7 @@ const head = [
   "/* depth.css · the app's surfaces (ground, sheet, slip, well, the night windows) and its print look.",
   `   FOLDED FILE. Do not edit here. Folded by scripts/fold-print-look.mjs from the design folder ${tilde(DESIGN)}`,
   `   (design version ${version}), in the order the design layer attaches them, @no-fold blocks left out:`,
-  ...sources.map(({ name, bytes }) => `     ${name.padEnd(16)} sha256 ${sha(bytes).slice(0, 16)}`),
+  ...sources.map(({ name, bytes }) => `     ${name.padEnd(20)} sha256 ${sha(bytes).slice(0, 16)}`),
   '   Plates: the design layer names them under the preview server; here they are print/<plate>, beside this file.',
   `   Every rule is meant to be scoped under ${SCOPE}; index.html sets that attribute.`,
   "   The two values the print look reads from the page come from print-look.mjs (an article's pigments, the old",

@@ -341,7 +341,19 @@ let host = null;
 let lang = null;
 let dataUrl = null;
 let contextUrl = null;
+let starsUrl = null;
+let kanaUrl = null;
 let gaveBack = false;
+
+/** Which sky engine to load: Star Sky 6 (star6/) is the learner's default; a driven browser without ?skydir= keeps
+ * version 3 so existing checks meet the screen they were written for. ?skydir=sky|v3 or ?skydir=sky-star6|star6
+ * chooses either copy explicitly. */
+function engineChoice() {
+  const asked = (new URLSearchParams(location.search).get('skydir') || '').trim();
+  if (asked === 'sky' || asked === 'v3') return 'v3';
+  if (asked === 'sky-star6' || asked === 'star6') return 'star6';
+  return navigator.webdriver === true ? 'v3' : 'star6';
+}
 
 /** Renderers that draw in software: Chromium's SwiftShader, Mesa's llvmpipe, softpipe and lavapipe, Windows' basic
  * render driver. */
@@ -421,6 +433,8 @@ function start() {
     look: lookOf(),
     lang,
     dataUrl,
+    ...(starsUrl ? { starsUrl } : {}),
+    ...(kanaUrl ? { kanaUrl } : {}),
     contextUrl: contextUrl || undefined,
     front: ownWords(),
     paused: covered,
@@ -533,11 +547,14 @@ async function mountOnce() {
   const refused = drawingRefused();
   if (refused) return giveBack(new Error(refused));
   window.__bunkiSkyMount = 'app';
+  const engineKind = engineChoice();
+  const enginePrefix = engineKind === 'star6' ? 'star6/' : '';
+  status.engine = engineKind;
   settle('loading');
   try {
-    const engine = load('sky.js')
-      .then(() => load('sky-world.js'))
-      .then(() => load('sky-web.js'));
+    const engine = load(`${enginePrefix}sky.js`)
+      .then(() => load(`${enginePrefix}sky-world.js`))
+      .then(() => load(`${enginePrefix}sky-web.js`));
     const skyFile = json('../data/share_alike/sky.json');
     const blob = (value) =>
       URL.createObjectURL(new Blob([JSON.stringify(value)], { type: 'application/json' }));
@@ -560,6 +577,8 @@ async function mountOnce() {
       context,
     ]);
     dataUrl = blob(joinSkyData(sky, sem));
+    starsUrl = engineKind === 'star6' ? here('star6/sky-stars.json') : null;
+    kanaUrl = engineKind === 'star6' ? here('star6/sky-kana.json') : null;
     contextUrl = ctx;
     start();
     if (!gaveBack) watch();

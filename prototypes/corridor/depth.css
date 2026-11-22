@@ -1,10 +1,11 @@
 /* depth.css · the app's surfaces (ground, sheet, slip, well, the night windows) and its print look.
    FOLDED FILE. Do not edit here. Folded by scripts/fold-print-look.mjs from the design folder ~/.dharma/bunki/PROGRAM/design
    (design version 1794452842), in the order the design layer attaches them, @no-fold blocks left out:
-     depth/depth.css  sha256 e2810e69e4cdb4a5
-     depth/kanji.css  sha256 4eb33ea6acec3986
-     depth/lead.css   sha256 8bf7bb856273f6a2
-     depth/print.css  sha256 3b3dcc88263ce333
+     depth/depth.css      sha256 e2810e69e4cdb4a5
+     depth/kanji.css      sha256 4eb33ea6acec3986
+     depth/lead.css       sha256 8bf7bb856273f6a2
+     depth/print.css      sha256 3b3dcc88263ce333
+     theme/integrity.css  sha256 5f12c3dcf94df751
    Plates: the design layer names them under the preview server; here they are print/<plate>, beside this file.
    Every rule is meant to be scoped under html[data-live-depth='1']; index.html sets that attribute.
    The two values the print look reads from the page come from print-look.mjs (an article's pigments, the old
@@ -2219,3 +2220,903 @@ html[data-live-depth='1']:not(#\#) .dictionary-sense-body > ul.dictionary-glosse
   content: '; ';
   color: color-mix(in oklab, currentColor 58%, transparent);
 }
+
+/* ==== theme/integrity.css ==== */
+
+/* integrity.css · every room in the chosen look (2026-11-13).
+   Loaded last of the design layer's sheets (live.js FILES, after depth/print.css). Every rule is scoped under
+   html[data-live-depth='1'], like the others, so the 深 switch takes it off with the rest.
+
+   Colours only: nothing here moves, hides or resizes anything; no type; no element ids.
+   Every value is a token of the chosen look, or a mix of two of them made here. No colour is written out for one look,
+   except where a section says so and why (14: the marks with a meaning, computed per look; 26: a picture drawn in code).
+
+   REPAIR (colour round of 2026-11-14, step "repair", 2026-11-15, after the fresh checker): section 22 is rewritten (the
+   report panel over the first screen takes the colours the same panel has in a room; the system's grey and blue
+   buttons there are gone), and the chosen JLPT level card at night takes its level's deep form (section 14c).
+
+   KEYS AND STRAYS (colour round of 2026-11-14, the step after the study card): sections 14 to 26 are new. The marks
+   with a meaning re-tuned per look (14); 赤's one dark (15); the level control on the first screen (16); Learn's card
+   at night (17); the sheets of understanding (18); the read-along highlight (19); veils and shadows (20); the idiom
+   chip's own character (21); the prototype's buttons (22); the city under the first screen in 浪 and 殻 (23); 金's gold
+   leaf (24); Orbit's frame (25); the glass in the bookshelf's search field (26). Colours only, as everywhere here.
+
+   THE STUDY CARD (colour round of 2026-11-14, his words: "need colors fixed and coordianted end to end"): the study
+   card, its deck page and a review now take the chosen look's colours too. Rounds one and two left their room
+   (data-room="deckplay") and a review in progress (body.zen) out; sections 1, 2, 6, 8 and 11 now reach them, and
+   section 13 is new. Their layout, type, sizes, order and scheduling are not touched: colours only.
+
+   The map this follows: design/theme/LOOKS.md (F-01 to F-24) and the three audits in design/shots/theme-20261113/.
+
+   ROUND TWO (2026-11-14), after the checker's walk in eleven looks: section 5 is rewritten (the Tutor stands on the
+   look's own paper in the day looks), and sections 10 to 12 are new (the gate's menu, the live mark, the idiom
+   chips). One thing in round two is more than a colour, and says so where it stands: the Tutor's sheet takes the
+   washi and the contact shadow every other room's sheet has (section 5). */
+
+/* =====================================================================================
+   1 · the look's second colour (F-02, F-05, F-06, F-07, F-10; A1-06 to A1-20; A2-10 to A2-14, A2-24)
+   The app's "go here" colour is one token, --ai (read as --color-accent and --tint by about 330 declarations: filled
+   buttons, links, rings, every hairline). In 墨 朱 柿 板 it was a navy (#2e4d6e, #2c3d5c, #1e4569): the blue of 藍,
+   standing in four looks that have no blue.
+   The app already names each look's own key pigment, the block its sky is printed from (--tone-key, editorial.css
+   5467 to 5477): sumi itself in 墨, the vermilion in 朱, the umber in 柿, the key block's sumi line in 板. In the
+   other seven looks that key and the accent are one colour. Here the accent takes the key in these four too.
+   ===================================================================================== */
+html[data-live-depth='1']:is([data-theme='sumi'], [data-theme='iwa'], [data-theme='keyblock']) {
+  --it-key: var(--ink);
+  --it-key-wash: color-mix(in srgb, var(--ink) 8%, transparent);
+  /* what a dark window lifts toward at its foot: the look's second ink */
+  --it-lift: var(--ink-2);
+}
+html[data-live-depth='1'][data-theme='shu'] {
+  --it-key: var(--red);
+  --it-key-wash: var(--red-wash);
+  /* 朱 over black, as on Negoro lacquer: the window's foot warms toward the vermilion */
+  --it-lift: var(--red);
+}
+/* 金 (A2-06): the same word's page had gold marks when opened from the first screen and light blue marks (#9db8e6,
+   written out for this look in editorial.css 4420) when opened from a room. The look's own token is the gold. */
+html[data-live-depth='1'][data-theme='yoru'] {
+  --it-key: var(--ai);
+  --it-key-wash: var(--ai-wash);
+}
+/* where the app makes its working colours: a room's body, a page over the first screen, the tabs there.
+   (柿 and 板 set the accent again on the page: editorial.css 4424, depth.css 104. This outranks both.)
+   (colour round 2026-11-14) now also the study card's room and a review in progress: the deck's Begin, Word list and
+   Settings, the deck settings' chosen buttons, "Continue with this card", the review's "show answer", its closing
+   buttons and "Report a problem" under it were the navy (or 金's light blue) there. */
+html[data-live-depth='1']:is([data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='keyblock'], [data-theme='yoru']) :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs)) {
+  --color-accent: var(--it-key);
+  --color-accent-wash: var(--it-key-wash);
+}
+/* the first screen itself reads the raw token (the ring round the seal, the gate's menu) */
+html[data-live-depth='1']:is([data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='keyblock']) body[data-view='drift'] {
+  --ai: var(--it-key);
+  --ai-wash: var(--it-key-wash);
+}
+
+/* the study card's room: the card is left alone, but the line under the five tabs there is the app's, not the
+   card's, and follows the look as in every other room (the tabs read these few tokens and no others of the accent) */
+html[data-live-depth='1']:is([data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='keyblock'])[data-room='deckplay'] body:not(.zen) #primary-tabs {
+  --color-accent: var(--it-key);
+  --color-accent-wash: var(--it-key-wash);
+  --color-rule: color-mix(in srgb, var(--it-key) 42%, transparent);
+  --color-rule-soft: color-mix(in srgb, var(--it-key) 13%, transparent);
+  --color-fill: color-mix(in srgb, var(--it-key) 6%, transparent);
+  --color-fill-strong: color-mix(in srgb, var(--it-key) 11%, transparent);
+  --ai: var(--it-key);
+  --tint: var(--it-key);
+}
+
+/* =====================================================================================
+   2 · the dark windows inside day pages (F-03, F-04, F-09; A1-02 to A1-04, A1-07, A1-08, A1-10; A2-07 to A2-09, A2-23)
+   Today's band of words, Me's N1 panel, the word web, the head of the slip, the kanji tiles, the glow on Learn's
+   stage. Their tones were the ink mixed with the navy. In these four looks they are now the look's one dark, the
+   deep ink the head of a word's page is already printed in (--head-ink, print.css 827 to 832), so a look has one
+   dark and not two. The light in them is the look's own night light (--zen-accent, --zen-text: the tokens of its
+   review stage).
+   ===================================================================================== */
+html[data-live-depth='1']:is([data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='keyblock']) :is(body:not([data-view='drift']):not(.zen), body[data-view='drift'] #sheet) {
+  --dp-night: var(--head-ink);
+  --dp-night-mid: color-mix(in oklab, var(--head-ink) 86%, var(--it-lift));
+  --dp-night-foot: color-mix(in oklab, var(--head-ink) 70%, var(--it-lift));
+  --dp-night-glow: color-mix(in oklab, var(--zen-accent) 58%, var(--head-ink));
+  --dp-night-read: color-mix(in oklab, var(--zen-accent) 50%, var(--zen-text));
+  --dp-shade: color-mix(in oklab, var(--ink) 84%, var(--head-ink));
+}
+
+/* =====================================================================================
+   3 · the Save chooser over the first screen (A2-04, A2-05, A2-29, A3-03)
+   The drawer hangs on the page's body. Over the first screen the look's working colours are set only inside the
+   opened page, so the drawer fell back to one spare cream (#f5efe0) under the look's own light ink: 1.03 to 1.09
+   to 1 in the night looks. It takes the same working colours a room gives it.
+   ===================================================================================== */
+html[data-live-depth='1'] body[data-view='drift'] > :is(.vocabulary-list-popover, .vocabulary-list-dialog) {
+  --color-ground: var(--world-ground);
+  --color-ground-2: var(--world-ground-2);
+  --color-paper: var(--world-paper);
+  --color-page: var(--world-ground);
+  --color-surface: color-mix(in srgb, var(--world-paper) 55%, #fffdf8);
+  --color-surface-sunk: color-mix(in srgb, var(--world-ground) 70%, var(--world-ink) 4%);
+  --color-ink: var(--world-ink);
+  --color-ink-2: color-mix(in srgb, var(--world-ink) 82%, var(--world-paper));
+  --color-label-2: color-mix(in srgb, var(--world-ink) 74%, var(--world-paper));
+  --color-muted: color-mix(in srgb, var(--world-ink) 74%, var(--world-paper));
+  --color-quiet: color-mix(in srgb, var(--world-ink) 70%, var(--world-paper));
+  --color-accent: var(--it-key, var(--world-accent));
+  --color-accent-wash: var(--it-key-wash, var(--world-accent-wash));
+  --color-signal: var(--world-signal);
+  --color-line: color-mix(in srgb, var(--world-ink) 16%, transparent);
+  --color-line-soft: color-mix(in srgb, var(--world-ink) 8%, transparent);
+  --color-edge-strong: color-mix(in srgb, var(--world-ink) 34%, transparent);
+  --color-rule: color-mix(in srgb, var(--color-accent) 42%, transparent);
+  --color-rule-soft: color-mix(in srgb, var(--color-accent) 13%, transparent);
+  --color-fill: color-mix(in srgb, var(--color-accent) 6%, transparent);
+  --color-fill-strong: color-mix(in srgb, var(--color-accent) 11%, transparent);
+  --color-glow: color-mix(in srgb, var(--color-accent) 42%, transparent);
+  --text: var(--world-ink);
+  --text-2: color-mix(in srgb, var(--world-ink) 74%, var(--world-paper));
+  --ed-ink: var(--world-ink);
+  --ed-paper: var(--world-paper);
+  --ed-muted: color-mix(in srgb, var(--world-ink) 74%, var(--world-paper));
+  --ed-rule: color-mix(in srgb, var(--world-ink) 16%, transparent);
+  --mini-rule: color-mix(in srgb, var(--world-ink) 16%, transparent);
+  color: var(--world-ink);
+}
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body[data-view='drift'] > :is(.vocabulary-list-popover, .vocabulary-list-dialog) {
+  --color-surface: var(--world-paper);
+  --color-surface-sunk: color-mix(in srgb, var(--world-ground) 70%, #000);
+  --color-ink-2: color-mix(in srgb, var(--world-ink) 84%, var(--world-ground));
+  --color-label-2: color-mix(in srgb, var(--world-ink) 78%, var(--world-ground));
+  --color-muted: color-mix(in srgb, var(--world-ink) 74%, var(--world-ground));
+  --color-quiet: color-mix(in srgb, var(--world-ink) 68%, var(--world-ground));
+  --color-fill: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  --color-fill-strong: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  --text-2: color-mix(in srgb, var(--world-ink) 78%, var(--world-ground));
+  --ed-muted: color-mix(in srgb, var(--world-ink) 74%, var(--world-ground));
+}
+
+/* =====================================================================================
+   4 · the gate in a page's own bar (F-11, A2-18, A2-22, A3-06)
+   No rule painted it, so the browser drew its own button: a grey tile by day, a dark one at night. It is cleared as
+   the same gate in a room's bar is (editorial.css 105 to 128). Its box stays 44 by 44 where it was.
+   ===================================================================================== */
+html[data-live-depth='1'] body:not(.zen) #sheet > .sheet-bar > button.bar-gate {
+  border: 0;
+  background: transparent;
+}
+
+/* =====================================================================================
+   5 · the Tutor (F-08; rewritten in round two after the checker's finding 3)
+   The app builds the Tutor from one fixed set, --sheet-* (register.css 459 to 535): a black lacquer room in every
+   look. Round one gave each look its own night there. That left a near-black room in the six day looks with no
+   seal pressed: to the eye the app had gone to a night look.
+   Now: in the DAY looks the Tutor stands on the look's own paper with the look's own ink, on the same ground and the
+   same sheet as every other room. In the NIGHT looks it stands on the look's own night (the tones of its review
+   stage, --zen-*: "each world's dojo is that world's own pigments deepened to night", corridor.css 1898), as in
+   round one.
+   ===================================================================================== */
+/* night looks: the look's own night */
+html[data-live-depth='1'][data-register='tutor']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) {
+  --sheet-ground: var(--zen-stage);
+  --sheet-ground-2: var(--zen-stage-crown);
+  --sheet-ground-0: color-mix(in oklab, var(--zen-stage-crown) 90%, var(--zen-text));
+  --sheet-ink: var(--zen-text);
+  --sheet-ink-2: color-mix(in oklab, var(--zen-text) 80%, var(--zen-stage));
+  --sheet-faint: color-mix(in srgb, var(--zen-text) 70%, transparent);
+  --sheet-faint-2: color-mix(in srgb, var(--zen-text) 56%, transparent);
+  --sheet-line: color-mix(in srgb, var(--zen-text) 20%, transparent);
+  --sheet-line-soft: color-mix(in srgb, var(--zen-text) 10%, transparent);
+  --sheet-ai: var(--zen-accent);
+  --sheet-ai-wash: color-mix(in srgb, var(--zen-accent) 14%, transparent);
+  --sheet-red: var(--zen-red);
+  --sheet-red-wash: color-mix(in srgb, var(--zen-red) 14%, transparent);
+}
+/* night looks, found on the way: the buttons on the washi card of the sentence under discussion took the room's
+   light ink (tighten.css, the app's own rule for every chip) on the card's cream: 1.03 to 1, with nothing switched
+   on too. They take the card's own ink. Seen on a stand-in card only: an empty record has no sentence to discuss. */
+html[data-live-depth='1'][data-register='tutor']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):not(#\#) #app main .teacher-context .chip {
+  /* :not(#\#) only lifts this rule over the app's own, which is written with the same lift (tighten.css 54) */
+  color: var(--card-ink);
+  border-color: var(--card-line);
+}
+/* one that cannot be pressed yet still says what it would do (register.css 524): the card's second ink. Three lifts,
+   because the design layer's own rule for such buttons carries three (depth.css 728). */
+html[data-live-depth='1'][data-register='tutor']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):not(#\#):not(#\#):not(#\#) #app main .teacher-context .chip:disabled {
+  color: var(--card-ink-2);
+}
+/* day looks: the look's own paper and ink. The fixed set is pointed at the look's raw tokens; the two quiet inks are
+   the look's ink thinned with its paper (the raw --faint is the ink at 42%: 2.7 to 1, too thin for a line he reads). */
+html[data-live-depth='1'][data-register='tutor']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'], [data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='akafuji'], [data-theme='keyblock']) {
+  --sheet-ground: var(--ground-0);
+  --sheet-ground-2: var(--ground-2);
+  --sheet-ground-0: var(--ground-0);
+  --sheet-ink: var(--ink);
+  --sheet-ink-2: var(--ink-2);
+  --sheet-faint: color-mix(in oklab, var(--ink) 78%, var(--ground-0));
+  --sheet-faint-2: color-mix(in oklab, var(--ink) 66%, var(--ground-0));
+  --sheet-line: color-mix(in srgb, var(--ink) 22%, transparent);
+  --sheet-line-soft: color-mix(in srgb, var(--ink) 10%, transparent);
+  --sheet-ai: var(--it-key, var(--ai));
+  --sheet-ai-wash: var(--it-key-wash, var(--ai-wash));
+  --sheet-red: var(--red);
+  --sheet-red-wash: var(--red-wash);
+  /* the app paints <html> in the lacquer here (register.css 459), which hides the look's printed sky behind the room.
+     With no ground of its own on <html>, the page's ground is the look's, as in every other room. */
+  background-color: transparent;
+}
+/* the sheet is the sheet of every room: washi, one hairline, one contact shadow (print.css 102 to 110, which names
+   four rooms and not this one). MORE THAN A COLOUR: a paper texture and a shadow, nothing moved or resized. */
+html[data-live-depth='1'][data-register='tutor']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'], [data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='akafuji'], [data-theme='keyblock']) body:not(.zen):not([data-view='drift']) #app > main {
+  background: url('print/washi-soft.webp') 0 0 / 3000px auto, var(--dp-sheet, var(--ground-0));
+  background-blend-mode: multiply;
+}
+@media (min-width: 521px) {
+  html[data-live-depth='1'][data-register='tutor']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'], [data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='akafuji'], [data-theme='keyblock']) body:not(.zen):not([data-view='drift']) #app > main {
+    border-color: transparent;
+    box-shadow: var(--dp-shadow-sheet);
+  }
+}
+/* the tutor's answers and the sentence under discussion were washi cards from one fixed set (--card-*: one cream,
+   one ink, a navy) under a black shadow made for the lacquer. In the day looks they are slips of the look's own
+   paper in the look's own ink; the shadow keeps its shape and takes the look's ink. */
+html[data-live-depth='1'][data-register='tutor']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'], [data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='akafuji'], [data-theme='keyblock']) :is(.teacher-context, .chat-row.tutor, .chat-row[data-role='assistant'], .chat-row.teacher) {
+  background: var(--dp-slip, var(--sheet-ground-0));
+  color: var(--sheet-ink);
+  --ink: var(--sheet-ink); --ink-2: var(--sheet-ink-2); --faint: var(--sheet-faint); --faint-2: var(--sheet-faint-2);
+  --line: var(--sheet-line); --line-soft: var(--sheet-line-soft); --red: var(--sheet-red); --red-wash: var(--sheet-red-wash);
+  --ai: var(--sheet-ai); --ai-wash: var(--sheet-ai-wash); --ground-0: var(--sheet-ground-0); --ground-2: var(--sheet-ground-2);
+}
+html[data-live-depth='1'][data-register='tutor']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'], [data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='akafuji'], [data-theme='keyblock']) .teacher-context {
+  box-shadow: 0 0 0 0.5px color-mix(in oklab, var(--sheet-ink) 20%, transparent), 0 14px 34px -20px color-mix(in oklab, var(--sheet-ink) 55%, transparent);
+}
+html[data-live-depth='1'][data-register='tutor']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'], [data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='akafuji'], [data-theme='keyblock']) :is(.chat-row.tutor, .chat-row[data-role='assistant'], .chat-row.teacher) {
+  box-shadow: 0 0 0 0.5px color-mix(in oklab, var(--sheet-ink) 20%, transparent), 0 10px 30px -18px color-mix(in oklab, var(--sheet-ink) 50%, transparent);
+}
+html[data-live-depth='1'][data-register='tutor']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'], [data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='akafuji'], [data-theme='keyblock']) .teacher-context .chip {
+  border-color: var(--sheet-line);
+  color: var(--sheet-ink);
+}
+html[data-live-depth='1'][data-register='tutor']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'], [data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='akafuji'], [data-theme='keyblock']) #app main .teacher-context :is(.teacher-note, label),
+html[data-live-depth='1'][data-register='tutor']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'], [data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='akafuji'], [data-theme='keyblock']) #app main .teacher-context .chip:disabled {
+  color: var(--sheet-ink-2);
+  border-color: var(--sheet-line);
+}
+
+/* =====================================================================================
+   6 · gold in 浪 and 殻 (F-14, A3-09)
+   One gold (#e2bd6c, and the house gold #d9b25f) stood in all five night looks: the ring on a chosen button, the
+   corner light of a page, the band under a kanji's head, the slip's edge. It is at home in 漆 金 雷, whose own night
+   light is a gold. In 浪 and 殻 the look's own night light is the pale sea blue and the phosphor: the gold takes
+   that there (--zen-accent, the same token that is a gold in the other three).
+   ===================================================================================== */
+html[data-live-depth='1']:is([data-theme='nami'], [data-theme='kaku']) :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs)) {
+  --gold: var(--zen-accent);
+  --color-gold: var(--zen-accent);
+  --color-gold-wash: color-mix(in srgb, var(--zen-accent) 14%, transparent);
+}
+
+/* =====================================================================================
+   7 · the level control on the first screen, at night (F-18, A3-11)
+   The old first screen has five palettes for eleven looks; its level handle, which stays on top of the sky, was one
+   blue (#4c6cb3) in all five night looks. It takes the look's own light.
+   ===================================================================================== */
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #drift-layer #lvlHandle,
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #drift-layer #lvl.hot #lvlTrack {
+  background: var(--ai);
+}
+
+/* =====================================================================================
+   8 · the cool blue-black under buttons and behind panels (F-21)
+   The edge under a filled button, the veil behind a panel from the foot and the veil behind the Save chooser's
+   dialog were mixed with one blue-black (#0b0f18, rgb(20 26 40), rgb(12 16 26), rgba(9, 18, 27)), cool in the warm
+   looks. They take the look's own deepest coat (--zen-stage-deep).
+   ===================================================================================== */
+html[data-live-depth='1'] :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs)) {
+  --color-press: color-mix(in srgb, var(--color-accent) 55%, var(--zen-stage-deep));
+  --elevation-press: 0 2px 0 var(--color-press), 0 8px 18px -6px color-mix(in srgb, var(--zen-stage-deep) 30%, transparent);
+}
+html[data-live-depth='1']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'], [data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='akafuji'], [data-theme='keyblock']) :is(body:not([data-view='drift']), body[data-view='drift'] :is(#sheet, #primary-tabs)) {
+  --color-scrim: color-mix(in srgb, var(--zen-stage-deep) 30%, transparent);
+}
+html[data-live-depth='1'] .vocabulary-list-dialog::backdrop {
+  background: color-mix(in srgb, var(--zen-stage-deep, #09121b) 58%, transparent);
+}
+
+/* =====================================================================================
+   9 · a link the browser painted (F-19)
+   The sources under a JLPT practice paper had no colour of their own: the browser's blue by day, its violet at night.
+   ===================================================================================== */
+html[data-live-depth='1'] .exam-sources a {
+  color: var(--color-accent, var(--ai));
+}
+
+/* =====================================================================================
+   10 · the gate's menu (round two; the checker's finding 4)
+   The menu behind the small gate in the middle of every bar. Over the first screen, and over a page opened from
+   the first screen, nothing gave it the working colours a room gives it, so it fell back to two fixed glasses: a
+   cool white (rgb(250 250 248 / 96%), editorial.css 5179) in all six day looks and a blue-black (#10141f at 80%,
+   corridor.css 694) with gold names in all five night looks. Its small parts were one grey (rgb(60 60 67)) by day
+   and white veils at night in every look and every place, rooms included.
+   Now it is one menu wherever it opens: every part is taken from the look's own raw tokens (the same ones in every
+   place), so it is the same paper, the same ink and the same accent over the first screen, over a page and in a
+   room. At night the paper is the look's raised night paper at 96%: the app's 80% let the sky's words and the
+   page's lines show through the rows.
+   ===================================================================================== */
+html[data-live-depth='1'] body:not(.zen) .nav-bar {
+  --gm-paper: var(--world-paper);
+  --gm-ink: var(--world-ink);
+  --gm-accent: var(--it-key, var(--world-accent));
+  --gm-red: var(--world-signal);
+  --gm-quiet: color-mix(in srgb, var(--world-ink) 78%, var(--world-paper));
+  background: var(--gm-paper);
+  border-color: color-mix(in srgb, var(--gm-ink) 17%, transparent);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--gm-ink) 8%, transparent), 0 18px 44px color-mix(in srgb, var(--gm-ink) 18%, transparent);
+}
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not(.zen) .nav-bar {
+  background: color-mix(in srgb, var(--gm-paper) 96%, transparent);
+  border-color: color-mix(in srgb, var(--gm-ink) 20%, transparent);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--zen-stage-deep, #000) 40%, transparent), 0 18px 44px color-mix(in srgb, var(--zen-stage-deep, #000) 55%, transparent);
+}
+/* the rows: names in the accent, the place he is in in the ink, small lines in the quiet ink, hairlines in the ink */
+html[data-live-depth='1'] body:not(.zen) .nav-bar .nav-station { color: var(--gm-ink); border-top-color: color-mix(in srgb, var(--gm-ink) 14%, transparent); }
+html[data-live-depth='1'] body:not(.zen) .nav-bar .nav-station:hover { background: color-mix(in srgb, var(--gm-accent) 8%, transparent); }
+html[data-live-depth='1'] body:not(.zen) .nav-bar :is(.nav-station-t, .nav-arrow) { color: var(--gm-accent); }
+html[data-live-depth='1'] body:not(.zen) .nav-bar .nav-station[aria-current='page'] .nav-station-t { color: var(--gm-ink); }
+html[data-live-depth='1'] body:not(.zen) .nav-bar .nav-station[aria-current='page'] .nav-station-t::before { background: var(--gm-red); }
+html[data-live-depth='1'] body:not(.zen) .nav-bar :is(.nav-station-sub, .nav-station-v) { color: var(--gm-quiet); }
+html[data-live-depth='1'] body:not(.zen) .nav-bar .nav-station-go { border-color: color-mix(in srgb, var(--gm-ink) 60%, transparent); }
+html[data-live-depth='1'] body:not(.zen) .nav-bar .nav-more { border-top-color: color-mix(in srgb, var(--gm-ink) 28%, transparent); }
+html[data-live-depth='1'] body:not(.zen) .nav-bar .nav-station > .theme-seal { color: var(--gm-red); border-color: color-mix(in srgb, var(--gm-red) 70%, transparent); }
+html[data-live-depth='1'] body:not(.zen) .nav-bar .nav-arrow:disabled { color: color-mix(in srgb, var(--gm-ink) 30%, transparent); }
+html[data-live-depth='1'] body:not(.zen) .nav-bar .nav-arrow:hover:not(:disabled) { background: color-mix(in srgb, var(--gm-ink) 8%, transparent); }
+/* the look-up field at its head */
+html[data-live-depth='1'] body:not(.zen) .nav-bar .nav-search-field svg { color: color-mix(in srgb, var(--gm-ink) 62%, transparent); }
+html[data-live-depth='1'] body:not(.zen) .nav-bar .nav-search-door { color: var(--gm-ink); background: color-mix(in srgb, var(--gm-ink) 8%, transparent); }
+html[data-live-depth='1'] body:not(.zen) .nav-bar .nav-search-door::placeholder { color: var(--gm-quiet); }
+html[data-live-depth='1'] body:not(.zen) .nav-bar .nav-search-door:focus { background: color-mix(in srgb, var(--gm-paper) 55%, #fffdf8); box-shadow: 0 0 0 2px var(--gm-accent); }
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not(.zen) .nav-bar .nav-search-door:focus { background: color-mix(in srgb, var(--gm-ink) 14%, transparent); }
+/* Review's count of due cards: white on the look's red, which at night is a light red (white on it reads under
+   3 to 1). At night the figure takes the look's ground. Tried on a stand-in figure only: an empty record has no
+   count to show. */
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body:not(.zen) .nav-bar .nav-count { background: var(--gm-red); color: var(--world-ground); }
+/* behind the menu the page steps back under a veil of the look's own ground (corridor.css 439). Over a page opened
+   from the first screen the veil had no colour to take; it takes the look's ground there as in a room. Over the
+   first screen itself there is still no veil: the look's paper laid over the night sky would fog it. */
+html[data-live-depth='1'] body[data-view='drift']:not(.zen) #gate-menu { --color-ground: var(--world-ground); }
+
+/* =====================================================================================
+   11 · the live mark (round two; F-16, the checker's finding 6)
+   One teal stood in every look (#0b6f78 by day, #5df2d6 at night; editorial.css 4346 and 4403): the frame and the
+   number of today in Me, the ticks round the centre of the word web, the progress of the listening bar, and 30
+   more places that read the same token. Each look now has its own live colour, in two forms:
+     on paper (the six day looks)                     the look's own red, the colour its seal is cut in
+     on a dark ground (a dark window in a day page;   the look's own night light (--zen-accent), the same light
+     every room of 漆 金 浪 雷)                         section 2 already gives the dark windows
+     殻                                               its own phosphor, as the app already says for its rooms
+                                                      (editorial.css 4431), now also on a page over the first screen
+   ===================================================================================== */
+html[data-live-depth='1']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'], [data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='akafuji'], [data-theme='keyblock']) :is(body:not([data-view='drift']):not(.zen), body[data-view='drift'] :is(#sheet, #primary-tabs)) {
+  --color-live: var(--color-signal);
+  --color-live-wash: color-mix(in srgb, var(--color-signal) 12%, transparent);
+  --color-live-glow: color-mix(in srgb, var(--color-signal) 0%, transparent);
+}
+/* the dark windows inside a day page (the word web's plate, the head of an article, Today's band, the N1 panel, the
+   slip's head): red on them read 1.5 to 2.2 to 1 */
+html[data-live-depth='1']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'], [data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='akafuji'], [data-theme='keyblock']) body:not(.zen) :is(.ww-plate, #app > main > .reader-hero + .reader-card, .today-sky, .me-n1, .mini-head) {
+  --color-live: var(--zen-accent);
+  --color-live-wash: color-mix(in srgb, var(--zen-accent) 13%, transparent);
+  --color-live-glow: color-mix(in srgb, var(--zen-accent) 45%, transparent);
+}
+/* found on the way, in the six day looks: the small ticks round the centre of the word web were drawn in the page's
+   dark ink at 42% on the dark plate the design layer gives the web (words.css 111; lead.css 271 re-inks their group,
+   not the ticks themselves): 1.2 to 1.5 to 1, not to be seen. At night the app draws them in the live colour at 60%
+   (words.css 116). On the dark plate they are drawn the same way by day. */
+html[data-live-depth='1']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'], [data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='akafuji'], [data-theme='keyblock']) body:not(.zen) .ww-plate .ww-ticks path {
+  stroke: var(--color-live);
+  opacity: 0.6;
+}
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu']) :is(body:not([data-view='drift']):not(.zen), body[data-view='drift'] :is(#sheet, #primary-tabs)) {
+  --color-live: var(--zen-accent);
+  --color-live-wash: color-mix(in srgb, var(--zen-accent) 13%, transparent);
+  --color-live-glow: color-mix(in srgb, var(--zen-accent) 45%, transparent);
+}
+html[data-live-depth='1'][data-theme='kaku'] :is(body:not([data-view='drift']):not(.zen), body[data-view='drift'] :is(#sheet, #primary-tabs)) {
+  --color-live: var(--color-accent);
+  --color-live-wash: color-mix(in srgb, var(--color-accent) 13%, transparent);
+  --color-live-glow: color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+
+/* =====================================================================================
+   12 · the idiom chips on a kanji's page (round two; the checker's finding 7)
+   Violet in every look, written out in the app (editorial.css 4187: lettering #5a3c69 on #6a4a7a at 11%). They take
+   what the radical chip beside them already has: the look's own fill and the look's own ink. Only the two colours
+   are set, so the slip of paper the design layer lays under every tile (depth.css 654) stays.
+   ===================================================================================== */
+html[data-live-depth='1'] :is(body:not([data-view='drift']):not(.zen), body[data-view='drift'] #sheet) .chip.t-idiom {
+  background-color: var(--color-fill);
+  color: var(--color-ink);
+}
+
+
+/* =====================================================================================
+   (lead, 2026-11-14, the checker's finding 12) 板 over the star sky: the search glass
+   The star sky in 板 is the block's black. The glass kept the look's dark ink at 72%
+   (print.css 193 gives it the light ink only while live.js is inking the old first
+   screen's words, which it does not do in 板), so it could not be seen. Here it takes
+   the print's white, as it does over the sky in the five other day looks.
+   ===================================================================================== */
+html[data-live-depth='1'][data-bunki-sky='1'][data-theme='keyblock']:not(#\#) body[data-view='drift'] #ginga-search { color: var(--print-white, #fdf9ee); opacity: 1; }
+
+/* =====================================================================================
+   13 · the study card, its deck page and a review (colour round 2026-11-14)
+   His words: "need colors fixed and coordianted end to end". The deck's room (data-room="deckplay": its front page,
+   its word list and settings, the card's two sides, the end of a sitting) and a review in progress (body.zen) take
+   the chosen look like every other room. Sections 1, 2, 6, 8 and 11 now reach them (the navy Begin, Word list,
+   Settings, chosen buttons and "Continue with this card"; the review's "show answer", its closing buttons and
+   "Report a problem"; 金's light blue there; the gold of 浪 and 殻; the press edges). This section adds what those
+   tokens do not reach. Colours only; nothing is moved, hidden or resized, and the type is not touched.
+   What stays, on purpose:
+     the stage of a sitting and of a review is the look's own night in every look (the app's lacquer, --color-lacquer,
+       "the world's own ink deepened", and the dojo's --zen-*, "each world's own pigments deepened to night"): it is
+       the look's own pigment, and the room's design. The cards on it are the look's paper and ink by day and the
+       look's night and light at night, as the study card already was.
+     the four grades (Again, Hard, Good, Easy), the card states and the review's counts: keys with a meaning, left to
+       the next step (listed in COLOUR-END-TO-END.md).
+   ===================================================================================== */
+/* 13a · the review card. The app prints it from one fixed set in every look, --card-* (corridor.css 1884: "warm washi
+   (墨・楮紙) on every desk, in every world"): 墨's paper #faf6ea, 墨's ink #211e17 and 墨's red #a02a1e, and a navy
+   #2e4d6e, so a review in 朱 had 墨's readings, and at night a cream card stood in every night look while the study
+   card was the look's own night. Now the review card is the study card's own paper (the deck's --kp-panel, the
+   look's --color-surface) with the look's ink, second ink, red and key: by day paper and ink, at night the look's
+   night paper and its light ink. Only inside a review: the Tutor's cards read the same set and keep section 5.
+   The app hands the set on twice (editorial.css 3849 to 3861 as --color-card-*, and 3992 to 4004 back as --card-*),
+   and the finished review's panel reads the first form (rooms/today.css 525): both are set here, the same. */
+html[data-live-depth='1'] body.zen {
+  --color-card-ground: color-mix(in oklab, var(--color-surface) 50%, var(--color-surface-sunk));
+  --color-card-ground-2: var(--color-surface-sunk);
+  --color-card-surface: var(--color-surface);
+  --color-card-ink: var(--ink);
+  --color-card-ink-2: var(--ink-2);
+  --color-card-signal: var(--red);
+  --color-card-signal-wash: color-mix(in srgb, var(--red) 8%, transparent);
+  --color-card-line: color-mix(in srgb, var(--ink) 16%, transparent);
+  --color-card-line-soft: color-mix(in srgb, var(--ink) 8%, transparent);
+  --color-card-quiet: color-mix(in srgb, var(--ink) 42%, transparent);
+  --color-card-muted: color-mix(in srgb, var(--ink) 30%, transparent);
+  --color-card-accent: var(--color-accent);
+  --color-card-accent-wash: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  --card-ground-0: var(--color-surface);
+  --card-ground: color-mix(in oklab, var(--color-surface) 50%, var(--color-surface-sunk));
+  --card-ground-2: var(--color-surface-sunk);
+  --card-ink: var(--ink);
+  --card-ink-2: var(--ink-2);
+  --card-red: var(--red);
+  --card-red-wash: color-mix(in srgb, var(--red) 8%, transparent);
+  --card-line: color-mix(in srgb, var(--ink) 16%, transparent);
+  --card-line-soft: color-mix(in srgb, var(--ink) 8%, transparent);
+  --card-faint: color-mix(in srgb, var(--ink) 42%, transparent);
+  --card-faint-2: color-mix(in srgb, var(--ink) 30%, transparent);
+  --card-ai: var(--color-accent);
+  --card-ai-wash: color-mix(in srgb, var(--color-accent) 8%, transparent);
+}
+/* at night quiet print on the night paper takes more light, as the app's own night set does (corridor.css 1878) */
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body.zen {
+  --color-card-signal-wash: color-mix(in srgb, var(--red) 14%, transparent);
+  --color-card-line: color-mix(in srgb, var(--ink) 20%, transparent);
+  --color-card-line-soft: color-mix(in srgb, var(--ink) 10%, transparent);
+  --color-card-quiet: color-mix(in srgb, var(--ink) 70%, transparent);
+  --color-card-muted: color-mix(in srgb, var(--ink) 56%, transparent);
+  --color-card-accent-wash: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  --card-red-wash: color-mix(in srgb, var(--red) 14%, transparent);
+  --card-line: color-mix(in srgb, var(--ink) 20%, transparent);
+  --card-line-soft: color-mix(in srgb, var(--ink) 10%, transparent);
+  --card-faint: color-mix(in srgb, var(--ink) 70%, transparent);
+  --card-faint-2: color-mix(in srgb, var(--ink) 56%, transparent);
+  --card-ai-wash: color-mix(in srgb, var(--color-accent) 14%, transparent);
+}
+/* at night the card's small labels on a kanji's readings ("On readings ·", "(lesson)", the note under them) were
+   printed in the stage's deepest coat (corridor.css 6440), made for the cream card: on the look's night paper they read
+   1.3 to 1.7 to 1. They take the card's own ink, as the rest of the card does. */
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body.zen [data-kanji-readings] .sense-pos {
+  color: var(--card-ink);
+}
+
+/* 13b · the end of a sitting stands in the sitting's own room. On a wide screen the sitting fills the window with
+   the look's lacquer (lead.css section 8), but its last screen fell back to the deck page's frame: the lacquer as a
+   dark column inside a white frame on the printed ground, the very thing section 8 put right for the sitting. The
+   same two colours as section 8, for the last screen too: the frame takes no colour, the ground is the lacquer.
+   Colours only; the boxes stay. */
+@media (min-width: 521px) {
+  html[data-live-depth='1'][data-room='deckplay'] body:has(#app > main > .kp > .kp-done)::before {
+    background:
+      radial-gradient(52% 44% at 50% 0%, color-mix(in srgb, var(--world-paper, var(--ground-0)) 7%, transparent), transparent 72%),
+      var(--color-lacquer, var(--zen-stage));
+  }
+  html[data-live-depth='1'][data-room='deckplay'] body:has(#app > main > .kp > .kp-done) #app > main {
+    background: none;
+    border-color: transparent;
+    box-shadow: none;
+  }
+}
+
+/* 13c · on the review's stage in a day look. A review stands on the look's own night (--zen-*) in every look, so
+   in the six day looks what stands on that stage and not on the card was a day colour on a night ground: the links
+   under the review ("Report a problem", "My reports") in the look's key read 1.1 to 2.6 to 1 there. They take the
+   dojo's own light (--zen-accent, which the app already uses for the stage's lamp and the card's rim), as the links
+   of the night looks take their light. "show answer" keeps the look's key as its fill where that key is a pigment
+   (朱's vermilion, the blue of 藍 and 赤); where the key is the look's ink (墨 柿 板) an ink slab on the night stage
+   cannot be seen (1.1 to 1.2 to 1 against the stage), so there it is lit by the dojo's light as the night looks
+   light their primary (tighten.css 233: "at night the primary is lit, never a solid fill: the accent as an edge").
+   Two :not(#\#) lift these over tighten.css 77, whose :is(… body[data-view='drift'] #sheet):not(#\#) weighs two ids. */
+html[data-live-depth='1']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'], [data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='akafuji'], [data-theme='keyblock']):not(#\#):not(#\#) body.zen .report-line :is(button, a) {
+  color: var(--zen-accent);
+}
+html[data-live-depth='1']:is([data-theme='sumi'], [data-theme='iwa'], [data-theme='keyblock']):not(#\#):not(#\#) body.zen #reveal:not(:disabled) {
+  background: color-mix(in srgb, var(--zen-accent) 12%, var(--zen-stage));
+  color: var(--zen-accent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--zen-accent) 72%, transparent);
+}
+
+/* =====================================================================================
+   14 · the marks with a meaning, re-tuned per look (colour round 2026-11-14, step "keys and strays")
+   His words: "need colors fixed and coordianted end to end". The lead's ruling: each mark keeps its meaning and its
+   hue family, and is re-tuned per look so it sits in that look's print, its lightness and strength set against the
+   look's paper or night the way the look's own red is. Three sets:
+     the four card states and grades   red (Again, learning, difficult) · amber (Hard, due on the deck, not yet) ·
+                                       green (Good, known, review due, I know this) · blue (Easy, new)
+     the five level colours            N5 green · N4 teal · N3 blue · N2 violet · N1 wine
+     the two answer edges              "I know this" and "Not yet": the green and the amber of the first set, so a
+                                       word's page and a card say yes and not yet in the same two colours
+   Each member has two forms in every look: on paper (--kx-*) and on dark (--kx-*-lit: the night windows of a day
+   page, a review's stage, the study card's dock, every page of a night look). How each value is reached is written in
+   theme/tools/keys-tune.mjs, which wrote the block below: on paper the lightness of the look's red and 0.8 of its
+   strength; on dark the lightness of the look's night red + 0.10 and 0.8 of its strength; the member's own hue; then
+   the least change that keeps lettering at 4.5 to 1 or more on every ground of that form, every two members of a set
+   0.08 or more apart (OKLab), and every member 0.07 or more from the look's red and its key (and on dark its night
+   light). The table per look: shots/colour-20261114/keys/keys-table.md.
+   ONE OF TWO PLACES WHERE A COLOUR IS WRITTEN OUT PER LOOK: a key is by its nature not one of the look's tokens (a
+   green in 朱); each value here is computed from that look's tokens by the rule above, and keys-tune.mjs writes it
+   again if they change. (The other is section 26: a picture drawn in code, which cannot read a token.)
+   ===================================================================================== */
+html[data-live-depth='1'][data-theme='shu'] {
+  --kx-red: #94463e; --kx-amber: #835704; --kx-green: #037534; --kx-blue: #1b61b0;
+  --kx-red-lit: #ef9185; --kx-amber-lit: #e6b062; --kx-green-lit: #76c387; --kx-blue-lit: #7cb1f6;
+  --kx-n5: #25741e; --kx-n4: #046d81; --kx-n3: #0362ae; --kx-n2: #854091; --kx-n1: #a03553;
+  --kx-n5-lit: #83c17c; --kx-n4-lit: #42c0dd; --kx-n3-lit: #7fb0f7; --kx-n2-lit: #d196da; --kx-n1-lit: #ed8f9c;
+}
+html[data-live-depth='1'][data-theme='sumi'] {
+  --kx-red: #7e2a23; --kx-amber: #7b5100; --kx-green: #0b6d32; --kx-blue: #225b9f;
+  --kx-red-lit: #e69388; --kx-amber-lit: #deac6a; --kx-green-lit: #7cbf8a; --kx-blue-lit: #80b0ec;
+  --kx-n5: #2a6b24; --kx-n4: #016678; --kx-n3: #1f5b9f; --kx-n2: #7a3f84; --kx-n1: #913754;
+  --kx-n5-lit: #87bd81; --kx-n4-lit: #50bfce; --kx-n3-lit: #7fb0ec; --kx-n2-lit: #cb97d3; --kx-n1-lit: #e5919c;
+}
+html[data-live-depth='1'][data-theme='iwa'] {
+  --kx-red: #5f1915; --kx-amber: #573900; --kx-green: #004b1e; --kx-blue: #134074;
+  --kx-red-lit: #e78e82; --kx-amber-lit: #d6a257; --kx-green-lit: #74bd84; --kx-blue-lit: #79acef;
+  --kx-n5: #164a11; --kx-n4: #004552; --kx-n3: #053e7c; --kx-n2: #5b2d62; --kx-n1: #641e2d;
+  --kx-n5-lit: #80bc79; --kx-n4-lit: #3fbcd3; --kx-n3-lit: #79acef; --kx-n2-lit: #cb92d4; --kx-n1-lit: #e68b98;
+}
+html[data-live-depth='1'][data-theme='keyblock'] {
+  --kx-red: #8d322b; --kx-amber: #855801; --kx-green: #167237; --kx-blue: #2a63a7;
+  --kx-red-lit: #f09f94; --kx-amber-lit: #dcaf6c; --kx-green-lit: #88c995; --kx-blue-lit: #8cbaf6;
+  --kx-n5: #327027; --kx-n4: #006c7e; --kx-n3: #2863a7; --kx-n2: #864a8f; --kx-n1: #9d425e;
+  --kx-n5-lit: #93c88c; --kx-n4-lit: #62c8de; --kx-n3-lit: #95b7f7; --kx-n2-lit: #d5a2dd; --kx-n1-lit: #ef9da7;
+}
+html[data-live-depth='1']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai']) {
+  --kx-red: #8d322b; --kx-amber: #855801; --kx-green: #167237; --kx-blue: #2a63a7;
+  --kx-red-lit: #f09f94; --kx-amber-lit: #e3b473; --kx-green-lit: #88c995; --kx-blue-lit: #8cbaf6;
+  --kx-n5: #327027; --kx-n4: #006c7e; --kx-n3: #2863a7; --kx-n2: #864a8f; --kx-n1: #9d425e;
+  --kx-n5-lit: #93c88c; --kx-n4-lit: #62c8de; --kx-n3-lit: #95b7f7; --kx-n2-lit: #d5a2dd; --kx-n1-lit: #ef9da7;
+}
+html[data-live-depth='1'][data-theme='akafuji'] {
+  --kx-red: #82312d; --kx-amber: #825601; --kx-green: #1d6b36; --kx-blue: #2f619e;
+  --kx-red-lit: #f2a095; --kx-amber-lit: #e2b371; --kx-green-lit: #8acb97; --kx-blue-lit: #8dbcf8;
+  --kx-n5: #356c2c; --kx-n4: #026978; --kx-n3: #31609f; --kx-n2: #7d4886; --kx-n1: #934157;
+  --kx-n5-lit: #94ca8e; --kx-n4-lit: #64c9e1; --kx-n3-lit: #96b9fa; --kx-n2-lit: #d7a4e0; --kx-n1-lit: #f19ea9;
+}
+html[data-live-depth='1'][data-theme='rokusho'] {
+  --kx-red-lit: #f6a095; --kx-amber-lit: #f7c37f; --kx-green-lit: #88cd96; --kx-blue-lit: #8cbdfc;
+  --kx-n5-lit: #93cb8d; --kx-n4-lit: #5fcbe3; --kx-n3-lit: #92bbfd; --kx-n2-lit: #daa4e2; --kx-n1-lit: #f59ea9;
+}
+html[data-live-depth='1'][data-theme='yoru'] {
+  --kx-red-lit: #ffaca1; --kx-amber-lit: #fdc77d; --kx-green-lit: #8fd99f; --kx-blue-lit: #9dc8ff;
+  --kx-n5-lit: #9bd794; --kx-n4-lit: #61d8ed; --kx-n3-lit: #9fc7ff; --kx-n2-lit: #e6adef; --kx-n1-lit: #ffa9b4;
+}
+html[data-live-depth='1'][data-theme='kaku'] {
+  --kx-red-lit: #ffa498; --kx-amber-lit: #f8b03c; --kx-green-lit: #7cd57c; --kx-blue-lit: #95c3fe;
+  --kx-n5-lit: #87d87a; --kx-n4-lit: #0fd6fa; --kx-n3-lit: #8fc5ff; --kx-n2-lit: #ec9ef9; --kx-n1-lit: #ffa1ae;
+}
+html[data-live-depth='1'][data-theme='nami'] {
+  --kx-red-lit: #fdb9af; --kx-amber-lit: #e3ca8f; --kx-green-lit: #a7dcb1; --kx-blue-lit: #8aafdf;
+  --kx-n5-lit: #afdaa9; --kx-n4-lit: #97e4f8; --kx-n3-lit: #85b1de; --kx-n2-lit: #e5bced; --kx-n1-lit: #fdb8b6;
+}
+html[data-live-depth='1'][data-theme='hakuu'] {
+  --kx-red-lit: #faa79b; --kx-amber-lit: #fcce8e; --kx-green-lit: #90d29d; --kx-blue-lit: #94c3ff;
+  --kx-n5-lit: #9ad194; --kx-n4-lit: #69d1e7; --kx-n3-lit: #9dc1ff; --kx-n2-lit: #deaae7; --kx-n1-lit: #f9a5af;
+}
+/* 14a · the two answer edges on a word's page. The head of the page is a dark window in every look (lead.css 205 to
+   220 drew both edges as one fixed mint and one fixed amber, #8ff1a5 and #ffc964, in all eleven looks). */
+html[data-live-depth='1']:not(#\#):not(#\#) #sheet:has(> h2.headword) > p.depth-basis > #depth-known { --answer: var(--kx-green-lit); }
+html[data-live-depth='1']:not(#\#):not(#\#) #sheet:has(> h2.headword) > p.depth-basis > #depth-not-yet { --answer: var(--kx-amber-lit); }
+/* 14b · the four states. On paper by day (Review statistics, the deck's word list and settings, the card); a review's
+   stage is the look's night in every look, so there they take the dark form, as everything does at night.
+   corridor.css 7464 to 7467 (--srs-*), decks/player/player.css 23 to 25 and 47 to 52 (--kp-*). */
+html[data-live-depth='1'] { --srs-new: var(--kx-blue); --srs-learn: var(--kx-red); --srs-due: var(--kx-green); --srs-hard: var(--kx-amber); }
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']),
+html[data-live-depth='1'] body.zen { --srs-new: var(--kx-blue-lit); --srs-learn: var(--kx-red-lit); --srs-due: var(--kx-green-lit); --srs-hard: var(--kx-amber-lit); }
+html[data-live-depth='1']:not(#\#) .kp { --kp-red: var(--kx-red); --kp-amber: var(--kx-amber); --kp-green: var(--kx-green); --kp-blue: var(--kx-blue); }
+html[data-live-depth='1']:not(#\#):is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) .kp { --kp-red: var(--kx-red-lit); --kp-amber: var(--kx-amber-lit); --kp-green: var(--kx-green-lit); --kp-blue: var(--kx-blue-lit); }
+/* the review's counts and its four answers were written out once for every look (corridor.css 7593 to 7595, 7667 to
+   7674: #9dbbe8, #ec9a86, #9fd59c, #e2c486) */
+html[data-live-depth='1'] body.zen .anki-counts .c-new { color: var(--kx-blue-lit); }
+html[data-live-depth='1'] body.zen .anki-counts .c-learn { color: var(--kx-red-lit); }
+html[data-live-depth='1'] body.zen .anki-counts .c-due { color: var(--kx-green-lit); }
+html[data-live-depth='1'] body.zen .grade.anki.g-again { border-top-color: var(--kx-red-lit); }
+html[data-live-depth='1'] body.zen .grade.anki.g-again .g-label { color: var(--kx-red-lit); }
+html[data-live-depth='1'] body.zen .grade.anki.g-hard { border-top-color: var(--kx-amber-lit); }
+html[data-live-depth='1'] body.zen .grade.anki.g-hard .g-label { color: var(--kx-amber-lit); }
+html[data-live-depth='1'] body.zen .grade.anki.g-good { border-top-color: var(--kx-green-lit); }
+html[data-live-depth='1'] body.zen .grade.anki.g-good .g-label { color: var(--kx-green-lit); }
+html[data-live-depth='1'] body.zen .grade.anki.g-easy { border-top-color: var(--kx-blue-lit); }
+html[data-live-depth='1'] body.zen .grade.anki.g-easy .g-label { color: var(--kx-blue-lit); }
+/* the study card's four answers on its dock (the dock is the look's night in every look): the app drew them at one
+   strength and four fixed hues from the dock's ink (editorial.css 3620 to 3634) */
+html[data-live-depth='1']:not(#\#) #app .kp-study .kp-again { --kp-grade-ink: var(--kx-red-lit); }
+html[data-live-depth='1']:not(#\#) #app .kp-study .kp-hard { --kp-grade-ink: var(--kx-amber-lit); }
+html[data-live-depth='1']:not(#\#) #app .kp-study .kp-good { --kp-grade-ink: var(--kx-green-lit); }
+html[data-live-depth='1']:not(#\#) #app .kp-study .kp-easy { --kp-grade-ink: var(--kx-blue-lit); }
+/* the Good pad is tinted (the usual answer) and edged at 45% of its ink on its sides; with the look's own green that
+   edge read 2.6 to 2.9 to 1 on the dock: at 62% it reads 3.7 or more (the top edge stays the full colour) */
+html[data-live-depth='1']:not(#\#) #app .kp-study .kp-good { border-color: color-mix(in srgb, var(--kp-grade-ink) 62%, transparent); border-top-color: var(--kp-grade-ink); }
+/* 14c · the five level colours (editorial.css 2344 to 2348, written out once for every look; at night the app only
+   mixed them with the light ink, so the names read 1.85 to 4.34 to 1 there) */
+html[data-live-depth='1'] body { --lv-n5: var(--kx-n5); --lv-n4: var(--kx-n4); --lv-n3: var(--kx-n3); --lv-n2: var(--kx-n2); --lv-n1: var(--kx-n1); }
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body { --lv-n5: var(--kx-n5-lit); --lv-n4: var(--kx-n4-lit); --lv-n3: var(--kx-n3-lit); --lv-n2: var(--kx-n2-lit); --lv-n1: var(--kx-n1-lit); }
+/* at night a level's own fill is its light form: the lettering laid on it takes the look's ground, as Review's count
+   in the menu does (section 10) */
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):not(#\#) :is(.gs-eyebrow, .exam-heading) .level-chip { color: var(--color-ground, var(--ground)); }
+/* (step "repair", 2026-11-15, the checker's note on the marks at night) the chosen JLPT level card at night was its
+   level's light form as a whole slab (in 漆 a bright lilac N2, #daa4e2), where the app's own night card was a deep
+   plum with light lettering. It takes the deep form: the level's light form mixed with the look's ground (40% in OKLab),
+   edged in the light form, with the look's light ink on it (4.55 to 1 or more in all five night looks and all five
+   levels, keys-math.mjs). The glow under it stays the level's own. */
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):not(#\#) .exam-levels .chip.exam-level-card[aria-pressed='true'] { background: color-mix(in oklab, var(--lv) 40%, var(--color-ground, var(--ground))); border-color: var(--lv); }
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):not(#\#) .exam-levels .chip.exam-level-card[aria-pressed='true'] :is(.exam-level-name, .exam-level-tests, .exam-level-last) { color: var(--color-ink, var(--ink)); }
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):not(#\#) .exam-levels .chip.exam-level-card[aria-pressed='true'] .exam-level-progress { background: color-mix(in srgb, var(--color-ink, var(--ink)) 26%, transparent); }
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):not(#\#) .exam-levels .chip.exam-level-card[aria-pressed='true'] .exam-level-progress::after { background: var(--color-ink, var(--ink)); }
+
+/* the context cards' front page: its level chip ("Level ungraded") is white on the look's key (editorial.css 847); at
+   night that key is a light gold or the phosphor and white on it read 1.58 to 2.0 to 1. As above, the lettering on a
+   light fill takes the look's ground. (The ten papers of the cards and their chooser are the deck's own: left.) */
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):not(#\#) .cd-room .level-chip.cd-level { color: var(--color-ground, var(--ground)); }
+
+/* =====================================================================================
+   15 · 赤: one dark (the checker's finding 10; audit 2, A2-17)
+   赤 printed four darks in its rooms: the navy head of a word's page (--head-ink #1b3355), a muddy brown-to-navy in
+   Today's window, the word web and the kanji tiles (its brown ink mixed with its blue, depth.css 92), and a brown
+   lacquer on Learn's stage (--color-lacquer #382115). Two of them stood on one page (the word page's head and its
+   kanji tiles). The dark windows take the look's one dark, its head ink, as section 2 does in 墨 朱 柿 板; their foot
+   lifts toward 赤's own blue (the sky of the Red Fuji), and Learn's stage is the same dark deepened. The stage of a
+   sitting and of a review stays the look's own night (section 13). */
+html[data-live-depth='1'][data-theme='akafuji'] { --it-lift: var(--ai); }
+html[data-live-depth='1'][data-theme='akafuji'] :is(body:not([data-view='drift']):not(.zen), body[data-view='drift'] #sheet) {
+  --dp-night: var(--head-ink);
+  --dp-night-mid: color-mix(in oklab, var(--head-ink) 86%, var(--it-lift));
+  --dp-night-foot: color-mix(in oklab, var(--head-ink) 70%, var(--it-lift));
+  --dp-night-glow: color-mix(in oklab, var(--zen-accent) 58%, var(--head-ink));
+  --dp-night-read: color-mix(in oklab, var(--zen-accent) 50%, var(--zen-text));
+  --dp-shade: color-mix(in oklab, var(--ink) 84%, var(--head-ink));
+  --dp-deep: color-mix(in oklab, var(--head-ink) 80%, #000);
+  --dp-deep-2: color-mix(in oklab, var(--head-ink) 64%, #000);
+}
+
+/* =====================================================================================
+   16 · the level control on the first screen, every look (the checker's finding 11; F-18)
+   The old first screen has five palettes for eleven looks (drift-layer.js 176), written on its own layer; section 7
+   gave its handle the look's light at night only. By day its handle was a green in 朱 赤 柿 and an orange in 墨 板 藍,
+   and its open labels were dark ink on the dark sky (1.18 to 1 in 朱). Now in every look: the track and the handle are
+   the look's key on the first screen (--ai there, the colour of the seal's ring), the handle edged in the look's
+   paper so it reads on any sky; the labels when open are the look's light (its print white by day, its ink at night);
+   the line of facts is a slip of the look's paper in the look's ink. The drift layer writes its palette on its own
+   element, so these name the parts themselves. */
+html[data-live-depth='1']:not(#\#):not(#\#) #drift-layer #lvlTrack { background: color-mix(in srgb, var(--ai) 70%, transparent); }
+html[data-live-depth='1']:not(#\#):not(#\#) #drift-layer #lvl.hot #lvlTrack { background: var(--ai); box-shadow: 0 0 10px color-mix(in srgb, var(--ai) 50%, transparent); }
+html[data-live-depth='1']:not(#\#):not(#\#) #drift-layer #lvlHandle { background: var(--ai); border-color: var(--world-paper); }
+html[data-live-depth='1']:not(#\#):not(#\#) #drift-layer #lvl.hot #lvlHandle { background: var(--ai); border-color: var(--world-paper); box-shadow: 0 0 16px color-mix(in srgb, var(--ai) 50%, transparent), 0 3px 12px color-mix(in srgb, var(--zen-stage-deep) 28%, transparent); }
+html[data-live-depth='1']:not(#\#):not(#\#) #drift-layer #lvlLabels,
+html[data-live-depth='1']:not(#\#):not(#\#) #drift-layer #lvl.hot #lvlLabels { color: var(--print-white, var(--world-paper)); }
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):not(#\#):not(#\#) #drift-layer :is(#lvlLabels, #lvl.hot #lvlLabels) { color: var(--world-ink); }
+html[data-live-depth='1']:not(#\#):not(#\#) #drift-layer #lvlInfo { color: var(--world-ink); background: color-mix(in srgb, var(--world-paper) 94%, transparent); border-color: color-mix(in srgb, var(--world-ink) 20%, transparent); }
+
+/* =====================================================================================
+   17 · Learn's card at night, and the learn card in 殻 (the checker's finding 15; F-17)
+   The card is lit paper in every look on purpose (lead.css 169: "the card keeps the room's own lit paper in every
+   look, night looks too"). At night that paper was the look's light ink mixed with one fixed tan (#c8b48c,
+   rooms/learn.css 41), and in 殻 a fixed cream with a fixed ink (#f3eee2, #18251f, learn.css 46 to 48). It stays lit
+   paper; the lamp it is lit by is the look's own night light (--zen-accent, the light of its stage), and 殻 takes the
+   same rule as the other four. */
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):is([data-room='learn'], [data-room='tests']) body:not([data-view='drift']) {
+  --learn-card: color-mix(in srgb, var(--color-ink) 86%, var(--zen-accent));
+  --learn-card-ink: color-mix(in srgb, var(--color-lacquer) 70%, #000);
+  --learn-card-muted: color-mix(in srgb, var(--color-lacquer) 72%, transparent);
+}
+
+/* =====================================================================================
+   18 · the sheets of understanding: the "why" sheet on a JLPT result, and guided practice's lacquer sheet
+   Both read the one fixed lacquer set the Tutor read before round two (register.css 462, guided-session.css 810:
+   "黒漆 in every world"): a black sheet in every look. They take what section 5 gives the Tutor: by day a slip of the
+   look's paper in the look's ink, with the slip's hairline and contact shadow (paint only: nothing moves); at night
+   the look's own night (its stage's tones). Not inside the Tutor, which section 5 sets on its own. */
+html[data-live-depth='1']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'], [data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='akafuji'], [data-theme='keyblock']):not([data-register='tutor']) body {
+  --sheet-ground: var(--dp-slip, var(--ground-0));
+  --sheet-ground-2: var(--ground-2);
+  --sheet-ground-0: var(--ground-0);
+  --sheet-ink: var(--ink);
+  --sheet-ink-2: var(--ink-2);
+  --sheet-faint: color-mix(in oklab, var(--ink) 78%, var(--ground-0));
+  --sheet-faint-2: color-mix(in oklab, var(--ink) 66%, var(--ground-0));
+  --sheet-line: color-mix(in srgb, var(--ink) 22%, transparent);
+  --sheet-line-soft: color-mix(in srgb, var(--ink) 10%, transparent);
+  --sheet-ai: var(--it-key, var(--ai));
+  --sheet-ai-wash: var(--it-key-wash, var(--ai-wash));
+  --sheet-red: var(--red);
+  --sheet-red-wash: var(--red-wash);
+}
+html[data-live-depth='1']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'], [data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='akafuji'], [data-theme='keyblock']):not([data-register='tutor']) :is(.exam-why-sheet, .gs-lacquer) {
+  box-shadow: 0 0 0 0.5px color-mix(in oklab, var(--ink) 20%, transparent), 0 10px 30px -18px color-mix(in oklab, var(--ink) 50%, transparent);
+}
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']):not([data-register='tutor']) body {
+  --sheet-ground: var(--zen-stage);
+  --sheet-ground-2: var(--zen-stage-crown);
+  --sheet-ground-0: color-mix(in oklab, var(--zen-stage-crown) 90%, var(--zen-text));
+  --sheet-ink: var(--zen-text);
+  --sheet-ink-2: color-mix(in oklab, var(--zen-text) 80%, var(--zen-stage));
+  --sheet-faint: color-mix(in srgb, var(--zen-text) 70%, transparent);
+  --sheet-faint-2: color-mix(in srgb, var(--zen-text) 56%, transparent);
+  --sheet-line: color-mix(in srgb, var(--zen-text) 20%, transparent);
+  --sheet-line-soft: color-mix(in srgb, var(--zen-text) 10%, transparent);
+  --sheet-ai: var(--zen-accent);
+  --sheet-ai-wash: color-mix(in srgb, var(--zen-accent) 14%, transparent);
+  --sheet-red: var(--zen-red);
+  --sheet-red-wash: color-mix(in srgb, var(--zen-red) 14%, transparent);
+}
+
+/* =====================================================================================
+   19 · the read-along highlight (the checker's finding 17)
+   The word being read was washed in one gold in every look (tighten.css 336: rgba(201, 162, 39, 0.28)), a gold on the
+   wave of 浪 and on the phosphor page of 殻. It is the look's own lamp, at the same strength: the night light of its
+   stage (--zen-accent), which is a gold in the looks whose light is gold, the pale sea blue in 浪 and the phosphor in 殻. */
+html[data-live-depth='1'] ::highlight(bunki-speaking) { background-color: color-mix(in srgb, var(--zen-accent) 28%, transparent); }
+
+/* =====================================================================================
+   20 · veils and shadows no look owned
+   The veil behind the kanji world's dialog (kanji-world-encounter.css 95: #050c18 at 87%), the veils and shadows of
+   the report panel and the 試 panel (maintenance/report-client.css 32 and 34, prototype-layer.css 136, 167, 170, 254:
+   rgb(20 30 40), rgb(20 26 34)), and the 読 seal's shadow on the bookshelf (rooms/read.css 25: rgb(20 24 34)) were one
+   cool blue-black in every look (the 読 seal's by day; at night the app gives it its own). They take the look's own
+   deepest coat (--zen-stage-deep), as section 8 did for the Save chooser's veil. The kanji world's dialog itself is left as it is: that world is its own by his ruling of 11-10
+   (LOOKS.md section 5). */
+html[data-live-depth='1'] .kw-dialog::backdrop { background: color-mix(in srgb, var(--zen-stage-deep) 87%, transparent); }
+html[data-live-depth='1'] #bunki-reports-root .br-sheet { box-shadow: -12px 8px 60px color-mix(in srgb, var(--zen-stage-deep) 20%, transparent); }
+html[data-live-depth='1'] #bunki-reports-root .br-sheet::backdrop { background: color-mix(in srgb, var(--zen-stage-deep) 38%, transparent); }
+html[data-live-depth='1'] #bunki-prototype-root .pl-sheet { box-shadow: -12px 8px 60px color-mix(in srgb, var(--zen-stage-deep) 20%, transparent); }
+html[data-live-depth='1'] #bunki-prototype-root .pl-sheet::backdrop { background: color-mix(in srgb, var(--zen-stage-deep) 38%, transparent); }
+html[data-live-depth='1'] #bunki-prototype-root .pl-intro { box-shadow: 0 2px 6px rgb(0 0 0 / 6%), 0 12px 32px color-mix(in srgb, var(--zen-stage-deep) 14%, transparent); }
+html[data-live-depth='1']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'], [data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='akafuji'], [data-theme='keyblock']):not(#\#) #shelf-body .shelf-mast-name img.shelf-art { box-shadow: 0 0 0 1px color-mix(in srgb, var(--zen-stage-deep) 16%, transparent), 0 2px 6px -1px color-mix(in srgb, var(--zen-stage-deep) 28%, transparent); }
+
+/* =====================================================================================
+   21 · the idiom chip's own character (round two left it: 3.55 to 4.44 to 1 in nine looks)
+   On a character's page each idiom chip prints the page's own character dimmer than the rest (depth.css 731: the ink
+   at 56%, --dp-dim), so the eye goes to the characters it does not know yet. Dimmer it stays, at a strength that
+   still reads: the ink at 72%. */
+html[data-live-depth='1']:not(#\#) body .sheet .chip.t-idiom .row-self { color: color-mix(in srgb, var(--ink) 72%, transparent); }
+
+/* =====================================================================================
+   22 · the prototype's own buttons and their panels (he sees them on every screen: they take the look too)
+   深 (live.js 52: on, a fixed red #c5392b with white) takes the look's red, its letter the look's paper by day and its
+   ground at night (on a night red white reads under 3 to 1). The 試 button and both panels' paper and ink already were
+   the look's.
+   THE REPORT PANEL (rewritten in the step "repair", 2026-11-15, the checker's finding 1). In a room the app's own button
+   families reach the panel (tighten.css 34 to 110, their states 170 to 241) and it is drawn in the look: Close a word in
+   the look's key (family C), the two tabs words with the chosen one inked by day and ringed at night (F), "Return to
+   lesson" a hairline slip (B), Send the panel's primary (A: lit in the key at night; by day see below, where B had
+   made it a slip and A's hover then hid its lettering). Over the first screen those families do not reach the panel (they
+   are scoped to a room or to a page, #sheet, and the panel hangs off <body>), so the browser drew its own buttons:
+   Send and "Return to lesson" were the system's grey by day (#c0c0c0, a 2 px bevel) and its glass at night (white at
+   25%), Send with the system's blue when it is the form's default. Round two's rule here gave Close and the tabs an
+   ink edge, which the same panel in a room does not have. Now over the first screen the panel takes, family by family,
+   the colours it has in a room. The boxes, the type and the widths of the edges stay the browser's: an edge the room
+   does not draw is made transparent, not taken away. Setting a ground switches the system's paint off in WebKit.
+   Any other button the panel can draw and no family names (Back to my reports, a report in the list, Copy report text,
+   Remove screenshot, Send follow-up, Still happening and the like) had the system's grey in every view: in every view
+   it takes no ground and the slip's edge. */
+html[data-live-depth='1'] #live-depth-switch.on { background: var(--red); border-color: var(--red); color: var(--ground-0); }
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) #live-depth-switch.on { color: var(--ground); }
+/* the room's tokens for these families, made from the look's raw tokens (editorial.css 4973 and 4978 by day, 5013 and
+   5017 at night: the muted ink, ink 78% with the paper by day (84% in 柿, its own) and 76% with the ground at night, and
+   the ink at 28% by day and 30% at night for an edge; the key as section 1 gives it) */
+html[data-live-depth='1'] body[data-view='drift'] #bunki-reports-root {
+  --rp-key: var(--it-key, var(--ai));
+  --rp-edge: color-mix(in srgb, var(--ink) 28%, transparent);
+  --rp-muted: color-mix(in srgb, var(--ink) 78%, var(--ground-0));
+}
+html[data-live-depth='1'][data-theme='iwa'] body[data-view='drift'] #bunki-reports-root { --rp-muted: color-mix(in srgb, var(--ink) 84%, var(--ground-0)); }
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body[data-view='drift'] #bunki-reports-root {
+  --rp-edge: color-mix(in srgb, var(--ink) 30%, transparent);
+  --rp-muted: color-mix(in srgb, var(--ink) 76%, var(--ground));
+}
+/* C · Close: a word in the look's key */
+html[data-live-depth='1'] body[data-view='drift'] #bunki-reports-root header.br-heading button.br-close { background-color: transparent; border-color: transparent; color: var(--rp-key); }
+/* F · the two tabs: words in the muted ink; the chosen one inked by day, ringed in the look's light at night */
+html[data-live-depth='1'] body[data-view='drift'] #bunki-reports-root nav.br-nav button { background-color: transparent; border-color: transparent; color: var(--rp-muted); }
+html[data-live-depth='1'] body[data-view='drift'] #bunki-reports-root nav.br-nav button[aria-current='page'] { background-color: var(--ink); color: var(--ground-0); }
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body[data-view='drift'] #bunki-reports-root nav.br-nav button[aria-current='page'] { background-color: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ai) 70%, transparent); }
+/* B · Send, "Return to lesson" and the other actions: hairline slips in the look's ink */
+html[data-live-depth='1'] body[data-view='drift'] #bunki-reports-root :is(.br-actions, .br-context-summary) button { background-color: transparent; border-color: var(--rp-edge); color: var(--ink); }
+/* A by day: Send is the panel's one filled key, in every view. tighten.css 37 names it in A ("the screen's one filled
+   key"), and A's hover, disabled and night rules name it too; only B, which names every .br-actions button and stands
+   later at the same weight, made it a slip by day. Under the pointer A's hover then filled it with the look's key mixed
+   with ink while B's ink lettering stayed: in a room by day Send read 1.96 to 1 in 朱, 1.47 in 藍, 1.27 in 赤 and 1.0
+   (gone) in 墨 柿 板 (repair-probe.mjs, report-after). Now by day it is the key with the paper's lettering at rest and
+   A's own hover under the pointer, as every other primary of the app; at night A's own lit form, below. The edge is
+   made transparent, so the key fills the box the browser gave it. */
+html[data-live-depth='1'] #bunki-reports-root { --rp-fill: var(--color-accent, var(--it-key, var(--ai))); --rp-on-fill: var(--color-paper, var(--ground-0)); }
+html[data-live-depth='1']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'], [data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='akafuji'], [data-theme='keyblock']):not(#\#):not(#\#) #bunki-reports-root .br-actions button.br-primary:not(:disabled) { background-color: var(--rp-fill); border-color: transparent; color: var(--rp-on-fill); }
+html[data-live-depth='1']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'], [data-theme='sumi'], [data-theme='shu'], [data-theme='iwa'], [data-theme='akafuji'], [data-theme='keyblock']):not(#\#):not(#\#) #bunki-reports-root .br-actions button.br-primary:not(:disabled):hover { background-color: color-mix(in srgb, var(--rp-fill) 88%, var(--color-ink, var(--ink))); }
+/* A at night: Send lit by the look's key, as in a room */
+html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku']) body[data-view='drift'] #bunki-reports-root .br-actions button.br-primary:not(:disabled) { background-color: color-mix(in srgb, var(--rp-key) 12%, var(--ground)); color: var(--rp-key); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--rp-key) 72%, transparent); }
+/* every other button of the panel, in every view (no family of the app's names them) */
+html[data-live-depth='1'] #bunki-reports-root button:not(.br-bug, .br-close, .br-exact-toggle):not(.br-nav *, .br-actions *, .br-context-summary *) { background-color: transparent; border-color: color-mix(in srgb, var(--br-ink, var(--ink)) 28%, transparent); }
+
+/* =====================================================================================
+   23 · the city under the first screen in 浪 and 殻 (the census: editorial.css 4930 to 4937)
+   Its windows, lamps and the edge of its paper are one gold in all five night looks. As in section 6, the gold is at
+   home in 漆 金 雷, whose night light is a gold; in 浪 and 殻 they take the look's own night light. */
+html[data-live-depth='1']:is([data-theme='nami'], [data-theme='kaku']):not(#\#) body.ginga #door-paper .today-wins { fill: var(--zen-accent); }
+html[data-live-depth='1']:is([data-theme='nami'], [data-theme='kaku']):not(#\#) body.ginga #door-paper .today-lamps { fill: color-mix(in oklab, var(--zen-accent) 64%, var(--zen-text)); }
+html[data-live-depth='1']:is([data-theme='nami'], [data-theme='kaku']):not(#\#) body.ginga #door-paper .door-washi { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--zen-accent) 10%, transparent), inset 0 0 26px 4px rgb(0 0 0 / 34%); }
+
+/* =====================================================================================
+   24 · 金's gold leaf (the census: 107 of 金's 130 stray kinds, all faint; print.css 747)
+   The bars of 金 are gold leaf: faint seams between the leaves and a sheen (John's note 70: "an aged, matte gold").
+   The seams and the sheen were written in their own browns and cream. They are the look's own gold, darkened for the
+   seams and lightened for the sheen, at the same strengths and in the same places. */
+html[data-live-depth='1'][data-theme='yoru']:not(#\#):not(#\#) body:not(.zen) :is(#app > .chrome, #app > .scale-thread, .primary-tabs, #sheet > .sheet-bar, #sheet > .scale-thread) {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, color-mix(in oklab, var(--bar-bg) 30%, #fff) 6%, transparent), transparent 42%, color-mix(in srgb, color-mix(in oklab, var(--bar-bg) 24%, #000) 5%, transparent)),
+    repeating-linear-gradient(90deg, transparent 0, transparent 109px, color-mix(in srgb, color-mix(in oklab, var(--bar-bg) 40%, #000) 11%, transparent) 109px, color-mix(in srgb, color-mix(in oklab, var(--bar-bg) 40%, #000) 11%, transparent) 110px),
+    url('print/washi-soft.webp') 0 0 / 3000px auto,
+    var(--bar-bg);
+}
+
+/* =====================================================================================
+   25 · Orbit's frame (a preview reached from the gate's menu: modules/orbit-preview.mjs 25 to 39)
+   Its frame was its own black with a vermilion tag and a cream bar in every look. The frame is the look's own night
+   stage, the bar the stage's light ink, the tag and the ring the stage's red. What Orbit draws inside its own window
+   (an iframe of its own page) is Orbit's, and is not touched. */
+html[data-live-depth='1'] dialog.orbit-preview { background: var(--zen-stage); color: var(--zen-text); }
+html[data-live-depth='1'] dialog.orbit-preview::backdrop { background: var(--zen-stage); }
+html[data-live-depth='1'] .orbit-preview-back { border-color: color-mix(in srgb, var(--zen-text) 32%, transparent); }
+html[data-live-depth='1'] .orbit-preview-back:focus-visible { outline-color: var(--zen-red); }
+html[data-live-depth='1'] .orbit-preview-tag,
+html[data-live-depth='1'] .orbit-preview-bar .orbit-preview-tag::after { border-color: var(--zen-red); color: color-mix(in oklab, var(--zen-red) 55%, var(--zen-text)); }
+html[data-live-depth='1'] dialog.orbit-preview[open] #bunki-reports-root .br-rail .br-bug:not(:hover, :focus-visible) { color: color-mix(in srgb, var(--zen-text) 78%, transparent); }
+
+/* =====================================================================================
+   26 · the glass in the bookshelf's search field (editorial.css 907)
+   A small magnifier drawn in the field's ground as a picture, its stroke one grey (#767680) in every look. A picture
+   drawn in code cannot read a token, so it is drawn again per look, stroke for stroke, in the look's second ink
+   (--ink-2, the value written out here is that token of that look, as palette.json reads it).
+   ===================================================================================== */
+html[data-live-depth='1'][data-theme='shu'][data-register='shelf'] .search-field { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23575145' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E"); }
+html[data-live-depth='1'][data-theme='sumi'][data-register='shelf'] .search-field { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a453a' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E"); }
+html[data-live-depth='1'][data-theme='iwa'][data-register='shelf'] .search-field { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235a3c22' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E"); }
+html[data-live-depth='1'][data-theme='keyblock'][data-register='shelf'] .search-field { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23544c40' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E"); }
+html[data-live-depth='1']:is(:not([data-theme]), [data-theme=''], [data-theme='hokusai'])[data-register='shelf'] .search-field { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a5d70' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E"); }
+html[data-live-depth='1'][data-theme='akafuji'][data-register='shelf'] .search-field { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237a5540' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E"); }
+html[data-live-depth='1'][data-theme='rokusho'][data-register='shelf'] .search-field { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cdc3b0' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E"); }
+html[data-live-depth='1'][data-theme='yoru'][data-register='shelf'] .search-field { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cfc6ae' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E"); }
+html[data-live-depth='1'][data-theme='kaku'][data-register='shelf'] .search-field { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2393b5ad' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E"); }
+html[data-live-depth='1'][data-theme='nami'][data-register='shelf'] .search-field { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b9c4cc' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E"); }
+html[data-live-depth='1'][data-theme='hakuu'][data-register='shelf'] .search-field { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c4b69c' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E"); }

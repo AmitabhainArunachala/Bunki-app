@@ -3206,6 +3206,7 @@ async function commitStorePatch(patch, appendArchive = []) {
  * target write (record-app: a producer error rejects before a target write) and is reported as not published. */
 const PRODUCER_DECLINED = 'producer-declined';
 const declineWrite = (reason) => Object.assign(new Error(PRODUCER_DECLINED), { code: PRODUCER_DECLINED, reason });
+export { declineWrite, recordEpoch };
 
 /** commitStorePatch with the save's publication outcome (HOOKS-SPEC §3.3), for callers that must not mistake a lost
  * acknowledgment for a refusal: { outcome, acknowledged, reason? }.
@@ -10006,8 +10007,15 @@ function listRowFor(node, label, item) {
   return { t: node.t, id: node.id, label, kind: NODE_KIND[node.t]?.[0], kindEn: NODE_KIND[node.t]?.[1], ts: item?.ts ?? Date.now(),
     ...(item?.sourceContextRef ? { sourceContextRef: item.sourceContextRef } : {}) };
 }
-/** Put a word in the place he picked. Not saved yet: Review is the surface's own keep (the one keep); a list is the one
- * list transaction, which keeps it first. Saved: a move between his lists, nothing else in the record changes. */
+function bundledReaderListWord(node) {
+  if (personalHost || node.t !== 'word' || node.by === 'sensei' || node.sourceContext || node.sourceContextRef) return false;
+  const from = node.from;
+  if (!from?.passage || !Number.isInteger(from.index) || from.index < 0) return false;
+  const passage = D.passages.find((entry) => entry.id === from.passage);
+  return !!passage?.tokens?.[from.index];
+}
+/** Put a word in the place he picked. Review uses the surface's own keep; a named list uses the list transaction.
+ * Moving a saved word changes its list membership and list memory. */
 async function placeWord(node, label, to, { keep = null, saved = null } = {}) {
   const allowed = personalHost?.captureAccess?.() || (() => true);
   if (!allowed()) return { status: 'held' };
@@ -10129,8 +10137,11 @@ function buildPlaceChooser({ node, label, current, kind = 'menu', more = [], onP
   const places = el('div', 'save-chooser-places');
   places.setAttribute('role', 'group');
   places.setAttribute('aria-labelledby', title.id);
-  const what = el('p', 'save-chooser-what', tx('保存した語はどれもカードになる。リストはもう一つの置き場。',
-    'Every saved word becomes a card. A list is one more place for it.'));
+  const what = el('p', 'save-chooser-what', !current && bundledReaderListWord(node)
+    ? tx('リストには語と出典が保存されます。復習の開始・再開は「今日」から。',
+      'A list keeps the word and its source. Start or resume reviews in Today.')
+    : tx('保存した語はどれもカードになる。リストはもう一つの置き場。',
+      'Every saved word becomes a card. A list is one more place for it.'));
   what.id = `${ids.title}-what`;
   places.setAttribute('aria-describedby', what.id);
   head.append(what);
@@ -10157,8 +10168,7 @@ function buildPlaceChooser({ node, label, current, kind = 'menu', more = [], onP
     choices.push(button);
     return button;
   };
-  // P4-2 · what a pick does, in words where he chooses: every saved word comes back as a card (a list pick keeps it as a
-  // card too: writeListMembership keeps the word, then lists it); Review is the card alone, a list is one more place
+  // P4-2 · Review keeps the card on its own. A list gives the saved word a named place.
   places.append(choice({ kind: 'review' }, { id: ids.review, count: S.taken.length,
     sub: tx('カードだけ', 'Card only') }));
   const order = listsByRecency(S.lists, S.saveMemory);
@@ -11907,14 +11917,15 @@ async function restoreKept(node, label, took) {
   else if (S.view === 'tray') render();
   return true;
 }
-/** One list transaction for the strip and Save ▾'s menu: the word is kept first (the one keep) when a list is added and
- * it is not kept yet; a list is his curation — taking the word off a list never un-keeps it. */
+/** One list transaction for the strip and Save ▾'s menu. A new bundled reader word is captured with its list membership. */
 async function writeListMembership(node, label, listName, on) {
   const allowed = personalHost?.captureAccess?.() || (() => true);
   if (!allowed()) return 'held';
   if (!recordWritable()) return 'not-writable';
   if (node.t === 'word' && ['conflict', 'unavailable'].includes(wordCaptureState(node))) return 'held';
-  if (on && !S.taken.some((row) => row.t === node.t && row.id === node.id)) {
+  const same = sameItem(node);
+  const neutral = on && bundledReaderListWord(node);
+  if (on && !neutral && !S.taken.some(same)) {
     const kept = await keepWord(node, label);
     if (!allowed()) return 'held';
     if (kept.status === 'held') return 'held';
@@ -11932,18 +11943,27 @@ async function writeListMembership(node, label, listName, on) {
         setOwnRecordValue(lists, listName, members.filter((row) => !(row.t === node.t && row.id === node.id)));
         return { lists };
       }
-      const item = latest.taken.find((row) => row.t === node.t && row.id === node.id);
-      if (!item) throw new Error('captured-item-no-longer-available');
-      if (node.t === 'word' && wordCaptureState(node, latest) !== 'taken') throw new Error('word-identity-conflict');
-      setOwnRecordValue(lists, listName, members.some((row) => row.t === node.t && row.id === node.id) ? members : [...members,
+      let item = latest.taken.find(same);
+      let patch = {};
+      if (neutral && !item) {
+        if (!bundledReaderListWord(node)) throw declineWrite('reader-source-changed');
+        if (wordCaptureState(node, latest) !== 'take') throw new Error('word-identity-conflict');
+        patch = captureStorePatch(latest, node, label, Date.now(), null, { start: false });
+        item = patch.taken.at(-1);
+      } else {
+        if (!item) throw new Error('captured-item-no-longer-available');
+        if (node.t === 'word' && wordCaptureState(node, latest) !== 'taken') throw new Error('word-identity-conflict');
+      }
+      setOwnRecordValue(lists, listName, members.some(same) ? members : [...members,
         { t: node.t, id: node.id, label, kind: NODE_KIND[node.t]?.[0], kindEn: NODE_KIND[node.t]?.[1], ts: item.ts,
           ...(item.sourceContextRef ? { sourceContextRef: item.sourceContextRef } : {}) }]);
       // SAVE · the record remembers when he last put a word on this list: the chooser offers his recent lists first
       const memory = saveMemoryWritable() ? withListUsed(latest.saveMemory, listName, Date.now()) : null;
-      return memory ? { lists, saveMemory: memory } : { lists };
+      return { ...patch, lists, ...(memory ? { saveMemory: memory } : {}) };
     });
   } catch { saved = false; }
-  if (!saved) return on ? 'list-failed' : 'remove-failed';
+  if (!saved) return neutral ? 'capture-failed' : on ? 'list-failed' : 'remove-failed';
+  if (neutral) refreshWordSaveControls(node, label);
   // S · made from a page's Save, the change is also the room's beneath (its lists, their counts): it is drawn again when
   // the page closes
   if (S.stack.length) S.roomStale = true;
@@ -16165,7 +16185,9 @@ function renderSavedLists(main) {
   const currentSurface = recordViewSurface();
   // month buckets fill themselves; named lists sit above them
   const buckets = new Map();
+  const takenByKey = new Map();
   for (const item of S.taken) {
+    takenByKey.set(srsKey(item.t, item.id), item);
     const key = monthKey(item.ts || 0);
     if (!buckets.has(key)) buckets.set(key, []);
     buckets.get(key).push(item);
@@ -16382,7 +16404,7 @@ function renderSavedLists(main) {
       row.append(field, save);
       main.append(row);
     }
-    for (const item of sec.items) main.append(trayLine(item, dueKeys));
+    for (const item of sec.items) main.append(trayLine(item, dueKeys, takenByKey.get(srsKey(item.t, item.id))));
   }
   main.append(maker);
 }
@@ -16490,8 +16512,9 @@ function renderListPage(main) {
     return;
   }
   // SAVE · on Saved today each word says where it went: Review, or its list
+  const takenByKey = new Map(S.taken.map((item) => [srsKey(item.t, item.id), item]));
   for (const item of items) {
-    const line = trayLine(item, dueKeys);
+    const line = trayLine(item, dueKeys, takenByKey.get(srsKey(item.t, item.id)));
     const at = todayRows?.find((row) => row.item === item)?.place;
     if (at) {
       const chip = el('span', `save-place-where${at.kind === 'list' ? ' is-list' : ''}`, tx(...placeWords(at)));
@@ -24351,7 +24374,7 @@ function wordCapturePlan(latest, node, { replace = false } = {}) {
   };
 }
 
-function captureStorePatch(latest, node, label, now = Date.now(), sourceContext = null, { replace = false } = {}) {
+function captureStorePatch(latest, node, label, now = Date.now(), sourceContext = null, { replace = false, start = true } = {}) {
   const item = {
     t: node.t,
     id: node.id,
@@ -24360,10 +24383,8 @@ function captureStorePatch(latest, node, label, now = Date.now(), sourceContext 
     kindEn: NODE_KIND[node.t][1],
     from: node.from || null,
     ts: now,
-    // 覚える is the explicit choice to memorize, so the row is started the
-    // moment it is taken. Rows that arrive any other way — import, legacy
-    // stores — carry no mark and wait for the learner's 始める.
-    started: now,
+    // 覚える starts review. Bundled list saves wait for the learner's 始める.
+    ...(start ? { started: now } : {}),
   };
   // The tutor may create cards (operator's word, 2026-08-24). The mark is
   // provenance for display and triage — it grants no scheduling authority,
@@ -24406,6 +24427,10 @@ function captureStorePatch(latest, node, label, now = Date.now(), sourceContext 
     deepWords = plan.deepWords;
   } else if (latest.taken.some((entry) => entry.t === node.t && entry.id === node.id)) return {};
   const patch = { taken: [...taken, item] };
+  if (!start) {
+    const key = srsKey(node.t, node.id);
+    if (latest.srs[key] && !latest.suspended[key]) patch.suspended = copyRecordWith(latest.suspended, key, now);
+  }
   if (sourceContext) {
     // Enrollment and its encounter are one acknowledged write. This reference
     // is provenance only; it grants neither processing nor scheduling rights.
@@ -28390,7 +28415,7 @@ function renderBrowse(main) {
     count.textContent = tx(`${hits.length} 件`, `${hits.length} card${hits.length === 1 ? '' : 's'}`);
     list.replaceChildren();
     for (const item of hits.slice(0, b.limit)) {
-      const line = trayLine(item, dueKeys);
+      const line = trayLine(item, dueKeys, item);
       const rec = S.srs[srsKey(item.t, item.id)];
       const fact = facts.get(item);
       const meta = el('span', 'browse-meta');
