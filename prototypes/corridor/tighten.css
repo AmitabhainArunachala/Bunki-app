@@ -396,10 +396,11 @@ html body #mini .mini-voice.is-speaking::after { left: calc(100% + 1px); width: 
 .settings-voice-server > .teacher-note { margin: 4px 0; }
 .settings-voice-server > .btn-tertiary { margin-right: 16px; }
 .settings-voice-server [hidden] { display: none !important; }
-/* the study pairing sits under the voice pairing and is set the same way (shared-study-pairing.mjs) */
-.settings-study-device { margin-top: 24px; }
+/* Nihongo Study is a section of its own above the voice pairing, ruled off from it (shared-study-pairing.mjs) */
+.settings-study-device { margin-top: 24px; padding: 16px 0; border-top: 1px solid var(--line-soft, var(--line)); border-bottom: 1px solid var(--line-soft, var(--line)); }
+.settings-study-device > .settings-writing-name { margin-bottom: 4px; }
 .settings-study-device > .teacher-note { margin: 4px 0; }
-.settings-study-device > .btn-tertiary { margin-right: 16px; }
+.settings-study-device > .btn-tertiary { margin: 8px 16px 0 0; }
 .settings-study-device > .chip { margin: 4px 0; }
 .settings-study-device[hidden], .settings-study-device [hidden] { display: none !important; }
 

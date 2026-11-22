@@ -44,7 +44,8 @@ import {
   frameState,
   gradeInFrame,
   loadStudyContent,
-  pairInSettings,
+  connectByLink,
+  connectPayload,
   readablePlaces,
   startHarnessSite,
   studyBlock,
@@ -326,21 +327,33 @@ async function runEngine(engine, launcher, { report, device, second, siteA, site
       page.on('pageerror', (error) => run.pageErrors.push(`${current}: ${scrub(error.message)}`));
       return page;
     };
-    const line = `learner: ${report.learner} · device: ${device.installation} · server: ${S} · environment: ${report.environment}`;
+    // the one-time connect link the learner's own tools open for him
+    const linkWith = (code) =>
+      connectPayload({
+        code,
+        learner: report.learner,
+        installation: device.installation,
+        server: S,
+        environment: report.environment,
+      });
+    const connectIn = async (page, code) => {
+      const answer = await connectByLink(page, page.url().replace(/#.*$/u, ''), linkWith(code));
+      return { paired: answer.state === 'connected', refused: answer.refused, note: answer.note };
+    };
 
     // a. pairing in Settings, the code redeemed by the page
     current = 'a';
     const page = watch(await context.newPage());
     await page.goto(`${siteA.origin}/harness.html?view=settings`, { waitUntil: 'load' });
     assert.equal((await studyBlock(page)).state, 'unpaired');
-    const wrong = await pairInSettings(page, { line, code: MADE_UP_CODE });
+    const wrong = await connectIn(page, MADE_UP_CODE);
     assert.equal(wrong.refused, 'code-invalid-or-expired', scrub(JSON.stringify(wrong)));
-    const paired = await pairInSettings(page, { line, code: device.code });
+    const paired = await connectIn(page, device.code);
     assert.equal(paired.paired, true, scrub(JSON.stringify(paired)));
     const block = await studyBlock(page);
     assert.equal(block.state, 'paired');
     assert.equal(block.bound, 'true');
-    assert.match(block.status, new RegExp(`studies on ${report.learner}’s Nihongo Study record`));
+    assert.match(block.status, /Connected\. This device studies on your Nihongo Study record\./);
     assert.equal(
       tokens.length,
       1,

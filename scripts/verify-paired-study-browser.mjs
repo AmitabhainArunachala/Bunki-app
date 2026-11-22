@@ -5,7 +5,7 @@
  * Not part of CI: it needs a built Bunki site and a study server on this machine. It serves the site on a loopback
  * port, and for each engine (Chromium, WebKit) and each width (390, 1440) it shows that
  *   - a profile that was never paired still gets the old player on the ordinary route `?deck=n2`;
- *   - a pairing line typed into Settings pairs the browser, and Settings says whose record it now studies on;
+ *   - a one-time connect link, confirmed with one click, pairs the browser, and Settings says it is connected;
  *   - the same ordinary route (no `sharedStudy` in the address) then opens the shared study engine, with no
  *     "Sync is not set up" and no "Trial copy";
  *   - a grade made in Bunki arrives at a second device of the same learner, and a grade made there arrives in Bunki;
@@ -49,7 +49,8 @@ import {
   frameState,
   gradeInFrame,
   loadStudyContent,
-  pairInSettings,
+  connectByLink,
+  connectPayload,
   readablePlaces,
   studyBlock,
   studyFrame,
@@ -291,8 +292,19 @@ async function main() {
     receipt.servers.at(-1).stopped = stopped !== false;
     server = null;
   };
-  const lineFor = (device) =>
-    `Bunki study code: ${device.code} · learner: ${server.learner} · device: ${device.installation} · server: ${server.browserUrl} · environment: ${server.environment}`;
+  // the one-time connect link the learner's own tools open for him
+  const linkFor = (device) =>
+    connectPayload({
+      code: device.code,
+      learner: server.learner,
+      installation: device.installation,
+      server: server.browserUrl,
+      environment: server.environment,
+    });
+  const connectIn = async (page, device) => {
+    const answer = await connectByLink(page, page.url().replace(/#.*$/u, ''), linkFor(device));
+    return { paired: answer.state === 'connected', refused: answer.refused, note: answer.note };
+  };
   try {
     for (const engine of engines) {
       // A server this starts is started afresh for each engine, with a fresh learner: a learner's new cards are 20 a
@@ -442,15 +454,17 @@ async function main() {
           if (device) {
             assert.equal(block.state, 'unpaired');
             run.shots.push(await shot(page, `${tag}-2-settings-unpaired`));
-            let paired = await pairInSettings(page, { line: lineFor(device) });
+            let paired = await connectIn(page, device);
             if (paired.refused === 'too-many-attempts') {
               // the server counts pairing calls by the minute: wait the minute out, once
               check('the server asked for a pause between pairings; waited a minute');
               await sleep(61000);
-              paired = await pairInSettings(page, { line: lineFor(device) });
+              paired = await connectIn(page, device);
             }
             assert.equal(paired.paired, true, `pairing was refused: ${paired.refused}`);
-            check('a pairing line typed into Settings pairs the browser', { said: paired.note });
+            check('a connect link and one click on Connect pair the browser', {
+              said: paired.note,
+            });
             pairedProfile = profile;
             await page.close();
             ({ page, block } = await openSettings(context));

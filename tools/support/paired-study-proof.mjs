@@ -1,4 +1,4 @@
-/* global window, document, bunkiSharedStudy, localStorage, indexedDB, Event, TextDecoder */
+/* global window, document, location, Buffer, bunkiSharedStudy, localStorage, indexedDB, Event, TextDecoder */
 /** Shared steps of the paired-study browser proofs (ENGINE-ONE.3): the page-side moves a learner makes (pair in
  * Settings, open a deck, grade a card, unpair) and a second device of the same learner that is the engine's own
  * store and sync client, driven from Node with none of Bunki's host code. Used by the suite's source-tree test
@@ -252,54 +252,84 @@ export async function studyBlock(page, { timeout = 60000 } = {}) {
       status: text('study-pair-status'),
       syncLine: text('study-pair-sync'),
       note: text('study-pair-note'),
-      formShown: shown('study-pair-form'),
+      fields: block.querySelectorAll('form, input, textarea').length,
       unpairShown: shown('study-unpair'),
       text: block.innerText,
     };
   }, settings);
 }
 
-/** Type what the learner types (the pairing line in the first box, a separate code in the second) and press Pair.
- * Resolves { paired, refused, note } as the block stood right after the answer. A pairing says so and then opens
- * the page again: this waits for that reload; where the new page lands is the caller's to follow. */
-export async function pairInSettings(page, { line = '', code = '' }, { timeout = 60000 } = {}) {
-  await studyBlock(page, { timeout });
-  await page.locator('#study-pair-learner').fill(line);
-  await page.locator('#study-pair-code').fill(code);
-  await page.evaluate(
-    (selector) => delete document.querySelector(selector).dataset.refused,
-    settings,
-  );
+/** A one-time connect link's payload, as the learner's own tools write it: base64url of the JSON
+ * {"v":1,"code","learner","installation","server","environment"}. */
+export const connectPayload = ({ code, learner, installation, server, environment, ...rest }) =>
+  Buffer.from(
+    JSON.stringify({ v: 1, code, learner, installation, server, environment, ...rest }),
+  ).toString('base64url');
+
+/** The question a connect link asks, as the page shows it. */
+const readConnect = (page) =>
+  page.evaluate(() => {
+    const panel = document.getElementById('study-connect');
+    const text = (id) => document.getElementById(id)?.textContent || '';
+    const shown = (id) => {
+      const node = document.getElementById(id);
+      return !!node && !node.hidden && node.getClientRects().length > 0;
+    };
+    return {
+      state: panel?.dataset.state ?? 'gone',
+      refused: panel?.dataset.refused || '',
+      title: text('study-connect-title'),
+      server: text('study-connect-server'),
+      note: text('study-connect-note'),
+      connectShown: shown('study-connect-yes'),
+      other: text('study-connect-no'),
+      address: location.href,
+    };
+  });
+
+/** Open `url` the way the learner's own tools do, with a connect link's payload in its fragment, and answer the one
+ * question the page asks: `answer` 'connect' (one click on Connect), 'not-now', or null (only look). Resolves
+ * { first, state, refused, title, server, note, connectShown, other, address }: `first` as the question was asked, the
+ * rest as it stood after the answer. A connection says so and opens the page again: this waits for that reload. */
+export async function connectByLink(
+  page,
+  url,
+  payload,
+  { answer = 'connect', beforeAnswer = null, timeout = 60000 } = {},
+) {
+  // a fresh load: a fragment alone added to the page's own address would not start the page again
+  await page.goto('about:blank');
+  await page.goto(`${url}#study-connect=${payload}`, { waitUntil: 'load', timeout });
+  await page.locator('#study-connect[data-state]').waitFor({ timeout });
+  const first = await readConnect(page);
+  // the question as it was asked, before it is answered (a picture of it, for one)
+  await beforeAnswer?.(first);
+  if (answer === null || first.state !== 'offer') return { first, ...first };
+  if (answer === 'not-now') {
+    await page.locator('#study-connect-no').click();
+    return { first, ...(await readConnect(page)) };
+  }
   const reloaded = page.waitForEvent('load', { timeout }).catch(() => null);
-  await page.locator('#study-pair-submit').click();
+  await page.locator('#study-connect-yes').click();
   await page.waitForFunction(
-    (selector) => {
-      const block = document.querySelector(selector);
-      return !!block && (block.dataset.paired === 'true' || !!block.dataset.refused);
-    },
-    settings,
+    () => ['connected', 'failed'].includes(document.getElementById('study-connect')?.dataset.state),
+    null,
     { timeout },
   );
-  const answer = await page.evaluate((selector) => {
-    const block = document.querySelector(selector);
-    return {
-      paired: block.dataset.paired === 'true',
-      refused: block.dataset.refused || '',
-      note: document.getElementById('study-pair-note')?.textContent || '',
-    };
-  }, settings);
-  if (answer.paired) {
+  const after = await readConnect(page);
+  if (after.state === 'connected') {
     await reloaded;
     await page.waitForLoadState('load', { timeout });
   }
-  return answer;
+  return { first, ...after };
 }
 
-/** Press Forget twice (the second press is the learner's "really"), read what the block says, wait for the reload. */
+/** Press Disconnect twice (the second press is the learner's "really", beside what it does), read what the block
+ * says, wait for the reload. */
 export async function unpairInSettings(page, { timeout = 60000 } = {}) {
   await studyBlock(page, { timeout });
-  const what = await page.locator('#study-unpair-what').innerText();
   await page.locator('#study-unpair').click();
+  const what = await page.locator('#study-unpair-what').innerText();
   const sure = await page.locator('#study-unpair').innerText();
   const reloaded = page.waitForEvent('load', { timeout }).catch(() => null);
   await page.locator('#study-unpair').click();
