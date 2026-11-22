@@ -1033,8 +1033,8 @@ function build() {
 /** the words that follow the interface language outside the sheet */
 function paintWords() {
   intro.querySelector('.pl-intro-text').textContent = t(
-    '試作版：「試」で新しいものの一覧を見て、気になるところを書けます。',
-    'Prototype: 試 lists what is new and takes your notes.');
+    'これは試作版です。新しいものには「新」の印があります。このボタンで一覧を見て、気になるところを書けます。',
+    'This is the prototype. New things carry the mark “new”. This button lists them and takes your notes.');
   intro.querySelector('.pl-intro-ok').textContent = t('わかった', 'OK');
   opener.setAttribute('aria-label', t('試作版：新しいものの一覧と、気になるところのメモ', 'Prototype: what is new, and your notes'));
   opener.title = t('試作版', 'Prototype');
