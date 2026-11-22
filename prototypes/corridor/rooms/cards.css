@@ -100,7 +100,15 @@ html[data-room='deckplay'] body:not(.zen):not([data-view='entry']):not([data-vie
   border: 0;
   background: transparent;
 }
+/* Avoid duplicate outer chrome ear mark while embedded Nihongo Study owns its own working ear inside the frame. */
+html[data-room='deckplay'] body:has(#app > main > [data-shared-study='ready']) #app > .chrome > .ear-spot {
+  display: none;
+}
 @media (max-width: 640px) {
   [data-shared-study='ready'] > .shared-study-back { margin-inline-start: 12px; padding-inline: 12px; }
   [data-shared-study='ready'] > p { margin-inline-end: 12px; padding: 5px 10px; }
+  /* Prevent the floating look seal from overlapping the embedded study heading's top-right menu on phones. */
+  html[data-room='deckplay'] body:has(#app > main > [data-shared-study='ready']) #bunki-look-seal {
+    display: none;
+  }
 }
