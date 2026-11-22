@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "sourceOnly": true,
-  "sourceHead": "bca9eaa32b28b44c7965f6743dfc35f15d221546",
-  "sourceSha256": "f0ab9cf5138d48a699dc7adcdfb3df94e9b8b89f560bee27e01126802a73780e",
+  "sourceHead": "f8c004b28a5fd1143b7d1b210834c545259646fb",
+  "sourceSha256": "32261afb332e2e61499c1c05f3f5712d23d07246e51a2f0f20d401835264fd4c",
   "sourcePins": {
-    "prototypes/corridor/corridor.js": "f0ab9cf5138d48a699dc7adcdfb3df94e9b8b89f560bee27e01126802a73780e",
+    "prototypes/corridor/corridor.js": "32261afb332e2e61499c1c05f3f5712d23d07246e51a2f0f20d401835264fd4c",
     "prototypes/corridor/modules/voice.mjs": "30888af9636f62ecd0927af39300ad03e1dd11bd1305adfd96bbc81c39338ccf",
     "prototypes/corridor/modules/word-entry.mjs": "55f865c793112607652eda17834497083bf51dd8cbb839ebf67da14cb8001efc",
     "prototypes/corridor/device-voice.mjs": "1ec444fbd02b45498ecbfd13dce244bb193895e438f9a52a06881a2b1599d436",
@@ -27,7 +27,7 @@
       "to": "cardVoiceStatus(btn, '', 'current-source-required');",
       "originalOperatorRetained": false,
       "semantics": "Explicit currentC18 cause supersession",
-      "expectedMutationSha256": "da9600495913f583adb1ff718fbf23a82921dee6581a8f06536636740ae32347"
+      "expectedMutationSha256": "0645c6b2aea3641bc773405335083d4bfb262a7f93c7f31ba07a0ab9cac43141"
     },
     {
       "id": "missing-word-copy-loses-locked-voice",
@@ -38,7 +38,7 @@
       "to": "cardVoiceStatus(btn, tx(...voiceLineOf('failed')), 'current-source-required');",
       "originalOperatorRetained": false,
       "semantics": "Explicit currentC18 cause supersession",
-      "expectedMutationSha256": "34091fc23dd6f324baa5e4e3559d47aec929c70979721582b4699da05aac4ed0"
+      "expectedMutationSha256": "27bdc12aaeee0b32e96d5138ee6cff55845299190380a766690cd82037e81d1a"
     },
     {
       "id": "card-unavailable-title-omitted",
@@ -49,7 +49,7 @@
       "to": "  void reason;",
       "originalOperatorRetained": true,
       "semantics": "Original behavior/operator retained",
-      "expectedMutationSha256": "02dacac4f35dbda9eb2bf9578b2b11cc0c9469448db4856dac474fe07398b152"
+      "expectedMutationSha256": "a18aa56b7bd2b66338670b2f5aed2a6bbc7669e639e30ece8f33e833ab57d6b6"
     },
     {
       "id": "card-retry-retains-error-title",
@@ -60,7 +60,7 @@
       "to": "  if (reason) btn.title = reason;",
       "originalOperatorRetained": false,
       "semantics": "Current live title behavior; redundant old operator superseded",
-      "expectedMutationSha256": "bcd1920056621736b8636110a4e044da17ada80281327db3c7c0d29c35626140"
+      "expectedMutationSha256": "dfaa06dce8ed706a90713a7689c79e7a01e563ca1ad11c4cae40c808ce09f21b"
     },
     {
       "id": "card-subsequent-error-title-stale",
@@ -71,7 +71,7 @@
       "to": "  if (btn.title !== 'stale failure sentinel') btn.title = reason;",
       "originalOperatorRetained": true,
       "semantics": "Original behavior/operator retained",
-      "expectedMutationSha256": "0d62a05ac8653ba026a8824905992d5669d8e55dc5a76790c43f66d92eabe90f"
+      "expectedMutationSha256": "88eed129ac1201a049995580ce045b7aa6d82c018c1d6d5dd6f9a2900880d4bb"
     },
     {
       "id": "pending-quote-creates-listen-control",
@@ -82,7 +82,7 @@
       "to": "for (const quote of root.querySelectorAll('blockquote.sentence-original'))",
       "originalOperatorRetained": true,
       "semantics": "Original behavior/operator retained",
-      "expectedMutationSha256": "2e550ae0bcb6c6c5925841c706f13e439bfc1f093cad7f553ff638bbda9a9541"
+      "expectedMutationSha256": "32b863abf07c63269a0ab366e5bba7de991516bab1773fa8af91a208b2045e58"
     }
   ],
   "fixture": "prototypes/corridor/tools/test-vh-voice-current-controls.mjs",
