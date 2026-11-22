@@ -1,5 +1,6 @@
 /** Interface copy only. Passages, learner text and dictionary entries keep their source language. */
 import {voiceCopies} from '../audio/voice-lines.mjs';
+import {READING_LIGHT_COLORS} from './card-audio.mjs';
 export function defaultInterfaceLanguage(device = globalThis.navigator) {
  const locales=Array.isArray(device?.languages)?device.languages:[];
  for(const locale of [...locales,device?.language]){
@@ -105,6 +106,8 @@ export const interfaceCopies = Object.freeze([
   ["前の上限変更を先に再試行してください。別の変更は保存していません。","Retry the previous limit change first. No different change was saved."],
   ["新規カードを受け取る接続がありません。設定を確認してください。","No connection can reserve new cards. Check Settings."],
   ["上限は保存しました。新規カードを受け取れませんでした。同じ操作を再試行してください。","The limit is saved. New cards could not be reserved. Retry preparation."],
+  ["上限は保存しました。今日の新規カード枠はすべて割り当て済みです。","The limit is saved. All of today’s new-card slots are allocated."],
+  ["新規カードを準備するには、設定で「同期」をタップしてから、準備を再試行してください。","Tap Sync in Settings, then retry new-card preparation."],
   ["上限の記録は端末に保存されています。処理をもう一度確認してください。","The limit record is saved on this device. Retry processing."],
   ["学習日が変わりました。今日の上限を確認してから選び直してください。","The study day changed. Check today’s limit before choosing again."],
   ["別の操作で今日の上限が増えました。現在の上限を確認してください。","Another change raised today’s limit. Check the current limit."],
@@ -334,6 +337,7 @@ export const interfaceCopies = Object.freeze([
   ["例文の形式を確認してください", "Check the example format"],
   ["生成内容の形式を確認してください", "Check the generated content format"],
   ["最初の3枚は内容の確認待ちです", "The first three cards await content review"],
+  ["内容の確認待ちです", "Awaiting content review"],
   ["確認理由を読み取れません", "Review reason could not be read"],
   ["作成できませんでした", "Creation failed"],
   ["この端末で学べます", "Ready on this device"],
@@ -536,6 +540,7 @@ export const interfaceCopies = Object.freeze([
   ["データ", "Data"],
   ["引き継ぎ", "Carried over"],
   ["この端末の表示と、すべてのデッキ共通の学習設定。", "Display settings for this device, and study settings shared by every deck."],
+  ...Object.values(READING_LIGHT_COLORS),
   ["1日の新規カード上限と学習日の区切りは、すべてのデッキ共通です。変更は翌日の学習日から有効です。", "New cards per day and the study-day boundary are shared by every deck. Changes take effect from the next study day."],
   ["このビルドで使える機能と、まだ準備中の機能です。", "What this build can do, and what is still being prepared."],
   ["記録をすべて書き出すか、互換のあるバックアップを追加します。", "Export every record, or add a compatible backup."],
@@ -576,7 +581,7 @@ export function translateInterfaceText(text,labels=interfaceLabels){
   [/^次の学習ステップは (\d{1,2}:\d{2}) です。予定はそのまま保存しています。$/,time=>`The next learning step is at ${time}. Its schedule is unchanged.`],
   [/^ほか(\d+)件$/,n=>`and ${n} more`],
   [/^(\d+) カード$/,n=>`${n} cards`],[/^(\d+) 回$/,n=>`${n} times`],
-  [/^(\d+)分$/,n=>`${n} min`],[/^(\d+)時間$/,n=>`${n} hr`],[/^(\d+)日$/,n=>`${n} days`],[/^(\d+)画$/,n=>`${n} strokes`],
+  [/^(\d+)分$/,n=>`${n} min`],[/^(\d+)時間$/,n=>`${n} hr`],[/^(\d+)日$/,n=>`${n} ${Number(n)===1?"day":"days"}`],[/^(\d+)画$/,n=>`${n} strokes`],
   [/^(\d+)件 · (\d+)〜(\d+)件を表示$/, (count,start,end)=>`Showing ${start}–${end} of ${count}`],
   [/^(\d+)件 · (\d+)〜(\d+)件$/, (count,start,end)=>`${start}–${end} of ${count}`],
   [/^語彙([\d,]+)件（わたしの言葉(\d+)件を含む）・文法(\d+)カード。(?:引き継いだ(\d+)件に、新しい言葉(\d+)件を追加しています。)?全文英訳は配布内容を表示しています。$/, (vocab,personal,grammar,base,added)=>`${vocab} vocabulary cards (including ${personal} personal words) and ${grammar} grammar cards. ${added?`${added} new words were added to ${base} carried-over words. `:''}Full English translations are included in the delivered content.`],

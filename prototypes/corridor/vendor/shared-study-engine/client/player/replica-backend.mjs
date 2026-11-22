@@ -4,11 +4,11 @@
 import {manualCardData} from './manual-cards.mjs';
 import {customSessionOptions,selectCustomSession,sessionReviewEvidence} from './study-sessions.mjs';
 import {ensureLocalDayBudget} from '../app/local-budget.mjs';
-import {canonicalizeLocalPending} from './local-canonical.mjs';
+import {canonicalizeLocalPending,localCanonicalFollowUp} from './local-canonical.mjs';
 import {contentReady} from './content-ready.mjs';
 import {createRestDayEvidenceReader} from './rest-day-evidence.mjs';
 import {createProjectionView} from './projection-view.mjs';
-import {StoreError} from '../store.mjs';
+import {StoreError, subscribeToCommittedState} from '../store.mjs';
 import { canonicalStringify, payloadHash } from '../schema/event.mjs';
 import { studyDayAllowance } from '../replay.mjs';
 import { servable,nextStep,createScheduler } from '../vendor/engine.js';
@@ -17,7 +17,7 @@ import {orderBacklogReviews} from './backlog-order.mjs';
 const clone = v => structuredClone(v);
 const immutable = v => { if (v && typeof v === 'object') { Object.values(v).forEach(immutable); Object.freeze(v); } return v; };
 
-export async function createReplicaBackend({ store, engine, catalog, pin = null, localAuthority = null, reserveNewPermits = null, now = Date.now, uuid = () => crypto.randomUUID() }) {
+export async function createReplicaBackend({ store, engine, catalog, pin = null, localAuthority = null, reserveNewPermits = null, checkNewPermits = null, now = Date.now, uuid = () => crypto.randomUUID() }) {
   let state = await store.readState(), projection = state.projection, disposed = false, lastTs = 0;
   const listeners = new Set(), intents = new Map();
   // Snapshot the host's accepted pin; the first explicit backlog selection
@@ -41,6 +41,8 @@ export async function createReplicaBackend({ store, engine, catalog, pin = null,
   // timer must not reserve the same sequence as a newly submitted command.
   let localWrite=Promise.resolve();
   const withLocalWrite=action=>{const result=localWrite.then(action);localWrite=result.catch(()=>{});return result;};
+  let canonicalFollowUp=null;
+  if(localAuthority){try{canonicalFollowUp=localCanonicalFollowUp(store,{authority:localAuthority,now});}catch{/* the separate receipt step reports a missing authority, as before */}}
   let previewCache = null;
   const entries = new Map(catalog.map(entry => [entry.taskKey, entry]));
   const manualEntries=()=>Object.values(projection.manualCards??{}).map(publicView);
@@ -49,6 +51,11 @@ export async function createReplicaBackend({ store, engine, catalog, pin = null,
   refreshManualEntries();
   let refreshGeneration=0, refreshedGeneration=0, compatibleGeneration=0, refreshing=false;
   const refreshWaiters=new Set();
+  function acceptSnapshot(next) {
+    if(next.storageRevision<state.storageRevision)return;
+    state=next;projection=next.projection;refreshManualEntries();
+    for(const fn of listeners){try{fn(publicView(projection));}catch{/* presentation only */}}
+  }
   function finishRefreshWaiters(through=Infinity,error=null){
     for(const waiter of refreshWaiters)if(waiter.generation<=through){
       refreshWaiters.delete(waiter);if(error)waiter.reject(error);else waiter.resolve();
@@ -67,10 +74,7 @@ export async function createReplicaBackend({ store, engine, catalog, pin = null,
           const next=await store.readState(compatibleGeneration>refreshedGeneration?{requireCompatible:true}:undefined);
           if(disposed)return;
           refreshedGeneration=readingGeneration;
-          if(next.storageRevision>=state.storageRevision){
-            state=next;projection=next.projection;refreshManualEntries();
-            for(const fn of listeners){try{fn(publicView(projection));}catch{/* presentation only */}}
-          }
+          acceptSnapshot(next);
           // Complete only callers covered by this read. Newer invalidations
           // continue in the background without holding earlier saves hostage.
           finishRefreshWaiters(readingGeneration);
@@ -81,7 +85,14 @@ export async function createReplicaBackend({ store, engine, catalog, pin = null,
     return done;
   }
   const refresh=()=>refreshThrough(++refreshGeneration);
-  const stop=store.subscribe(()=>{refresh().catch(()=>{});});
+  const stop=subscribeToCommittedState(store,next=>{
+    if(disposed)return;
+    // Keep a pending fresh or strict recovery read in control of its generation.
+    if(!next||refreshing||compatibleGeneration>refreshedGeneration){refresh().catch(()=>{});return;}
+    refreshedGeneration=++refreshGeneration;
+    acceptSnapshot(next);
+    finishRefreshWaiters(refreshedGeneration);
+  });
   // Share only calls queued before a read starts. A later status request gets
   // a new read even if an older one is still in flight (including cross-handle writes).
   let queuedStatus=null;
@@ -133,7 +144,11 @@ export async function createReplicaBackend({ store, engine, catalog, pin = null,
           if (recovered.event.id !== record.proof.event.id || recovered.bodyHash !== record.proof.bodyHash)
             throw Object.assign(Error('immutable-conflict'), { code: 'immutable-conflict' });
         } else {
-          try { saved = await store.appendOrFind(wireCommand); }
+          // The standalone Mac authority gives its own save a local receipt.
+          // A store that can make both one commit takes them together, in the
+          // local-write order the receipts already used; any other store saves
+          // first and receipts afterwards, exactly as before.
+          try { saved = canonicalFollowUp && store.combinesFollowUp === true ? await withLocalWrite(()=>store.appendOrFind(wireCommand,{followUp:canonicalFollowUp})) : await store.appendOrFind(wireCommand); }
           catch (error) {
             if (error.code && !['storage-failed', 'storage-conflict', 'schema-unsupported', 'event-too-large'].includes(error.code)) throw error;
             recovered = await store.lookupCommand(wireCommand); if (!recovered.persisted) throw error;
@@ -146,7 +161,7 @@ export async function createReplicaBackend({ store, engine, catalog, pin = null,
         record.proof ??= immutable({ event: (recovered ?? saved).event, bodyHash: (recovered ?? saved).bodyHash });
         const event = record.proof.event;
         if (record.admissionBlocked || recovered?.blockedReason) return persistedResult(record.admissionBlocked ?? recovered.blockedReason);
-        if(localAuthority)await withLocalWrite(()=>canonicalizeLocalPending(store,{authority:localAuthority,now}));
+        if(localAuthority&&!saved?.followedUp)await withLocalWrite(()=>canonicalizeLocalPending(store,{authority:localAuthority,now}));
         // A successful append already invalidates via the store subscription.
         // Lost commit replies have no notification, so force a read in that case.
         await refreshThrough(saved?.appended&&refreshGeneration>beforeRefresh?refreshGeneration:++refreshGeneration, Boolean(recovered));
@@ -386,7 +401,7 @@ export async function createReplicaBackend({ store, engine, catalog, pin = null,
    * setting. Ready carries the current applied outcome independently of the old
    * submit kind. An unchanged total has no intent or persisted:true claim. */
   async function changeTodayAllowance(key,amount,displayedDay){
-    if(!localAuthority&&typeof reserveNewPermits!=='function')return {kind:'unsupported',reason:'server-permit-required'};
+    if(!localAuthority&&!checkNewPermits&&typeof reserveNewPermits!=='function')return {kind:'unsupported',reason:'server-permit-required'};
     const absolute=key==='newTodayTotal';
     if(absolute?(!Number.isInteger(amount)||amount<0||amount>200):![5,10,20].includes(amount)){
       return {kind:'invalid',reason:absolute?'invalid-today-total':'invalid-day-override'};
@@ -428,6 +443,9 @@ export async function createReplicaBackend({ store, engine, catalog, pin = null,
         const outcome=record.intent?projection.outcomes?.[record.result.eventId]:null;
         const canonical=record.intent&&Object.values(state.canonical).some(row=>row.event.id===record.result.eventId&&row.seq<=state.appliedSeq);
         if(canonical&&outcome?.status==='observation')return {status:'stopped',reason:outcome.reason||'setting-not-applied',facts};
+        if(checkNewPermits&&(record.intent?!canonical:Object.values(state.local).some(({event})=>
+          event.type==='settings'&&['newTodayTotal','newTodayOverride'].includes(event.data.key)&&
+          event.data.value?.day===record.day&&event.data.value.timezone===record.timezone)))return {status:'pending',reason:'new-permits-sync-required'};
         // A provisional refusal cannot release an increment. Synchronization
         // must establish the canonical outcome before another operation starts.
         if(record.intent&&outcome?.status!=='applied')return {status:'pending',reason:'setting-processing-required',awaitingCanonical:outcome?.status==='observation'&&!canonical};
@@ -445,6 +463,13 @@ export async function createReplicaBackend({ store, engine, catalog, pin = null,
         let condition=inspect();
         if(condition&&!condition.awaitingCanonical)return prepared(record,condition.status,condition.reason,condition.facts);
         if(!['durable','observation-only'].includes(result.kind)||projection.error||projection.updateRequired)return prepared(record,'pending','setting-processing-required');
+        if(checkNewPermits){
+          if(condition)return prepared(record,condition.status,condition.reason,condition.facts);
+          const reason=checkNewPermits(state);
+          if(reason==='new-permits-budget-exhausted')return prepared(record,'stopped',reason,current());
+          if(reason)return prepared(record,'pending',reason);
+          return prepared(record,'ready',null,current());
+        }
         preparing=true;
         if(localAuthority)await withLocalWrite(()=>ensureLocalDayBudget(store,{now}));
         else {const status=await reserveNewPermits();if(status?.error||!(await store.status()).upToDate)throw Error('server-permit-required');}
