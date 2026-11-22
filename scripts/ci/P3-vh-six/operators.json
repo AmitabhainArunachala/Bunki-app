@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "sourceOnly": true,
-  "sourceHead": "96174b228982b651a413d395dfb42778316d91f1",
+  "sourceHead": "bca9eaa32b28b44c7965f6743dfc35f15d221546",
   "sourceSha256": "f0ab9cf5138d48a699dc7adcdfb3df94e9b8b89f560bee27e01126802a73780e",
   "sourcePins": {
     "prototypes/corridor/corridor.js": "f0ab9cf5138d48a699dc7adcdfb3df94e9b8b89f560bee27e01126802a73780e",
-    "prototypes/corridor/modules/voice.mjs": "0f23f72c745899f9e2f85a3b27bf7d497d13668911731f4a89da23676e75cb57",
+    "prototypes/corridor/modules/voice.mjs": "30888af9636f62ecd0927af39300ad03e1dd11bd1305adfd96bbc81c39338ccf",
     "prototypes/corridor/modules/word-entry.mjs": "55f865c793112607652eda17834497083bf51dd8cbb839ebf67da14cb8001efc",
     "prototypes/corridor/device-voice.mjs": "1ec444fbd02b45498ecbfd13dce244bb193895e438f9a52a06881a2b1599d436",
-    "prototypes/corridor/modules/voice-lines.mjs": "22f2408f458858888aa533afdb540eadec02cd2e7657bf4572e2b03bc4a3ce04",
+    "prototypes/corridor/modules/voice-lines.mjs": "22a467d7e82c4e94b799b64e7594dd1dcb56964c5cf342a518d394d5ee93f169",
     "prototypes/corridor/modules/card-audio.mjs": "87a3f4d1857f3ca24075d1bbd7063c4e54da2095fec3d5eecddc71c5ee130ed4",
     "prototypes/corridor/tools/voice-lock.mjs": "78616a4d51de657feb3d5639baddb6c502c6b7c8f751e2ba6e6c8732e40dc5a8",
     "prototypes/corridor/audio/voice-lock.json": "16c2ea339ad6bbe6dd19fe1266bae9b6686a8cac92fe713a67b3245a039e074e",
