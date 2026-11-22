@@ -21,7 +21,10 @@
     } catch (e) { return true; }
   }
   if (softwareOnly()) return;
-  var dir = /^[a-z0-9-]{1,40}$/.test(q.get('skydir') || '') ? q.get('skydir') : 'sky';   // ?skydir=sky-next: the lead's working copy, for checks before a release
+  /* Which sky. (2026-11-15) John chose star sky 6 as the base ("SKY 6 is defineily the most sound logic so far"), so a person's browser opens it on the
+   * first screen. A driven browser that names no folder keeps the version 3 sky its checks were written for (the same rule as the line above: a check
+   * meets the screen it was written for). ?skydir=sky gives the older sky to anyone; ?skydir=<folder> any other copy. Before: always 'sky'. */
+  var dir = /^[a-z0-9-]{1,40}$/.test(q.get('skydir') || '') ? q.get('skydir') : (navigator.webdriver === true ? 'sky' : 'sky-star6');
   var base = '/design/' + dir + '/', v = Date.now().toString(36);
   function load(src) { return new Promise(function (res, rej) { var s = document.createElement('script'); s.src = base + src + '?v=' + v; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
   var lookOf = function () { return document.documentElement.getAttribute('data-theme') || 'hokusai'; };

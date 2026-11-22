@@ -5,6 +5,9 @@
  * /design/depth/version.txt changes, so a change shows in his open app within about three seconds, with
  * no reload and no lost place. While on, the app's own folded copy (depth.css in the build) is set aside,
  * so the design folder is the one truth here. Off: the flat app, for comparison.
+ * The switch (lean pass, 2026-11-22; on the phone the floating 深 lay over page text): one row "深 Depth" with On | Off
+ * in the 試 sheet, which the app's prototype layer draws from window.__bunkiPrototypeRows. A build whose layer does not
+ * draw such rows (no data-pl-rows on its root), or a page with no layer after 8 s, keeps the floating 深 button.
  * Writes one key of its own in localStorage (bunki-live-depth). Never touches the learner record. */
 (function () {
   if (window.__bunkiLiveDepth) return;
@@ -34,10 +37,14 @@
   (function skyLayer() {
     try { var s = document.createElement('script'); s.src = '/design/sky/mount.js?v=' + Date.now().toString(36); s.async = true; document.head.appendChild(s); } catch (e) { /* the old first screen stays */ }
   })();
+  // The look seal on every page, from design/theme/. It shows itself only where the app's own seal is not in the page.
+  (function lookSeal() {
+    try { var s = document.createElement('script'); s.src = '/design/theme/look-seal.js?v=' + Date.now().toString(36); s.async = true; document.head.appendChild(s); } catch (e) { /* the app's own seal still works on the first screen */ }
+  })();
   var KEY = 'bunki-live-depth';
   var on = true;
   try { on = localStorage.getItem(KEY) !== '0'; } catch (e) { /* this visit only */ }
-  var FILES = ['depth/depth.css', 'depth/kanji.css', 'depth/lead.css', 'depth/print.css'];
+  var FILES = ['depth/depth.css', 'depth/kanji.css', 'depth/lead.css', 'depth/print.css', 'theme/integrity.css'];
   var links = [];
   var ver = '';
   var style = document.createElement('style');
@@ -83,15 +90,34 @@
     btn.classList.toggle('on', on);
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
   }
-  btn.addEventListener('click', function () {
-    on = !on;
+  function setOn(value) {
+    on = !!value;
     try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) { /* this visit only */ }
     apply();
+  }
+  btn.addEventListener('click', function () { setOn(!on); });
+  (window.__bunkiPrototypeRows = window.__bunkiPrototypeRows || []).push({
+    id: 'live-depth', name: ['深 奥行き', '深 Depth'], on: function () { return on; }, set: setOn
   });
+  function layerKind() {
+    var root = document.getElementById('bunki-prototype-root');
+    return root ? (root.hasAttribute('data-pl-rows') ? 'rows' : 'old') : '';
+  }
   function mount() {
     document.head.appendChild(style);
-    document.body.appendChild(btn);
     apply();
+    var settled = false, watch = null, late = 0;
+    var settle = function (kind) {
+      if (settled) return;
+      settled = true;
+      if (watch) watch.disconnect();
+      clearTimeout(late);
+      if (kind !== 'rows') document.body.appendChild(btn);
+    };
+    if (layerKind()) { settle(layerKind()); return; }
+    watch = new MutationObserver(function () { var kind = layerKind(); if (kind) settle(kind); });
+    watch.observe(document.body, { childList: true });
+    late = setTimeout(function () { settle(layerKind()); }, 8000);
   }
   if (document.body) mount(); else document.addEventListener('DOMContentLoaded', mount);
   /* The article's own picture is handed to the stylesheet as a variable, so the page can let it bleed into its
