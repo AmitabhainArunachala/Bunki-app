@@ -47,6 +47,7 @@ const {
   ENDED_MARKER,
   PAIRING_CHANNEL,
   studyPairingLine,
+  studySyncedLine,
 } = pairingModule;
 const { openPairedStudyHost, studyTransportBridge, pairedReplicaName } = hostModule;
 
@@ -319,6 +320,7 @@ function memoryCredentialStore() {
               pairedAt: row.pairedAt,
               phase: row.phase,
               ended: row.ended ? Object.freeze({ ...row.ended }) : null,
+              syncedAt: row.syncedAt ?? null,
             })
           : null,
         token: row && !row.ended ? row.sealed : null,
@@ -344,6 +346,9 @@ function memoryCredentialStore() {
     },
     async markReady(ref) {
       return change('markReady', studyRowChanges.ready(row, ref));
+    },
+    async synced(ref, at) {
+      return change('synced', studyRowChanges.synced(row, ref, at));
     },
     async end(ref, ending) {
       return change('end', studyRowChanges.end(row, ref, ending));
@@ -464,6 +469,7 @@ function createWorld({ voiceServer = null, refuseFlag = false } = {}) {
       host.withAdapter((binding) => createBunkiStudyAdapter({ ...binding, content }));
     return {
       env,
+      now,
       marker,
       endedMark,
       state,
@@ -663,7 +669,13 @@ test('pair: one request to the configured server, the credential kept, the host 
     state: 'up-to-date',
     error: null,
     unsent: null,
+    syncedAt: world.now(),
   });
+  // when the record was last brought up to date is kept on the pairing's own row, for a page that has not opened study
+  await until(
+    () => world.store.peek().syncedAt === world.now(),
+    'the row keeps the time of the last sync',
+  );
   // every sync request carries the credential and the replica's capability, and a GET nothing more
   const pull = world.server.log.find((row) => row.url.startsWith(`${SERVER}/v1/events?`));
   assert.deepEqual(Object.keys(pull.headers).sort(), ['Authorization', 'X-NSRS-Reducer-SHA256']);
@@ -1377,6 +1389,7 @@ test('unpair: the credential and the flag go, sync stops, the copy of the record
     learner: null,
     installation: null,
     marked: false,
+    syncedAt: null,
   });
   await assert.rejects(
     world.openHost(),
@@ -1883,6 +1896,69 @@ test(
   },
 );
 
+/** Page start with `hash` in the address: what was done in what order, and the address afterwards. */
+function bootWithLink(hash) {
+  const script = `
+    const order = [];
+    let address = '/index.html?ui=ja' + ${JSON.stringify(hash)};
+    const define = (name, value) => Object.defineProperty(globalThis, name, { value, configurable: true, writable: true });
+    define('localStorage', { getItem: (key) => { order.push('read ' + key); return null; }, setItem: (key) => void order.push('write ' + key), removeItem: (key) => void order.push('remove ' + key) });
+    define('sessionStorage', { getItem: () => null, setItem: (key) => void order.push('session ' + key), removeItem() {} });
+    define('location', {
+      get hash() { order.push('hash read'); const at = address.indexOf('#'); return at < 0 ? '' : address.slice(at); },
+      pathname: '/index.html', search: '?ui=ja',
+      reload: () => void order.push('reload'), replace: (url) => { order.push('replace'); address = url; },
+    });
+    define('history', { state: { kept: 1 }, replaceState(state, title, url) { order.push('replaceState'); this.kept = state; address = url; } });
+    await import(${JSON.stringify(new URL('shared-study-boot.mjs', root).href)});
+    console.log(JSON.stringify({ order, address, state: globalThis.history.kept ?? null }));
+    process.exit(0);
+  `;
+  const output = execFileSync(process.execPath, ['--input-type=module', '-e', script], {
+    encoding: 'utf8',
+    env: { PATH: process.env.PATH },
+    timeout: 25000,
+  });
+  return JSON.parse(output.trim().split('\n').at(-1));
+}
+
+test(
+  'page start: a connect link leaves the address before anything else runs, a malformed one too, and no other address is touched',
+  SLOW,
+  () => {
+    const payload = Buffer.from(
+      JSON.stringify({
+        v: 1,
+        code: NO_SUCH_CODE,
+        learner: LEARNER,
+        installation: studyInstallation(),
+        server: SERVER,
+        environment: ENVIRONMENT,
+      }),
+    ).toString('base64url');
+    for (const hash of [
+      `#study-connect=${payload}`,
+      '#study-connect=%7B%22v%22%3A1!!',
+      '#study-connect=',
+    ]) {
+      const started = bootWithLink(hash);
+      // the first thing this page does with the address is take the link out of it, before any storage is read
+      assert.deepEqual(started.order.slice(0, 2), ['hash read', 'replaceState'], hash);
+      assert.equal(started.address, '/index.html?ui=ja', hash);
+      assert.deepEqual(started.state, { kept: 1 });
+      assert.equal(
+        started.order.some((step) => /^(write|session) /.test(step)),
+        false,
+        hash,
+      );
+    }
+    // an address of the app's own (a route) is left as it is
+    const route = bootWithLink('#context');
+    assert.equal(route.address, '/index.html?ui=ja#context');
+    assert.equal(route.order.includes('replaceState'), false);
+  },
+);
+
 /** As much of a page as the Settings block touches: elements that keep what is set on them, events that can be
  * fired, a timer that is held and a reload that is counted. The block in a real browser is the browser test's part. */
 function pageDouble({ english = true, env = {} } = {}) {
@@ -1928,6 +2004,7 @@ function pageDouble({ english = true, env = {} } = {}) {
     };
   };
   const timers = [];
+  const intervals = [];
   const reloads = [];
   const find = (node, id) =>
     node.id === id ? node : node.children.map((child) => find(child, id)).find(Boolean) || null;
@@ -1948,9 +2025,12 @@ function pageDouble({ english = true, env = {} } = {}) {
     env: {
       ...env,
       setTimeout: (run, ms) => void timers.push({ run, ms }),
+      setInterval: (run, ms) => intervals.push({ run, ms }),
+      clearInterval: (id) => void (intervals[id - 1] && (intervals[id - 1].cleared = true)),
       location: { reload: () => void reloads.push(1) },
     },
     timers,
+    intervals,
     reloads,
     find,
     said: (node) => said(node).join('\n'),
@@ -1971,9 +2051,43 @@ async function settingsBlock(tab, host, english = true) {
     env: page.env,
     pairing: tab.pairing,
     host,
+    now: tab.now,
   });
   return { page, block, at: (id) => page.find(block, id) };
 }
+/** A connect link's payload, as the learner's own tools write it. */
+const linkFor = (minted, fields = {}) =>
+  Buffer.from(
+    JSON.stringify({
+      v: 1,
+      code: minted.code,
+      learner: LEARNER,
+      installation: minted.installation,
+      server: SERVER,
+      environment: ENVIRONMENT,
+      ...fields,
+    }),
+  ).toString('base64url');
+/** The question a connect link asks, in one tab: its page, the panel, and whether it is on the page. */
+async function connectPanel(tab, link, { english = true, env = {} } = {}) {
+  const page = pageDouble({ english, env: { ...tab.env, ...env } });
+  let mounted = null;
+  const panel = await pairingModule.offerStudyConnect(link, {
+    env: page.env,
+    pairing: tab.pairing,
+    english,
+    el: page.el,
+    mount: (node) => void (mounted = node),
+    unmount: (node) => void (mounted = mounted === node ? null : mounted),
+  });
+  return { page, panel, at: (id) => page.find(panel, id), mounted: () => mounted };
+}
+/** Requests that spend a pairing code. */
+const pairRequests = (world) => world.server.log.filter((row) => row.url.endsWith('/v1/pair'));
+/** Let whatever was started run its course before something is said not to have happened. */
+const settle = async () => {
+  for (let turn = 0; turn < 25; turn++) await tick();
+};
 /** The shape shared-study-boot.mjs gives Settings for the page's host. */
 function pageHost(study, order = []) {
   const listeners = new Set();
@@ -1994,86 +2108,255 @@ function pageHost(study, order = []) {
   };
 }
 
-test('Settings: the form, a refusal in plain words in the page’s language, and a pairing that says so and reopens the page', async () => {
+test('Settings: Nihongo Study with no form, “Not connected” in the page’s language, and a connection made by a link shown at once', async () => {
   const world = createWorld();
-  // this page hears nothing from the other tabs: what its block shows after a pairing is its own doing
-  const { page, block, at } = await settingsBlock(world.tab({ deaf: true }), null);
+  const { block, at } = await settingsBlock(world.tab(), null);
   assert.equal(block.dataset.state, 'unpaired');
   assert.equal(block.dataset.paired, 'false');
-  assert.equal(seen(at('study-pair-form')), true);
-  assert.equal(seen(at('study-unpair')), false);
-  assert.equal(seen(at('study-pair-reopen')), false);
-  assert.match(at('study-pair-status').textContent, /not connected to a Nihongo Study record yet/);
-
-  const wrong = pairLine({ ...world.server.code(), code: NO_SUCH_CODE }).learner;
-  at('study-pair-learner').value = wrong;
-  await at('study-pair-form').fire('submit');
-  assert.equal(block.dataset.refused, 'code-invalid-or-expired');
-  assert.equal(at('study-pair-note').textContent, studyPairingLine('code-invalid-or-expired')[1]);
-  assert.equal(block.dataset.state, 'unpaired');
-  assert.equal(seen(at('study-pair-form')), true);
-  assert.equal(world.store.peek(), null);
-  assert.deepEqual(page.timers, []);
-  // a code typed alone, as the form's second box invites: the block says what is missing
-  at('study-pair-learner').value = '';
-  at('study-pair-code').value = NO_SUCH_CODE;
-  await at('study-pair-form').fire('submit');
-  assert.equal(block.dataset.refused, 'invalid-pairing');
-  at('study-pair-learner').value = LEARNER;
-  await at('study-pair-form').fire('submit');
-  assert.equal(block.dataset.refused, 'pairing-line-required');
-  assert.match(at('study-pair-note').textContent, /A code alone cannot pair/);
-  at('study-pair-code').value = '';
-
-  const japanese = await settingsBlock(world, null, false);
-  japanese.at('study-pair-learner').value = wrong;
-  await japanese.at('study-pair-form').fire('submit');
+  assert.equal(block.children[0].textContent, 'Nihongo Study');
   assert.equal(
-    japanese.at('study-pair-note').textContent,
-    studyPairingLine('code-invalid-or-expired')[0],
+    at('study-pair-status').textContent,
+    'Not connected. Study here stays on this device.',
   );
-  assert.match(
+  // no form, no field, no code box: a device is connected by the link, never by typing
+  const tags = (node) => [node.tag, ...node.children.flatMap(tags)];
+  assert.deepEqual(
+    tags(block).filter((tag) => ['form', 'input', 'textarea', 'label'].includes(tag)),
+    [],
+  );
+  for (const id of ['study-pair-sync', 'study-unpair', 'study-unpair-what', 'study-pair-reopen'])
+    assert.equal(seen(at(id)), false, id);
+  const japanese = await settingsBlock(world.tab(), null, false);
+  assert.equal(
     japanese.at('study-pair-status').textContent,
-    /Nihongo Study の記録につながっていません/,
+    '未接続。この端末の学習はこの端末だけに保存されます。',
   );
-  assert.notEqual(
-    studyPairingLine('code-invalid-or-expired')[0],
-    studyPairingLine('code-invalid-or-expired')[1],
-  );
+  assert.equal(japanese.at('study-unpair').textContent, '接続を解除');
 
+  // a link opened in another tab connects this browser: the block hears it and says what is left to do
   const minted = world.server.code();
-  at('study-pair-learner').value = pairLine(minted).learner;
-  await at('study-pair-form').fire('submit');
-  assert.equal(block.dataset.paired, 'true');
-  assert.match(
-    at('study-pair-note').textContent,
-    new RegExp(`now studies on ${LEARNER}’s Nihongo Study record`),
+  assert.deepEqual(await world.pairing.pair({ link: linkFor(minted) }), {
+    ok: true,
+    learner: LEARNER,
+    installation: minted.installation,
+  });
+  await until(() => block.dataset.state === 'reopen', 'the block heard of the connection');
+  assert.equal(
+    at('study-pair-status').textContent,
+    'Connected. Reopen Bunki and study starts on your Nihongo Study record.',
   );
-  assert.equal(seen(at('study-pair-note')), true);
-  assert.equal(seen(at('study-pair-form')), false);
-  assert.equal(at('study-pair-learner').value, '');
+  assert.equal(seen(at('study-pair-reopen')), true);
+  assert.equal(at('study-pair-sync').textContent, 'Not synced yet.');
+  assert.equal(seen(at('study-unpair')), true);
+  assert.equal(at('study-unpair').textContent, 'Disconnect');
+  // what Disconnect does is said beside the second press, not before
+  assert.equal(seen(at('study-unpair-what')), false);
+  await until(() => japanese.block.dataset.state === 'reopen', 'the other block heard of it');
+  assert.match(japanese.at('study-pair-status').textContent, /^接続済み。/);
+});
+
+test('a connect link asks one question: nothing is kept or sent before Connect, Not now keeps and sends nothing, and one click on Connect pairs', async () => {
+  const world = createWorld();
+  const minted = world.server.code();
+  const link = linkFor(minted);
+  const offer = await connectPanel(world, link);
+  assert.equal(offer.panel.dataset.state, 'offer');
+  assert.equal(offer.mounted(), offer.panel);
+  assert.equal(
+    offer.at('study-connect-title').textContent,
+    'Connect this browser to your Nihongo Study record?',
+  );
+  assert.equal(offer.at('study-connect-server').textContent, `Server: ${new URL(SERVER).host}`);
+  assert.equal(seen(offer.at('study-connect-yes')), true);
+  assert.equal(offer.at('study-connect-yes').textContent, 'Connect');
+  assert.equal(offer.at('study-connect-no').textContent, 'Not now');
+  // before Connect: nothing sent, nothing kept, nothing written anywhere
+  await settle();
+  assert.deepEqual(world.server.log, []);
+  assert.equal(world.store.peek(), null);
+  assert.deepEqual(world.store.calls, []);
+  assert.deepEqual(world.localStorage.writes, []);
+
+  // Not now: the question goes away, and still nothing is sent or kept; a late press of Connect does nothing
+  await offer.at('study-connect-no').fire('click');
+  assert.equal(offer.mounted(), null);
+  assert.equal(offer.panel.dataset.state, 'closed');
+  await offer.at('study-connect-yes').fire('click');
+  await settle();
+  assert.deepEqual(world.server.log, []);
+  assert.equal(world.store.peek(), null);
+  assert.deepEqual(world.store.calls, []);
+  assert.deepEqual(world.localStorage.writes, []);
+  assert.deepEqual(offer.page.timers, []);
+  assert.deepEqual(offer.page.reloads, []);
+
+  // the same link opened again, and one click on Connect: one request, to the named server, and the page reopens
+  const again = await connectPanel(world, link);
+  await again.at('study-connect-yes').fire('click');
+  assert.equal(again.panel.dataset.state, 'connected');
+  assert.equal(again.at('study-connect-title').textContent, 'Connected');
+  assert.equal(
+    again.at('study-connect-note').textContent,
+    'This browser now studies on your Nihongo Study record. Reopening Bunki…',
+  );
+  assert.equal(seen(again.at('study-connect-yes')), false);
+  assert.equal(seen(again.at('study-connect-no')), false);
+  assert.deepEqual(
+    pairRequests(world).map((row) => row.url),
+    [`${SERVER}/v1/pair`],
+  );
   assert.equal(world.store.peek().scope.installation, minted.installation);
-  // the page is opened again only after it has said so
-  assert.deepEqual(page.reloads, []);
-  assert.equal(page.timers.length, 1);
-  assert.ok(page.timers[0].ms >= 1000);
-  page.timers[0].run();
-  assert.deepEqual(page.reloads, [1]);
-  // a page that has not been opened again yet says what is left to do; so does the other block, told at once
-  const waiting = await settingsBlock(world, null);
-  assert.equal(waiting.block.dataset.state, 'reopen');
-  assert.equal(seen(waiting.at('study-pair-reopen')), true);
-  assert.equal(seen(waiting.at('study-pair-form')), false);
-  await until(
-    () => japanese.block.dataset.state === 'reopen',
-    'the other block heard of the pairing',
+  assert.equal(world.marker.get(), true);
+  assert.deepEqual(again.page.reloads, []);
+  assert.equal(again.page.timers.length, 1);
+  assert.ok(again.page.timers[0].ms >= 1000);
+  again.page.timers[0].run();
+  assert.deepEqual(again.page.reloads, [1]);
+
+  // in Japanese, and a refusal from the server is one plain line with Close
+  const other = createWorld();
+  const japanese = await connectPanel(
+    other,
+    linkFor({ ...other.server.code(), code: NO_SUCH_CODE }),
+    {
+      english: false,
+    },
+  );
+  assert.equal(
+    japanese.at('study-connect-title').textContent,
+    'このブラウザーを Nihongo Study の記録につなぎますか？',
+  );
+  assert.equal(japanese.at('study-connect-yes').textContent, '接続');
+  assert.equal(japanese.at('study-connect-no').textContent, '今はしない');
+  await japanese.at('study-connect-yes').fire('click');
+  assert.equal(japanese.panel.dataset.state, 'failed');
+  assert.equal(japanese.panel.dataset.refused, 'code-invalid-or-expired');
+  assert.equal(
+    japanese.at('study-connect-note').textContent,
+    studyPairingLine('code-invalid-or-expired')[0],
+  );
+  assert.equal(seen(japanese.at('study-connect-yes')), false);
+  assert.equal(japanese.at('study-connect-no').textContent, '閉じる');
+  assert.equal(other.store.peek(), null);
+  assert.deepEqual(japanese.page.reloads, []);
+});
+
+test('a connect link that names another server than the one this browser knows is refused with nothing sent', async () => {
+  const world = createWorld({ voiceServer: SERVER });
+  const minted = world.server.code();
+  const elsewhere = linkFor(minted, { server: 'http://127.0.0.1:9' });
+  const refused = await connectPanel(world, elsewhere);
+  assert.equal(refused.panel.dataset.state, 'refused');
+  assert.equal(refused.panel.dataset.refused, 'server-mismatch');
+  assert.equal(
+    refused.at('study-connect-title').textContent,
+    'This link cannot connect this browser',
+  );
+  assert.match(
+    refused.at('study-connect-note').textContent,
+    /not the server this device is set up for\. Nothing was connected\./,
+  );
+  assert.equal(seen(refused.at('study-connect-yes')), false);
+  assert.equal(refused.at('study-connect-no').textContent, 'Close');
+  await refused.at('study-connect-yes').fire('click');
+  // asked directly, the pairing call refuses it the same way
+  assert.deepEqual(await world.pairing.pair({ link: elsewhere }), {
+    ok: false,
+    code: 'server-mismatch',
+  });
+  await settle();
+  assert.deepEqual(world.server.log, []);
+  assert.equal(world.store.peek(), null);
+  assert.deepEqual(world.localStorage.writes, []);
+  // a link that is not whole, or names a speak-only voice install, is refused the same way, before anything is sent
+  const cut = await connectPanel(world, linkFor(minted).slice(0, 40));
+  assert.equal(cut.panel.dataset.refused, 'invalid-link');
+  const extra = await connectPanel(world, linkFor(minted, { token: 'x' }));
+  assert.equal(extra.panel.dataset.refused, 'invalid-link');
+  const voice = await connectPanel(
+    world,
+    linkFor({ ...minted, installation: `bunki-${'d'.repeat(32)}` }),
+  );
+  assert.equal(voice.panel.dataset.refused, 'not-a-study-device');
+  assert.deepEqual(world.server.log, []);
+});
+
+test('an already-connected browser cannot be re-pointed by a link: it is told so and offered Close only', async () => {
+  const world = createWorld();
+  const bunki = await world.paired();
+  await settle();
+  const before = world.store.peek();
+  const spent = pairRequests(world).length;
+  const minted = world.server.code();
+  const held = await connectPanel(world, linkFor(minted));
+  assert.equal(held.panel.dataset.state, 'held');
+  assert.equal(held.at('study-connect-title').textContent, 'This browser is already connected');
+  assert.match(held.at('study-connect-note').textContent, /disconnect it in Settings first\.$/);
+  assert.equal(seen(held.at('study-connect-yes')), false);
+  assert.equal(held.at('study-connect-no').textContent, 'Close');
+  // a press that reaches the hidden button does nothing, and the pairing call itself refuses
+  await held.at('study-connect-yes').fire('click');
+  assert.deepEqual(await world.pairing.pair({ link: linkFor(minted) }), {
+    ok: false,
+    code: 'already-paired',
+  });
+  await settle();
+  assert.equal(pairRequests(world).length, spent);
+  assert.equal(world.store.peek(), before);
+  assert.equal(bunki.host.status().closed, null);
+  await held.at('study-connect-no').fire('click');
+  assert.equal(held.mounted(), null);
+  await bunki.host.dispose();
+});
+
+test('the code of a connect link never reaches storage, a log or the words on the page', async () => {
+  const world = createWorld();
+  const minted = world.server.code();
+  const link = linkFor(minted);
+  const session = [];
+  const sessionStorage = {
+    getItem: () => null,
+    setItem: (key, value) => void session.push([key, String(value)]),
+    removeItem: () => {},
+  };
+  const printed = [];
+  const kept = {};
+  for (const name of ['log', 'info', 'warn', 'error', 'debug']) {
+    kept[name] = console[name];
+    console[name] = (...args) => void printed.push(args.map(String).join(' '));
+  }
+  let offer;
+  try {
+    offer = await connectPanel(world, link, { env: { sessionStorage } });
+    await offer.at('study-connect-yes').fire('click');
+    await settle();
+  } finally {
+    Object.assign(console, kept);
+  }
+  assert.equal(offer.panel.dataset.state, 'connected');
+  for (const [where, text] of [
+    ['localStorage', JSON.stringify([...world.localStorage.kept, ...world.localStorage.writes])],
+    ['sessionStorage', JSON.stringify(session)],
+    ['the stored row', JSON.stringify(world.store.peek())],
+    ['the panel', offer.page.said(offer.panel)],
+    ['the console', printed.join('\n')],
+  ]) {
+    assert.equal(text.includes(minted.code), false, `the code reached ${where}`);
+    assert.equal(text.includes(link), false, `the link reached ${where}`);
+  }
+  // the code went to the named server in the one request that spends it, and nowhere else
+  const carrying = world.server.log.filter((row) => JSON.stringify(row).includes(minted.code));
+  assert.deepEqual(
+    carrying.map((row) => [row.method, row.url]),
+    [['POST', `${SERVER}/v1/pair`]],
   );
 });
 
-test('Settings on a paired page: whose record, how sync stands, a pairing the server ended, and forgetting in two presses', async () => {
+test('Settings on a paired page: connected, when it last synced, a pairing the server ended, and Disconnect in two presses', async () => {
   const world = createWorld();
   const bunki = await world.paired();
   await bunki.adapter.platform.requestNewCards();
+  const synced = world.now();
   const order = [];
   const host = pageHost(bunki, order);
   const { page, block, at } = await settingsBlock(world, host);
@@ -2081,13 +2364,33 @@ test('Settings on a paired page: whose record, how sync stands, a pairing the se
   assert.equal(block.dataset.bound, 'true');
   assert.equal(
     at('study-pair-status').textContent,
-    `This device studies on ${LEARNER}’s Nihongo Study record (device …${bunki.installation.slice(-4)}).`,
+    'Connected. This device studies on your Nihongo Study record.',
   );
-  assert.equal(at('study-pair-sync').textContent, 'Synced.');
+  assert.equal(at('study-pair-sync').textContent, 'Synced just now.');
+  assert.equal(block.dataset.synced, String(synced));
   assert.equal(seen(at('study-pair-sync')), true);
-  assert.equal(seen(at('study-pair-form')), false);
   assert.equal(seen(at('study-unpair')), true);
-  assert.match(at('study-unpair-what').textContent, /stays on the device, unused/);
+  assert.equal(at('study-unpair').textContent, 'Disconnect');
+  assert.equal(seen(at('study-unpair-what')), false);
+  // the time is said again while Settings stays open, and in Japanese the same way
+  world.advance(2 * 60000);
+  assert.equal(page.intervals.length, 1);
+  page.intervals[0].run();
+  assert.equal(at('study-pair-sync').textContent, 'Synced 2 minutes ago.');
+  assert.deepEqual(studySyncedLine(synced, synced + 2 * 60000), [
+    '2分前に同期しました。',
+    'Synced 2 minutes ago.',
+  ]);
+  assert.deepEqual(studySyncedLine(synced, synced + 3 * 3600000, true), [
+    '最後の同期は3時間前です。',
+    'Last synced 3 hours ago.',
+  ]);
+  // a page that has not opened study says it from the pairing's own row
+  const elsewhere = await settingsBlock(world.tab(), null);
+  assert.equal(elsewhere.block.dataset.state, 'reopen');
+  assert.equal(elsewhere.at('study-pair-sync').textContent, 'Synced 2 minutes ago.');
+  // that tab's Settings is closed again (a block no longer on its page stops listening)
+  elsewhere.block.isConnected = false;
   // nothing the block holds is the credential or the server's address
   const shown = page.said(block);
   assert.equal(shown.includes(world.server.tokenOf(bunki.installation)), false);
@@ -2096,6 +2399,7 @@ test('Settings on a paired page: whose record, how sync stands, a pairing the se
   world.state.online = false;
   await bunki.host.synchronize();
   assert.match(at('study-pair-sync').textContent, /^Offline\./);
+  assert.match(at('study-pair-sync').textContent, / Last synced 2 minutes ago\.$/);
   // one answer given with no connection waits on the device
   await grade(bunki.adapter.backend, catalog[0].taskKey, 3);
   world.state.online = true;
@@ -2125,10 +2429,13 @@ test('Settings on a paired page: whose record, how sync stands, a pairing the se
   const reopened = await settingsBlock(world, null);
   assert.equal(reopened.block.dataset.state, 'ended');
   assert.equal(reopened.block.dataset.unsent, '1');
-  assert.equal(seen(reopened.at('study-pair-form')), false);
+  assert.equal(seen(reopened.at('study-pair-sync')), false);
+  assert.equal(seen(reopened.at('study-unpair')), true);
 
   await at('study-unpair').fire('click');
-  assert.match(at('study-unpair').textContent, /Really forget it/);
+  assert.equal(at('study-unpair').textContent, 'Really disconnect (sync stops)');
+  assert.equal(seen(at('study-unpair-what')), true);
+  assert.match(at('study-unpair-what').textContent, /stays on the device, unused/);
   assert.notEqual(world.store.peek(), null);
   assert.deepEqual(order, []);
   world.store.calls.length = 0;
@@ -2145,12 +2452,16 @@ test('Settings on a paired page: whose record, how sync stands, a pairing the se
   assert.equal(page.timers.length, 1);
   page.timers[0].run();
   assert.deepEqual(page.reloads, [1]);
-  // the other block heard it and shows the form again
+  // the other block heard it and says the device is not connected
   await until(
     () => reopened.block.dataset.state === 'unpaired',
     'the other block heard of the forgetting',
   );
-  assert.equal(seen(reopened.at('study-pair-form')), true);
+  assert.equal(
+    reopened.at('study-pair-status').textContent,
+    'Not connected. Study here stays on this device.',
+  );
+  assert.equal(seen(reopened.at('study-unpair')), false);
 });
 
 test('Settings in a tab whose pairing was changed elsewhere: it stops saying it is the pairing’s page', async () => {
@@ -2164,12 +2475,16 @@ test('Settings in a tab whose pairing was changed elsewhere: it stops saying it 
   await first.host.dispose();
   assert.deepEqual(await world.pairing.unpair(), { ok: true });
   await until(() => block.dataset.state === 'unpaired', 'the block heard of the forgetting');
-  assert.equal(seen(at('study-pair-form')), true);
+  assert.equal(
+    at('study-pair-status').textContent,
+    'Not connected. Study here stays on this device.',
+  );
   const next = await world.paired();
   await until(() => block.dataset.state === 'reopen', 'the block heard of the new pairing');
   assert.equal(block.dataset.bound, 'false');
   assert.equal(seen(at('study-pair-reopen')), true);
-  assert.equal(seen(at('study-pair-sync')), false);
+  // what it says of sync is the new pairing's own row, never the old host's
+  assert.match(at('study-pair-sync').textContent, /^(Not synced yet|Synced just now)\.$/);
   assert.equal(at('study-pair-status').textContent.includes(next.installation.slice(-4)), false);
   await next.host.dispose();
   await second.host.dispose();

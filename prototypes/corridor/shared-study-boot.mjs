@@ -17,14 +17,31 @@
  * by the marks changing. A tab whose study surface is open stops there and says so (the real host does that); a tab
  * that has not opened study yet simply stops being a paired page.
  *
- * It also gives Settings its study block (`globalThis.bunkiStudyPairing.settingsBlock`), filled by
+ * It also gives Settings its Nihongo Study panel (`globalThis.bunkiStudyPairing.settingsBlock`), filled by
  * shared-study-pairing.mjs when Settings is drawn. This file imports nothing, so that it costs an unpaired page one
- * small request and travels with the install. */
+ * small request and travels with the install.
+ *
+ * A one-time connect link (`#study-connect=<payload>`, see shared-study-pairing.mjs) carries a pairing code. It is
+ * taken out of the address first of all, before this page reads anything else, whether or not the payload is any
+ * good; the payload is then held in memory only and handed to the confirmation the pairing module shows. */
+const LINK = '#study-connect=';
+const env = globalThis;
+/** The link's payload, or null. Nothing else in this file runs before these lines. */
+let offered = null;
+{
+  let address = '';
+  try { address = String(env.location?.hash || ''); } catch { address = ''; }
+  if (address.startsWith(LINK)) {
+    try { env.history.replaceState(env.history.state, '', `${env.location.pathname}${env.location.search}`); offered = address.slice(LINK.length); } catch {
+      // an address that cannot be rewritten in place is left by loading the page again without the link
+      try { env.location.replace(`${env.location.pathname}${env.location.search}`); } catch { /* nothing more can be done */ }
+    }
+  }
+}
 const MARKER = 'bunki-shared-study:paired:v1';
 const ENDED = 'bunki-shared-study:ended:v1';
 const CHANNEL = 'bunki-study-pairing';
 const KIND = 'bunki-paired-study/v1';
-const env = globalThis;
 
 const kept = (key) => { try { return env.localStorage?.getItem(key) || ''; } catch { return ''; } };
 /** A pairing this device holds and that has not ended. */
@@ -114,8 +131,15 @@ if (!env.bunkiSharedStudyHost && marked()) {
   env.addEventListener?.('storage', (event) => { if (!event || event.key === null || event.key === MARKER || event.key === ENDED) host.recheck(); });
 }
 
+// the connect link's one question, shown once the page is there to show it in; the payload leaves this file with it
+if (offered !== null) {
+  const payload = offered;
+  offered = null;
+  void loadPairing().then((module) => module.offerStudyConnect(payload, { env })).catch(() => { /* no question, nothing kept */ });
+}
+
 env.bunkiStudyPairing = Object.freeze({
-  /** Settings, beside the voice pairing: this device's study pairing. `tx` and `el` are the app's own helpers. */
+  /** Settings, above the voice pairing: Nihongo Study on this device. `tx` and `el` are the app's own helpers. */
   settingsBlock({ tx, el }) {
     const block = el('div', 'settings-study-device');
     block.id = 'settings-study-device';

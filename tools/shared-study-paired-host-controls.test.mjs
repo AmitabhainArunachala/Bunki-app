@@ -63,9 +63,17 @@ const T = {
     'page start: no flag binds nothing; a flag binds the host; a flag with no pairing behind it is taken away',
   startEnded: 'page start honours the mark of an ended pairing: the flag alone does not bind it',
   settings:
-    'Settings: the form, a refusal in plain words in the page’s language, and a pairing that says so and reopens the page',
+    'Settings: Nihongo Study with no form, “Not connected” in the page’s language, and a connection made by a link shown at once',
   settingsPaired:
-    'Settings on a paired page: whose record, how sync stands, a pairing the server ended, and forgetting in two presses',
+    'Settings on a paired page: connected, when it last synced, a pairing the server ended, and Disconnect in two presses',
+  link: 'a connect link asks one question: nothing is kept or sent before Connect, Not now keeps and sends nothing, and one click on Connect pairs',
+  linkServer:
+    'a connect link that names another server than the one this browser knows is refused with nothing sent',
+  linkHeld:
+    'an already-connected browser cannot be re-pointed by a link: it is told so and offered Close only',
+  linkCode: 'the code of a connect link never reaches storage, a log or the words on the page',
+  linkAddress:
+    'page start: a connect link leaves the address before anything else runs, a malformed one too, and no other address is touched',
   settingsChanged:
     'Settings in a tab whose pairing was changed elsewhere: it stops saying it is the pairing’s page',
   either: 'the channel and the marks: both tell the other tabs, and either alone is enough',
@@ -247,11 +255,82 @@ const FAULTS = [
   ],
   // ---- Settings
   [
-    'Settings shows a pairing as made at once, before the page is opened again',
-    PAIRING,
-    'current = { ...current, failed: false, paired: true, ended: false, unsent: null, learner: answer.learner, installation: answer.installation, marked: true };',
+    'Settings says when the record was last brought up to date',
+    HOST,
+    "if (next.getSyncState() === 'up-to-date' && !next.getSyncError() && closed === null) noteSynced();",
     '',
-    T.settings,
+    T.settingsPaired,
+  ],
+  [
+    'a page that has not opened study says when from the pairing’s own row',
+    PAIRING,
+    'synced: (row, ref, { at }) => (isStudyRow(row, ref) && !row.ended && Number.isFinite(at) && !(row.syncedAt >= at) ? { ...row, syncedAt: at } : null),',
+    'synced: () => null,',
+    T.settingsPaired,
+  ],
+  // ---- the connect link
+  [
+    'a connect link leaves the address before anything else runs',
+    BOOT,
+    "try { env.history.replaceState(env.history.state, '', `${env.location.pathname}${env.location.search}`); offered = address.slice(LINK.length); }",
+    "try { setTimeout(() => env.history.replaceState(env.history.state, '', `${env.location.pathname}${env.location.search}`), 0); offered = address.slice(LINK.length); }",
+    T.linkAddress,
+  ],
+  [
+    'a malformed connect link leaves the address too',
+    BOOT,
+    'if (address.startsWith(LINK)) {',
+    'if (/^#study-connect=[A-Za-z0-9_-]+={0,2}$/.test(address)) {',
+    T.linkAddress,
+  ],
+  [
+    'nothing is kept or sent before Connect',
+    PAIRING,
+    "yes.addEventListener('click', go);",
+    'void go();',
+    T.link,
+  ],
+  [
+    'Not now keeps nothing and sends nothing',
+    PAIRING,
+    "no.addEventListener('click', close);",
+    "no.addEventListener('click', go);",
+    T.link,
+  ],
+  [
+    'a connect link naming another server is refused before anything is sent',
+    PAIRING,
+    "if (parsed.server && configured && parsed.server !== configured) return refuse('server-mismatch');",
+    '',
+    T.linkServer,
+  ],
+  [
+    'a browser that is already connected cannot be re-pointed by a link',
+    PAIRING,
+    "if (kept.device) return refuse('already-paired');",
+    '',
+    T.linkHeld,
+  ],
+  [
+    'the code of a connect link is kept in memory only, never in storage',
+    PAIRING,
+    'let link = text;',
+    "let link = text; try { env.sessionStorage?.setItem('bunki-study-connect', text); } catch { /* none */ }",
+    T.linkCode,
+  ],
+  [
+    'the code of a connect link is never logged',
+    PAIRING,
+    'let link = text;',
+    "let link = text; console.info('study-connect', text);",
+    T.linkCode,
+  ],
+  [
+    'the code of a connect link is never shown',
+    PAIRING,
+    "const server = el('p', 'study-connect-server', vetted.ok ? say(ASK.server(vetted.host)) : '');",
+    "const server = el('p', 'study-connect-server', vetted.ok ? say(ASK.server(`${vetted.host} (${parseStudyConnect(text).code})`)) : '');",
+    T.linkCode,
   ],
   [
     'Settings speaks the page’s language',
@@ -556,7 +635,7 @@ const browserSuite = fileURLToPath(
   new URL('./shared-study-paired-browser.test.mjs', import.meta.url),
 );
 const BROWSER_TEST =
-  'a browser pairs in Settings, studies on the paired record, exchanges a grade both ways, restarts, loses its pairing to the server and to the learner';
+  'a browser connects from a link with one click, studies on the paired record, exchanges a grade both ways, restarts, loses its pairing to the server and to the learner';
 const BROWSER_FAULTS = [
   [
     'the credential is sealed with a key the browser will not export',

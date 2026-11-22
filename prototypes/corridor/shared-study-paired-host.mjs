@@ -38,10 +38,10 @@ const WRITES = ['submitCommand', 'resumeCommand', 'mutate', 'capture', 'practice
 
 const LINES = Object.freeze({
   ...STUDY_CLOSED_LINES,
-  'study-pairing-missing': ['この端末のペアリングが見つかりません。設定でもう一度ペアリングしてください。', 'This device’s pairing was not found. Pair it again in Settings.'],
+  'study-pairing-missing': ['この端末のペアリングが見つかりません。Nihongo Study からもう一度接続してください。', 'This device’s pairing was not found. Connect it again from Nihongo Study.'],
   'study-storage-failed': ['このブラウザーの保存領域を読めませんでした。ページを読み込み直してください。', 'This browser’s storage could not be read. Reload the page.'],
-  'study-replica-missing': ['この端末にあるはずの学習記録の写しが見つかりません。設定でペアリングを消し、新しいコードでもう一度ペアリングしてください。',
-    'This device’s copy of the study record is missing. In Settings, forget the pairing and pair again with a new code.'],
+  'study-replica-missing': ['この端末にあるはずの学習記録の写しが見つかりません。設定で接続を解除し、Nihongo Study からもう一度接続してください。',
+    'This device’s copy of the study record is missing. In Settings, disconnect, then connect again from Nihongo Study.'],
   'study-first-sync': ['この端末は、学習の前に一度あなたの記録を受け取る必要があります。オンラインでもう一度開いてください。',
     'This device has to fetch your record once before you study on it. Open this again while online.'],
   'study-first-sync-blocked': ['この Bunki では、あなたの記録の一部をまだ読めません（ほかの端末で作ったカードなど）。記録はそのままです。この端末ではまだ学習できません。',
@@ -127,6 +127,15 @@ export async function openPairedStudyHost(options = {}) {
   let disposed = false, binding = null, active = null, activeStorage = null, session = null, stopSession = null;
   /** Why this host has stopped, or null while it is the pairing's host; and what was still unsent when it ended. */
   let closed = null, unsent = null;
+  /** When a sync of this page last left the record up to date, and when that was last written to the pairing's row
+   * (at most once a minute: Settings on a page that has not opened study reads it from there). */
+  let syncedAt = null, keptSyncedAt = 0;
+  const noteSynced = () => {
+    syncedAt = now();
+    if (typeof store.synced !== 'function' || syncedAt - keptSyncedAt < 60000) return;
+    keptSyncedAt = syncedAt;
+    void store.synced(ref, { at: syncedAt }).catch(() => { keptSyncedAt = 0; });
+  };
 
   /** Stop being a host: the credential leaves memory, sync stops, every answer is refused from here on. */
   function shut(code) {
@@ -210,6 +219,7 @@ export async function openPairedStudyHost(options = {}) {
     });
     const stop = next.subscribeSyncState(() => {
       if (next.getSyncError() === 'authentication-required' && closed === null) void endPairing();
+      if (next.getSyncState() === 'up-to-date' && !next.getSyncError() && closed === null) noteSynced();
       notify();
     });
     return { next, stop };
@@ -307,7 +317,7 @@ export async function openPairedStudyHost(options = {}) {
      * `study-pairing-changed`) or null; `unsent` is what was still waiting when the server ended the pairing. Never
      * the credential or the server's address. */
     status: () => ({ started: !!active, ended: closed !== null, closed, state: session ? session.getSyncState() : 'idle',
-      error: session ? session.getSyncError() : null, unsent }),
+      error: session ? session.getSyncError() : null, unsent, syncedAt }),
     subscribe(listener) {
       if (typeof listener !== 'function') throw new Error('study-host-listener');
       listeners.add(listener);

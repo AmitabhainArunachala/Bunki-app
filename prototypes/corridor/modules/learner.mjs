@@ -703,13 +703,14 @@ function renderWritingChoice() {
       wordHighlight(), (value) => setReadHighlight(value)),
     el('p', 'settings-layout-note', tx('書く速さは、書の間のスライダー一つで決まります。',
       'The writing speed is set in one place: the writing room’s slider.')));
+  // Nihongo Study, a section of its own above the voice server: connected or not, when it last synced, and
+  // Disconnect; a device is connected by the one-time connect link, never here (shared-study-boot.mjs hands the
+  // panel over; a build that does not load it, like the single file, shows none)
+  const studyDevice = globalThis.bunkiStudyPairing?.settingsBlock?.({ tx, el });
+  if (studyDevice) section.append(studyDevice);
   // the voice server: paired or not, where the last sentence came from, the budget, and the one-time pairing
   const voiceServer = voiceSettingsBlock();
   if (voiceServer) section.append(voiceServer);
-  // the study record: this device as a study device of a Nihongo Study learner, paired and unpaired here
-  // (shared-study-boot.mjs hands the block over; a build that does not load it, like the single file, shows none)
-  const studyDevice = globalThis.bunkiStudyPairing?.settingsBlock?.({ tx, el });
-  if (studyDevice) section.append(studyDevice);
   return section;
 }
 
