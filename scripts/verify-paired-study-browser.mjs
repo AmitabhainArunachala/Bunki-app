@@ -5,7 +5,7 @@
  * Not part of CI: it needs a built Bunki site and a study server on this machine. It serves the site on a loopback
  * port, and for each engine (Chromium, WebKit) and each width (390, 1440) it shows that
  *   - a profile that was never paired still gets the old player on the ordinary route `?deck=n2`;
- *   - a pairing line typed into Settings pairs the browser, and Settings says whose record it now studies on;
+ *   - a one-time connect link, confirmed with one click, pairs the browser, and Settings says it is connected;
  *   - the same ordinary route (no `sharedStudy` in the address) then opens the shared study engine, with no
  *     "Sync is not set up" and no "Trial copy";
  *   - a grade made in Bunki arrives at a second device of the same learner, and a grade made there arrives in Bunki;

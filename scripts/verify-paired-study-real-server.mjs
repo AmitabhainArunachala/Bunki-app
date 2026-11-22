@@ -353,7 +353,7 @@ async function runEngine(engine, launcher, { report, device, second, siteA, site
     const block = await studyBlock(page);
     assert.equal(block.state, 'paired');
     assert.equal(block.bound, 'true');
-    assert.match(block.status, new RegExp(`studies on ${report.learner}’s Nihongo Study record`));
+    assert.match(block.status, /Connected\. This device studies on your Nihongo Study record\./);
     assert.equal(
       tokens.length,
       1,
