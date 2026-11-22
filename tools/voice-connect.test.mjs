@@ -26,7 +26,7 @@ const SLOW = { timeout: 60000 };
 const CODE = 'A0B0A0B0A0B0';
 const LEARNER = 'test-learner';
 const SERVER = 'https://test.example.workers.dev';
-const OTHER = 'https://other.example.workers.dev';
+const OTHER = 'https://fake.example.workers.dev';
 const payloadOf = (value) => Buffer.from(JSON.stringify(value)).toString('base64url');
 const LINK = payloadOf({ v: 1, code: CODE, learner: LEARNER, server: SERVER });
 const token = () => `${'nsrs'}_prod_${'x'.repeat(8)}.${'0'.repeat(64)}`;
@@ -68,7 +68,7 @@ test("a voice link is read under the pairing line's rules, and anything else is 
 
 test('the one Settings field takes a voice link or the line an older launcher prints', async () => {
   assert.deepEqual(
-    client.voicePairingInput(`  https://bunki.example.pages.dev/#voice-connect=${LINK}\n`),
+    client.voicePairingInput(`  https://test.example.pages.dev/#voice-connect=${LINK}\n`),
     { link: LINK },
   );
   assert.deepEqual(client.voicePairingInput(`#voice-connect=${LINK}`), { link: LINK });

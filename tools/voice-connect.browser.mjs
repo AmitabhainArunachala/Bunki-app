@@ -227,7 +227,7 @@ async function walk(engine) {
     }
     await page
       .locator('#voice-pair-learner')
-      .fill(`https://bunki-proto-2250f0.pages.dev/#voice-connect=${linkFor()}`);
+      .fill(`https://test.example.pages.dev/#voice-connect=${linkFor()}`);
     await page.locator('#voice-pair-submit').click();
     await page.waitForFunction(
       () => document.getElementById('settings-voice-server')?.dataset.paired === 'true',
