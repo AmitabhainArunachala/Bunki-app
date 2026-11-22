@@ -413,7 +413,8 @@ async function main() {
           await page.locator('#me-settings').first().click({ timeout: 30000 });
           const block = await studyBlock(page);
           // LEAN (2026-11-22): Settings shows Nihongo Study only while this device is connected
-          if (block.state !== 'unpaired') await page.locator('#settings-study-device').scrollIntoViewIfNeeded();
+          if (block.state !== 'unpaired')
+            await page.locator('#settings-study-device').scrollIntoViewIfNeeded();
           return { page, block };
         };
         const deck = `${siteOrigin}/?deck=n2&ui=en`;
@@ -454,6 +455,12 @@ async function main() {
           let { page, block } = await openSettings(context);
           if (device) {
             assert.equal(block.state, 'unpaired');
+            assert.equal(
+              block.shown,
+              false,
+              'Settings shows a Nihongo Study row while this device is not connected',
+            );
+            check('Settings shows no Nihongo Study row while this device is not connected');
             run.shots.push(await shot(page, `${tag}-2-settings-unpaired`));
             let paired = await connectIn(page, device);
             if (paired.refused === 'too-many-attempts') {
@@ -472,8 +479,13 @@ async function main() {
           } else check('this width uses the profile this engine paired at an earlier width');
           assert.equal(block.state, 'paired');
           assert.equal(block.bound, 'true');
+          assert.equal(
+            block.shown,
+            true,
+            'Settings hides the Nihongo Study row of a connected device',
+          );
           run.shots.push(await shot(page, `${tag}-3-settings-paired`));
-          check('Settings says whose record this device studies on', { said: block.status });
+          check('Settings shows the Nihongo Study row once connected', { said: block.status });
           await page.close();
 
           // 3. the ordinary route opens the engine on the paired record
