@@ -1,8 +1,4 @@
 {
-  "42382895574/2": {
-    "result": "observed",
-    "startedAt": "2026-11-07T18:08:08Z"
-  },
   "42406261624/1": {
     "result": "observed",
     "startedAt": "2026-11-07T19:27:00Z"
@@ -63,8 +59,8 @@
     "result": "retry",
     "policy": "002dc875d95d7d62d63eaed04ff00e3c74fed894c7b0b9d4615572cf2957a401",
     "startedAt": "2026-11-20T10:49:07Z",
-    "failures": 18,
-    "attemptedAt": "2026-11-21T18:24:05.096Z",
+    "failures": 19,
+    "attemptedAt": "2026-11-22T18:24:32.871Z",
     "reason": "Observation artifact not yet available: bunki-plan-42431546894-2"
   },
   "42407075841/3": {
