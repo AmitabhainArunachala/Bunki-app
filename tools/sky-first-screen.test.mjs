@@ -169,10 +169,14 @@ function oldScreen() {
 
 const settled = (states) =>
   `(() => { const s = window.__bunkiSkyApp; return !!s && ${JSON.stringify(states)}.includes(s.state); })()`;
-const drawn = () =>
-  !!window.__SKY__?.W?.ready &&
-  !!window.__SKY__.W.fonts &&
-  (window.__SKY__.W.stats?.labels || 0) >= 300;
+const drawn = () => {
+  const W = window.__SKY__?.W;
+  if (!W?.ready || !W.fonts) return false;
+  const labels = W.stats?.labels || 0;
+  if (window.__bunkiSkyApp?.engine === 'star6')
+    return !!W.star?.ok && W.lens === 'star' && labels >= 100;
+  return labels >= 300;
+};
 
 let server;
 let origin;
@@ -1095,10 +1099,22 @@ describe.each(engines)('the sky (宙) as the app’s first screen, in %s', (engi
 
     if (draws)
       test('control: a browser that is not driven gets the sky without asking', async () => {
-        const { context, page } = await open({ before: [[hideDriver]], until: ['mounted'] });
+        const { context, page, errors } = await open({
+          before: [[hideDriver]],
+          until: ['mounted'],
+        });
         try {
           await waitDrawn(page);
-          expect(await page.evaluate(() => document.documentElement.dataset.bunkiSky)).toBe('1');
+          const seen = await page.evaluate(() => ({
+            marked: document.documentElement.dataset.bunkiSky,
+            engine: window.__bunkiSkyApp.engine,
+            lens: window.__SKY__.W.lens,
+            starOk: !!window.__SKY__.W.star?.ok,
+            labels: window.__SKY__.W.stats?.labels || 0,
+          }));
+          expect(seen).toMatchObject({ marked: '1', engine: 'star6', lens: 'star', starOk: true });
+          expect(seen.labels).toBeGreaterThanOrEqual(100);
+          expect(errors).toEqual([]);
         } finally {
           await context.close();
         }
