@@ -7,102 +7,6 @@
     "attemptedAt": "2026-11-23T18:25:27.927Z",
     "reason": "Command failed: gh api --paginate --slurp repos/AmitabhainArunachala/Bunki-app/actions/runs/42431546894/attempts/2/jobs?per_page=100"
   },
-  "42400327580/4": {
-    "result": "observed",
-    "startedAt": "2026-11-09T01:01:08Z"
-  },
-  "42418249759/4": {
-    "result": "observed",
-    "startedAt": "2026-11-09T01:00:54Z"
-  },
-  "42489884950/2": {
-    "result": "observed",
-    "startedAt": "2026-11-09T01:00:46Z"
-  },
-  "42407075841/5": {
-    "result": "observed",
-    "startedAt": "2026-11-09T01:00:59Z"
-  },
-  "42431546894/4": {
-    "result": "observed",
-    "startedAt": "2026-11-09T01:00:47Z"
-  },
-  "42406261624/5": {
-    "result": "observed",
-    "startedAt": "2026-11-09T01:00:59Z"
-  },
-  "42418249759/5": {
-    "result": "observed",
-    "startedAt": "2026-11-09T09:03:35Z"
-  },
-  "42407075841/6": {
-    "result": "observed",
-    "startedAt": "2026-11-09T09:03:40Z"
-  },
-  "42489884950/3": {
-    "result": "observed",
-    "startedAt": "2026-11-09T09:03:28Z"
-  },
-  "42400327580/5": {
-    "result": "observed",
-    "startedAt": "2026-11-09T09:03:46Z"
-  },
-  "42431546894/5": {
-    "result": "observed",
-    "startedAt": "2026-11-09T09:03:28Z"
-  },
-  "42406261624/6": {
-    "result": "observed",
-    "startedAt": "2026-11-09T09:03:41Z"
-  },
-  "42593972611/1": {
-    "result": "observed",
-    "startedAt": "2026-11-09T09:30:38Z"
-  },
-  "42597380709/1": {
-    "result": "observed",
-    "startedAt": "2026-11-09T09:58:06Z"
-  },
-  "42597380709/2": {
-    "result": "observed",
-    "startedAt": "2026-11-09T17:06:03Z"
-  },
-  "42418249759/6": {
-    "result": "observed",
-    "startedAt": "2026-11-09T17:06:23Z"
-  },
-  "42489884950/4": {
-    "result": "observed",
-    "startedAt": "2026-11-09T17:06:14Z"
-  },
-  "42593972611/2": {
-    "result": "observed",
-    "startedAt": "2026-11-09T17:06:04Z"
-  },
-  "42400327580/6": {
-    "result": "observed",
-    "startedAt": "2026-11-09T17:06:37Z"
-  },
-  "42407075841/7": {
-    "result": "observed",
-    "startedAt": "2026-11-09T17:06:31Z"
-  },
-  "42431546894/6": {
-    "result": "observed",
-    "startedAt": "2026-11-09T17:06:14Z"
-  },
-  "42406261624/7": {
-    "result": "observed",
-    "startedAt": "2026-11-09T17:06:32Z"
-  },
-  "42665809642/1": {
-    "result": "observed",
-    "startedAt": "2026-11-09T17:33:41Z"
-  },
-  "42597380709/3": {
-    "result": "observed",
-    "startedAt": "2026-11-09T17:19:50Z"
-  },
   "42597380709/4": {
     "result": "observed",
     "startedAt": "2026-11-10T01:08:59Z"
@@ -1666,5 +1570,9 @@
   "45228958886/1": {
     "result": "observed",
     "startedAt": "2026-11-23T17:33:29Z"
+  },
+  "45449862978/1": {
+    "result": "observed",
+    "startedAt": "2026-11-24T17:33:18Z"
   }
 }
