@@ -3724,9 +3724,13 @@ export async function nextNewWord(deckIds, storage = window.localStorage) {
 export async function summary(deckId, storage = window.localStorage) {
   if (isSharedStudyMode() && (isSharedDeck(deckId) || deckId === 'shared-grammar')) return (await sharedPlayer()).summary(deckId);
   if (isSharedStudyMode()) return {due:0,fresh:0,total:0,words:0,authority:'unmapped'};
-  const { deck } = await loadDeck(deckId);
-  const { state } = loadState(storage, deck);
+  const { deck, index } = await loadDeck(deckId);
+  const state = normalizeState(readJson(storage, stateKey(deck.id)), deck);
+  let lastReviewedAt = 0;
+  for (const [id, record] of Object.entries(state.cards)) {
+    if (index.cards.has(id)) lastReviewedAt = Math.max(lastReviewedAt, Date.parse(record.last_review) || 0);
+  }
   const prefs = prefsFor(storage, deck);
   const q = buildQueue(deck, state, new Date(), prefs.newPerDay, { skip: skipFor(prefs.mode), buried: buriedToday(storage, deck.id, new Date()) });
-  return { due: q.due.length, fresh: q.fresh.length, total: q.queue.length, words: deck.words.length, titleJa: deck.titleJa, titleEn: deck.titleEn };
+  return { lastReviewedAt, due: q.due.length, fresh: q.fresh.length, total: q.queue.length, words: deck.words.length, titleJa: deck.titleJa, titleEn: deck.titleEn };
 }

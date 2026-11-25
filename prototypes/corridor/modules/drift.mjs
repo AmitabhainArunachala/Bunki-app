@@ -512,9 +512,10 @@ function renderTodayWord(pick) {
   return block;
 }
 
-function renderTodayLine(today, door, read) {
+function renderTodayLine(door, read, deckDoor) {
   const line = el('section', 'today-line');
   line.setAttribute('aria-label', tx('今日', 'Today'));
+  if (deckDoor) line.append(deckDoor);
   if (door) line.append(door);
   if (read) {
     const then = el('button', 'today-then');

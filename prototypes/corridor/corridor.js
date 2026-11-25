@@ -4,7 +4,7 @@ import { VOICE_NOTES, VOICE_WORDS, voiceLineOf, voiceShortOf } from './modules/v
 import { activeDictionaryQuery, appendJapaneseLookup, joyoDialChanges, conjugations, dictionaryAnsweredForm, dictionaryDetailsFor, dictionaryGlossSummary, dictionaryLoneDoor, dictionaryQueryError, dictionaryQueryKey, dictionaryReadingSupportsForm, dictionaryRowsForForm, dictionarySearchContext, dictionaryShardNumber, displayPairs, ensureDictionaryRowsForForm, ensureSense, exampleFnv, exampleOrder, fetchExampleJson, findExamples, glossaryCrossRefPlan, hasEmbeddedDictionaryIndex, inlineTokenGloss, inlineWordGloss, inlineWordReading, japaneseLookupEntryRecord, japaneseLookupHelpId, japaneseLookupRecord, kanjiReadingsInWord, loadDictionaryJson, lookup, lookupBlockWords, lookupItemBlocks, lookupOccurrence, nameReaderToken, normalizeGloss, phoneticAnnotationCandidates, phoneticAnnotationIndices, phoneticAnnotationRanges, posLine, readerDoorGloss, readerDoorLead, readerGlossLine, readerGlossMissText, readerHelp, readerLayerParagraph, readerLayerReading, readerLookupAnswer, readerRenderedTokens, readerTokenAt, readerTokenAtIndex, readerTokenNode, readerWordNote, readingAsksIndex, readingExpected, readingForm, readingPlaceFailure, readingTargets, readingToken, readingTokenEntry, readyTokenReading, renderConjugation, renderDictionaryDetails, renderDictionaryHomographs, renderThesaurus, requestDictionaryDetails, reviewTokenMatcher, senseChoice, senseFillInPlace, senseMoreElement, senseMoreLine, senseNeighbours, senseRefine, senseWithin, tapLadderHint, tokenReading, validDictionaryRow, yomiReadingType } from './modules/dictionary.mjs';
 import { blankSlip, keepMenuInCard, drawSheetActionLine, entryCueReading, findSheetDoor, flySeal, foldEntryForms, holdRing, keepFloatingBeside, keptState, keptWordProjection, listToMarkdown, listeningField, markStripMore, miniKanjiWeb, note, noteSlipDepth, openSlip, openWordWebLadder, paintWordSave, placeSaveMenu, rememberSheet, renderWordCaptureNote, reopenSaveMenu, saveAiDeviceConfig, saveOne, saveReaderPosition, saveReportRelay, saveReportRelayLink, savedNodeRecord, savedRecordNoteDraft, sealHostedWord, setSaveDrawerPush, sheetActionVisitHolds, sheetTakeLabel, slipAllowed, slipHeadword, slipScroller, standingSlip, takenContext, toggleTaken, travelSlip, unsaveEverywhere, wordCaptureBasis, wordCaptureHeldText, wordCaptureOpenLabel, wordCaptureState, wordDepth, wordPresentationKey, wordRow, wordSaveFacts } from './modules/word-entry.mjs';
 import { clearTouchReadingSeat, encounterIdentity, encounterPatch, fileIntakeFailure, filePageLabel, finishTouchReadingFade, holdReaderCapture, readerCaptureReasonText, readerTakeCurrent, readerTakeNode, reconcileSourceInboxEntries, rememberFileDraft, renderEncounterTrail, seatInlineGloss, seatTouchReading, setTouchReadingShown, sourceInboxEntries, sourceLadderAction, sourceProcessingScope, stopTouchReadingFade, syncReaderTakeSeal, touchReading } from './modules/capture.mjs';
-import { cardDepth, cardInk, deckCounts, deckWordsBegun, focusPool, focusProseWord, focusReturnMarkOnce, focusSentencePracticeTarget, gradeTag, guidedCardStatus, guidedDoorInJlptRoom, learnHead, learnerModel, learnerSourceLabel, learningContextRef, learningEnrollHeldText, learningItemNode, lessonChoices, lessonMissedLast, lessonPlan, lessonPreviousRuns, markCardMore, mockSubjectKey, practiceIdentity, presentReviewAnswer, renderFocus, renderSrsStats, reviewAnswerAvailable, reviewBack, reviewCardBack, reviewCounts, sharedStudyActive, sharedStudyFence, srsCardKind, srsDecks, srsForecast, srsLearnerPolicy, srsPrefStep, srsPrefValue, srsPresetState, srsWhen } from './modules/study-host.mjs';
+import { cardDepth, cardInk, deckCounts, deckWordsBegun, focusPool, focusProseWord, focusReturnMarkOnce, focusSentencePracticeTarget, gradeTag, guidedCardStatus, guidedDoorInJlptRoom, learnHead, learnerModel, learnerSourceLabel, learningContextRef, learningEnrollHeldText, learningItemNode, lessonChoices, lessonMissedLast, lessonPlan, lessonPreviousRuns, markCardMore, mockSubjectKey, practiceIdentity, presentReviewAnswer, renderFocus, renderSrsStats, reviewAnswerAvailable, reviewBack, reviewCardBack, reviewCounts, todayDeckDoor, sharedStudyActive, sharedStudyFence, srsCardKind, srsDecks, srsForecast, srsLearnerPolicy, srsPrefStep, srsPrefValue, srsPresetState, srsWhen } from './modules/study-host.mjs';
 import { adjacentScaleOutTarget, backupCounts, keepSentencePracticeFocusVisible, paintRoomScaleThread, refreshScaleOrigin, requestScaleReturn, resumeAssessmentV2, retireScaleDestination, retireScaleTransients, retryMockLoad, revealFocusedChromeDoor, revealMountedScaleCurrent, scaleFallbackOut, scaleKanjiParts, scaleLabel, scaleLineTop, scaleName, scaleNodeBelongs, scaleNodeFrom, scaleOutTarget, scaleParentIndex, scalePathData, scaleReaderIndex, scaleShelfView, scaleSource, scaleThread, scaleWordKanji } from './modules/return.mjs';
 import { GRAMMARS, activateKanjiFamily, activateKanjiStructure, animcjkGlyphFor, clearStoryHero, heroOf, inkCeremony, inkSpecFor, inkStrokeMs, joyoOnNote, kanjiCourseEntryNode, kanjiCourseEvidencePatch, kanjiCourseNodeUnit, kanjiCourseReferenceHelp, kanjiCourseReturnFrame, kanjiCourseTeachingHelp, kanjiEnterCourseDoor, kanjiFamilyAuthorize, kanjiFamilyCitations, kanjiFamilyControlId, kanjiFamilyCourseExpectation, kanjiFamilyHasExampleOrigin, kanjiFamilyLiveVisit, kanjiFamilyRefusal, kanjiFamilyStatus, kanjiFinderUniverse, kanjiQuestBound, kanjiQuestLine, kanjiQuestOpen, kanjiQuestQuote, kanjiQuestRedraw, kanjiQuestRender, kanjiQuestRunStarted, kanjiQuestSeed, kanjiQuestSelfCheck, kanjiQuestSettle, kanjiQuestStage, kanjiQuestStructural, kanjiQuestSummary, kanjiReference, kanjiReferenceView, kanjiSlipReading, kankenLevels, kdxFrequencyHits, kdxGlyphName, kdxGridShown, kdxLoadFailed, kdxPartHits, kdxRadicalResults, kdxTextResults, kkldLine, kkldNumberGlyphs, kkldOf, nameStoryHero, openKanjiRooms, paintStrokes, paintTok, renderGrammarNode, renderIdiomNode, renderKanjiFamilyDisclosure, renderKanjiNode, renderKanjiRoomChooser, renderKdxDraw, renderParticleNode, renderRadicalNode, renderSentenceNode, sentenceDoor, sentenceDraftCopyButton, sentenceDraftInputMatches, sentenceDraftStatus, sentenceKept, sentencePracticeError, sentenceSource, storyAccent, storyBlock, storyDate, storyHeroArriving, storyHeroOnScreen, storyInstrument, storyKicker, storyLede, storyLevel, storyPicture, storyPictureSource, storySeries, storyVersions, storyYourWords, strokeAwakeField, strokeClassicReadings, strokeClassificationLine, strokeControl, strokeMissing, strokeReadingField, strokeReferenceStatus, strokeRoomRecord, strokeStart, worldName, worldPickerEsc, wwDefault, wwExcerpt, wwInkLabel, wwKanjiPassage, wwLearn, wwMine, wwModel, wwOpenPassage, wwPassages, wwPush, wwReadingChoices, wwRecentre, wwSlipNode, wwValid } from './modules/worlds.mjs';
 import { approvedNarrationManifest, availableSentenceListeningCue, excerptListenLabel, paintListenProgress, receivedPracticeAlternativeLabel, receivedPracticeLoadKey, reconcileAssessmentResults, reconcileSheetActionLines, recordFrameRow, recordNoteEditable, recordNoteExpected, recordPickerSurface, recordSha256, recordSyncStatus, recordUnavailable, recordViewSurface, refreshListenRow, resolveSentenceListeningCue, speakChip, speakGateEvidence, speakSentence, stopReadAloud, transcriptRangeLabel, voiceForRole, voicePendingNote } from './modules/voice.mjs';
@@ -5581,9 +5581,10 @@ function back({ instant = false } = {}) {
     return;
   }
   if (S.view === 'deckplay' || S.view === 'contextdeck') {
-    S.view = 'dojo';
+    S.view = S.view === 'deckplay' ? deckReturnView : 'dojo';
     render();
     window.scrollTo(0, 0);
+    if (S.view === 'tray') document.querySelector('.today-deck-door')?.focus({ preventScroll: true });
     return;
   }
   if (S.view === 'dojo' || S.view === 'tests') {
@@ -15843,6 +15844,15 @@ function renderTray(main) {
   main.append(hero);
   requestAnimationFrame(() => todayPlaceSky(hero));
   let lineDoor = null;
+  const legacyReview = !sharedStudyActive();
+  const deckDoor = (!legacyReview || !trayToday?.order.length) && window.__CORRIDOR_STANDALONE__ !== true
+    ? todayDeckDoor(loadDeckPlayer, () => roomTransition(() => {
+      S.view = 'dojo';
+      render();
+      const decks = document.querySelector('[data-learn-section="decks"]');
+      decks?.scrollIntoView({ block: 'start' });
+      decks?.querySelector('button')?.focus({ preventScroll: true });
+    })) : null;
   const record = renderTodayRecord();
   // Anki's deck screen first (operator, 2026-09-28): what is waiting, one Study, the decks
   if (S.taken.length && scheduler) {
@@ -15882,9 +15892,8 @@ function renderTray(main) {
       btn.append(pace);
     }
     if (due.length) btn.append(el('i', 'today-arrow'));
-    lineDoor = btn;
+    if (legacyReview) lineDoor = btn;
     const detail = renderTodayDetail(today);
-    main.append(renderTodayLine(today, lineDoor, readPick));
     record.append(detail.section);
     const fold = detail.body;
     fold.append(deckCounts(today));
@@ -15970,8 +15979,7 @@ function renderTray(main) {
       fold.append(qb, note);
     }
   }
-  // no cards yet (or no scheduler): the line still offers the reading and the word walk
-  if (!lineDoor && readPick) main.append(renderTodayLine(null, null, readPick));
+  if (lineDoor || readPick || deckDoor) head.after(renderTodayLine(lineDoor, readPick, deckDoor));
   renderSentencePracticeLibrary(main);
   // The stable global live region owns storage errors. This surface adds only
   // the quiet backup reminder when the record itself is healthy.
@@ -29158,7 +29166,7 @@ function mockLengthsRow() {
 
 /** The study hall's doors, by id: the same seven rooms and the same entries as ever. */
 function studyHallDoors() {
-  const due = S.taken.length && scheduler ? todayQueue().order.length : 0;
+  const due = !sharedStudyActive() && S.taken.length && scheduler ? todayQueue().order.length : 0;
   const { tests: readyTests, sections: readySections, written: readyWritten } = learnTestCounts();
   // the reference library, named in the layout under test for what it holds
   const levelsName = placesLayout()
@@ -29229,7 +29237,13 @@ function learnDeckSummary(id) {
     .then((mod) => mod.summary(id))
     .then((got) => {
       deckSummaries[id] = got;
-      if (S.view === 'dojo') render();
+      if (S.view === 'dojo') {
+        // Refreshing counts replaces the picker. Keep the chosen deck under the
+        // keyboard cursor if a slower deck finishes loading while it has focus.
+        const focused = document.activeElement?.closest('.dojo-deck[data-deck]')?.dataset.deck;
+        render();
+        if (focused) document.querySelector(`.dojo-deck[data-deck="${CSS.escape(focused)}"]`)?.focus({ preventScroll: true });
+      }
     })
     .catch(() => {})
     .finally(() => deckSummaryPending.delete(id));
@@ -29467,11 +29481,13 @@ function loadDeckPlayer() {
 }
 
 let deckOpenRequest = null;
+let deckReturnView = 'dojo';
 function openDeck(id, { autoStart = false } = {}) {
   if (id === 'shared-grammar' && !sharedStudyActive()) return;
   if (!roomTransitionUpdating && (S.view !== 'deckplay' || S.deckPlay !== id)) return roomTransition(() => openDeck(id, { autoStart }));
   keepScroll();
   deckPlayerError = false;
+  if (S.view !== 'deckplay') deckReturnView = S.view === 'tray' ? 'tray' : 'dojo';
   deckOpenRequest = { id, autoStart };
   S.deckPlay = id;
   S.view = 'deckplay';
@@ -29612,9 +29628,7 @@ function renderDeckPlay(main) {
       },
       onLeave() {
         delete deckSummaries[S.deckPlay];
-        S.view = 'dojo';
-        render();
-        window.scrollTo(0, 0);
+        back();
       },
     })
     .catch((err) => {

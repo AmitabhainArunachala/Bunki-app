@@ -77,7 +77,12 @@ export async function createBunkiStudyAdapter({content, storage, identity, trans
       const held=permits.filter(p=>p.install===installation&&!p.usedBy&&p.startsAt<=at&&p.endsAt>at).length;
       const spent=permits.filter(p=>p.usedBy&&p.startsAt<day.endsAt&&p.endsAt>day.startsAt).length;
       const fresh=Math.min(unseen,held,Math.max(0,day.limit-spent));
-      return {due,fresh,total:due+fresh,words:new Set(all.map(e=>e.noteGuid)).size,
+      let lastReviewedAt = 0;
+      for (const review of projection.reviews) {
+        const entry = entries.get(review.taskKey);
+        if (entry && !review.undoneAt && inDeck(entry, deckId)) lastReviewedAt = Math.max(lastReviewedAt, review.at);
+      }
+      return {lastReviewedAt,due,fresh,total:due+fresh,words:new Set(all.map(e=>e.noteGuid)).size,
         begun:new Set(all.filter(e=>projection.introductions[e.taskKey]).map(e=>e.noteGuid)).size,authority:'shared-v4'};
     },
     async missedTerms(deckId,since=0) {

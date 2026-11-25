@@ -695,6 +695,49 @@ function learnHead(n, ja, en, count) {
   return head;
 }
 
+// Each summary already applies its own scheduler, limits and authority. Navigation
+// only ranks eligible sittings: due work first, then the learner's last graded deck.
+function nextDeckSitting(rows) {
+  return rows.filter(([, , sum]) => sum?.total > 0).sort((a, b) =>
+    Number(b[2].due > 0) - Number(a[2].due > 0) ||
+    (b[2].lastReviewedAt || 0) - (a[2].lastReviewedAt || 0) ||
+    b[2].due - a[2].due || b[2].fresh - a[2].fresh)[0];
+}
+
+function todayDeckDoor(loadPlayer, choose) {
+  const button = el('button', 'today-deck-door');
+  button.type = 'button';
+  const label = el('span', 'today-deck-label', tx('デッキを選ぶ', 'Choose a study deck'));
+  button.append(label, el('i', 'today-arrow'));
+  let sitting = null;
+  button.addEventListener('click', () => sitting ? openDeck(sitting[0], { autoStart: true }) : choose());
+  // A new local learner has no deck to resume. Opening Today should not download
+  // untouched deck files. Paired installations read only the shared projection.
+  let candidates = DOJO_DECKS;
+  if (!sharedStudyActive()) {
+    try { candidates = candidates.filter(({ id }) => Object.hasOwn(localStorage, `bunki-cloze:${id}`)); }
+    catch { candidates = []; }
+  }
+  if (candidates.length && window.__CORRIDOR_STANDALONE__ !== true) {
+    void loadPlayer().then(async player => {
+      const rows = await Promise.all(candidates.map(async ({ id, ja, en }) => {
+        try { return [id, tx(ja, en), await player.summary(id)]; }
+        catch { return [id, '', null]; }
+      }));
+      if (!button.isConnected) return;
+      sitting = nextDeckSitting(rows.filter(([, , sum]) => sum?.lastReviewedAt > 0));
+      if (!sitting) return;
+      const [id, title, sum] = sitting;
+      button.dataset.stageDeck = id;
+      label.textContent = tx('デッキを続ける', 'Continue studying');
+      const name = el('span', 'today-deck-title', title);
+      button.insertBefore(name, button.lastChild);
+      if (sum.due) name.append(el('small', 'today-deck-due', tx(`復習 ${sum.due} 枚`, `${sum.due} due`)));
+    }).catch(() => {});
+  }
+  return button;
+}
+
 function renderLearnStage(main, doors) {
   const stage = el('section', 'learn-stage');
   stage.setAttribute('aria-labelledby', 'learn-stage-title');
@@ -713,8 +756,9 @@ function renderLearnStage(main, doors) {
   // and the review stays one quiet line pointing home
   const sums = LEARN_STAGE_DECKS.map(([id, ja, en]) => [id, tx(ja, en), learnDeckSummary(id)]);
   const loaded = sums.filter(([, , sum]) => sum);
-  const best = loaded.slice().sort((a, b) => b[2].due - a[2].due || b[2].fresh - a[2].fresh)[0];
-  const sitting = best && (best[2].due || best[2].fresh) ? best : null;
+  const otherStudied = DOJO_DECKS.filter(deck => !LEARN_STAGE_DECKS.some(([id]) => id === deck.id)
+    && deckSummaries[deck.id]?.lastReviewedAt > 0).map(deck => [deck.id, tx(deck.ja, deck.en), deckSummaries[deck.id]]);
+  const sitting = nextDeckSitting([...loaded, ...otherStudied]);
   // Review is every card's home in the layout under test: the learner's own saved words lead when
   // they wait (the founding need: "I don't want to lose it"), else the deck with a sitting ready
   const deckStage = places ? !due && !!sitting : !!sitting;
@@ -731,7 +775,7 @@ function renderLearnStage(main, doors) {
   const text = el('p', 'learn-card-text');
   if (deckStage) {
     const deck = DOJO_DECKS.find((d) => d.id === sitting[0]);
-    meta.textContent = tx('次の一席 · デッキ', 'next sitting · deck');
+    meta.textContent = sitting[2].lastReviewedAt ? tx('続きのデッキ', 'Continue studying') : tx('次の一席 · デッキ', 'next sitting · deck');
     text.classList.add('is-deck');
     text.textContent = deck ? tx(deck.ja, deck.en) : sitting[1];
   } else if (face?.parts) {
@@ -848,9 +892,12 @@ function deckSittingButton([id, short, sum]) {
   go.type = 'button';
   go.dataset.stageDeck = id;
   const total = sum.total;
-  go.append(el('span', 'learn-go-t', sum.due
-    ? tx(`${short}の ${total} 枚を始める`, `Begin ${total} ${short} card${total === 1 ? '' : 's'}`)
-    : tx(`${short}の新規 ${total} 枚を始める`, `Begin ${total} new ${short} card${total === 1 ? '' : 's'}`)));
+  const label = sum.lastReviewedAt
+    ? tx(`${total} 枚を続ける`, `Continue · ${total} card${total === 1 ? '' : 's'}`)
+    : sum.due
+      ? tx(`${short}の ${total} 枚を始める`, `Begin ${total} ${short} card${total === 1 ? '' : 's'}`)
+      : tx(`${short}の新規 ${total} 枚を始める`, `Begin ${total} new ${short} card${total === 1 ? '' : 's'}`);
+  go.append(el('span', 'learn-go-t', label));
   go.addEventListener('click', () => openDeck(id, { autoStart: true }));
   return go;
 }
@@ -891,4 +938,4 @@ function cardDepth(node, now = Date.now()) {
   return stability >= INK_DEPTH.owned ? 'owned' : stability >= INK_DEPTH.recalled ? 'recalled' : 'again';
 }
 
-export { sharedStudyActive, sharedStudyFence, learnerSourceLabel, gradeTag, focusProseWord, cardInk, markCardMore, focusReturnMarkOnce, srsPresetState, srsPrefValue, srsPrefStep, lessonLaneIds, lessonPlan, lessonMissedLast, lessonPreviousRuns, lessonGloss, lessonChoices, learningEnrollHeldText, practiceIdentity, mockSubjectKey, learnerModel, learningContextRef, learningItemNode, focusSentencePracticeTarget, srsLearnerPolicy, srsWhen, srsForecast, reviewAnswerAvailable, reviewCardBack, presentReviewAnswer, reviewBack, srsCardKind, reviewCounts, deckCounts, srsDecks, renderSrsStats, focusPool, guidedCardStatus, guidedDoorInJlptRoom, learnHead, renderLearnStage, deckSittingButton, deckWordsBegun, renderFocus, cardDepth };
+export { todayDeckDoor, sharedStudyActive, sharedStudyFence, learnerSourceLabel, gradeTag, focusProseWord, cardInk, markCardMore, focusReturnMarkOnce, srsPresetState, srsPrefValue, srsPrefStep, lessonLaneIds, lessonPlan, lessonMissedLast, lessonPreviousRuns, lessonGloss, lessonChoices, learningEnrollHeldText, practiceIdentity, mockSubjectKey, learnerModel, learningContextRef, learningItemNode, focusSentencePracticeTarget, srsLearnerPolicy, srsWhen, srsForecast, reviewAnswerAvailable, reviewCardBack, presentReviewAnswer, reviewBack, srsCardKind, reviewCounts, deckCounts, srsDecks, renderSrsStats, focusPool, guidedCardStatus, guidedDoorInJlptRoom, learnHead, renderLearnStage, deckSittingButton, deckWordsBegun, renderFocus, cardDepth };

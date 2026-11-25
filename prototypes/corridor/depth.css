@@ -277,33 +277,6 @@ html[data-live-depth='1'][data-room='tray']:not(#\#) body:not([data-view='drift'
 }
 html[data-live-depth='1']:is([data-theme='rokusho'], [data-theme='yoru'], [data-theme='nami'], [data-theme='hakuu'], [data-theme='kaku'])[data-room='tray']:not(#\#) body:not([data-view='drift']) #app > main > .today-hero > .today-universe { color: var(--ink); }
 
-/* ---- 札 what you act on: the lines under the word are slips ---- */
-html[data-live-depth='1'][data-room='tray'] body:not([data-view='drift']) .today-line > :is(#review-start:not(.quiet), .today-then) {
-  width: calc(100% + 20px);
-  margin-inline: -10px;
-  padding-inline: 12px;
-  border-color: transparent;
-  border-radius: var(--radius-control);
-  background: var(--dp-slip);
-  box-shadow: inset 0 1px 0 var(--dp-catch), var(--dp-shadow-slip);
-  transition: transform var(--motion-ma) var(--ease-standard), box-shadow var(--motion-ma) var(--ease-standard);
-}
-/* red is the thread: the next thing to do carries it, nothing else does */
-html[data-live-depth='1'][data-room='tray'] body:not([data-view='drift']) .today-line > #review-start:not(.quiet),
-html[data-live-depth='1'][data-room='tray'] body:not([data-view='drift']) .today-line:not(:has(> #review-start:not(.quiet))) > .today-then { --dp-edge: var(--red); }
-html[data-live-depth='1'][data-room='tray'] body:not([data-view='drift']) .today-line > #review-start:not(.quiet):not(:last-child) { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
-html[data-live-depth='1'][data-room='tray'] body:not([data-view='drift']) .today-line > #review-start:not(.quiet) + .today-then { border-top-left-radius: 0; border-top-right-radius: 0; }
-@media (hover: hover) {
-  html[data-live-depth='1'][data-room='tray'] body:not([data-view='drift']) .today-line > :is(#review-start:not(.quiet), .today-then):hover:where(:not(:disabled)) {
-    transform: translateY(-1px);
-    box-shadow: inset 0 1px 0 var(--dp-catch), var(--dp-shadow-slip-up);
-  }
-}
-html[data-live-depth='1'][data-room='tray'] body:not([data-view='drift']) .today-line > :is(#review-start:not(.quiet), .today-then):active:where(:not(:disabled)) {
-  transform: translateY(0);
-  box-shadow: inset 0 1px 0 var(--dp-catch), var(--dp-shadow-slip-down);
-}
-
 /* ---- 窪 what you write into is sunk, in every room ---- */
 html[data-live-depth='1']:is([data-room='tray'], [data-room='list'], [data-room='learn'], [data-room='me'], [data-room='shelf'], [data-room='search']) body:not([data-view='drift']) #app > main :is(.record-note-input, .search-field, .list-maker-field):not(:focus) {
   /* on the ground the full wash; on a sheet half of it (the plane says which), the inner top shadow kept */
