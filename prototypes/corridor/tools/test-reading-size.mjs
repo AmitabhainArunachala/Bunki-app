@@ -53,10 +53,16 @@ try {
           assert.equal(await font('#reader .tok.content ruby rt'), 21);
           assert(await fits());
           await systemType.evaluate(sheet => sheet.remove());
-          await page.locator('#dials-toggle').click();
+          const toggle = page.locator('#dials-toggle');
+          await toggle.focus();
+          await toggle.press('Enter');
+          assert(await toggle.evaluate(n => n === document.activeElement));
           assert.equal(await checked(100), 'true');
-          await page.locator('[data-dial="furigana:2"]').click();
+          const furigana = page.locator('[data-dial="furigana:2"]');
+          await furigana.focus();
+          await furigana.press('Enter');
           await visible('#reader.fg-always');
+          assert(await furigana.evaluate(n => n === document.activeElement));
           const sizeButton = page.locator('button[data-reading-size="125"]');
           await sizeButton.focus();
           await sizeButton.press('Enter');

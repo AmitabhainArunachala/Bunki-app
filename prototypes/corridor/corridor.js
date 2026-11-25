@@ -8530,6 +8530,7 @@ function dialRow(labelJa, labelEn, key, options) {
     b.setAttribute('aria-pressed', String(S.dials[key] === index));
     b.addEventListener('click', async () => {
       if (b.disabled) return;
+      const keepFocus = b.matches(':focus-visible');
       b.disabled = true;
       const dials = { ...S.dials, [key]: index };
       const saved = await commitStorePatch({ dials });
@@ -8537,7 +8538,10 @@ function dialRow(labelJa, labelEn, key, options) {
       if (!saved) return;
       S.dialsUrlOverride = false;
       S.dials = dials;
-      if (b.isConnected) render();
+      if (b.isConnected) {
+        render();
+        if (keepFocus) document.querySelector(`[data-dial="${key}:${index}"]`)?.focus({ preventScroll: true });
+      }
     });
     seg.append(b);
   });
@@ -14009,8 +14013,10 @@ function renderReader(main) {
   dialsToggle.id = 'dials-toggle';
   dialsToggle.append(uiIcon('sliders'));
   dialsToggle.addEventListener('click', () => {
+    const keepFocus = dialsToggle.matches(':focus-visible');
     S.dialsOpen = !S.dialsOpen;
     render();
+    if (keepFocus) document.getElementById('dials-toggle')?.focus({ preventScroll: true });
   });
   // the listen door: one mark in one place (John, 2026-10-15): folded, its speaker mark ends the instrument line until
   // the learner opens it; none at all when this article has no recording
@@ -37174,7 +37180,7 @@ function renderSettings(main) {
   }
   const language = el('section', 'foundation-section settings-rows settings-general');
   language.id = 'settings-general';
-  language.append(row('表示言語', 'Interface language', choices));
+  language.append(row('表示言語', 'Interface language', choices), readingSizeRow());
   // a door with its value: the name at the left, what it is now at the right
   const valued = (door, value) => {
     const text = el('span', 'settings-world-text');

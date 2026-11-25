@@ -722,7 +722,6 @@ function renderWritingChoice() {
     return line;
   };
   section.append(
-    readingSizeRow(),
     row('settings-brush', '筆 — 語が自分で書かれる', '筆 — a word writes itself',
       [['first', '初めての語', 'First meeting'], ['always', 'いつも', 'Always'], ['never', '書かない', 'Never']],
       wordBrush(), (value) => setWordPref(WORD_BRUSH_KEY, 'wordBrush', WORD_BRUSH, value)),
