@@ -729,12 +729,8 @@ try {
             const { pathname } = new URL(link.href);
             return { path: pathname.split('/').pop(), href: pathname, rules };
           });
-          const word = document.querySelector('#shelf-body .japanese-lookup-word');
-          const style = word && getComputedStyle(word);
           return { sheets, art: art?.naturalWidth || 0,
-            grid: getComputedStyle(document.getElementById('shelf-reading-results')).display,
-            word: style && { display: style.display, border: style.borderTopStyle, background: style.backgroundColor,
-              padding: style.padding, minWidth: style.minWidth, minHeight: style.minHeight } };
+            grid: getComputedStyle(document.getElementById('shelf-reading-results')).display };
         })
       : { sheets: [], art: null };
     const editorialAt = offlineLook.sheets.findLastIndex((sheet) => sheet.path === 'editorial.css');
@@ -751,14 +747,27 @@ try {
         offlineLook.art > 0,
       JSON.stringify(offlineLook),
     );
-    check('cold offline shelf and lookup words retain their packaged styles',
-      offlineLook.grid === 'grid' && ['inline', 'inline-block'].includes(offlineLook.word?.display) &&
-        offlineLook.word.border === 'none' && offlineLook.word.background === 'rgba(0, 0, 0, 0)' &&
-        offlineLook.word.padding === '0px' && offlineLook.word.minWidth === '0px' && offlineLook.word.minHeight === '0px',
-      JSON.stringify(offlineLook));
-    await app.locator('#lang [data-lang="bi"]').click();
+    check('cold offline shelf retains its packaged grid', offlineLook.grid === 'grid', offlineLook.grid);
+    // Shelf titles open articles. Today's Japanese prose exposes actual inline lookup words.
+    await app.locator('#tab-today').click();
+    const word = await app.locator('.today-dayword .japanese-lookup-word[data-lookup-text]:visible').first()
+      .evaluate(node => {
+        const style = getComputedStyle(node);
+        return { text: node.textContent, display: style.display, border: style.borderTopStyle,
+          background: style.backgroundColor, padding: style.padding, minWidth: style.minWidth, minHeight: style.minHeight };
+      });
+    check('cold offline lookup words retain their packaged inline styles',
+      Boolean(word.text.trim()) && ['inline', 'inline-block'].includes(word.display) && word.border === 'none' &&
+        word.background === 'rgba(0, 0, 0, 0)' && word.padding === '0px' && word.minWidth === '0px' && word.minHeight === '0px',
+      JSON.stringify(word));
+    await app.locator('#tab-read').click();
+    // The single switch is named for the current language and the action it offers.
+    await app.getByRole('group', { name: '表示言語' }).getByRole('button', { name: /English/ }).click();
+    const currentLanguage = app.getByRole('group', { name: 'Interface language' }).getByRole('button', { name: /switch to 日本語/ });
+    await currentLanguage.waitFor();
     check('cold offline style fixture returns to active English before the remaining journey',
-      await app.locator('#lang [data-lang="bi"]').getAttribute('aria-pressed') === 'true');
+      await currentLanguage.innerText() === 'EN' && await app.locator('#tab-read').innerText() === 'Read' &&
+        await app.locator('body').evaluate(body => body.classList.contains('ui-bi')));
     for (const path of ['editorial.css', 'design/ink-hoku-nami.png']) {
       const cached = await fetchOutcome(app, `${base}${APP}${path}`);
       check(`offline ${path} bytes match the installed artifact`,
