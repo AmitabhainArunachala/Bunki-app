@@ -8,8 +8,7 @@
  * self-consistent. Here zod re-derives the shape straight from the JSON on disk,
  * so a loader bug and a schema bug have to coincide to pass.
  *
- * zod is a devDependency pinned at 4.4.3, the exact version verified in the
- * WP-00 dependency register (MIT, no constraint on the pending OD-09 licence).
+ * The fixture validator uses the same pinned Zod version as the application.
  */
 
 import { readFileSync } from 'node:fs';

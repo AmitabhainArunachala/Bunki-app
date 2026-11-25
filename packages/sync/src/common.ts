@@ -1,3 +1,4 @@
+import { utf16String } from '@bunki/domain/wire-text';
 import { z } from 'zod';
 
 export type DeepReadonly<T> = T extends readonly (infer U)[]
@@ -128,10 +129,8 @@ export function parse<T>(schema: z.ZodType<T>, raw: unknown): T {
 
 // Existing dictionary/card IDs include Japanese forms. Preserve opaque Unicode
 // identities byte-for-byte; normalizing or restricting them to ASCII is lossy.
-export const idSchema = z
-  .string()
+export const idSchema = utf16String(200)
   .min(1)
-  .max(200)
   .regex(/^\S+$/u)
   .refine(wellFormed)
   .refine((value) =>
@@ -142,7 +141,7 @@ export const idSchema = z
   );
 export const digestSchema = z.string().regex(/^[0-9a-f]{64}$/u);
 export const countSchema = z.number().int().min(0).max(Number.MAX_SAFE_INTEGER);
-export const textSchema = (max: number) => z.string().min(1).max(max).refine(wellFormed);
+export const textSchema = (max: number) => utf16String(max).min(1).refine(wellFormed);
 
 /** Binary ordering is portable; locale-dependent collation is not a sync rule. */
 export const compare = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);

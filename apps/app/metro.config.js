@@ -16,7 +16,8 @@ const config = getDefaultConfig(projectRoot);
 // Watch the whole workspace so edits in packages/* trigger a rebuild.
 config.watchFolders = [workspaceRoot];
 
-// Resolve from the app first, then the hoisted root.
+// Resolve from the app first, then the hoisted root. The root pins application
+// Zod 4 here. Expo CLI resolves its own Zod 3 when it runs under Node.
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, 'node_modules'),
   path.resolve(workspaceRoot, 'node_modules'),

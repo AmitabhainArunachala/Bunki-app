@@ -1,4 +1,5 @@
 import { inputHashOf, sha256Hex } from '@bunki/ai/hash';
+import { utf16String } from '@bunki/domain/wire-text';
 import { z } from 'zod';
 import {
   AssessmentValidationError,
@@ -319,7 +320,7 @@ export function preserveLegacySummary(setIdRaw: unknown, raw: unknown): LegacySu
 const legacyRunSchema = z
   .object({
     setId: textSchema(40),
-    level: z.string().max(200).optional(),
+    level: utf16String(200).optional(),
     ix: z.number().int().min(0).max(400),
     answers: z.array(z.number().int().min(0).max(3).nullable()).max(400),
     ts: z.number().finite().optional(),

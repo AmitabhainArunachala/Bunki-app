@@ -9,6 +9,6 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "decode-uri-component-modern": "npm:decode-uri-component@0.5.0"
+    "decode-uri-component-modern": "npm:decode-uri-component@0.5.1"
   }
 }

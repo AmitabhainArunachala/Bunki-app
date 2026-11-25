@@ -2,7 +2,7 @@
 
 Expo Router 57 uses the CommonJS API of `query-string` 7. That parser expects
 `require('decode-uri-component')` to return a function. The patched upstream
-decoder, version 0.5.0, instead exports an ESM default. This private package adapts
+decoder, version 0.5.1, instead exports an ESM default. This private package adapts
 that export and preserves the older decoder's plus-to-space behavior, including
 URL fragments. `%2B` remains a literal plus sign.
 

@@ -1,3 +1,4 @@
+import { utf16String } from '@bunki/domain/wire-text';
 import { z } from 'zod';
 
 export type DeepReadonly<T> = T extends readonly (infer U)[]
@@ -97,10 +98,8 @@ export function isWellFormedText(text: string): boolean {
 }
 
 export const textSchema = (max: number) =>
-  z
-    .string()
+  utf16String(max)
     .min(1)
-    .max(max)
     .refine(isWellFormedText)
     .refine((text) => text.trim().length > 0)
     .refine(

@@ -14,6 +14,7 @@ import {
   type ArticleCandidate,
   type ArticleCapabilityInput,
 } from '@bunki/reading';
+import { utf16String } from '@bunki/domain/wire-text';
 import { z } from 'zod';
 import { parseFeedEntry } from '../contracts.ts';
 import { feedEntryId } from '../identity.ts';
@@ -74,7 +75,7 @@ function attributionFor(
 }
 
 const sha = z.string().regex(/^[a-f0-9]{64}$/u);
-const bounded = (max: number) => z.string().min(1).max(max);
+const bounded = (max: number) => utf16String(max).min(1);
 const credit = z.strictObject({ name: bounded(100), url: bounded(4096) });
 const block = z.strictObject({
   kind: z.enum(['paragraph', 'heading', 'list-item']),
@@ -193,7 +194,7 @@ function createGlobalVoicesPublisherLink(
 }
 
 const responseSchema = z.strictObject({
-  html: z.string().max(MAX_PUBLISHER_HTML_BYTES),
+  html: utf16String(MAX_PUBLISHER_HTML_BYTES),
   finalUrl: bounded(4096),
   contentType: bounded(300),
   fetchedAt: instantSchema,
