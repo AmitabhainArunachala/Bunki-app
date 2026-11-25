@@ -53,7 +53,63 @@ async function labels(page, cdp, lang) {
   // the house voice (one hand, slice E): 不具合を知らせる · Report a problem
   check('actual accessibility tree report entry ' + lang, actual.button.some(n => n.role === 'button' && n.name === expected[0]) && actual.container.some(n => n.name === expected[1]) && actual.title === expected[0], actual);
 }
+async function checkStudyRotation() {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce', serviceWorkers: 'block' });
+  try {
+    const page = await context.newPage();
+    await page.goto(host.origin + '/index.html?deck=n1&ui=bi');
+    await page.locator('#kp-start').click();
+    await page.locator('#kp-reveal').click();
+    await resting(page);
+    const original = await page.evaluate(census);
+    const passage = page.locator('#kp-card > .kp-sentence');
+    await passage.hover();
+    const wheelLanded = passage.evaluate(p => new Promise(resolve => p.addEventListener('scrollend', resolve, { once: true })));
+    await page.mouse.wheel(0, 230);
+    await wheelLanded;
+    const reading = () => {
+      const p = document.querySelector('#kp-card > .kp-sentence');
+      const top = p.getBoundingClientRect().top;
+      const spans = [...p.querySelectorAll('.kp-s')];
+      return spans.findIndex(s => s.getBoundingClientRect().bottom > top + 1);
+    };
+    const sourceSentence = await page.evaluate(reading);
+    const sourcePose = await page.evaluate(census);
+    for (const [width, height] of [[667, 375], [844, 390], [768, 1024], [1024, 768], [1440, 900], [390, 844]]) {
+      await page.setViewportSize({ width, height });
+      await resting(page);
+      const pose = await page.evaluate(census);
+      const layout = await page.evaluate(() => {
+        const rect = selector => document.querySelector(selector).getBoundingClientRect();
+        const p = rect('#kp-card > .kp-sentence'), a = rect('.kp-answer'), w = rect('.kp-word'), g = rect('.kp-grades');
+        const pads = [...document.querySelectorAll('.kp-grade')];
+        return { split: p.right <= a.left, wordVisible: w.top >= 0 && w.bottom <= g.top,
+          reachable: pads.length === 4 && pads.every(pad => {
+            const r = pad.getBoundingClientRect();
+            return r.height >= 44 && pad.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2));
+          }) };
+      });
+      check(`rotation ${width}×${height} keeps revealed card, useful reading area and reachable grade controls`,
+        pose.card === original.card && pose.ledger === original.ledger && pose.overflow === 0 &&
+        layout.split === (width > height) && layout.wordVisible && layout.reachable, { layout, pose });
+      await page.screenshot({ path: OUT + `/study-rotation-${width}x${height}.png` });
+      // At the intermediate desktop size the entire passage can fit, so the
+      // scroll offset naturally becomes zero there. The compact return should
+      // restore the learner's sentence.
+      if (width === 390) {
+        const returned = await page.evaluate(reading);
+        check('portrait returns to the chosen sentence and scroll offset', returned === sourceSentence &&
+          Math.abs(pose.inner - sourcePose.inner) <= 1 && Math.abs(pose.page - sourcePose.page) <= 1, { sourceSentence, returned, sourcePose, pose });
+      }
+    }
+    await page.locator('#kp-grade-good').click();
+    await resting(page);
+    const history = await page.evaluate(() => JSON.parse(localStorage.getItem('bunki-cloze:n1')).log);
+    check('one grade after rotating records exactly one review', history.length === 1, history);
+  } finally { await context.close(); }
+}
 try {
+  await checkStudyRotation();
   for (const width of [320, 390]) for (const zoom of ['full', 'focus']) {
     const context = await browser.newContext({ viewport: { width, height: 844 }, reducedMotion: 'reduce', serviceWorkers: 'block' });
     try {

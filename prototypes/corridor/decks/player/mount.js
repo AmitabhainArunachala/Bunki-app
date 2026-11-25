@@ -857,6 +857,7 @@ const reflowWatch = typeof ResizeObserver === 'function'
     for (const { target } of entries) {
       if (!target.isConnected) { reflowWatch.unobserve(target); continue; }
       for (const tok of target.querySelectorAll('.kp-tok')) tok.classList.toggle('kp-split', tok.getClientRects().length > 1);
+      if (ctx?.focusRoom && ui.revealed && target.matches('#kp-card > .kp-sentence')) fitStudyLayout(target);
     }
   })
   : null;
@@ -2579,7 +2580,14 @@ function windowPassage(from, page = from) {
   const passage = face?.querySelector('.kp-sentence');
   const def = face?.querySelector('.kp-answer > .kp-def');
   const bar = ctx.root.querySelector('.kp-grades');
-  if (!passage || !def || !bar || ui.screen !== 'study' || getComputedStyle(bar).position !== 'fixed') return;
+  if (!passage || !def || !bar || ui.screen !== 'study') return;
+  if (getComputedStyle(bar).position !== 'fixed') {
+    // A window fitted in portrait no longer constrains a tablet or desktop card.
+    passage.classList.remove('kp-window');
+    passage.style.removeProperty('--kp-window-h');
+    placeWindowControls(face, passage, false);
+    return;
+  }
   passage.classList.remove('kp-window');
   passage.style.removeProperty('--kp-window-h');
   window.scrollTo({ top: 0, behavior: 'instant' });
@@ -2636,6 +2644,50 @@ function windowPassage(from, page = from) {
   // Put a long reading window at the top of the reading area. Its clipped
   // earlier lines then stay behind the chrome, rather than under card controls.
   if (seat > 0) window.scrollTo({ top: window.scrollY + seat, behavior: 'instant' });
+}
+
+// Keep the sentence at the learner's reading position when the columns reflow.
+// These seats belong to DOM passages and disappear with the card.
+const studySeats = new WeakMap();
+function fitStudyLayout(passage) {
+  const face = passage.parentElement;
+  const split = getComputedStyle(face).getPropertyValue('--kp-split').trim() === '1';
+  if (split) {
+    watchWindowEdges(passage, face);
+    watchWindowEdges(face.querySelector('.kp-answer'), face);
+  }
+  let seat = studySeats.get(passage);
+  if (!seat) {
+    seat = { width: innerWidth, split, sentence: null, fraction: 0 };
+    studySeats.set(passage, seat);
+    passage.addEventListener('scroll', () => {
+      // Resizing may clamp the old offset before the observer runs.
+      if (innerWidth !== seat.width || passage.scrollTop === seat.restoredTo || passage.scrollHeight <= passage.clientHeight) return;
+      seat.restoredTo = null;
+      const top = passage.getBoundingClientRect().top;
+      for (const sentence of passage.querySelectorAll('.kp-s')) {
+        const row = sentence.getBoundingClientRect();
+        if (!row.height || row.bottom <= top) continue;
+        seat.sentence = sentence;
+        seat.fraction = Math.max(0, (top - row.top) / row.height);
+        break;
+      }
+    }, { passive: true });
+    return;
+  }
+  if (seat.width === innerWidth && seat.split === split) return;
+  seat.width = innerWidth;
+  seat.split = split;
+  if (externalSheet() || ctx.host?.slipOpen?.() || ui.pop) return;
+  fitBar();
+  fitClamps(face);
+  windowPassage(passage.scrollTop, window.scrollY);
+  settleBack();
+  if (seat.sentence && (split || passage.classList.contains('kp-window'))) {
+    const row = seat.sentence.getBoundingClientRect();
+    passage.scrollTop += row.top - passage.getBoundingClientRect().top + seat.fraction * row.height;
+  }
+  seat.restoredTo = passage.scrollTop;
 }
 
 /** Initial window fitting must leave a whole first row's 44px reach inside the
@@ -2700,6 +2752,16 @@ function settleBack() {
   const folds = face.querySelector('.kp-folds');
   // Recalculate the extra seating gap after a viewport, font or fold change.
   folds?.style.removeProperty('margin-top');
+  if (getComputedStyle(face).getPropertyValue('--kp-split').trim() === '1') {
+    const passage = face.querySelector('.kp-sentence');
+    const mark = passage?.querySelector('.kp-target, .kp-blank');
+    if (mark) {
+      const view = passage.getBoundingClientRect();
+      const word = mark.getBoundingClientRect();
+      if (word.top < view.top || word.bottom > view.bottom) passage.scrollTop += word.top - view.top - (view.height - word.height) / 2;
+    }
+    return;
+  }
   const bar = ctx.root.querySelector('.kp-grades');
   const barTop = bar ? Math.min(innerHeight, bar.getBoundingClientRect().top) : innerHeight;
   const bottomLimit = barTop - SETTLE_GAP;
