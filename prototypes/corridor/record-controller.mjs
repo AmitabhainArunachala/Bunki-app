@@ -168,7 +168,7 @@ async function readArchive() {
     return await new Promise((done, fail) => {
       const tx = db.transaction(['turns', 'imports'], 'readonly', { durability: 'strict' });
       let error;
-      const timer = setTimeout(() => { error = new ArchiveReadDeadline(); try { tx.abort(); } catch { db.close(); fail(error); } }, 5000);
+      const timer = setTimeout(() => { error ??= new ArchiveReadDeadline(); try { tx.abort(); } catch { db.close(); fail(error); } }, 5000);
       tx.onabort = () => { clearTimeout(timer); fail(error || new RecordControllerError('archive-unavailable')); };
       try {
         const turns = tx.objectStore('turns'); const imports = tx.objectStore('imports');

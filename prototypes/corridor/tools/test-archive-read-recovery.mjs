@@ -60,6 +60,7 @@ try {
       ['active-read', 1, ''],
       ['active-read', Infinity, ''],
       ['error', 0, ''],
+      ['invalid-schema', 0, ''],
     ]) {
       localStorage.setItem(recordKey, record);
       localStorage.setItem('bunki-drift-v1', '{}');
@@ -116,6 +117,27 @@ try {
       };
       IDBDatabase.prototype.transaction = function (...args) {
         const tx = nativeTransaction.apply(this, args);
+        if (this.name === archiveName && phase === 'invalid-schema') {
+          const objectStore = tx.objectStore.bind(tx);
+          tx.objectStore = (name) => {
+            const store = objectStore(name);
+            if (name === 'turns')
+              Object.defineProperty(store, 'keyPath', { value: 'invalid' });
+            return store;
+          };
+          const abort = tx.abort.bind(tx);
+          let waitingForAbort = false;
+          tx.abort = () => {
+            abort();
+            // The verifier already rejected this schema. Model its deadline
+            // landing before the native abort notification is delivered.
+            if (!waitingForAbort) {
+              waitingForAbort = true;
+              fired++;
+              deadline();
+            }
+          };
+        }
         if (this.name === archiveName && attempts === 2)
           tx.addEventListener('complete', () => {
             retryConfirmed = true;
@@ -169,6 +191,10 @@ try {
       assert.equal(result.attempts, 1);
     } else if (result.change) {
       assert.equal(result.error, 'source-changed');
+    } else if (result.phase === 'invalid-schema') {
+      assert.equal(result.error, 'unsupported-archive');
+      assert.equal(result.attempts, 1);
+      assert.equal(result.fired, 1);
     } else if (result.phase === 'error') {
       assert.equal(result.error, 'archive-unavailable');
       assert.equal(result.attempts, 1);
