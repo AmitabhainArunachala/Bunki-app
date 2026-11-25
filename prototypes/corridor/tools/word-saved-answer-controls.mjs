@@ -188,7 +188,8 @@ export const WORD_CONTROLS = Object.freeze({
  * check list its complete unmutated baseline receipt reports; these rows must be in it. */
 export const LEARNING_RECORD_CONTROLS = Object.freeze({
   RB: { note: 'the renderer binds a copy of the session, not the real one', setups: ['word-review-render-fixture-starts-unbound'],
-    witnesses: ['word-review-shows-and-binds-its-saved-answer', 'word-review-changed-answer-refuses-both-producers-and-asks-for-a-fresh-look'],
+    witnesses: ['timed-practice-short-step-records-only-the-first-scheduled-grade',
+      'word-review-shows-and-binds-its-saved-answer', 'word-review-changed-answer-refuses-both-producers-and-asks-for-a-fresh-look'],
     collateral: [], edits: [['  const presented = presentReviewAnswer(rv);\n', '  const presented = presentReviewAnswer({ ...rv });\n']] },
   C6b: { note: 'UI word-answer check removed from the review face', setups: [],
     witnesses: ['word-review-unavailable-face-refuses-grades-and-writes-nothing'], collateral: [], edits: [

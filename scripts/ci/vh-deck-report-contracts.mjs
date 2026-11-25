@@ -35,6 +35,7 @@ export const DECK_CASES = Object.freeze({
     'abort preserves answer; committed grade and sibling burial survive reload',
     'durable undo preserves the original event',
     'answer upgrade preserves evidence; Japanese feedback, complete ruby and deliberate English reveal',
+    'Japanese keyboard reveal preserves the learner record',
     'malformed restore, free reading, search and routes preserve evidence',
     'concurrent windows cannot overwrite or double-grade stale evidence',
     'complete backup round-trips into a second device context',
@@ -1373,6 +1374,10 @@ export const PLACES_CASES = Object.freeze([
   'current · a tap on the left half leaves the front',
   'current · a tap on the right half turns the card',
   'current · the Readings switch is on the back',
+  'keyboard · a modified number keeps the revealed card and its ledger',
+  'keyboard · one plain number records exactly one review',
+  'keyboard · a browser shortcut preserves the committed review',
+  'keyboard · Enter activates the focused exit control',
   'current · no page errors',
 ]);
 export const EXPERIENCE_CASES = Object.freeze([

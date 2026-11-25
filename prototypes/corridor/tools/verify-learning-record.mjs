@@ -332,6 +332,7 @@ await check('timed-practice-short-step-records-only-the-first-scheduled-grade', 
   assert.deepEqual(f.S.revlog, scheduled.revlog);
   assert.deepEqual(f.S.srs, scheduled.srs);
   assert.deepEqual(f.S.stats, scheduled.stats);
+  assert.equal(f.S.obslog.length, 1, 'the bound practice answer commits one observation');
   assert.deepEqual(f.S.obslog[0].slice(1), ['dojo', 'word:学校', 4, 'due']);
   pending = undo(); f.ack(); assert.equal(await pending, true);
   assert.deepEqual(f.S.revlog, scheduled.revlog);
