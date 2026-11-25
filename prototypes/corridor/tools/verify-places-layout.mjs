@@ -32,6 +32,7 @@ import process from 'node:process';
 import { chromium } from 'playwright-core';
 import { startCorridorDev } from '../../../scripts/serve-corridor-dev.mjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
+import { deltaE } from './contrast-kotoba.mjs';
 import { silenceBrowserAudio } from './browser-audio-silence.mjs';
 import { restoreAppFixture } from './record-fixture-support.mjs';
 import { rubyHideMovesNothing, rubyTurnKeepsPassage } from './vh-visual-contracts.mjs';
@@ -115,12 +116,19 @@ async function gradesColourCoded(page, world) {
       const pad = document.querySelector(`#kp-grade-${id}`);
       const ink = paint(getComputedStyle(pad.querySelector('b')).color);
       const ground = paint(dock, getComputedStyle(pad).backgroundColor);
-      return { id, ink, ratio: Math.round(ratio(ink, ground) * 10) / 10 };
+      return { id, ink, ratio: ratio(ink, ground) };
     });
   });
-  const apart = pads.every((a, i) => pads.every((b, j) => i === j || Math.max(...a.ink.map((v, k) => Math.abs(v - b.ink[k]))) >= 40));
-  const detail = pads.map((p) => `${p.id} rgb(${p.ink.join(',')}) ${p.ratio}:1`).join(' · ');
-  check(`focus · ${world}: the four grades are colour coded, each in its own hue`, apart, detail);
+  // depth.css requires every pair of grade colours to be 0.08 apart in OKLab;
+  // deltaE returns that distance multiplied by 100 for the contrast reports.
+  const distances = pads.flatMap((a, i) => pads.slice(i + 1).map(b => ({
+    pair: `${a.id}/${b.id}`,
+    distance: deltaE(a.ink, b.ink) / 100,
+  })));
+  const detail = pads.map((p) => `${p.id} rgb(${p.ink.join(',')}) ${p.ratio.toFixed(1)}:1`).join(' · ');
+  check(`focus · ${world}: all six grade-colour pairs are at least 0.08 apart in OKLab`,
+    distances.length === 6 && distances.every(p => p.distance >= 0.08),
+    distances.map(p => `${p.pair} ${p.distance.toFixed(5)}`).join(' · '));
   check(`focus · ${world}: every grade word reads at 4.5:1 or more on its pad`, pads.every((p) => p.ratio >= 4.5), detail);
 }
 async function openSettings(page) {
@@ -164,11 +172,21 @@ try {
 
     const names = await tabNames(page);
     check('bar · five places: Review · Bookshelf · Dictionary · Tests · Progress', names.join() === 'Review,Bookshelf,Dictionary,Tests,Progress', names.join());
-    const touching = await page.evaluate(() => {
-      const spans = [...document.querySelectorAll('#primary-tabs .primary-tab')].map((b) => { const r = document.createRange(); r.selectNodeContents(b.firstChild); return r.getBoundingClientRect(); });
-      return spans.some((a, i) => i && a.left < spans[i - 1].right + 4);
+    const labelGaps = await page.locator('#primary-tabs .primary-tab-label').evaluateAll(labels => {
+      const rects = labels.map(label => {
+        const range = document.createRange();
+        range.selectNodeContents(label);
+        return range.getBoundingClientRect();
+      });
+      return rects.flatMap((a, i) => rects.slice(i + 1).map((b, j) => ({
+        pair: [labels[i].textContent, labels[i + j + 1].textContent],
+        // The seeded phone layout can wrap. Labels must clear each other
+        // by four pixels on at least one axis, including across rows.
+        gap: Math.max(b.left - a.right, a.left - b.right, b.top - a.bottom, a.top - b.bottom),
+      })));
     });
-    check('bar · no two labels touch at 390 px', !touching);
+    check('bar · all ten pairs of rendered labels are at least 4px apart at 390px',
+      labelGaps.length === 10 && labelGaps.every(p => p.gap >= 4), JSON.stringify(labelGaps));
     for (const tab of ['review', 'bookshelf', 'dictionary', 'tests', 'progress']) {
       await page.locator(`#tab-${tab}`).click();
       await wait(700);
@@ -267,9 +285,21 @@ try {
     // Progress
     await page.locator('#tab-progress').click();
     await wait(800);
-    // the goals that are not begun say where their decks are: Review here, never the old Learn
-    const homes = await page.locator('#app main').evaluate((m) => (m.textContent.match(/deck is in \w+/gu) || []).join(' ; '));
-    check('progress · unbegun goals send you to Review, never to Learn', /deck is in Review/.test(homes) && !/in Learn/.test(homes), homes);
+    // The lean Progress page has four doors. Test its actual routes and keep
+    // an obsolete route name from leaking back into the Places layout.
+    const doors = await page.locator('.me-doors .foundation-door').evaluateAll(nodes =>
+      nodes.map(n => [n.id, n.innerText.trim()]));
+    check('progress · the four current doors are Progress, Review statistics, Saved words & lists, and Settings',
+      JSON.stringify(doors) === JSON.stringify([['me-progress', 'Progress'], ['me-statistics', 'Review statistics'],
+        ['me-collections', 'Saved words & lists'], ['me-settings', 'Settings']]) &&
+      !(await page.locator('#app main').innerText()).includes('deck is in Learn'), doors.join());
+    for (const [door, room] of [['me-progress', 'kagami'], ['me-statistics', 'srs-stats']]) {
+      await page.locator('#' + door).click();
+      await wait();
+      check(`progress · ${door} opens ${room}`, (await view(page)) === room);
+      await back();
+      check(`progress · Back from ${room} returns to Progress`, (await view(page)) === 'me');
+    }
     await page.locator('#me-collections').click();
     await wait(800);
     check('progress · Saved words & lists opens Saved', (await view(page)) === 'saved');
