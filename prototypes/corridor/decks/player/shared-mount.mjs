@@ -63,6 +63,7 @@ export function readHostAppearance({english=true}={}) {
       'on-accent':onAccent,
       vermilion:red,
       texture:'none',
+      'reading-multiplier':pick('--reading-multiplier')||'1',
     }),
   });
 }
@@ -72,7 +73,7 @@ function subscribeHostAppearance(listener,{english=true}={}) {
   let disposed=false;
   const push=()=>{if(!disposed)listener(readHostAppearance({english}));};
   const rootObserver=new MutationObserver(push);
-  rootObserver.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','data-live-depth','lang']});
+  rootObserver.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','data-live-depth','data-reading-size','lang']});
   let bodyObserver=null;
   if(document.body){
     bodyObserver=new MutationObserver(push);
@@ -104,7 +105,8 @@ export async function render(main,{deckId,english=true,onLeave,autoStart}={}) {
   // a paired host that has stopped on this page does not start again here: the page says so and offers to reopen
   const paired=globalThis.bunkiSharedStudyHost,stopped=paired?.closed?.();
   if(stopped){renderClosed(root,stopped,{english,onLeave});return;}
-  root.append(element('p',english?'Opening shared study…':'共通の学習を開いています…'));
+  const opening=element('p',english?'Opening your study record…':'学習記録を開いています…');
+  opening.setAttribute('role','status');root.append(opening);
   let adapter,voice=null;
   try {[adapter,voice]=await Promise.all([sharedStudyRuntime(),openBunkiStudyVoice().catch(()=>null)]);}
   catch(error){

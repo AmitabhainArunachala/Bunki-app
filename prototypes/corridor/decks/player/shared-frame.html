@@ -17,6 +17,41 @@
   :root[data-embedded="1"] main{padding:10px 12px 28px}
   :root[data-embedded="1"] .screen-head{padding:12px 14px;margin-bottom:12px}
 }
+/* Reading preferences follow the learner into the embedded card. Leave the
+   grading bar and its hit targets independent of passage typography. */
+:root[data-embedded="1"] {
+  --study-passage-size: 1.25rem;
+  --study-definition-size: .9375rem;
+  --study-ruby-size: .75rem;
+  --passage-size: calc(1.5rem * var(--reading-multiplier, 1));
+}
+:root[data-embedded="1"] #app [data-focus] [data-passage="passage"] {
+  font-size: calc(var(--study-passage-size) * var(--reading-multiplier, 1));
+  line-height: 2.3;
+}
+:root[data-embedded="1"] #app [data-focus] .study-card .definition .passage {
+  font-size: calc(var(--study-definition-size) * var(--reading-multiplier, 1));
+  line-height: 1.75;
+}
+:root[data-embedded="1"] #app .passage rt {
+  font-size: calc(var(--study-ruby-size) * var(--reading-multiplier, 1));
+}
+:root[data-embedded="1"] #app .term-block h1 {
+  font-size: calc(1.75rem * var(--reading-multiplier, 1));
+  overflow-wrap: anywhere;
+}
+:root[data-embedded="1"] #app [data-short-gloss],
+:root[data-embedded="1"] #app .term-block .reading {
+  font-size: calc(1rem * var(--reading-multiplier, 1));
+}
+@media (min-width: 900px) {
+  :root[data-embedded="1"] {
+    --study-passage-size: 1.875rem;
+    --study-definition-size: 1.0625rem;
+    --study-ruby-size: .875rem;
+  }
+  :root[data-embedded="1"] #app [data-focus] [data-passage="passage"] { line-height: 1.8; }
+}
 /* Keep the original reading and its reference entry together on the back.
    The canonical card remains the scroll container and owns all interactions. */
 @media (min-width: 38em) and (orientation: landscape) {

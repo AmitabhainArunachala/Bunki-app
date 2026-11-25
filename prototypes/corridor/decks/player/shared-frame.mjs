@@ -6,6 +6,12 @@ import {bindStudyPresentation,bindSharedStudyViewport} from '../../shared-study-
 import {moduleForSharedDeck,sharedDictionaryBuild} from '../../shared-study-content.mjs';
 
 const root=document.querySelector('#app');
+const params=new URLSearchParams(location.search);
+const english=params.get('ui')==='en';
+const opening=root.querySelector('[role="status"]');
+function openingStatus(ja,en) {
+  if(opening)opening.textContent=english?en:ja;
+}
 const json=async(path,hash,withDigest=false)=>{
   const response=await fetch(new URL(path,import.meta.url));if(!response.ok)throw Error('shared-ui-content-unavailable');
   const bytes=await response.arrayBuffer();
@@ -18,6 +24,7 @@ try {
   const port=window.frameElement?.bunkiStudyPort;
   const adapter=port?.adapter;
   if(!adapter)throw Error('shared-host-frame-binding-required');
+  openingStatus('学習教材と辞書を開いています…','Opening study materials and dictionary…');
   const binding=structuredClone(port.binding);
   if(!/^[a-f0-9]{64}$/.test(binding?.dictionary?.buildSha256??''))throw Error('shared-dictionary-binding-required');
   // The two authenticated inputs are independent. Start loading the compressed
@@ -48,8 +55,9 @@ try {
   const catalog=structuredClone(adapter.catalog).map(entry=>entry.module==='grammar'?{...entry,grammarRecord:records.get(entry.noteGuid),grammarTask:tasks.get(entry.taskKey)}:entry);
   // Only this explicitly bound shared frame loads the full dictionary. The
   // existing stamped SW verifies and lazily caches its compressed asset.
+  openingStatus('例文と辞書の対応を確認しています…','Checking dictionary entries against the study passages…');
   const dictionary=await prepareOfflineDictionary(dictionaryInput,catalog);
-  const params=new URLSearchParams(location.search),prefix='bunki-shared-study:appearance:';
+  const prefix='bunki-shared-study:appearance:';
   const initialAppearance=typeof port.readAppearance==='function'?port.readAppearance():null;
   let sessionLanguage=initialAppearance?.language||params.get('ui')||null;
   let sessionTheme=initialAppearance?.baseTheme||null;
@@ -165,4 +173,21 @@ try {
     app.dispose();
   }
   window.addEventListener('pagehide', onPagehide);
-} catch(error) {root.replaceChildren();const p=document.createElement('p');p.setAttribute('role','alert');p.textContent=`Shared study could not open: ${error.message}`;root.append(p);}
+} catch(error) {
+  root.replaceChildren();
+  const message=document.createElement('p');
+  message.setAttribute('role','alert');
+  message.textContent=english?'Study materials could not be opened.':'学習教材を開けませんでした。';
+  root.append(message);
+  if(window.frameElement?.bunkiStudyPort?.adapter) {
+    const retry=document.createElement('button');
+    retry.type='button';
+    retry.textContent=english?'Try opening again':'もう一度開く';
+    retry.onclick=()=>location.reload();
+    root.append(retry);
+  }
+  const details=document.createElement('details'),label=document.createElement('summary'),reason=document.createElement('p');
+  label.textContent=english?'Technical details':'詳細';
+  reason.textContent=String(error?.message||error);
+  details.append(label,reason);root.append(details);
+}
