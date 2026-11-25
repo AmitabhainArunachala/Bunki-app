@@ -1375,6 +1375,8 @@ try {
         if (label === '390') {
           // A phone rotation keeps the open article and puts its first word
           // between the fixed navigation bars on short landscape displays.
+          const intro = page.locator('.pl-intro-ok');
+          if (await intro.isVisible()) await intro.click();
           const first = page.locator('#reader .tok.content').first();
           const firstText = await first.innerText();
           for (const size of [{ width: 568, height: 320 }, { width: 844, height: 390 }]) {
