@@ -1111,6 +1111,7 @@ const RECORD_GATE_CASES = {
     'uncertain-target-commit-keeps-read-finish-ui-unpublished',
   ],
   learningControlled: [
+    'saved-reading-selects-the-same-target-for-context-and-recall',
     'grade-rejection-keeps-schedule-log-stats-and-session-with-double-tap-guard',
     'queued-grade-recomputes-latest-card-and-preserves-concurrent-log-and-stats',
     'not-recalled-forces-again-even-if-another-grade-is-requested',
@@ -1151,6 +1152,8 @@ const RECORD_GATE_CASES = {
     'hfix1b-me-reads-one-count-so-unaided-never-exceeds-read',
   ],
   learningBrowser: [
+    'stale-saved-context-preserves-the-card-and-only-an-explicit-grade-advances-it',
+    'return-to-the-saved-inflection-without-writing-a-review',
     'quiz-answer-rejection-and-reload-preserve-the-unanswered-question',
     'quiz-next-and-close-reject-without-advancing-or-leaving',
     'quiz-close-rejection-keeps-the-completed-run',

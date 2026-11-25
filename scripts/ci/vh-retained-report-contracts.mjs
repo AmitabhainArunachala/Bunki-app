@@ -1112,6 +1112,7 @@ const WORD_CONTROL_COLLATERAL = Object.freeze({
   KP3b: ['P3r'],
 });
 const LEARNING_RECORD_INVENTORY = Object.freeze([
+  'saved-reading-selects-the-same-target-for-context-and-recall',
   'grade-rejection-keeps-schedule-log-stats-and-session-with-double-tap-guard',
   'queued-grade-recomputes-latest-card-and-preserves-concurrent-log-and-stats',
   'not-recalled-forces-again-even-if-another-grade-is-requested',

@@ -439,6 +439,7 @@ const pinnedPaths = {
   'words.json': 'prototypes/corridor/data/share_alike/words.json',
 };
 const learningInventory = [
+  'saved-reading-selects-the-same-target-for-context-and-recall',
   'grade-rejection-keeps-schedule-log-stats-and-session-with-double-tap-guard',
   'queued-grade-recomputes-latest-card-and-preserves-concurrent-log-and-stats',
   'not-recalled-forces-again-even-if-another-grade-is-requested',
@@ -501,6 +502,7 @@ const tapOutput = (marker, rows) => {
 function syntheticMutationControls({
   word = WORD_CONTROLS,
   learning = LEARNING_RECORD_CONTROLS,
+  learningCases = learningInventory,
 } = {}) {
   const authored = readAuthoredCorridor(join(ROOT, 'prototypes/corridor'));
   const pins = Object.fromEntries(
@@ -588,7 +590,7 @@ function syntheticMutationControls({
   for (const [name, control] of Object.entries(word))
     add(`tap-${name}`, 'tap', name, word, tapRows(control.witnesses));
   const learningRows = (witnesses = []) =>
-    Object.fromEntries(learningInventory.map((id) => [id, !witnesses.includes(id)]));
+    Object.fromEntries(learningCases.map((id) => [id, !witnesses.includes(id)]));
   add('learning-baseline', 'receipt', null, learning, learningRows());
   for (const [name, control] of Object.entries(learning))
     add(`learning-${name}`, 'receipt', name, learning, learningRows(control.witnesses));
@@ -613,7 +615,7 @@ function syntheticMutationControls({
     pins: { before: pins, after: structuredClone(pins), stable: true },
     stage: { dir: 'assessment-stage', files: {} },
     inventory: [...PRODUCER_WORD_INVENTORY],
-    learningInventory: [...learningInventory],
+    learningInventory: [...learningCases],
     childIds,
     verdicts,
     pass: true,
@@ -820,6 +822,14 @@ test('word-saved-answer mutation controls: survived, missing, tampered, unstable
   m = fresh();
   m.report.learningInventory.pop();
   fail('learning inventory reduced', m);
+  fail(
+    'a complete-looking schedule that omitted the saved-reading check everywhere',
+    syntheticMutationControls({
+      learningCases: learningInventory.filter(
+        (id) => id !== 'saved-reading-selects-the-same-target-for-context-and-recall',
+      ),
+    }),
+  );
   m = fresh();
   m.report.inventory.pop();
   fail('word inventory reduced', m);
