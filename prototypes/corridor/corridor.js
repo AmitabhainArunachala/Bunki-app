@@ -4122,28 +4122,24 @@ async function boot() {
   }
   S.variantsBar = anyVariantParam;
   if (['bi', 'ja'].includes(params.get('ui'))) S.lang = params.get('ui');
-  try { await ensureReadingModule(); }
-  catch { protectStore('読み物の機能を読み込めない。保存を止めて記録を保護している。接続してから再読み込みする。',
-    'The reading component could not load. Saving is paused to protect article versions. Reconnect and reload the app.'); }
-  try { await ensureTeacherContextModule(); }
-  catch { protectStore('先生との学習記録を読み込めない。再読み込みして続ける。',
-    'Saved teaching contexts could not load. Reconnect and reload to protect your record.'); }
-  try { await ensureTeacherDraftModule(); }
-  catch { protectStore('質問の下書きを読み込めない。再読み込みして続ける。',
-    'Saved questions could not load. Reconnect and reload to protect your record.'); }
-  try { await ensureSentenceDraftModule(); }
-  catch { protectStore('練習の下書きを読み込めない。再読み込みして続ける。',
-    'Saved practice drafts could not load. Reconnect and reload to protect your record.'); }
-  // If there are existing source records, their validator will protect them
-  // when this module is unavailable. Older records can still open normally.
-  try { await ensureFeedModule(); } catch { /* The source shelf offers retry. */ }
-  try { await ensurePublisherModule(); } catch { /* Existing originals fail closed; the source shelf offers retry. */ }
-  try { await ensureSourceInboxModule(); } catch { /* Existing captures fail closed; the inbox offers retry. */ }
-  try { sentencePracticeModule = await import(window.__KAIRO_SENTENCE_PRACTICE_URL__ || './sentence-practice.mjs'); }
-  catch { /* Existing source practice fails closed; neutral captures remain available. */ }
-  try { sourceProcessingModule = await import(window.__KAIRO_SOURCE_PROCESSING_URL__ || './source-processing.mjs'); }
-  catch { /* Local reading remains available; sending an excerpt requires this module. */ }
-  try { await ensureAssessmentModule(); } catch { /* Existing typed attempts fail closed in loadStore. */ }
+  // Fetch independent validators together. Every import settles before record
+  // ownership or validation begins; apply protection in the original order.
+  const [reading, contexts, questions, drafts] = await Promise.allSettled([
+    ensureReadingModule(), ensureTeacherContextModule(), ensureTeacherDraftModule(), ensureSentenceDraftModule(),
+    ensureFeedModule(), ensurePublisherModule(), ensureSourceInboxModule(), ensureAssessmentModule(),
+    import(window.__KAIRO_SENTENCE_PRACTICE_URL__ || './sentence-practice.mjs').then(module => { sentencePracticeModule = module; }),
+    import(window.__KAIRO_SOURCE_PROCESSING_URL__ || './source-processing.mjs').then(module => { sourceProcessingModule = module; }),
+  ]);
+  if (reading.status === 'rejected') protectStore('読み物の機能を読み込めない。保存を止めて記録を保護している。接続してから再読み込みする。',
+    'The reading component could not load. Saving is paused to protect article versions. Reconnect and reload the app.');
+  if (contexts.status === 'rejected') protectStore('先生との学習記録を読み込めない。再読み込みして続ける。',
+    'Saved teaching contexts could not load. Reconnect and reload to protect your record.');
+  if (questions.status === 'rejected') protectStore('質問の下書きを読み込めない。再読み込みして続ける。',
+    'Saved questions could not load. Reconnect and reload to protect your record.');
+  if (drafts.status === 'rejected') protectStore('練習の下書きを読み込めない。再読み込みして続ける。',
+    'Saved practice drafts could not load. Reconnect and reload to protect your record.');
+  // Optional validators remain unavailable on failure. Existing records are
+  // checked at load, and the source shelf can retry its own providers.
   if (await acquireRecordOwnership()) await openAppRecord();
   await resumeSavedPractice();
   await resumeAssessmentV2();
