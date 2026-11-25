@@ -24,21 +24,17 @@ try {
   const port=window.frameElement?.bunkiStudyPort;
   const adapter=port?.adapter;
   if(!adapter)throw Error('shared-host-frame-binding-required');
-  openingStatus('学習教材と辞書を開いています…','Opening study materials and dictionary…');
+  openingStatus('学習教材を開いています…','Opening study materials…');
   const binding=structuredClone(port.binding);
   if(!/^[a-f0-9]{64}$/.test(binding?.dictionary?.buildSha256??''))throw Error('shared-dictionary-binding-required');
-  // The two authenticated inputs are independent. Start loading the compressed
-  // dictionary as soon as its BUILD is verified, while grammar is preparing.
-  const buildReady=json('../../data/shared-study/BUILD.json',binding.dictionary.buildSha256,true);
-  const grammarReady=Promise.all(['registry.json','grammar.json','grammar-reviews.json']
-    .map(name=>json(`../../data/shared-study/${name}`,binding.grammarAssets[name])))
-    .then(async ([registry,module,reviews])=>({registry,prepared:await grammar.prepareGrammarModule(module,{identityRegistry:registry,reviewIndex:reviews,qaMode:false})}));
-  const dictionaryReady=buildReady.then(({value:build})=>loadOfflineDictionary({
-    build:sharedDictionaryBuild(binding,build),base:new URL('../../data/shared-study/',import.meta.url).href
-  }));
-  const [{registry,prepared},themes,{value:build,sha256:buildSha256},dictionaryInput]=await Promise.all([
-    grammarReady,json('../../vendor/shared-study-engine/themes/tokens.json'),buildReady,dictionaryReady,
+  // Read the small pinned resources together. Keep the 163 MB dictionary
+  // decode out of grammar preparation's peak memory window.
+  const [registry,module,reviews,themes,{value:build,sha256:buildSha256}]=await Promise.all([
+    ...['registry.json','grammar.json','grammar-reviews.json'].map(name=>json(`../../data/shared-study/${name}`,binding.grammarAssets[name])),
+    json('../../vendor/shared-study-engine/themes/tokens.json'),
+    json('../../data/shared-study/BUILD.json',binding.dictionary.buildSha256,true),
   ]);
+  const prepared=await grammar.prepareGrammarModule(module,{identityRegistry:registry,reviewIndex:reviews,qaMode:false});
   // Hand the authenticated BUILD and canonical grammar records to the parent
   // observer without waiting for startup or a scan. Setup failure must leave
   // mount and grades usable; this frame never owns another observer.
@@ -55,6 +51,10 @@ try {
   const catalog=structuredClone(adapter.catalog).map(entry=>entry.module==='grammar'?{...entry,grammarRecord:records.get(entry.noteGuid),grammarTask:tasks.get(entry.taskKey)}:entry);
   // Only this explicitly bound shared frame loads the full dictionary. The
   // existing stamped SW verifies and lazily caches its compressed asset.
+  openingStatus('辞書を開いています…','Opening the study dictionary…');
+  const dictionaryInput=await loadOfflineDictionary({
+    build:sharedDictionaryBuild(binding,build),base:new URL('../../data/shared-study/',import.meta.url).href,
+  });
   openingStatus('例文と辞書の対応を確認しています…','Checking dictionary entries against the study passages…');
   const dictionary=await prepareOfflineDictionary(dictionaryInput,catalog);
   const prefix='bunki-shared-study:appearance:';
