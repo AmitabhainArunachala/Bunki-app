@@ -30,6 +30,13 @@ The public distribution remains pinned to the 354-file Nihongo Study release at 
 
 The synthetic 75 ms RTT boot probe on the production-based slice measured the ten validator requests spanning a median 3,426 ms before and 337 ms after the common boot change, three fresh browser contexts per variant. This interval excludes the rest of launch. CPU contention varied. The original production journey still transferred about 20 MB on an uncompressed loopback host.
 
+## Executed integration checks
+
+- In a fresh shared preview, the baseline had zero reachable grades at 844 × 390 and 667 × 375. After the host layout change all four grades received a browser hit at both sizes. The same N2 card stayed revealed across portrait, phone landscape, tablet and desktop. One grade advanced the review. Both the appearance control and the audio control remain reachable.
+- Two independently paired clients reviewed the same card offline against a local instance of the actual Worker. Each queued one answer. After reconnecting, both retained an applied review and a stale-parent observation, had identical FSRS card bytes and reported zero pending uploads. The inputs and accounts were synthetic.
+- The Chromium paired-browser walk exercised pairing, two-way grade transfer, reopening and revocation through the Worker. The separately tested native desktop journal has a different transport and narrower record coverage.
+- The private canonical renderer was tested independently. The same four seconds of recall plus sixty seconds in menus changed from a recorded 64 seconds to 4 seconds on the upstream branch. The selected grade and reducer digest were preserved. This upstream change enters Bunki through a later released-engine import.
+
 ## Evaluation
 
 Judgments on the inspected paths use five-point increments on a 0–100 scale. The columns record discovery, integrity fixes, adaptive layouts and the combined candidate. A reproducible loss or unreachable primary action rates below 60. Scores near 75 require repeatable behavior across the exercised paths. Scores above 90 require sustained use on real devices. Where an iteration supplied no new evidence the score stays fixed.
