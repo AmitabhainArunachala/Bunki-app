@@ -139,6 +139,15 @@ try {
       await page.locator('[data-screen="connections"]').click();
       assert.equal(await page.locator('.pc-route').count(),1);
       checks.push(name+': malformed restore, free reading, search and routes preserve evidence');
+      await page.goto(url+'&ui=ja');
+      await openSaved(page);
+      assert.equal(await page.locator('.pc').getAttribute('lang'),'ja');
+      const beforeReveal = (await stored(page)).progress;
+      await page.keyboard.press('Space');
+      await page.locator('[data-grade="3"]').waitFor();
+      assert.deepEqual((await stored(page)).progress,beforeReveal);
+      checks.push(name+': Japanese keyboard reveal preserves the learner record');
+      await page.goto(url);
       // Race two real windows against the same revision. Only one may commit.
       const second=await context.newPage();await second.goto(url);await openSaved(second);
       await page.reload();await openSaved(page);

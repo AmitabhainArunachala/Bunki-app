@@ -499,9 +499,11 @@ export async function mount(container, {onLeave, themes = [], currentTheme, onTh
     if (await transact(old => ({...old,settings}))) { resetCard(); notice(tx("Study settings saved.")); }
   });
   root.addEventListener('keydown',event => {
-    if (exploring || screen!=='study' || /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName) || event.metaKey || event.ctrlKey || event.altKey || event.repeat) return;
+    if (busy || exploring || screen !== 'study' || event.defaultPrevented || event.isComposing) return;
+    if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey || event.repeat) return;
+    if (event.target.isContentEditable || event.target.closest('input, textarea, select')) return;
     if (/^[1-4]$/.test(event.key) && revealed) { event.preventDefault(); grade(Number(event.key)); }
-    else if (event.code===tx("Space") && current && !revealed && !/^(BUTTON|A|SUMMARY)$/.test(event.target.tagName)) { event.preventDefault(); revealed=true; paint(); focusAnswer(); }
+    else if (event.code === 'Space' && current && !revealed && !event.target.closest('button, a[href], summary')) { event.preventDefault(); revealed=true; paint(); focusAnswer(); }
   });
   const ticker = setInterval(() => { if (!root.isConnected) { clearInterval(ticker); store?.close(); } else if (screen==='study' && !current && !busy) paint(); },30000);
   try { store = await openStore(); await refreshHome(); }

@@ -465,6 +465,18 @@ try {
     check('current · a tap on the right half turns the card', (await bare()).revealed);
     check('current · the Readings switch is on the back', await page.locator('#kp-readings').isVisible());
     await gradesColourCoded(page, 'current layout');
+    const ledger = () => page.evaluate(() => localStorage.getItem('bunki-cloze:n2'));
+    const beforeGrade = await ledger();
+    await page.keyboard.press('Alt+3');
+    check('keyboard · a modified number keeps the revealed card and its ledger', (await bare()).revealed && await ledger() === beforeGrade);
+    await page.keyboard.press('3');
+    check('keyboard · one plain number records exactly one review', JSON.parse(await ledger()).log.length === 1 && !(await bare()).revealed);
+    const afterGrade = await ledger();
+    await page.keyboard.press('Control+u');
+    check('keyboard · a browser shortcut preserves the committed review', await ledger() === afterGrade && !(await bare()).revealed);
+    await page.locator('#kp-quit').focus();
+    await page.keyboard.press('Enter');
+    check('keyboard · Enter activates the focused exit control', await page.locator('#kp-start').isVisible() && await ledger() === afterGrade);
     check('current · no page errors', !errors.length, errors.slice(0, 2).join(' | '));
     await context.close();
   }

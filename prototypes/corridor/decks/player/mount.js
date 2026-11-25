@@ -3483,7 +3483,10 @@ function onKey(e) {
   if (e.defaultPrevented || !ctx?.root?.isConnected || ui.screen !== 'study'
     || ctx.root.closest('[inert], [aria-hidden="true"], [hidden]')
     || (ctx.host && document.querySelector('#sheet, #stroke-page'))
-    || e.target.closest?.('input, textarea')) return;
+    || document.querySelector('dialog[open]')) return;
+  if (e.repeat || e.isComposing || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+  const target = e.target;
+  if (target.isContentEditable || target.closest?.('input, textarea, select')) return;
   // an open slip (the host's) or popover takes the keys: Escape closes it, and nothing grades behind it
   const slip = !!ctx.host && safely(() => !!ctx.host.slipOpen?.(), false);
   if (slip || ui.pop) {
@@ -3494,14 +3497,16 @@ function onKey(e) {
     }
     return;
   }
+  const activation = e.key === ' ' || e.key === 'Enter';
+  if (activation && target.closest?.('button, a[href], summary, [role="button"]')) return;
   const mode = cardMode();
-  if (!ui.revealed && (e.key === ' ' || e.key === 'Enter')) {
+  if (!ui.revealed && activation) {
     e.preventDefault();
     if (mode !== 'choice') reveal();
   } else if (ui.revealed && mode !== 'choice' && ['1', '2', '3', '4'].includes(e.key)) {
     e.preventDefault();
     commit(Number(e.key));
-  } else if (ui.revealed && mode === 'choice' && (e.key === ' ' || e.key === 'Enter')) {
+  } else if (ui.revealed && mode === 'choice' && activation) {
     e.preventDefault();
     next();
   } else if (e.key === 'u' && ui.undo) undo();
