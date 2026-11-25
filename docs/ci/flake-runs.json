@@ -7,18 +7,6 @@
     "attemptedAt": "2026-11-24T19:22:54.274Z",
     "reason": "Command failed: gh api --paginate --slurp repos/AmitabhainArunachala/Bunki-app/actions/runs/42431546894/attempts/2/jobs?per_page=100"
   },
-  "42766585487/1": {
-    "result": "observed",
-    "startedAt": "2026-11-10T06:09:13Z"
-  },
-  "42766679919/1": {
-    "result": "observed",
-    "startedAt": "2026-11-10T06:10:03Z"
-  },
-  "42767964241/1": {
-    "result": "observed",
-    "startedAt": "2026-11-10T06:21:30Z"
-  },
   "42770473307/1": {
     "result": "observed",
     "startedAt": "2026-11-10T06:43:53Z"
@@ -1598,5 +1586,9 @@
   "45554582943/1": {
     "result": "observed",
     "startedAt": "2026-11-25T05:35:01Z"
+  },
+  "45560648509/1": {
+    "result": "observed",
+    "startedAt": "2026-11-25T06:26:45Z"
   }
 }
