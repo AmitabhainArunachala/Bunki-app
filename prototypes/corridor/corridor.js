@@ -4331,16 +4331,19 @@ async function boot() {
       const chars = rec.k && rec.k.length ? rec.k : [...w].filter(isKanji);
       for (const c of chars) add(c, w);
     }
-    const rank = (w) => {
-      const g = D.words[w];
-      const graded = g && g.jlpt ? 0 : 1;
-      const jl = g && g.jlpt ? 5 - g.jlpt : 9;
-      return graded * 100 + jl * 10 + Math.min([...w].length, 9);
-    };
-    for (const c of Object.keys(buckets)) {
-      D.kanjiWords[c] = [...buckets[c]].sort(
-        (a, b) => rank(a) - rank(b) || [...a].length - [...b].length || (a < b ? -1 : 1),
-      );
+    // Compute Unicode length and JLPT rank once per entry in the bucket.
+    // Comparisons run repeatedly while building a large compound index.
+    for (const [kanji, words] of Object.entries(buckets)) {
+      const ranked = Array.from(words, word => {
+        const level = D.words[word]?.jlpt;
+        const length = [...word].length;
+        const graded = level ? 0 : 1;
+        const jl = level ? 5 - level : 9;
+        const rank = graded * 100 + jl * 10 + Math.min(length, 9);
+        return { word, length, rank };
+      });
+      ranked.sort((a, b) => a.rank - b.rank || a.length - b.length || (a.word < b.word ? -1 : 1));
+      D.kanjiWords[kanji] = ranked.map(entry => entry.word);
     }
   }
   D.wordCap = manifest.caps.kanjiWordCap;
