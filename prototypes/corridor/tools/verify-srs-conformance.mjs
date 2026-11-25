@@ -281,7 +281,7 @@ const MUTANTS = {
   'pos-plus-4': () => mutant('decks/player/mount.js', `  ui.pos++;\n  // the next card by srs-core's rule: a learning step comes back when it is due, never a few cards later\n  settle();\n`,
     `  ui.pos++;\n  // the next card by srs-core's rule: a learning step comes back when it is due, never a few cards later\n  settle();\n  { const s = ctx.state.cards[id]; if (s && s.state !== 2 && new Date(s.due).getTime() - Date.now() < 15 * MIN) ui.queue.splice(Math.min(ui.queue.length, ui.pos + 4), 0, id); }\n`),
   'lying-label': () => mutant('decks/player/mount.js', `el('small', null, fmtWait(pv[name]))`, `el('small', null, fmtWait(pv[name] === 600000 ? 300000 : pv[name]))`),
-  'stale-whole-write': () => mutant('decks/player/mount.js', `  if (text !== ctx.ledgerText && text != null) {`, `  if (false) {`),
+  'stale-whole-write': () => mutant('decks/player/mount.js', `  if (text !== ctx.ledgerText) {`, `  if (false) {`),
   'context-frozen-queue': () => mutant('decks/context-dense/mount.js', `  ui.index += 1;\n  settle(next, now);`, `  ui.index += 1;\n  ui.screen = ui.index >= ui.queue.length ? 'done' : 'card';`),
   // the deck claims the grade stored but never writes it: the bounded ledger wait must turn the scenario red
   'context-never-writes': () => mutant('decks/context-dense/mount.js', `    storage.setItem(storageKey, JSON.stringify(state));\n    return true;`, `    return true;`),
@@ -603,6 +603,51 @@ async function playerTwoWindows(browser, engine, { mutate = null } = {}) {
   check(`[${engine}] P0 two open copies: A answers five review cards Good (${out.labels?.[0]}); the stale copy's answer is refused, nothing rolls back`, pass && /another window/u.test(out.toast), { logA: out.logA, logB: out.logB, rolledBack: out.rolledBack.length, keptTheirDays: out.allDays, toast: out.toast });
   check(`[${engine}] P0 …and after a reload none of those cards is due again today`, /Done for today|今日はここまで/u.test(out.startAfter), out.startAfter);
   return pass;
+}
+
+/** Losing access to the latest record must never turn a cached sitting into the source of truth. */
+async function playerUnavailableLedger(browser, engine) {
+  const { context, page } = await newPage(browser);
+  const key = 'bunki-cloze:n2';
+  const bytes = () => page.evaluate(k => localStorage.getItem(k), key);
+  try {
+    await openDeck(page);
+    await page.locator('#kp-start').click();
+    await answer(page);
+    for (const fault of ['unreadable', 'removed', 'read-denied']) {
+      await onCard(page);
+      await page.locator('#kp-reveal').click();
+      const card = await page.locator('#kp-card').getAttribute('data-card');
+      const previous = await bytes();
+      await page.evaluate(({ k, fault }) => {
+        if (fault === 'unreadable') localStorage.setItem(k, 'unreadable replacement');
+        if (fault === 'removed') localStorage.removeItem(k);
+        if (fault === 'read-denied') {
+          const get = Storage.prototype.getItem;
+          Storage.prototype.getItem = function (id) {
+            if (id !== k) return get.call(this, id);
+            Storage.prototype.getItem = get;
+            throw new DOMException('Fixture read refusal', 'SecurityError');
+          };
+        }
+      }, { k: key, fault });
+      await page.locator('#kp-grade-good').click();
+      await page.locator('#kp-to-backup').waitFor();
+      const expected = fault === 'unreadable' ? 'unreadable replacement' : fault === 'removed' ? null : previous;
+      assert.equal(await bytes(), expected);
+      assert.equal(await page.locator('#kp-card').getAttribute('data-card'), card);
+      // The exact prior record becomes readable again. Retry the same revealed card.
+      await page.evaluate(([k, text]) => localStorage.setItem(k, text), [key, previous]);
+      await page.locator('#kp-grade-good').click();
+      await page.waitForFunction(([k, n]) => JSON.parse(localStorage.getItem(k)).log.length === n + 1, [key, JSON.parse(previous).log.length]);
+      const recovered = JSON.parse(await bytes());
+      assert.deepEqual(recovered.log.slice(0, -1), JSON.parse(previous).log);
+      assert.equal(recovered.log.at(-1)[0], card);
+      check(`[${engine}] P0 ${fault} ledger refuses overwrite and recovers the same review`, true);
+    }
+  } finally {
+    await context.close();
+  }
 }
 
 /** P0, a word lookup: a stale copy's tap on a word is merged into the stored ledger, never written over newer grades */
@@ -961,6 +1006,7 @@ for (const engine of ENGINES) {
     if (runs('john')) await scenario(`[${engine}] John's route`, () => playerJohnRoute(browser, engine));
     if (runs('steps')) await scenario(`[${engine}] deck player steps`, () => playerSteps(browser, engine));
     if (runs('p0')) await scenario(`[${engine}] P0 two windows`, () => playerTwoWindows(browser, engine));
+    if (runs('p0')) await scenario(`[${engine}] P0 ledger read failure`, () => playerUnavailableLedger(browser, engine));
     if (runs('p0')) await scenario(`[${engine}] P0 lookup race`, () => playerLookupRace(browser, engine));
     if (runs('context')) await scenario(`[${engine}] context deck`, () => contextDeck(browser, engine));
     if (runs('corridor')) await scenario(`[${engine}] corridor review`, () => corridorReview(browser, engine));

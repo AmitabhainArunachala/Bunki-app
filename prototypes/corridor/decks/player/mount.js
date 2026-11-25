@@ -301,13 +301,14 @@ function loadState(storage, deck) {
   try {
     text = storage.getItem(stateKey(deck.id));
   } catch {
-    text = null;
+    return { state: normalizeState(null, deck), notice: SAVE_FAILED, text: undefined };
   }
   let raw = null;
   let unreadable = false;
   if (text != null) {
     try {
       raw = JSON.parse(text);
+      unreadable = raw?.format !== STATE_FORMAT || raw?.version !== VERSION || raw?.deckId !== deck.id;
     } catch {
       unreadable = true;
     }
@@ -316,7 +317,7 @@ function loadState(storage, deck) {
   const storedCards = raw && typeof raw === 'object' && raw.cards && typeof raw.cards === 'object' ? Object.keys(raw.cards).length : 0;
   if (text != null && !Object.keys(state.cards).length && (unreadable || storedCards)) {
     const kept = writeRaw(storage, quarantineKey(deck.id), text);
-    return { state, notice: kept ? QUARANTINED : '', text };
+    return { state, notice: kept ? QUARANTINED : SAVE_FAILED, text: kept ? text : undefined };
   }
   return { state, notice: '', text };
 }
@@ -355,14 +356,16 @@ function writeLedger(change) {
   try {
     text = ctx.storage.getItem(stateKey(ctx.deck.id));
   } catch {
-    text = ctx.ledgerText;
+    return { failed: true };
   }
-  if (text !== ctx.ledgerText && text != null) {
+  if (text !== ctx.ledgerText) {
+    // A removed or unreadable revision cannot be merged. Keep the durable
+    // bytes and the open card, so the learner can recover before retrying.
+    if (text == null) return { failed: true };
     const read = readLedger(text, ctx.deck);
-    if (read) {
-      ctx.state = read;
-      ctx.ledgerText = text;
-    }
+    if (!read) return { failed: true };
+    ctx.state = read;
+    ctx.ledgerText = text;
   }
   const before = ctx.state;
   const next = change(before);
@@ -3458,7 +3461,8 @@ function restoreButton(ta, msg) {
     try {
       current = ctx.storage.getItem(key);
     } catch {
-      current = null;
+      msg.textContent = t(SAVE_FAILED);
+      return;
     }
     if (!writeRaw(ctx.storage, beforeRestoreKey(ctx.deck.id), current ?? JSON.stringify(ctx.state))) {
       msg.textContent = t(RESTORE_NO_ROOM);
