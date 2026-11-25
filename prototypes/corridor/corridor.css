@@ -6808,6 +6808,15 @@ body.zen .focus-hud-end {
   min-height: var(--tap);
 }
 
+/* The card can scroll behind the toolbar on a short screen. Use the
+   available right margin for the clock so it never covers a character. */
+@media (orientation: landscape) and (min-width: 760px) and (max-height: 520px) {
+  body.zen .focus-hud:not(.done) {
+    justify-content: flex-end;
+    padding-right: calc(72px + env(safe-area-inset-right));
+  }
+}
+
 /* the beat between learning steps — a soft count while the next card ripens */
 .zen-wait {
   gap: 18px;
@@ -8206,7 +8215,7 @@ body.zen .anki-counts .c-due { color: #9fd59c; }
 .anki-undo-slot .review-undo .en-sub {
   display: none;
 }
-body.zen .anki-undo-slot .review-undo {
+body.zen #app .anki-undo-slot .review-undo {
   color: var(--zen-text);
   background: transparent;
   border: 1px solid color-mix(in srgb, var(--zen-text) 30%, transparent);
