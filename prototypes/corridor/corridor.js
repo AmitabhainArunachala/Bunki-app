@@ -2183,7 +2183,7 @@ async function runRecordSyncAction(method) {
       recordFailure(status.code, true);
       return;
     }
-    if (method === 'sync') {
+    if (method === 'sync' && status.code !== 'snapshot-timeout') {
       const refreshed = await refreshRecordSyncSnapshot(slot);
       if (!slot.current() || slot.generation !== generation) return;
       if (refreshed.status !== 'active') recordFailure(refreshed.reason, true);
@@ -15179,6 +15179,7 @@ function updateRecordSyncSurface(container) {
   const slot = recordSyncSlot;
   const writable = recordWritable();
   const state = slot?.status.state || 'unavailable';
+  const retrySnapshot = state === 'error' && slot.status.code === 'snapshot-timeout';
   let message;
   if (!writable) message = tx('記録を保護しているため、同期を停止している。保存の警告を確認する。',
     'Sync is paused while this record is protected. Check the storage warning.');
@@ -15187,6 +15188,8 @@ function updateRecordSyncSurface(container) {
     'Syncing between devices isn’t available here. You can export your record below.');
   else if (state === 'connecting') message = tx('接続を確認している。アプリの案内に従ってください。', 'Connecting. Follow any confirmation shown by the app.');
   else if (state === 'syncing') message = tx('記録を同期している。', 'Syncing records…');
+  else if (retrySnapshot) message = tx('この端末の記録の読み込みに時間がかかっている。「今すぐ同期」でもう一度試してください。',
+    'The local record took too long to read. Choose Sync now to try again.');
   else if (state === 'error') message = tx('同期を完了できなかった。接続を確認して、もう一度試す。', 'Sync could not finish. Check the connection and try again.');
   else if (state === 'ready' && slot.status.result?.pendingCausal) message = tx('関連する変更を待っている記録がある。もう一度同期する。',
     'Some changes are waiting for related changes. Sync again.');
@@ -15205,8 +15208,8 @@ function updateRecordSyncSurface(container) {
   const idle = state === 'unavailable' && slot?.pending !== 'register';
   container.hidden = idle;
   for (const part of container.querySelectorAll('.record-sync-actions, .record-sync-scope')) part.hidden = idle;
-  connect.disabled = !writable || !slot || !!slot.pending || ['unavailable', 'ready', 'syncing', 'connecting'].includes(state);
-  sync.disabled = !writable || !slot?.registrationId || !!slot.pending || state !== 'ready';
+  connect.disabled = !writable || !slot || !!slot.pending || retrySnapshot || ['unavailable', 'ready', 'syncing', 'connecting'].includes(state);
+  sync.disabled = !writable || !slot?.registrationId || !!slot.pending || (state !== 'ready' && !retrySnapshot);
   // Disconnect remains usable during an in-flight cycle. Its newer generation
   // prevents the older completion from restoring a misleading ready state.
   disconnect.disabled = !writable || !slot?.registrationId || slot.pending === 'disconnect' ||
