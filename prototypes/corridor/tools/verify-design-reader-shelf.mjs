@@ -1372,6 +1372,24 @@ try {
           return { tokens: sentence.length, lastBottom: Math.round(last.bottom), viewport: innerHeight, misses: misses.slice(0, 4), missCount: misses.length };
         });
         assert.equal(probe.missCount, 0, `first sentence not wholly on the first screen: ${JSON.stringify(probe.misses)}`);
+        if (label === '390') {
+          // A phone rotation keeps the open article and puts its first word
+          // between the fixed navigation bars on short landscape displays.
+          const intro = page.locator('.pl-intro-ok');
+          if (await intro.isVisible()) await intro.click();
+          const first = page.locator('#reader .tok.content').first();
+          const firstText = await first.innerText();
+          for (const size of [{ width: 568, height: 320 }, { width: 844, height: 390 }]) {
+            await page.setViewportSize(size);
+            assert.equal(await first.innerText(), firstText);
+            const reachable = await first.evaluate(node => {
+              const box = node.getClientRects()[0];
+              return node.contains(document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2)) &&
+                document.documentElement.scrollWidth <= innerWidth;
+            });
+            assert(reachable, `opening word clipped or covered at ${size.width}×${size.height}`);
+          }
+        }
         return probe;
       });
     }
@@ -1670,6 +1688,8 @@ try {
       await run(`P1-fresh-word-demo-${label}`, viewport, async (page) => {
         page.__verifierPhase = 'fresh shelf';
         await open(page);
+        const intro = page.locator('.pl-intro-ok');
+        if (await intro.isVisible()) await intro.click();
         const learning = (record) => Object.fromEntries(['taken', 'srs', 'obslog', 'revlog', 'lists', 'teacherContexts']
           .map((key) => [key, record[key] ?? null]));
         const before = learning(await readAppRecord(page));
@@ -1688,6 +1708,21 @@ try {
         assert(!demonstration.tip && !demonstration.instructions, 'the permanent reader tip remains');
         assert.equal(demonstration.seen, '1', 'demonstration did not remember its device-only seen mark');
         assert.equal(demonstration.audio, 0, 'the demonstration played audio');
+        if (label === '390') {
+          for (const size of [{ width: 844, height: 390 }, PHONE]) {
+            await page.setViewportSize(size);
+            await page.waitForFunction(({ width, word }) => {
+              const card = document.querySelector('#mini[data-demo="true"]');
+              const headline = card?.querySelector('.mini-word');
+              if (!headline || headline.textContent.trim() !== word) return false;
+              const bounds = card.getBoundingClientRect();
+              const head = headline.getBoundingClientRect();
+              const hit = document.elementFromPoint(head.left + head.width / 2, head.top + head.height / 2);
+              return bounds.left >= 0 && bounds.right <= width + 1
+                && document.documentElement.scrollWidth <= width + 1 && headline.contains(hit);
+            }, { width: size.width, word: demonstration.word });
+          }
+        }
         await page.waitForTimeout(800);
         assert.deepEqual(learning(await readAppRecord(page)), before, 'the demonstration created learner history or review work');
         await page.keyboard.press('Escape');

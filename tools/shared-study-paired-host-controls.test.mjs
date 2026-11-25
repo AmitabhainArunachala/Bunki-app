@@ -203,7 +203,7 @@ const FAULTS = [
   [
     'a 401 ends the pairing: the credential is dropped and the screen is told',
     HOST,
-    "if (next.getSyncError() === 'authentication-required' && closed === null) void endPairing();",
+    "if (next.getSyncError() === 'authentication-required' && closed === null) void endPairing(currentAdapter());",
     '',
     T.revoked,
   ],
@@ -445,7 +445,7 @@ const FAULTS = [
   [
     'what was still waiting when the pairing ended is counted',
     HOST,
-    "try { unsent = adapter ? (await adapter.store.outbox(500)).filter((record) => record?.event?.type === 'review').length : 0; } catch { unsent = null; }",
+    "unsent = Object.values(journal.local).filter((row) => row.ackedSeq === null && row.event.type === 'review').length;",
     'unsent = null;',
     T.ended,
   ],
@@ -496,7 +496,7 @@ const FAULTS = [
   [
     'a first open the server refuses ends the pairing and says so',
     HOST,
-    "if (!closed && result?.error === 'authentication-required') await endPairing();",
+    "if (!closed && result?.error === 'authentication-required') await endPairing(adapter);",
     '',
     T.firstRefused,
   ],

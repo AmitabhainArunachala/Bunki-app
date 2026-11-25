@@ -1703,6 +1703,92 @@ test('after the pairing has ended an answer is refused in plain words, nothing i
   await bunki.host.dispose();
 });
 
+test('revocation after a lost departure response reports the answer as unconfirmed even when the server has it', async () => {
+  const world = createWorld();
+  const first = await world.paired();
+  await first.adapter.platform.requestNewCards();
+  await first.host.dispose();
+  const host = await world.openHost({
+    sync: { automatic: true, online: () => world.state.online, eventTarget: new EventTarget() },
+    fetch: async (url, init) => {
+      const response = await world.server.fetch(url, init);
+      if (init.keepalive) throw Error('lost-after-acceptance');
+      return response;
+    },
+  });
+  const adapter = await world.bind(host);
+  world.state.online = false;
+  const made = await grade(adapter.backend, catalog[0].taskKey, 3);
+  world.state.online = true;
+  assert.equal(await host.flushBeforeClose(), false);
+  assert.equal(world.server.rows.filter((row) => row.event.id === made.result.eventId).length, 1);
+  assert.equal((await adapter.store.status()).pendingUpload, 1);
+  await host.dispose();
+
+  world.server.revoke(first.installation);
+  const reopened = await world.openHost();
+  await assert.rejects(world.bind(reopened), /study-pairing-ended/);
+  await until(() => world.store.peek().ended, 'the reopened installation was ended');
+  assert.equal(world.store.peek().ended.unsent, 1);
+  for (const [english, diagnostic] of [
+    [true, /could not confirm that the server received 1 saved answer/],
+    [false, /サーバーが受信したか確認できていません/],
+  ]) {
+    const panel = await settingsBlock(world, null, english);
+    assert.match(panel.at('study-pair-status').textContent, diagnostic);
+  }
+  await reopened.dispose();
+});
+
+test('a server refusal on reopen counts the offline answer from the existing replica', async () => {
+  const world = createWorld();
+  const first = await world.paired();
+  await first.adapter.platform.requestNewCards();
+  world.state.online = false;
+  await grade(first.adapter.backend, catalog[0].taskKey, 3);
+  await first.host.dispose();
+
+  world.server.revoke(first.installation);
+  world.state.online = true;
+  const reopened = await world.openHost();
+  await assert.rejects(world.bind(reopened), /study-pairing-ended/);
+  await until(() => world.store.peek().ended, 'the reopened installation was ended');
+  assert.equal(world.store.peek().ended.unsent, 1);
+  assert.equal((await (await replicaOf(world, first.installation)).status()).pendingUpload, 1);
+  await reopened.dispose();
+});
+
+test('the ended-pairing count covers unacknowledged answers beyond one upload page', async () => {
+  const world = createWorld();
+  const minted = world.server.code();
+  await world.pairing.pair(pairLine(minted));
+  const host = await world.openHost();
+  let refused = false;
+  // Diagnostic fixture with two reviews beyond the 500-row wire window and
+  // one acknowledged review. Sync still uses the canonical store until refusal.
+  const rows = Array.from({ length: 503 }, (_, index) => ({
+    event: { type: index < 500 ? 'settings' : 'review' },
+    ackedSeq: index === 502 ? 7 : null,
+  }));
+  await host.withAdapter(async (binding) => {
+    const adapter = await createBunkiStudyAdapter({ ...binding, content });
+    return {
+      ...adapter,
+      store: {
+        ...adapter.store,
+        outbox: (...args) => (refused ? rows.slice(0, args[0]) : adapter.store.outbox(...args)),
+        readState: (...args) => (refused ? { local: rows } : adapter.store.readState(...args)),
+      },
+    };
+  });
+  world.server.revoke(minted.installation);
+  refused = true;
+  await host.synchronize();
+  await until(() => world.store.peek().ended, 'the installation was ended');
+  assert.equal(world.store.peek().ended.unsent, 2);
+  await host.dispose();
+});
+
 test('forgetting is made durable first: a page that closes midway leaves a pairing that is ended, never one that comes back', async () => {
   // the order, when nothing fails: the mark, the row ended, the row removed, the flag cleared
   const world = createWorld();
@@ -2352,6 +2438,38 @@ test('the code of a connect link never reaches storage, a log or the words on th
   );
 });
 
+test('Settings offers a real retry after a connection failure and removes it after recovery', async () => {
+  const world = createWorld();
+  const first = await world.paired();
+  await first.adapter.platform.requestNewCards();
+  await first.host.dispose();
+
+  let failing = false;
+  const host = await world.openHost({
+    fetch: (url, init) => {
+      if (failing) throw Error('connection-interrupted');
+      return world.server.fetch(url, init);
+    },
+  });
+  const adapter = await world.bind(host);
+  const panel = await settingsBlock(world, host);
+  const retry = panel.at('study-pair-retry');
+  assert.equal(seen(retry), false);
+  await grade(adapter.backend, catalog[0].taskKey, 3);
+  failing = true;
+  assert.equal((await host.synchronize()).error, 'network-failed');
+  assert.equal(seen(retry), true);
+  assert.match(panel.at('study-pair-sync').textContent, /Check your connection/);
+  assert.equal((await adapter.store.status()).pendingUpload, 1);
+
+  failing = false;
+  await retry.fire('click');
+  assert.equal(host.status().state, 'up-to-date');
+  assert.equal((await adapter.store.status()).pendingUpload, 0);
+  assert.equal(seen(retry), false);
+  await host.dispose();
+});
+
 test('Settings on a paired page: connected, when it last synced, a pairing the server ended, and Disconnect in two presses', async () => {
   const world = createWorld();
   const bunki = await world.paired();
@@ -2417,7 +2535,7 @@ test('Settings on a paired page: connected, when it last synced, a pairing the s
   assert.match(at('study-pair-status').textContent, /The server ended this device’s pairing/);
   assert.match(
     at('study-pair-status').textContent,
-    /1 answer saved on this device was never uploaded\. It is still on this device\./,
+    /This device could not confirm that the server received 1 saved answer\./,
   );
   assert.equal(seen(at('study-pair-sync')), false);
   assert.equal(seen(at('study-unpair')), true);

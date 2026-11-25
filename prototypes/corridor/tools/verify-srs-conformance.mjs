@@ -281,7 +281,7 @@ const MUTANTS = {
   'pos-plus-4': () => mutant('decks/player/mount.js', `  ui.pos++;\n  // the next card by srs-core's rule: a learning step comes back when it is due, never a few cards later\n  settle();\n`,
     `  ui.pos++;\n  // the next card by srs-core's rule: a learning step comes back when it is due, never a few cards later\n  settle();\n  { const s = ctx.state.cards[id]; if (s && s.state !== 2 && new Date(s.due).getTime() - Date.now() < 15 * MIN) ui.queue.splice(Math.min(ui.queue.length, ui.pos + 4), 0, id); }\n`),
   'lying-label': () => mutant('decks/player/mount.js', `el('small', null, fmtWait(pv[name]))`, `el('small', null, fmtWait(pv[name] === 600000 ? 300000 : pv[name]))`),
-  'stale-whole-write': () => mutant('decks/player/mount.js', `  if (text !== ctx.ledgerText && text != null) {`, `  if (false) {`),
+  'stale-whole-write': () => mutant('decks/player/mount.js', `  if (text !== ctx.ledgerText) {`, `  if (false) {`),
   'context-frozen-queue': () => mutant('decks/context-dense/mount.js', `  ui.index += 1;\n  settle(next, now);`, `  ui.index += 1;\n  ui.screen = ui.index >= ui.queue.length ? 'done' : 'card';`),
   // the deck claims the grade stored but never writes it: the bounded ledger wait must turn the scenario red
   'context-never-writes': () => mutant('decks/context-dense/mount.js', `    storage.setItem(storageKey, JSON.stringify(state));\n    return true;`, `    return true;`),
@@ -352,10 +352,22 @@ async function answer(page, grade = 'good', deck = 'n2') {
   const stepNote = await shownText(page.locator('.kp-stepnote'));
   const shownAt = await nowIn(page);
   await page.locator(`#kp-grade-${grade}`).click();
-  await page.waitForFunction(([key, card, n]) => (JSON.parse(localStorage.getItem(key) || '{}').log || []).filter((r) => r[0] === card).length > n, [`bunki-cloze:${deck}`, card, (before?.reps ?? 0)], { timeout: 10000 }).catch(() => {});
+  // Retained rows can start after a card's first review, or reach their retention cap.
+  // Observe the requested grade in this card's next revision and its matching log row.
+  const stored = await page.waitForFunction(([key, id, reps, rating]) => {
+    const ledger = JSON.parse(localStorage.getItem(key) || '{}');
+    const updated = ledger.cards?.[id];
+    const row = ledger.log?.at(-1);
+    return updated?.reps === reps && row?.[0] === id && row[1] === rating && row[2] === updated.last_review;
+  }, [`bunki-cloze:${deck}`, card, (before?.reps ?? 0) + 1, player.RATINGS[grade]], { timeout: 10000 })
+    .then(() => true).catch(error => {
+      // A control which serves a card early can lead to a real refusal.
+      if (error.name === 'TimeoutError') return false;
+      throw error;
+    });
   const ledger = await ledgerOf(page, deck);
   const after = ledger?.cards?.[card] ?? null;
-  const row = [...(ledger?.log || [])].reverse().find((r) => r[0] === card);
+  const row = stored ? [...(ledger?.log || [])].reverse().find((r) => r[0] === card) : null;
   const promised = row && after ? playerWait(Date.parse(after.due) - Date.parse(row[2])) : null;
   return { card, before, after, label, promised, chips, stepNote, shownAt, early: isEarly(chips) };
 }
@@ -605,6 +617,51 @@ async function playerTwoWindows(browser, engine, { mutate = null } = {}) {
   return pass;
 }
 
+/** Losing access to the latest record must never turn a cached sitting into the source of truth. */
+async function playerUnavailableLedger(browser, engine) {
+  const { context, page } = await newPage(browser);
+  const key = 'bunki-cloze:n2';
+  const bytes = () => page.evaluate(k => localStorage.getItem(k), key);
+  try {
+    await openDeck(page);
+    await page.locator('#kp-start').click();
+    await answer(page);
+    for (const fault of ['unreadable', 'removed', 'read-denied']) {
+      await onCard(page);
+      await page.locator('#kp-reveal').click();
+      const card = await page.locator('#kp-card').getAttribute('data-card');
+      const previous = await bytes();
+      await page.evaluate(({ k, fault }) => {
+        if (fault === 'unreadable') localStorage.setItem(k, 'unreadable replacement');
+        if (fault === 'removed') localStorage.removeItem(k);
+        if (fault === 'read-denied') {
+          const get = Storage.prototype.getItem;
+          Storage.prototype.getItem = function (id) {
+            if (id !== k) return get.call(this, id);
+            Storage.prototype.getItem = get;
+            throw new DOMException('Fixture read refusal', 'SecurityError');
+          };
+        }
+      }, { k: key, fault });
+      await page.locator('#kp-grade-good').click();
+      await page.locator('#kp-to-backup').waitFor();
+      const expected = fault === 'unreadable' ? 'unreadable replacement' : fault === 'removed' ? null : previous;
+      assert.equal(await bytes(), expected);
+      assert.equal(await page.locator('#kp-card').getAttribute('data-card'), card);
+      // The exact prior record becomes readable again. Retry the same revealed card.
+      await page.evaluate(([k, text]) => localStorage.setItem(k, text), [key, previous]);
+      await page.locator('#kp-grade-good').click();
+      await page.waitForFunction(([k, n]) => JSON.parse(localStorage.getItem(k)).log.length === n + 1, [key, JSON.parse(previous).log.length]);
+      const recovered = JSON.parse(await bytes());
+      assert.deepEqual(recovered.log.slice(0, -1), JSON.parse(previous).log);
+      assert.equal(recovered.log.at(-1)[0], card);
+      check(`[${engine}] P0 ${fault} ledger refuses overwrite and recovers the same review`, true);
+    }
+  } finally {
+    await context.close();
+  }
+}
+
 /** P0, a word lookup: a stale copy's tap on a word is merged into the stored ledger, never written over newer grades */
 async function playerLookupRace(browser, engine, { mutate = null } = {}) {
   const T = T_LOCAL.getTime();
@@ -744,7 +801,7 @@ async function corridorReview(browser, engine, { mutate = null } = {}) {
   const out = { shown: [], labels: [], earlyBeforeChoice: 0 };
   try {
     out.todayKeys = await page.evaluate(() => window.__KAIRO_SRS__.today().keys);
-    await page.locator('#tray').click();
+    await page.locator('#tray, #tab-today').click();
     await page.locator('#review-start').click();
     const grade = async () => {
       await page.waitForSelector('#reveal, .grade.g-good', { timeout: 15000 });
@@ -800,7 +857,7 @@ async function timedKanji(browser, engine) {
   const { context, page } = await corridorBoot(browser, seed);
   const out = {};
   try {
-    await page.locator('#chrome-dojo').click();
+    await page.locator('#chrome-dojo, #tab-learn').click();
     await page.locator('.focus-start').waitFor({ timeout: 15000 });
     await page.locator('.focus-mode').filter({ hasText: /kanji only/iu }).click();
     await page.locator('.focus-start').click();
@@ -961,6 +1018,7 @@ for (const engine of ENGINES) {
     if (runs('john')) await scenario(`[${engine}] John's route`, () => playerJohnRoute(browser, engine));
     if (runs('steps')) await scenario(`[${engine}] deck player steps`, () => playerSteps(browser, engine));
     if (runs('p0')) await scenario(`[${engine}] P0 two windows`, () => playerTwoWindows(browser, engine));
+    if (runs('p0')) await scenario(`[${engine}] P0 ledger read failure`, () => playerUnavailableLedger(browser, engine));
     if (runs('p0')) await scenario(`[${engine}] P0 lookup race`, () => playerLookupRace(browser, engine));
     if (runs('context')) await scenario(`[${engine}] context deck`, () => contextDeck(browser, engine));
     if (runs('corridor')) await scenario(`[${engine}] corridor review`, () => corridorReview(browser, engine));

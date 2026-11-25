@@ -31,6 +31,7 @@ import {
 } from '../prototypes/corridor/study-engine-adapter.mjs';
 import { attachSharedStudyAudioPreparation } from '../prototypes/corridor/shared-study-audio-preparation.mjs';
 import { createSharedStudyStorage } from '../prototypes/corridor/shared-study-storage.mjs';
+import { emptyState, normalizeState } from '../prototypes/corridor/decks/player/engine.js';
 import {
   createStudyEngine,
   createMemoryAdapter,
@@ -234,6 +235,7 @@ function productModule(path, imports, dependencies) {
   new vm.Script(compiled.outputText, { filename: path }).runInNewContext({
     ...dependencies,
     URLSearchParams,
+    structuredClone,
     exports,
     require: (specifier) => {
       if (!Object.hasOwn(imports, specifier))
@@ -362,7 +364,16 @@ describe('Bunki canonical shared study consumer', () => {
       expect(created).toHaveLength(1);
       expect(attach).toHaveBeenCalledTimes(1);
       expect(attach.mock.calls[0][0].adapter).toBe(created[0]);
-      expect(attach.mock.calls[0][0].binding).toBe(loaded.binding);
+      const { source, grammarAssets, dictionary, counts } = loaded.binding;
+      const pins = { source, grammarAssets, dictionary, counts };
+      expect(attach.mock.calls[0][0].binding).toEqual(pins);
+      const framePins = context.sharedPresentationBinding(result);
+      expect(framePins).toEqual(pins);
+      framePins.counts.tasks = 0;
+      expect(context.sharedPresentationBinding(result).counts.tasks).toBe(counts.tasks);
+      expect(() => context.sharedPresentationBinding({})).toThrow(
+        'shared-host-frame-binding-required',
+      );
       expect(result).not.toBe(created[0]);
       expect(result.store).toBe(store);
       expect(result.backend).toBe(backend);
@@ -391,6 +402,33 @@ describe('Bunki canonical shared study consumer', () => {
       expect(bound.result.presentation).toBe(presentation);
       expect(bound.result.identity).toBe(host.identity);
       expect(bound.queries).toEqual([]);
+    }
+    // The paired host returns a distinct frozen facade around the adapter
+    // created in its callback. The frame receives that facade.
+    let guarded;
+    const paired = await mount({
+      host: {
+        async withAdapter(open) {
+          const prepared = await open({
+            identity: { learner: 'test-bound' },
+            presentation: 'phone',
+          });
+          guarded = Object.freeze({ ...prepared });
+          return guarded;
+        },
+      },
+    });
+    expect(paired.result).toBe(guarded);
+    for (const replacement of [{ store: {} }, { catalog: [] }]) {
+      await expect(
+        mount({
+          host: {
+            async withAdapter(open) {
+              return { ...(await open({ identity: { learner: 'test-bound' } })), ...replacement };
+            },
+          },
+        }),
+      ).rejects.toThrow('shared-host-frame-binding-required');
     }
   }, 60_000);
   it('offers only held permits without an explicitly enabled bound reserve authority', async () => {
@@ -740,10 +778,29 @@ describe('Bunki canonical shared study consumer', () => {
   it('retains normal legacy counts and missed terms while selecting shared authority only in shared mode', async () => {
     let shared = false,
       sharedCalls = 0;
-    const storage = {},
-      deck = { id: 'n2', words: [{}, {}], titleJa: '語', titleEn: 'Words' },
-      state = { log: [['word-a-card', 1, new Date(NOW).toISOString()]] };
-    const p = productContext('decks/player/mount.js', ['summary', 'missedTerms'], {
+    const at = new Date(NOW).toISOString();
+    const record = {
+      due: at,
+      last_review: at,
+      stability: 1,
+      difficulty: 5,
+      reps: 1,
+      lapses: 0,
+      state: 1,
+    };
+    const state = {
+      ...emptyState('n2'),
+      cards: {
+        'word-a-card': record,
+        'retired-card': { ...record, last_review: new Date(NOW + 1000).toISOString() },
+      },
+      log: [['word-a-card', 1, at]],
+    };
+    const storage = { getItem: (key) => (key === 'bunki-cloze:n2' ? JSON.stringify(state) : null) };
+    const deck = { id: 'n2', words: [{}, {}], titleJa: '語', titleEn: 'Words' };
+    const p = productContext('decks/player/mount.js', ['summary', 'missedTerms', 'readJson'], {
+      normalizeState,
+      stateKey: (id) => `bunki-cloze:${id}`,
       isSharedStudyMode: () => shared,
       isSharedDeck: (id) => SHARED_DECKS.includes(id),
       window: { localStorage: storage },
@@ -768,7 +825,13 @@ describe('Bunki canonical shared study consumer', () => {
         },
       }),
     });
-    expect(await p.summary('n2')).toMatchObject({ due: 1, fresh: 2, total: 3, words: 2 });
+    expect(await p.summary('n2')).toMatchObject({
+      lastReviewedAt: NOW,
+      due: 1,
+      fresh: 2,
+      total: 3,
+      words: 2,
+    });
     expect(await p.missedTerms('n2', storage, NOW)).toEqual([
       { term: '語', reading: 'ご', at: NOW, deck: 'n2' },
     ]);

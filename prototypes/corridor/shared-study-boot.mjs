@@ -112,6 +112,8 @@ function createLazyHost() {
         if (env.bunkiSharedStudyHost === lazy) delete env.bunkiSharedStudyHost;
       }).catch(() => { /* the device could not be read: nothing is concluded from that */ });
     },
+    synchronize: () => live?.synchronize(),
+    flushBeforeClose: () => live?.flushBeforeClose() ?? Promise.resolve(false),
     async dispose() {
       gone = true;
       listeners.clear();
@@ -132,7 +134,10 @@ function unbind(host) {
 if (!env.bunkiSharedStudyHost && marked()) {
   const host = createLazyHost();
   env.bunkiSharedStudyHost = host;
-  env.addEventListener?.('pagehide', (event) => { if (event?.persisted !== true) void host.dispose().catch(() => {}); });
+  env.addEventListener?.('pagehide', (event) => {
+    const closing = host.flushBeforeClose();
+    if (event?.persisted !== true) void closing.finally(() => host.dispose()).catch(() => {});
+  });
   // the other tabs of this browser: a channel, and the two marks changing (either alone reaches this tab)
   try { new env.BroadcastChannel(CHANNEL).onmessage = () => host.recheck(); } catch { /* no channel here */ }
   env.addEventListener?.('storage', (event) => { if (!event || event.key === null || event.key === MARKER || event.key === ENDED) host.recheck(); });

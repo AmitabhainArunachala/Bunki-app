@@ -6045,6 +6045,8 @@ body.zen .grade-row {
 }
 /* the dojo's clock becomes a whisper: time and one small door, nothing more */
 body.zen .focus-hud {
+  /* Let taps through the transparent clock strip reach More and Undo. */
+  pointer-events: none;
   /* one quiet top line, not a pill floating mid-air: the clock holds the
    * centre and the way out stands in the right corner — the same corner
    * as plain review's ×, so the hand already knows it (operator's real
@@ -6073,6 +6075,7 @@ body.zen .focus-hud-left {
   align-items: center;
 }
 body.zen .focus-hud-end {
+  pointer-events: auto;
   position: absolute;
   right: 6px;
   top: 50%;
@@ -6082,6 +6085,15 @@ body.zen .focus-hud-end {
   background: transparent;
   color: var(--faint);
   min-height: var(--tap);
+}
+
+/* The card can scroll behind the toolbar on a short screen. Use the
+   available right margin for the clock so it never covers a character. */
+@media (orientation: landscape) and (min-width: 760px) and (max-height: 520px) {
+  body.zen .focus-hud:not(.done) {
+    justify-content: flex-end;
+    padding-right: calc(72px + env(safe-area-inset-right));
+  }
 }
 
 /* ---- list management (覚える stage 2): inline maker, rename, armed delete.
@@ -7360,7 +7372,7 @@ body.zen .anki-counts .c-due { color: #9fd59c; }
 .anki-undo-slot .review-undo .en-sub {
   display: none;
 }
-body.zen .anki-undo-slot .review-undo {
+body.zen #app .anki-undo-slot .review-undo {
   color: var(--zen-text);
   background: transparent;
   border: 1px solid color-mix(in srgb, var(--zen-text) 30%, transparent);

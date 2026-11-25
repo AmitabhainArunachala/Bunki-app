@@ -37,16 +37,16 @@ const hostPlatform = (extra = {}) =>
 /** Run the frame entry as written and return what it hands to the canonical mount. */
 async function mountedBy(platform) {
   let mounted = null;
-  const data = {
-    'shared-study-content.json': {
-      dictionary: { buildSha256: digest },
-      grammarAssets: {
-        'registry.json': digest,
-        'grammar.json': digest,
-        'grammar-reviews.json': digest,
-      },
-      counts: { vocabulary: 0, grammar: 0 },
+  const frameBinding = {
+    dictionary: { buildSha256: digest },
+    grammarAssets: {
+      'registry.json': digest,
+      'grammar.json': digest,
+      'grammar-reviews.json': digest,
     },
+    counts: { vocabulary: 0, grammar: 0 },
+  };
+  const data = {
     'registry.json': {},
     'grammar.json': {},
     'grammar-reviews.json': {},
@@ -87,6 +87,7 @@ async function mountedBy(platform) {
   // No audio port on the frame and no pack host on the adapter: the trial host as it is today.
   context.frameElement = {
     bunkiStudyPort: {
+      binding: frameBinding,
       adapter: { catalog: [], backend: {}, store: {}, platform, now: () => 0 },
       onCardStart() {},
     },

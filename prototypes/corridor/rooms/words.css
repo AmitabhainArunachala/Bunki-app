@@ -466,3 +466,9 @@ html[data-room='search'] #app > main > .search-page.search-page-busy ~ .today-da
 #kanji-quest-door {
   margin: 0 8px 8px 0;
 }
+
+/* Keep a long headword whole when it fits. If its reading and definition no
+   longer fit beside it, give them the next line at the chosen reading size. */
+.search-page-results .nav-search-row { flex-wrap: wrap; row-gap: var(--space-1, 4px); }
+.search-page-results .nsr-glyph { max-inline-size: 100%; overflow-wrap: anywhere; line-break: strict; }
+.search-page-results .nsr-stack { flex: 1 1 9em; }

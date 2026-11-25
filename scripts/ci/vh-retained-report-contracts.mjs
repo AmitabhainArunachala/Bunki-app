@@ -1055,6 +1055,7 @@ const LEARNING_CONTROL_WITNESSES = Object.freeze({
   RB: {
     setups: ['word-review-render-fixture-starts-unbound'],
     witnesses: [
+      'timed-practice-short-step-records-only-the-first-scheduled-grade',
       'word-review-shows-and-binds-its-saved-answer',
       'word-review-changed-answer-refuses-both-producers-and-asks-for-a-fresh-look',
     ],
@@ -1111,6 +1112,7 @@ const WORD_CONTROL_COLLATERAL = Object.freeze({
   KP3b: ['P3r'],
 });
 const LEARNING_RECORD_INVENTORY = Object.freeze([
+  'saved-reading-selects-the-same-target-for-context-and-recall',
   'grade-rejection-keeps-schedule-log-stats-and-session-with-double-tap-guard',
   'queued-grade-recomputes-latest-card-and-preserves-concurrent-log-and-stats',
   'not-recalled-forces-again-even-if-another-grade-is-requested',
@@ -1120,6 +1122,7 @@ const LEARNING_RECORD_INVENTORY = Object.freeze([
   'undo-does-not-overwrite-a-later-card-change',
   'acknowledged-grade-disposes-question-view-and-clears-transient-response-state',
   'undo-after-ungraded-skip-restores-the-actual-graded-item-and-removes-only-its-reinsertion',
+  'timed-practice-short-step-records-only-the-first-scheduled-grade',
   'dojo-evidence-waits-for-ack-and-never-creates-schedule-state',
   'show-answer-turns-the-card-without-a-write-and-ignores-a-second-press',
   'word-review-render-fixture-starts-unbound',

@@ -6,6 +6,12 @@ import {bindStudyPresentation,bindSharedStudyViewport} from '../../shared-study-
 import {moduleForSharedDeck,sharedDictionaryBuild} from '../../shared-study-content.mjs';
 
 const root=document.querySelector('#app');
+const params=new URLSearchParams(location.search);
+const english=params.get('ui')==='en';
+const opening=root.querySelector('[role="status"]');
+function openingStatus(ja,en) {
+  if(opening)opening.textContent=english?en:ja;
+}
 const json=async(path,hash,withDigest=false)=>{
   const response=await fetch(new URL(path,import.meta.url));if(!response.ok)throw Error('shared-ui-content-unavailable');
   const bytes=await response.arrayBuffer();
@@ -18,16 +24,16 @@ try {
   const port=window.frameElement?.bunkiStudyPort;
   const adapter=port?.adapter;
   if(!adapter)throw Error('shared-host-frame-binding-required');
-  const binding=await json('../../data/shared-study-content.json');
-  if(!/^[a-f0-9]{64}$/.test(binding.dictionary?.buildSha256??''))throw Error('shared-dictionary-binding-required');
-  const [registry,module,reviews,themes,buildResult]=await Promise.all([
+  openingStatus('学習教材を開いています…','Opening study materials…');
+  const binding=structuredClone(port.binding);
+  if(!/^[a-f0-9]{64}$/.test(binding?.dictionary?.buildSha256??''))throw Error('shared-dictionary-binding-required');
+  // Read the small pinned resources together. Keep the 163 MB dictionary
+  // decode out of grammar preparation's peak memory window.
+  const [registry,module,reviews,themes,{value:build,sha256:buildSha256}]=await Promise.all([
     ...['registry.json','grammar.json','grammar-reviews.json'].map(name=>json(`../../data/shared-study/${name}`,binding.grammarAssets[name])),
     json('../../vendor/shared-study-engine/themes/tokens.json'),
     json('../../data/shared-study/BUILD.json',binding.dictionary.buildSha256,true),
   ]);
-  const {value:build,sha256:buildSha256}=buildResult;
-  // The canonical preparer validates every frozen example, cloze target, reading
-  // span and translation binding. No Bunki reimplementation of grammar faces.
   const prepared=await grammar.prepareGrammarModule(module,{identityRegistry:registry,reviewIndex:reviews,qaMode:false});
   // Hand the authenticated BUILD and canonical grammar records to the parent
   // observer without waiting for startup or a scan. Setup failure must leave
@@ -45,8 +51,13 @@ try {
   const catalog=structuredClone(adapter.catalog).map(entry=>entry.module==='grammar'?{...entry,grammarRecord:records.get(entry.noteGuid),grammarTask:tasks.get(entry.taskKey)}:entry);
   // Only this explicitly bound shared frame loads the full dictionary. The
   // existing stamped SW verifies and lazily caches its compressed asset.
-  const dictionary=await prepareOfflineDictionary(await loadOfflineDictionary({build:sharedDictionaryBuild(binding,build),base:new URL('../../data/shared-study/',import.meta.url).href}),catalog);
-  const params=new URLSearchParams(location.search),prefix='bunki-shared-study:appearance:';
+  openingStatus('辞書を開いています…','Opening the study dictionary…');
+  const dictionaryInput=await loadOfflineDictionary({
+    build:sharedDictionaryBuild(binding,build),base:new URL('../../data/shared-study/',import.meta.url).href,
+  });
+  openingStatus('例文と辞書の対応を確認しています…','Checking dictionary entries against the study passages…');
+  const dictionary=await prepareOfflineDictionary(dictionaryInput,catalog);
+  const prefix='bunki-shared-study:appearance:';
   const initialAppearance=typeof port.readAppearance==='function'?port.readAppearance():null;
   let sessionLanguage=initialAppearance?.language||params.get('ui')||null;
   let sessionTheme=initialAppearance?.baseTheme||null;
@@ -141,6 +152,15 @@ try {
   applyHostAppearance(initialAppearance);
   const disposeAppearance=typeof port.subscribeAppearance==='function'?port.subscribeAppearance(next=>applyHostAppearance(next,{syncLanguage:true})):()=>{};
   const disposeViewport=bindSharedStudyViewport({app,root,onCardStart:port.onCardStart});
+  // Rotating changes the parent header and the trial copy's line wrapping. Seat
+  // the same card below the new header without remounting its reading surface.
+  let frameWidth = window.innerWidth;
+  const onResize = () => {
+    if (window.innerWidth === frameWidth) return;
+    frameWidth = window.innerWidth;
+    if (app.read().screen === 'study') port.onCardStart?.();
+  };
+  window.addEventListener('resize', onResize);
   if(params.get('start')==='1')root.querySelector('[data-start]')?.click();
   window.bunkiSharedStudy=Object.freeze({app,backend:adapter.backend,store:adapter.store,catalog,dictionary});
   function onPagehide(event) {
@@ -148,8 +168,26 @@ try {
     window.removeEventListener('pagehide', onPagehide);
     disposeAppearance();
     voicePort?.abortAll?.();
+    window.removeEventListener('resize', onResize);
     disposeViewport();
     app.dispose();
   }
   window.addEventListener('pagehide', onPagehide);
-} catch(error) {root.replaceChildren();const p=document.createElement('p');p.setAttribute('role','alert');p.textContent=`Shared study could not open: ${error.message}`;root.append(p);}
+} catch(error) {
+  root.replaceChildren();
+  const message=document.createElement('p');
+  message.setAttribute('role','alert');
+  message.textContent=english?'Study materials could not be opened.':'学習教材を開けませんでした。';
+  root.append(message);
+  if(window.frameElement?.bunkiStudyPort?.adapter) {
+    const retry=document.createElement('button');
+    retry.type='button';
+    retry.textContent=english?'Try opening again':'もう一度開く';
+    retry.onclick=()=>location.reload();
+    root.append(retry);
+  }
+  const details=document.createElement('details'),label=document.createElement('summary'),reason=document.createElement('p');
+  label.textContent=english?'Technical details':'詳細';
+  reason.textContent=String(error?.message||error);
+  details.append(label,reason);root.append(details);
+}

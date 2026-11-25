@@ -3,7 +3,7 @@
 const { randomUUID } = require('node:crypto');
 const { Buffer } = require('node:buffer');
 const { setTimeout, clearTimeout } = require('node:timers');
-const { SyncCoordinator, ReplicationStoreError, parseSyncBinding } = require('./native-rpc-session.cjs');
+const { SyncCoordinator, ReplicationStoreError, operationReference, parseSyncBinding } = require('./native-rpc-session.cjs');
 const { launchNativeCloudSync } = require('./native-cloud-sync.cjs');
 const { isAppURL } = require('./navigation-policy.cjs');
 
@@ -23,7 +23,7 @@ const RECORD_CODES = new Set([...STORE_CODES, 'writer-required', 'session-change
   'drift-root-conflict', 'noncanonical-drift-state', 'migration-conflict', 'target-occupied',
   'source-changed-before-prepare', 'reserved-migration-data']);
 const exact = (value, keys) => value !== null && typeof value === 'object' && !Array.isArray(value)
-  && Object.keys(value).sort().join(',') === [...keys].sort().join(',');
+  && Object.keys(value).length === keys.length && keys.every((key) => Object.hasOwn(value, key));
 const sameBinding = (a, b) => ['accountId', 'learnerId', 'sessionId'].every((key) => a?.[key] === b?.[key]);
 const failure = (code) => Object.assign(new Error('Record sync: ' + code), { code });
 const fixedCode = (error) => typeof error?.code === 'string' && /^[a-z][a-z0-9-]{0,63}$/u.test(error.code)
@@ -33,6 +33,29 @@ function bounded(value, limit) {
   try { text = JSON.stringify(value); } catch { throw failure('invalid-response'); }
   if (typeof text !== 'string' || Buffer.byteLength(text, 'utf8') > limit) throw failure('batch-too-large');
   return value;
+}
+
+// The local store can report operations in insertion/duplicate groups. Compare
+// the full multiset so order changes and repeated deliveries remain lossless.
+function matchesReceipt(method, request, receipt) {
+  if (!exact(receipt, ['changeId', 'committedRevision', 'operations', 'outcome', 'runtimeLabel'])
+      || !['browser', 'native', 'ci-substitute'].includes(receipt.runtimeLabel)
+      || !['committed', 'duplicate'].includes(receipt.outcome)
+      || !Number.isSafeInteger(receipt.committedRevision) || receipt.committedRevision < 1
+      || !Array.isArray(receipt.operations)) return false;
+  const acknowledge = method === 'acknowledgeOutbox';
+  if (receipt.changeId !== (acknowledge ? request.acknowledgementId : request.deliveryId)) return false;
+  // A duplicate returns the original durable revision. Exact replay can
+  // return expectedRevision + 1; a later retry can return an older revision.
+  const nextRevision = request.expectedRevision + 1;
+  if (receipt.outcome === 'duplicate' ? receipt.committedRevision > nextRevision
+    : receipt.committedRevision !== nextRevision) return false;
+  const expected = acknowledge ? request.operations : request.delivery.operations.map(operationReference);
+  if (receipt.operations.length !== expected.length || !receipt.operations.every((row) =>
+    exact(row, ['opId', 'sha256']) && typeof row.opId === 'string' && typeof row.sha256 === 'string')) return false;
+  const sorted = (rows) => rows.map((row) => JSON.stringify([row.opId, row.sha256])).sort();
+  const actual = sorted(receipt.operations);
+  return sorted(expected).every((key, index) => key === actual[index]);
 }
 
 /** One renderer document owns one local-store registration. Registering IDs
@@ -115,12 +138,15 @@ function createRecordSyncHost({ window, owner, origin, configuration, canConnect
         // A missing reply to a write is an uncertain result, never a retryable
         // revision race. The existing controller must recover before reuse.
         slot.pending.delete(requestId);
-        latchUncertain(slot);
-        reject(new ReplicationStoreError('reopen-required'));
-        disconnectSlot(slot, 'reopen-required');
+        if (method === 'snapshot') {
+          reject(failure('snapshot-timeout'));
+        } else {
+          latchUncertain(slot);
+          reject(new ReplicationStoreError('reopen-required'));
+        }
       }, storeTimeoutMs);
       timer.unref();
-      slot.pending.set(requestId, { method, resolve, reject, timer });
+      slot.pending.set(requestId, { method, request, resolve, reject, timer });
       try { slot.frame.send('bunki:sync:store-request', envelope); }
       catch { clearTimeout(timer); slot.pending.delete(requestId); reject(failure('stale-session')); }
     });
@@ -133,6 +159,7 @@ function createRecordSyncHost({ window, owner, origin, configuration, canConnect
     if (!pending) return;
     slot.pending.delete(input.requestId);
     clearTimeout(pending.timer);
+    let mutationUnconfirmed = pending.method !== 'snapshot';
     try {
       if (!currentSession(slot)) throw failure('stale-session');
       const response = bounded(input.response, pending.method === 'snapshot' ? 32 * 1024 * 1024 : 8 * 1024 * 1024);
@@ -142,6 +169,11 @@ function createRecordSyncHost({ window, owner, origin, configuration, canConnect
             !RECORD_CODES.has(response.error.code) ||
             (Object.hasOwn(response.error, 'targetCommitDurable') && typeof response.error.targetCommitDurable !== 'boolean'))
           throw failure('invalid-response');
+        // The adapter can report invalid-response if a completed controller
+        // call returned no receipt. Only a definite refusal clears uncertainty.
+        if (mutationUnconfirmed && response.error.code === 'invalid-response')
+          throw failure('invalid-response');
+        mutationUnconfirmed = false;
         if (response.error.targetCommitDurable === true || response.error.code === 'reopen-required') latchUncertain(slot);
         if (slot.storageUncertain) throw new ReplicationStoreError('reopen-required');
         if (STORE_CODES.has(response.error.code)) throw new ReplicationStoreError(response.error.code);
@@ -150,8 +182,15 @@ function createRecordSyncHost({ window, owner, origin, configuration, canConnect
       if (!exact(response, ['ok', 'value']) || response.ok !== true) throw failure('invalid-response');
       if (pending.method === 'snapshot' && (!sameBinding(response.value?.policy?.binding, slot.binding) ||
           !Array.isArray(response.value.documents) || response.value.documents.length !== 0)) throw failure('binding-mismatch');
+      if (mutationUnconfirmed && !matchesReceipt(pending.method, pending.request, response.value))
+        throw failure('invalid-response');
       pending.resolve(response.value);
-    } catch (error) { pending.reject(error); }
+    } catch (error) {
+      if (mutationUnconfirmed) {
+        latchUncertain(slot);
+        pending.reject(new ReplicationStoreError('reopen-required'));
+      } else pending.reject(error);
+    }
   }
   async function register(input) {
     if (closed || !exact(input, ['binding'])) throw failure('invalid-request');

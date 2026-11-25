@@ -10,12 +10,69 @@
 :root[data-embedded="1"] main{max-width:960px;padding:12px 20px 36px;min-height:0}
 :root[data-embedded="1"] .screen-head{background:color-mix(in srgb,var(--surface) 94%,transparent);padding:14px 20px;border:1px solid var(--line);border-radius:12px;margin-bottom:14px}
 :root[data-embedded="1"] .daily-intro.sheet{margin-top:0}
-:root[data-embedded="1"] #app:has([data-focus]),:root[data-embedded="1"] #app:has([data-finish]){height:var(--nsrs-embedded-height,100dvh);background:transparent}
+:root[data-embedded="1"] #app:has([data-focus]),:root[data-embedded="1"] #app:has([data-finish]){height:var(--nsrs-embedded-height,100dvh);min-height:0;background:transparent}
 :root[data-embedded="1"] #app [data-focus] .study-heading{background:color-mix(in srgb,var(--surface) 94%,transparent);border:1px solid var(--line);border-radius:10px}
 @media(max-width:640px){
   :root[data-embedded="1"] .shared-status{width:auto;margin:4px 12px 0;padding:6px 12px}
   :root[data-embedded="1"] main{padding:10px 12px 28px}
   :root[data-embedded="1"] .screen-head{padding:12px 14px;margin-bottom:12px}
+}
+/* Reading preferences follow the learner into the embedded card. Leave the
+   grading bar and its hit targets independent of passage typography. */
+:root[data-embedded="1"] {
+  --study-passage-size: 1.25rem;
+  --study-definition-size: .9375rem;
+  --study-ruby-size: .75rem;
+  --passage-size: calc(1.5rem * var(--reading-multiplier, 1));
+}
+:root[data-embedded="1"] #app [data-focus] [data-passage="passage"] {
+  font-size: calc(var(--study-passage-size) * var(--reading-multiplier, 1));
+  line-height: 2.3;
+}
+:root[data-embedded="1"] #app [data-focus] .study-card .definition .passage {
+  font-size: calc(var(--study-definition-size) * var(--reading-multiplier, 1));
+  line-height: 1.75;
+}
+:root[data-embedded="1"] #app .passage rt {
+  font-size: calc(var(--study-ruby-size) * var(--reading-multiplier, 1));
+}
+:root[data-embedded="1"] #app .term-block h1 {
+  font-size: calc(1.75rem * var(--reading-multiplier, 1));
+  overflow-wrap: anywhere;
+}
+:root[data-embedded="1"] #app [data-short-gloss],
+:root[data-embedded="1"] #app .term-block .reading {
+  font-size: calc(1rem * var(--reading-multiplier, 1));
+}
+@media (min-width: 900px) {
+  :root[data-embedded="1"] {
+    --study-passage-size: 1.875rem;
+    --study-definition-size: 1.0625rem;
+    --study-ruby-size: .875rem;
+  }
+  :root[data-embedded="1"] #app [data-focus] [data-passage="passage"] { line-height: 1.8; }
+}
+/* Keep the original reading and its reference entry together on the back.
+   The canonical card remains the scroll container and owns all interactions. */
+@media (min-width: 38em) and (orientation: landscape) {
+  :root[data-embedded="1"] #app [data-vocabulary-back] {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: clamp(1rem, 3vw, 2.5rem);
+    align-items: start;
+  }
+  :root[data-embedded="1"] #app [data-vocabulary-back] > [data-passage] {
+    width: 100%;
+    margin: 0;
+    line-break: strict;
+  }
+  :root[data-embedded="1"] #app [data-vocabulary-back] > [data-vocabulary-entry] {
+    min-width: 0;
+    padding-inline-start: 1rem;
+    border-inline-start: 1px solid var(--line);
+    overflow-wrap: anywhere;
+  }
+  :root[data-embedded="1"] #app [data-vocabulary-back] .term-block { margin-top: 0; }
 }
 </style>
 </head><body><main id="app"><p role="status">学習を開いています…</p></main><script type="module" src="./shared-frame.mjs"></script></body></html>

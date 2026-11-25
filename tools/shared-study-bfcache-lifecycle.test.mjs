@@ -289,7 +289,6 @@ if (!vm.SourceTextModule) {
       counts: { vocabulary: 1, grammar: 0 },
     };
     const assets = {
-      'shared-study-content.json': binding,
       'registry.json': registry,
       'grammar.json': grammar,
       'grammar-reviews.json': reviews,
@@ -297,7 +296,7 @@ if (!vm.SourceTextModule) {
       'tokens.json': {},
     };
     const win = {
-      frameElement: { bunkiStudyPort: { adapter: f.adapter, onCardStart: () => {} } },
+      frameElement: { bunkiStudyPort: { binding, adapter: f.adapter, onCardStart: () => {} } },
       addEventListener: events.addEventListener.bind(events),
       removeEventListener: events.removeEventListener.bind(events),
     };

@@ -1,6 +1,6 @@
 /** Host the exact canonical study UI in a same-origin frame. No second player,
  * admission policy, or legacy-ledger writer is implemented in this module. */
-import {sharedStudyRuntime} from '../../shared-study-runtime.mjs';
+import {sharedStudyRuntime,sharedPresentationBinding} from '../../shared-study-runtime.mjs';
 import {openBunkiStudyVoice} from '../../modules/shared-study-voice.mjs';
 let serial=0;
 const element=(tag,text)=>{const node=document.createElement(tag);if(text)node.textContent=text;return node;};
@@ -63,6 +63,7 @@ export function readHostAppearance({english=true}={}) {
       'on-accent':onAccent,
       vermilion:red,
       texture:'none',
+      'reading-multiplier':pick('--reading-multiplier')||'1',
     }),
   });
 }
@@ -72,7 +73,7 @@ function subscribeHostAppearance(listener,{english=true}={}) {
   let disposed=false;
   const push=()=>{if(!disposed)listener(readHostAppearance({english}));};
   const rootObserver=new MutationObserver(push);
-  rootObserver.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','data-live-depth','lang']});
+  rootObserver.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','data-live-depth','data-reading-size','lang']});
   let bodyObserver=null;
   if(document.body){
     bodyObserver=new MutationObserver(push);
@@ -104,7 +105,8 @@ export async function render(main,{deckId,english=true,onLeave,autoStart}={}) {
   // a paired host that has stopped on this page does not start again here: the page says so and offers to reopen
   const paired=globalThis.bunkiSharedStudyHost,stopped=paired?.closed?.();
   if(stopped){renderClosed(root,stopped,{english,onLeave});return;}
-  root.append(element('p',english?'Opening shared study…':'共通の学習を開いています…'));
+  const opening=element('p',english?'Opening your study record…':'学習記録を開いています…');
+  opening.setAttribute('role','status');root.append(opening);
   let adapter,voice=null;
   try {[adapter,voice]=await Promise.all([sharedStudyRuntime(),openBunkiStudyVoice().catch(()=>null)]);}
   catch(error){
@@ -138,7 +140,6 @@ export async function render(main,{deckId,english=true,onLeave,autoStart}={}) {
   if(adapter.identity.environment==='test-bunki-shared-preview')root.append(element('p',english?'Trial copy. Your real study record stays as it is.':'試しの写し。実際の学習記録はそのままです。'));
   const frame=element('iframe');frame.title=english?'Shared study':'共通の学習';frame.dataset.sharedStudyFrame='';
   frame.allow='autoplay';
-  frame.style.cssText='display:block;width:100%;height:calc(100dvh - 7rem);min-height:28rem;border:0;background:transparent';
   const url=new URL('./shared-frame.html',import.meta.url);url.searchParams.set('deck',deckId);url.searchParams.set('ui',english?'en':'ja');if(autoStart)url.searchParams.set('start','1');
   // The child receives the already bound backend, never credentials or a new
   // independent learner identity. This port is same-origin and frame-specific.
@@ -156,6 +157,7 @@ export async function render(main,{deckId,english=true,onLeave,autoStart}={}) {
   const onCardStart=()=>{
     if(request!==serial||!root.isConnected||!frame.isConnected||frame.parentNode!==root)return;
     const chromeBottom=Math.max(0,document.querySelector('.chrome')?.getBoundingClientRect().bottom??0);
+    frame.style.setProperty('--shared-study-chrome-height', `${chromeBottom}px`);
     const target=window.scrollY+frame.getBoundingClientRect().top-chromeBottom;
     window.scrollTo({top:Math.max(0,target),behavior:'instant'});
   };
@@ -165,7 +167,7 @@ export async function render(main,{deckId,english=true,onLeave,autoStart}={}) {
     disposers.add(stop);
     return ()=>{disposers.delete(stop);stop();};
   };
-  frame.bunkiStudyPort=Object.freeze({adapter,onCardStart,readAppearance,subscribeAppearance,...(audio?{audio}:{}),...(voice?{voice}:{})});
+  frame.bunkiStudyPort=Object.freeze({adapter,binding:sharedPresentationBinding(adapter),onCardStart,readAppearance,subscribeAppearance,...(audio?{audio}:{}),...(voice?{voice}:{})});
   frame.src=url.href;root.append(frame);
   // the pairing ending under an open screen closes the screen: nothing more is answered into a copy that cannot be sent
   const unhear=paired?.onClosed?.(notice=>{unhear?.();if(request!==serial||!root.isConnected)return;cleanup();renderClosed(root,notice,{english,onLeave});});

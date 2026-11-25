@@ -36,6 +36,7 @@
  */
 
 import { isoInstantSchema, type CandidateEnvelopeMetadata } from '@bunki/domain';
+import { utf16String } from '@bunki/domain/wire-text';
 import { z } from 'zod';
 
 import { AiRequestValidationError, AiResponseValidationError } from './errors.ts';
@@ -123,9 +124,9 @@ export const MAX_PROVIDER_NAME_CHARS = 32;
 export const threadContextSchema = z.strictObject({
   contentClass: z.literal('seeded-fixture'),
   /** The written form the candidate is about. */
-  targetForm: nonEmptyString.max(MAX_TARGET_FORM_CHARS),
+  targetForm: utf16String(MAX_TARGET_FORM_CHARS).min(1),
   /** One seeded sentence or passage line the form occurs in. */
-  excerpt: nonEmptyString.max(MAX_CONTEXT_EXCERPT_CHARS),
+  excerpt: utf16String(MAX_CONTEXT_EXCERPT_CHARS).min(1),
   /** Which seed record the excerpt came from, so the request is auditable. */
   seedRef: nonEmptyString,
 });
@@ -153,8 +154,8 @@ export type AiRequestEnvelope = z.infer<typeof aiRequestEnvelopeSchema>;
  * seam in the README instead of faked here.
  */
 export const candidatePayloadSchema = z.strictObject({
-  targetForm: nonEmptyString.max(MAX_TARGET_FORM_CHARS),
-  explanation: nonEmptyString.max(MAX_EXPLANATION_CHARS),
+  targetForm: utf16String(MAX_TARGET_FORM_CHARS).min(1),
+  explanation: utf16String(MAX_EXPLANATION_CHARS).min(1),
 });
 
 export type AiCandidatePayload = z.infer<typeof candidatePayloadSchema>;
@@ -174,8 +175,8 @@ export const candidateChecksSchema = z.strictObject({
 export const aiCandidateEnvelopeSchema = z.strictObject({
   candidateId: nonEmptyString,
   payload: candidatePayloadSchema,
-  model: nonEmptyString.max(MAX_MODEL_ID_CHARS),
-  provider: nonEmptyString.max(MAX_PROVIDER_NAME_CHARS),
+  model: utf16String(MAX_MODEL_ID_CHARS).min(1),
+  provider: utf16String(MAX_PROVIDER_NAME_CHARS).min(1),
   promptVersion: nonEmptyString,
   createdAt: isoInstantSchema,
   checks: candidateChecksSchema,

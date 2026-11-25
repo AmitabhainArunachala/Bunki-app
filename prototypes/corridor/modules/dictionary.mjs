@@ -2116,7 +2116,32 @@ function bankExamplesFor(id, node = null) {
   return banked.filter((ex) => exampleHoldsWord(ex.tokens, identity));
 }
 
-function findExamples(id, cap = 4, node = null) {
+// A review asks for the reading the learner saved. The shelf and bank may file
+// homographs together, and a bank example may spell this entry another way.
+function reviewTokenMatcher(id, answer) {
+  if (answer?.status !== 'available' || !answer.reading) return () => false;
+  const reading = kataToHira(answer.reading);
+  const forms = new Set([id, answer.head]);
+  if (answer.source === 'core') {
+    for (const form of exampleIdentity(id).forms) forms.add(form);
+  } else if (answer.seq) {
+    const row = dictionaryRowBySeq(answer.seq);
+    for (const form of row?.[4] || []) {
+      if (dictionaryReadingSupportsForm(row, reading, form)) forms.add(form);
+    }
+  }
+  const kana = new Set([...forms].filter(form => form && READER_KANA.test(form)).map(kataToHira));
+  return token => {
+    if (!token?.c || !token.b) return false;
+    if (!forms.has(token.b) && !(kana.size && READER_KANA.test(token.b) && kana.has(kataToHira(token.b)))) return false;
+    const entry = token.sense?.seq || token.seq;
+    if (answer.seq && entry && String(entry) !== String(answer.seq)) return false;
+    const spoken = tokenReading(token) || (token.s === token.b && READER_KANA.test(token.s) ? token.s : '');
+    return !!spoken && kataToHira(spoken) === reading;
+  };
+}
+
+function findExamples(id, cap = 4, node = null, matches = null) {
   const out = [];
   const identity = node ? exampleIdentity(id, node) : null;
   for (const p of D.passages) {
@@ -2126,7 +2151,7 @@ function findExamples(id, cap = 4, node = null) {
     let hit = false;
     for (const [index, t] of p.tokens.entries()) {
       sentence.push(t);
-      if (t.c && t.b === id && (!identity || exampleTokenIsWord(t, identity))) hit = true;
+      if (!hit && (matches ? matches(t) : t.c && t.b === id && (!identity || exampleTokenIsWord(t, identity)))) hit = true;
       if ('。！？'.includes(t.s)) {
         if (hit) out.push({ tokens: sentence, source: learnerSourceLabel(p), passage: p.id, start });
         sentence = [];
@@ -2140,7 +2165,7 @@ function findExamples(id, cap = 4, node = null) {
   }
   // the bank fills what the shelf cannot — already-fetched sentences only
   // (ensureBankExamples warms this cache; callers refresh once it lands), and only the word's own (KT-6)
-  const banked = bankExamplesFor(id, node);
+  const banked = matches ? (D.exampleBank?.get(id) || []).filter(ex => ex.tokens.some(matches)) : bankExamplesFor(id, node);
   if (banked.length) {
     const seen = new Set(out.map((ex) => ex.tokens.map((t) => t.s).join('')));
     for (const ex of banked) {
@@ -2604,4 +2629,4 @@ function displayKunReading(reading) {
   return dot < 0 ? value : `${value.slice(0, dot)}（${value.slice(dot + 1)}）`;
 }
 
-export { lookup, joyoDialChanges, embeddedDictionaryJson, loadDictionaryJson, hasEmbeddedDictionaryIndex, dictionaryCoreMatch, dictionaryGlossSummary, dictionaryReadingSupportsForm, dictionarySummaryFor, validDictionaryRow, dictionaryRowsForForm, ensureDictionaryRowBySeq, ensureDictionaryRowsForForm, ensureDictionaryRowsForNode, dictionaryRowsFor, dictionaryDetailRowsFor, dictionaryShardNumber, dictionaryShardId, ensureDictionaryDetails, dictionaryDetailsFor, dictionaryTag, posCode, posLine, kanjiReadingsInWord, displayPairs, inlineWordReading, inlineGlossLine, inlineWordGloss, inlineTokenGloss, tokenGlossLine, readingLine, japaneseLookupRecord, japaneseLookupEntryRecord, lookupBlockWords, japaneseLookupHelpId, lookupOccurrence, lookupItemBlocks, annotationPieceReadings, annotationReadsAs, phoneticAnnotationCandidates, phoneticAnnotationRanges, phoneticAnnotationIndices, appendJapaneseLookup, inlineGloss, readerWordNote, readerGlossMissText, tokenReading, lemmaTakesForm, lemmaReading, kanaIru, readingForm, teFormSenseGlosses, teFormAnswer, ensureTeFormAnswer, teFormRecord, senseNeighbours, sidecarSense, senseNegation, senseSpelledReading, senseMustRun, senseExpression, senseChoice, senseDoor, senseIsQuick, senseRecord, senseNameHeldText, senseMoreElement, senseMoreLine, ensureSense, senseRefine, senseFillInPlace, senseWithin, narrowLemmaEntries, dictionaryRowsReadAs, alternateLemmaDoor, soundChangeReadings, kanjiReadingsOf, soundChangeDoor, readerLookupAnswer, readingAsksIndex, readyTokenReading, readingToken, readingTokenEntry, readerTokenAtIndex, readerCompoundEnd, readerJoinedToken, readerRenderedTokens, dictionaryAnsweredForm, readerDoorGloss, readerDoorLead, readerGlossLine, tapLadderHint, readerWordHint, readerTokenState, nameReaderToken, readerHelp, glossaryCrossRefPlan, readerLayerParagraph, readerLayerReading, readingExpected, readingPlaceFailure, thesClusters, renderThesaurus, hiraToKata, normalizeGloss, dictionarySearchContext, dictionaryQueryKey, dictionaryQueryError, dictionaryQueryToken, activeDictionaryQuery, readerTokenAt, readerTokenNode, dictionaryEpoch, yomiVariantsOf, yomiReadingType, exampleIdentity, exampleKanji, exampleSenseKey, exampleOwnRows, exampleTokenIsWord, exampleHoldsWord, bankExamplesFor, findExamples, exampleFnv, fetchExampleJson, readingTargets, conjugations, renderConjugation, relationTarget, relationReadingQualifier, dictionaryRelationRoute, renderDictionaryRelations, renderDictionaryDetails, dictionaryHomographChoices, homographLines, dictionaryLoneDoor, renderDictionaryHomographs, requestDictionaryDetails, exampleOrder, partGloss, partMeaning, displayKunReading };
+export { lookup, joyoDialChanges, embeddedDictionaryJson, loadDictionaryJson, hasEmbeddedDictionaryIndex, dictionaryCoreMatch, dictionaryGlossSummary, dictionaryReadingSupportsForm, dictionarySummaryFor, validDictionaryRow, dictionaryRowsForForm, ensureDictionaryRowBySeq, ensureDictionaryRowsForForm, ensureDictionaryRowsForNode, dictionaryRowsFor, dictionaryDetailRowsFor, dictionaryShardNumber, dictionaryShardId, ensureDictionaryDetails, dictionaryDetailsFor, dictionaryTag, posCode, posLine, kanjiReadingsInWord, displayPairs, inlineWordReading, inlineGlossLine, inlineWordGloss, inlineTokenGloss, tokenGlossLine, readingLine, japaneseLookupRecord, japaneseLookupEntryRecord, lookupBlockWords, japaneseLookupHelpId, lookupOccurrence, lookupItemBlocks, annotationPieceReadings, annotationReadsAs, phoneticAnnotationCandidates, phoneticAnnotationRanges, phoneticAnnotationIndices, appendJapaneseLookup, inlineGloss, readerWordNote, readerGlossMissText, tokenReading, lemmaTakesForm, lemmaReading, kanaIru, readingForm, teFormSenseGlosses, teFormAnswer, ensureTeFormAnswer, teFormRecord, senseNeighbours, sidecarSense, senseNegation, senseSpelledReading, senseMustRun, senseExpression, senseChoice, senseDoor, senseIsQuick, senseRecord, senseNameHeldText, senseMoreElement, senseMoreLine, ensureSense, senseRefine, senseFillInPlace, senseWithin, narrowLemmaEntries, dictionaryRowsReadAs, alternateLemmaDoor, soundChangeReadings, kanjiReadingsOf, soundChangeDoor, readerLookupAnswer, readingAsksIndex, readyTokenReading, readingToken, readingTokenEntry, readerTokenAtIndex, readerCompoundEnd, readerJoinedToken, readerRenderedTokens, dictionaryAnsweredForm, readerDoorGloss, readerDoorLead, readerGlossLine, tapLadderHint, readerWordHint, readerTokenState, nameReaderToken, readerHelp, glossaryCrossRefPlan, readerLayerParagraph, readerLayerReading, readingExpected, readingPlaceFailure, thesClusters, renderThesaurus, hiraToKata, normalizeGloss, dictionarySearchContext, dictionaryQueryKey, dictionaryQueryError, dictionaryQueryToken, activeDictionaryQuery, readerTokenAt, readerTokenNode, dictionaryEpoch, yomiVariantsOf, yomiReadingType, exampleIdentity, exampleKanji, exampleSenseKey, exampleOwnRows, exampleTokenIsWord, exampleHoldsWord, bankExamplesFor, reviewTokenMatcher, findExamples, exampleFnv, fetchExampleJson, readingTargets, conjugations, renderConjugation, relationTarget, relationReadingQualifier, dictionaryRelationRoute, renderDictionaryRelations, renderDictionaryDetails, dictionaryHomographChoices, homographLines, dictionaryLoneDoor, renderDictionaryHomographs, requestDictionaryDetails, exampleOrder, partGloss, partMeaning, displayKunReading };

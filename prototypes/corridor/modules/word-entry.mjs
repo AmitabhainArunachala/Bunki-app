@@ -845,7 +845,7 @@ function openWordWebLadder(item, section, anchor, keyboard = false, redo = false
   });
 }
 
-function takenContext(item) {
+function takenContext(item, matches = null) {
   const ctx = item.ctx;
   if (!ctx) return null;
   const p = D.passages.find((x) => x.id === ctx.p);
@@ -868,6 +868,10 @@ function takenContext(item) {
       .catch(() => {});
     return null;
   }
+  // An upgraded article can have fewer tokens or a different word at this
+  // position. Keep the saved row intact and use the ordinary word prompt.
+  const token = p.tokens[ctx.i];
+  if (!Number.isInteger(ctx.i) || !token || (matches && !matches(token))) return null;
   let start = 0;
   let end = p.tokens.length;
   if (ctx.scope === 'para' && Array.isArray(p.paras) && p.paras.length) {
@@ -892,7 +896,7 @@ function takenContext(item) {
       }
     }
   }
-  return { tokens: p.tokens.slice(start, end), source: learnerSourceLabel(p), passage: p.id, start };
+  return { tokens: p.tokens.slice(start, end), source: learnerSourceLabel(p), passage: p.id, start, targetOffset: ctx.i - start };
 }
 
 function wordIdentityRelation(node, card) {

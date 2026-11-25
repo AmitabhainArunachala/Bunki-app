@@ -1,14 +1,14 @@
 import { createDeviceVoice, REASONS as DEVICE_VOICE_REASONS } from './device-voice.mjs';
 import { listsByRecency, moveLists, placeOf, savedBetween, validSaveMemory, withBoxOpened, withListDropped, withListRenamed, withListUsed } from './modules/save-places.mjs';
 import { VOICE_NOTES, VOICE_WORDS, voiceLineOf, voiceShortOf } from './modules/voice-lines.mjs';
-import { activeDictionaryQuery, appendJapaneseLookup, joyoDialChanges, conjugations, dictionaryAnsweredForm, dictionaryDetailsFor, dictionaryGlossSummary, dictionaryLoneDoor, dictionaryQueryError, dictionaryQueryKey, dictionaryReadingSupportsForm, dictionaryRowsForForm, dictionarySearchContext, dictionaryShardNumber, displayPairs, ensureDictionaryRowsForForm, ensureSense, exampleFnv, exampleOrder, fetchExampleJson, findExamples, glossaryCrossRefPlan, hasEmbeddedDictionaryIndex, inlineTokenGloss, inlineWordGloss, inlineWordReading, japaneseLookupEntryRecord, japaneseLookupHelpId, japaneseLookupRecord, kanjiReadingsInWord, loadDictionaryJson, lookup, lookupBlockWords, lookupItemBlocks, lookupOccurrence, nameReaderToken, normalizeGloss, phoneticAnnotationCandidates, phoneticAnnotationIndices, phoneticAnnotationRanges, posLine, readerDoorGloss, readerDoorLead, readerGlossLine, readerGlossMissText, readerHelp, readerLayerParagraph, readerLayerReading, readerLookupAnswer, readerRenderedTokens, readerTokenAt, readerTokenAtIndex, readerTokenNode, readerWordNote, readingAsksIndex, readingExpected, readingForm, readingPlaceFailure, readingTargets, readingToken, readingTokenEntry, readyTokenReading, renderConjugation, renderDictionaryDetails, renderDictionaryHomographs, renderThesaurus, requestDictionaryDetails, senseChoice, senseFillInPlace, senseMoreElement, senseMoreLine, senseNeighbours, senseRefine, senseWithin, tapLadderHint, tokenReading, validDictionaryRow, yomiReadingType } from './modules/dictionary.mjs';
+import { activeDictionaryQuery, appendJapaneseLookup, joyoDialChanges, conjugations, dictionaryAnsweredForm, dictionaryDetailsFor, dictionaryGlossSummary, dictionaryLoneDoor, dictionaryQueryError, dictionaryQueryKey, dictionaryReadingSupportsForm, dictionaryRowsForForm, dictionarySearchContext, dictionaryShardNumber, displayPairs, ensureDictionaryRowsForForm, ensureSense, exampleFnv, exampleOrder, fetchExampleJson, findExamples, glossaryCrossRefPlan, hasEmbeddedDictionaryIndex, inlineTokenGloss, inlineWordGloss, inlineWordReading, japaneseLookupEntryRecord, japaneseLookupHelpId, japaneseLookupRecord, kanjiReadingsInWord, loadDictionaryJson, lookup, lookupBlockWords, lookupItemBlocks, lookupOccurrence, nameReaderToken, normalizeGloss, phoneticAnnotationCandidates, phoneticAnnotationIndices, phoneticAnnotationRanges, posLine, readerDoorGloss, readerDoorLead, readerGlossLine, readerGlossMissText, readerHelp, readerLayerParagraph, readerLayerReading, readerLookupAnswer, readerRenderedTokens, readerTokenAt, readerTokenAtIndex, readerTokenNode, readerWordNote, readingAsksIndex, readingExpected, readingForm, readingPlaceFailure, readingTargets, readingToken, readingTokenEntry, readyTokenReading, renderConjugation, renderDictionaryDetails, renderDictionaryHomographs, renderThesaurus, requestDictionaryDetails, reviewTokenMatcher, senseChoice, senseFillInPlace, senseMoreElement, senseMoreLine, senseNeighbours, senseRefine, senseWithin, tapLadderHint, tokenReading, validDictionaryRow, yomiReadingType } from './modules/dictionary.mjs';
 import { blankSlip, keepMenuInCard, drawSheetActionLine, entryCueReading, findSheetDoor, flySeal, foldEntryForms, holdRing, keepFloatingBeside, keptState, keptWordProjection, listToMarkdown, listeningField, markStripMore, miniKanjiWeb, note, noteSlipDepth, openSlip, openWordWebLadder, paintWordSave, placeSaveMenu, rememberSheet, renderWordCaptureNote, reopenSaveMenu, saveAiDeviceConfig, saveOne, saveReaderPosition, saveReportRelay, saveReportRelayLink, savedNodeRecord, savedRecordNoteDraft, sealHostedWord, setSaveDrawerPush, sheetActionVisitHolds, sheetTakeLabel, slipAllowed, slipHeadword, slipScroller, standingSlip, takenContext, toggleTaken, travelSlip, unsaveEverywhere, wordCaptureBasis, wordCaptureHeldText, wordCaptureOpenLabel, wordCaptureState, wordDepth, wordPresentationKey, wordRow, wordSaveFacts } from './modules/word-entry.mjs';
 import { clearTouchReadingSeat, encounterIdentity, encounterPatch, fileIntakeFailure, filePageLabel, finishTouchReadingFade, holdReaderCapture, readerCaptureReasonText, readerTakeCurrent, readerTakeNode, reconcileSourceInboxEntries, rememberFileDraft, renderEncounterTrail, seatInlineGloss, seatTouchReading, setTouchReadingShown, sourceInboxEntries, sourceLadderAction, sourceProcessingScope, stopTouchReadingFade, syncReaderTakeSeal, touchReading } from './modules/capture.mjs';
-import { cardDepth, cardInk, deckCounts, deckWordsBegun, focusPool, focusProseWord, focusReturnMarkOnce, focusSentencePracticeTarget, gradeTag, guidedCardStatus, guidedDoorInJlptRoom, learnHead, learnerModel, learnerSourceLabel, learningContextRef, learningEnrollHeldText, learningItemNode, lessonChoices, lessonMissedLast, lessonPlan, lessonPreviousRuns, markCardMore, mockSubjectKey, practiceIdentity, presentReviewAnswer, renderFocus, renderSrsStats, reviewAnswerAvailable, reviewBack, reviewCardBack, reviewCounts, sharedStudyActive, sharedStudyFence, srsCardKind, srsDecks, srsForecast, srsLearnerPolicy, srsPrefStep, srsPrefValue, srsPresetState, srsWhen } from './modules/study-host.mjs';
+import { cardDepth, cardInk, deckCounts, deckWordsBegun, focusPool, focusProseWord, focusReturnMarkOnce, focusSentencePracticeTarget, gradeTag, guidedCardStatus, guidedDoorInJlptRoom, learnHead, learnerModel, learnerSourceLabel, learningContextRef, learningEnrollHeldText, learningItemNode, lessonChoices, lessonMissedLast, lessonPlan, lessonPreviousRuns, markCardMore, mockSubjectKey, practiceIdentity, presentReviewAnswer, renderFocus, renderSrsStats, reviewAnswerAvailable, reviewBack, reviewCardBack, reviewCounts, todayDeckDoor, sharedStudyActive, sharedStudyFence, srsCardKind, srsDecks, srsForecast, srsLearnerPolicy, srsPrefStep, srsPrefValue, srsPresetState, srsWhen } from './modules/study-host.mjs';
 import { adjacentScaleOutTarget, backupCounts, keepSentencePracticeFocusVisible, paintRoomScaleThread, refreshScaleOrigin, requestScaleReturn, resumeAssessmentV2, retireScaleDestination, retireScaleTransients, retryMockLoad, revealFocusedChromeDoor, revealMountedScaleCurrent, scaleFallbackOut, scaleKanjiParts, scaleLabel, scaleLineTop, scaleName, scaleNodeBelongs, scaleNodeFrom, scaleOutTarget, scaleParentIndex, scalePathData, scaleReaderIndex, scaleShelfView, scaleSource, scaleThread, scaleWordKanji } from './modules/return.mjs';
 import { GRAMMARS, activateKanjiFamily, activateKanjiStructure, animcjkGlyphFor, clearStoryHero, heroOf, inkCeremony, inkSpecFor, inkStrokeMs, joyoOnNote, kanjiCourseEntryNode, kanjiCourseEvidencePatch, kanjiCourseNodeUnit, kanjiCourseReferenceHelp, kanjiCourseReturnFrame, kanjiCourseTeachingHelp, kanjiEnterCourseDoor, kanjiFamilyAuthorize, kanjiFamilyCitations, kanjiFamilyControlId, kanjiFamilyCourseExpectation, kanjiFamilyHasExampleOrigin, kanjiFamilyLiveVisit, kanjiFamilyRefusal, kanjiFamilyStatus, kanjiFinderUniverse, kanjiQuestBound, kanjiQuestLine, kanjiQuestOpen, kanjiQuestQuote, kanjiQuestRedraw, kanjiQuestRender, kanjiQuestRunStarted, kanjiQuestSeed, kanjiQuestSelfCheck, kanjiQuestSettle, kanjiQuestStage, kanjiQuestStructural, kanjiQuestSummary, kanjiReference, kanjiReferenceView, kanjiSlipReading, kankenLevels, kdxFrequencyHits, kdxGlyphName, kdxGridShown, kdxLoadFailed, kdxPartHits, kdxRadicalResults, kdxTextResults, kkldLine, kkldNumberGlyphs, kkldOf, nameStoryHero, openKanjiRooms, paintStrokes, paintTok, renderGrammarNode, renderIdiomNode, renderKanjiFamilyDisclosure, renderKanjiNode, renderKanjiRoomChooser, renderKdxDraw, renderParticleNode, renderRadicalNode, renderSentenceNode, sentenceDoor, sentenceDraftCopyButton, sentenceDraftInputMatches, sentenceDraftStatus, sentenceKept, sentencePracticeError, sentenceSource, storyAccent, storyBlock, storyDate, storyHeroArriving, storyHeroOnScreen, storyInstrument, storyKicker, storyLede, storyLevel, storyPicture, storyPictureSource, storySeries, storyVersions, storyYourWords, strokeAwakeField, strokeClassicReadings, strokeClassificationLine, strokeControl, strokeMissing, strokeReadingField, strokeReferenceStatus, strokeRoomRecord, strokeStart, worldName, worldPickerEsc, wwDefault, wwExcerpt, wwInkLabel, wwKanjiPassage, wwLearn, wwMine, wwModel, wwOpenPassage, wwPassages, wwPush, wwReadingChoices, wwRecentre, wwSlipNode, wwValid } from './modules/worlds.mjs';
 import { approvedNarrationManifest, availableSentenceListeningCue, excerptListenLabel, paintListenProgress, receivedPracticeAlternativeLabel, receivedPracticeLoadKey, reconcileAssessmentResults, reconcileSheetActionLines, recordFrameRow, recordNoteEditable, recordNoteExpected, recordPickerSurface, recordSha256, recordSyncStatus, recordUnavailable, recordViewSurface, refreshListenRow, resolveSentenceListeningCue, speakChip, speakGateEvidence, speakSentence, stopReadAloud, transcriptRangeLabel, voiceForRole, voicePendingNote } from './modules/voice.mjs';
-import { maintenanceScreenName, meSection, mergeGrammar, portableRecord, primaryTabs, readRecordDrafts, renderLayoutChoice, renderMe, renderWritingChoice, showRecordBackup, stampRegister, storedArchiveRow, syncTrayCount, themeId, themeIx, updateMeasurements, validArchiveRows, validArchiveTurn, validImportJournal, validStoredArchiveRows } from './modules/learner.mjs';
+import { applyReadingSize, readingSizeRow, maintenanceScreenName, meSection, mergeGrammar, portableRecord, primaryTabs, readRecordDrafts, renderLayoutChoice, renderMe, renderWritingChoice, showRecordBackup, stampRegister, storedArchiveRow, syncTrayCount, themeId, themeIx, updateMeasurements, validArchiveRows, validArchiveTurn, validImportJournal, validStoredArchiveRows } from './modules/learner.mjs';
 import { byLeadingDrops, byNewest, dateStamp, dayKey, depthBasisParts, depthDot, depthNodeOf, helpByMonth, landOnKeptWords, leadingDropDays, localDayOrdinal, localMonthKey, luminance, monthKey, monthLabel, notYetMarks, readerDateStamp, renderDrift, renderKagami, renderTodayLine, renderTodayWord, roughestThisWeek, startOfDay, syncDriftTheme, todayCity, todayDateline, todayHash, todayKanji, todayLearning, todayPlaceSky, todayReadPick, todayRedrawSky, todaySecondsPerCard, todaySkyWhy, todaySkyWord, trayLine } from './modules/drift.mjs';
 import { articleFingerprint, catalogLabel, feedDate, levelChip, levelPhrase, libraryDiscoverable, libraryVisibilityPolicy, openReferenceEntry, placeSealStrip, publisherLink, readerChoiceMatch, readerChoiceTokenHolds, readerEntryNode, referenceCollectionChip, refreshReadingPlacesSurface, renderCatalogNode, renderPublisherContextSelection, renderReaderChoice, renderReaderChoiceNote, renderReferenceMetadata, renderReferenceNode, resolveReadingPlace, searchRowShownByCore, shelfBodyToken, shelfCurrentDay, shelfDailyOrder, shelfDateline, shelfStories, shelfTallyText } from './modules/library.mjs';
 import { activeTeacherContext, aiAsk, aiChatTurns, aiCreateCards, aiKey, aiProvider, aiQuizParse, aiReadingSegments, aiRequestTimeoutMs, aiTeachingSubject, aiTransport, askOnRequest, canonicalAiBaseUrl, refreshTeacherChatHistory, renderAiCoach, renderAiExamples, renderAiTutor, sizeTeacherQuestion, teacherChatStatus, teacherDoorKey, teacherDraftCopyButton, teacherDraftStatus, teacherSentence, teacherSourceError, teacherWindowDraftKey, validAiEvidenceTurn } from './modules/teacher.mjs';
@@ -27,7 +27,7 @@ import { activeTeacherContext, aiAsk, aiChatTurns, aiCreateCards, aiKey, aiProvi
  * FSRS-6 (ts-fsrs 5.4.1) under packages/domain's pinned parameters.
  */
 // BEGIN GENERATED RELEASE IDENTITY — npm run release:sync
-const APP_RELEASE = Object.freeze({"version":"1.3.0-rc.2","channel":"rc","releasedOn":"2026-11-09","learnerDataEpoch":1});
+const APP_RELEASE = Object.freeze({"version":"1.3.0-rc.5","channel":"rc","releasedOn":"2026-11-25","learnerDataEpoch":1});
 // END GENERATED RELEASE IDENTITY
 const DATA = {
   safe: ['kanken', 'sem'],
@@ -2183,7 +2183,7 @@ async function runRecordSyncAction(method) {
       recordFailure(status.code, true);
       return;
     }
-    if (method === 'sync') {
+    if (method === 'sync' && status.code !== 'snapshot-timeout') {
       const refreshed = await refreshRecordSyncSnapshot(slot);
       if (!slot.current() || slot.generation !== generation) return;
       if (refreshed.status !== 'active') recordFailure(refreshed.reason, true);
@@ -4368,31 +4368,28 @@ async function boot() {
   }
   S.variantsBar = anyVariantParam;
   if (['bi', 'ja'].includes(params.get('ui'))) S.lang = params.get('ui');
-  try { await ensureReadingModule(); }
-  catch { protectStore('読み物の機能を読み込めない。保存を止めて記録を保護している。接続してから再読み込みする。',
-    'The reading component could not load. Saving is paused to protect article versions. Reconnect and reload the app.'); }
-  try { await ensureTeacherContextModule(); }
-  catch { protectStore('先生との学習記録を読み込めない。再読み込みして続ける。',
-    'Saved teaching contexts could not load. Reconnect and reload to protect your record.'); }
-  try { await ensureTeacherDraftModule(); }
-  catch { protectStore('質問の下書きを読み込めない。再読み込みして続ける。',
-    'Saved questions could not load. Reconnect and reload to protect your record.'); }
-  try { await ensureSentenceDraftModule(); }
-  catch { protectStore('練習の下書きを読み込めない。再読み込みして続ける。',
-    'Saved practice drafts could not load. Reconnect and reload to protect your record.'); }
-  // If there are existing source records, their validator will protect them
-  // when this module is unavailable. Older records can still open normally.
-  try { await ensureFeedModule(); } catch { /* The source shelf offers retry. */ }
-  try { await ensurePublisherModule(); } catch { /* Existing originals fail closed; the source shelf offers retry. */ }
-  try { await ensureSourceInboxModule(); } catch { /* Existing captures fail closed; the inbox offers retry. */ }
-  try { sentencePracticeModule = await import(window.__KAIRO_SENTENCE_PRACTICE_URL__ || './sentence-practice.mjs'); }
-  catch { /* Existing source practice fails closed; neutral captures remain available. */ }
-  try { sourceProcessingModule = await import(window.__KAIRO_SOURCE_PROCESSING_URL__ || './source-processing.mjs'); }
-  catch { /* Local reading remains available; sending an excerpt requires this module. */ }
-  try { await ensureAssessmentModule(); } catch { /* Existing typed attempts fail closed in loadStore. */ }
+  // Fetch independent validators together. Every import settles before record
+  // ownership or validation begins; apply protection in the original order.
+  const [reading, contexts, questions, drafts] = await Promise.allSettled([
+    ensureReadingModule(), ensureTeacherContextModule(), ensureTeacherDraftModule(), ensureSentenceDraftModule(),
+    ensureFeedModule(), ensurePublisherModule(), ensureSourceInboxModule(), ensureAssessmentModule(),
+    import(window.__KAIRO_SENTENCE_PRACTICE_URL__ || './sentence-practice.mjs').then(module => { sentencePracticeModule = module; }),
+    import(window.__KAIRO_SOURCE_PROCESSING_URL__ || './source-processing.mjs').then(module => { sourceProcessingModule = module; }),
+  ]);
+  if (reading.status === 'rejected') protectStore('読み物の機能を読み込めない。保存を止めて記録を保護している。接続してから再読み込みする。',
+    'The reading component could not load. Saving is paused to protect article versions. Reconnect and reload the app.');
+  if (contexts.status === 'rejected') protectStore('先生との学習記録を読み込めない。再読み込みして続ける。',
+    'Saved teaching contexts could not load. Reconnect and reload to protect your record.');
+  if (questions.status === 'rejected') protectStore('質問の下書きを読み込めない。再読み込みして続ける。',
+    'Saved questions could not load. Reconnect and reload to protect your record.');
+  if (drafts.status === 'rejected') protectStore('練習の下書きを読み込めない。再読み込みして続ける。',
+    'Saved practice drafts could not load. Reconnect and reload to protect your record.');
+  // Optional validators remain unavailable on failure. Existing records are
+  // checked at load, and the source shelf can retry its own providers.
   if (await acquireRecordOwnership()) await openAppRecord();
   await resumeSavedPractice();
   await resumeAssessmentV2();
+  applyReadingSize();
   setKairoTheme(themeId());
   // The layout under test can be chosen by link. The choice stays on this device and the word
   // leaves the address, so reloading the same page cannot undo a choice made since in Settings.
@@ -4579,16 +4576,19 @@ async function boot() {
       const chars = rec.k && rec.k.length ? rec.k : [...w].filter(isKanji);
       for (const c of chars) add(c, w);
     }
-    const rank = (w) => {
-      const g = D.words[w];
-      const graded = g && g.jlpt ? 0 : 1;
-      const jl = g && g.jlpt ? 5 - g.jlpt : 9;
-      return graded * 100 + jl * 10 + Math.min([...w].length, 9);
-    };
-    for (const c of Object.keys(buckets)) {
-      D.kanjiWords[c] = [...buckets[c]].sort(
-        (a, b) => rank(a) - rank(b) || [...a].length - [...b].length || (a < b ? -1 : 1),
-      );
+    // Compute Unicode length and JLPT rank once per entry in the bucket.
+    // Comparisons run repeatedly while building a large compound index.
+    for (const [kanji, words] of Object.entries(buckets)) {
+      const ranked = Array.from(words, word => {
+        const level = D.words[word]?.jlpt;
+        const length = [...word].length;
+        const graded = level ? 0 : 1;
+        const jl = level ? 5 - level : 9;
+        const rank = graded * 100 + jl * 10 + Math.min(length, 9);
+        return { word, length, rank };
+      });
+      ranked.sort((a, b) => a.rank - b.rank || a.length - b.length || (a.word < b.word ? -1 : 1));
+      D.kanjiWords[kanji] = ranked.map(entry => entry.word);
     }
   }
   D.wordCap = manifest.caps.kanjiWordCap;
@@ -8530,6 +8530,7 @@ function dialRow(labelJa, labelEn, key, options) {
     b.setAttribute('aria-pressed', String(S.dials[key] === index));
     b.addEventListener('click', async () => {
       if (b.disabled) return;
+      const keepFocus = b.matches(':focus-visible');
       b.disabled = true;
       const dials = { ...S.dials, [key]: index };
       const saved = await commitStorePatch({ dials });
@@ -8537,7 +8538,10 @@ function dialRow(labelJa, labelEn, key, options) {
       if (!saved) return;
       S.dialsUrlOverride = false;
       S.dials = dials;
-      if (b.isConnected) render();
+      if (b.isConnected) {
+        render();
+        if (keepFocus) document.querySelector(`[data-dial="${key}:${index}"]`)?.focus({ preventScroll: true });
+      }
     });
     seg.append(b);
   });
@@ -10926,6 +10930,15 @@ function noteBoxOpened(span, key) {
  * then the word's kanji, and in an article one named door into the word's sentence. Escape, or a tap
  * outside, puts it away. */
 let miniAnchor = null;
+let miniResizeFrame = 0;
+window.addEventListener('resize', () => {
+  if (!miniAnchor || miniResizeFrame) return;
+  miniResizeFrame = requestAnimationFrame(() => {
+    miniResizeFrame = 0;
+    const card = document.getElementById('mini');
+    if (card && miniAnchor?.isConnected) placeFloating(card, anchorBox(miniAnchor));
+  });
+}, { passive: true });
 const SAVE_PRESS_MS = 600;
 /* The slip (contract §1): one DOM for every word, kanji or particle the learner can touch, in every room.
  * The reader calls it with a token; every other surface comes through openSlip, which adds
@@ -11350,7 +11363,10 @@ function placeFloating(card, r) {
     const box = node.getBoundingClientRect();
     return box.height ? box[edge] : null;
   };
-  const height = window.innerHeight || Infinity;
+  // A popup with its previous landscape coordinates can extend the mobile
+  // scrollable area during rotation. Measure the new CSS layout viewport.
+  const width = document.documentElement.clientWidth || window.innerWidth;
+  const height = document.documentElement.clientHeight || window.innerHeight || Infinity;
   // A clipped card meets the chrome edge: a gutter here can expose half a title glyph. On a page the edge is the page's
   // own bar (G1: Back is never covered)
   const onPage = !!card.dataset.page;
@@ -11358,8 +11374,8 @@ function placeFloating(card, r) {
   // the deck's grade dock is a floor too: the slip never covers the four grades (it sits above a word in the lower third)
   // G5 · nor the 層 mark at the foot, where the card would stand over it (it sits beside 音, so on a phone it takes no
   // more room than 音 does)
-  const cardLeft = m.width >= window.innerWidth - 48 ? Math.max(0, (window.innerWidth - m.width) / 2)
-    : Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2));
+  const cardLeft = m.width >= width - 48 ? Math.max(0, (width - m.width) / 2)
+    : Math.max(8, Math.min(width - m.width - 8, r.left + r.width / 2 - m.width / 2));
   const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height,
     fixedEdge('.kp-grades', 'top') ?? height, layersMarkTop(cardLeft, m.width) ?? height) - 8;
   const roomAbove = r.top - 10 - ceiling, roomBelow = floor - (r.bottom + 10);
@@ -11367,7 +11383,7 @@ function placeFloating(card, r) {
   let seatHeight = m.height;
   // Reserve the real sentence view's space before the word popup appears. The inert
   // measuring copy is removed synchronously, so its layout never becomes a frame or a control.
-  if (window.innerWidth <= 520 && !sentence && card.querySelector('.mini-sentence-pane')) {
+  if (width <= 520 && !sentence && card.querySelector('.mini-sentence-pane')) {
     const measure = card.cloneNode(true);
     measure.classList.add('is-sentence');
     measure.inert = true;
@@ -11399,12 +11415,12 @@ function placeFloating(card, r) {
   // Keep the short word card's fixed seat, and restore that reading position on Back.
   // SAVE · P3-1: the pane's chooser never turns a floating pane into a page card (that moved the Save he pressed from
   // 180 to 387 and ran the pane under the bottom bar): with the chooser open the pane holds its seat and scrolls inside
-  const documentFlow = window.innerWidth <= 520 && sentence
+  const documentFlow = width <= 520 && sentence
     && (wasDocument || (!card.dataset.chooserPin && m.height > (pinHolds ? pinnedRoom : Math.max(roomAbove, roomBelow, 96))));
   if (documentFlow) {
     if (!wasDocument) card.dataset.flowScroll = String(window.scrollY);
     card.dataset.flow = 'document';
-    card.style.left = `${Math.max(0, (window.innerWidth - m.width) / 2)}px`;
+    card.style.left = `${Math.max(0, (width - m.width) / 2)}px`;
     card.style.top = `${r.bottom + 10 + window.scrollY}px`;
     delete card.dataset.floatingTop;
     card.dataset.side = 'below';
@@ -11513,9 +11529,9 @@ function placeFloating(card, r) {
   }
   // a card nearly as wide as the screen is centred, its two gutters equal (review round 2 #13);
   // a narrower card stays beside its word
-  const left = m.width >= window.innerWidth - 48
-    ? Math.max(0, (window.innerWidth - m.width) / 2)
-    : Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2));
+  const left = m.width >= width - 48
+    ? Math.max(0, (width - m.width) / 2)
+    : Math.max(8, Math.min(width - m.width - 8, r.left + r.width / 2 - m.width / 2));
   // the text's layer: the seat is the glass position once the text has finished moving (window.scrollY + shift)
   const ox = scroller === 'window' ? window.scrollX : 0, oy = scroller === 'window' ? startScroll + shift : 0;
   if (scroller === 'window') { card.dataset.flow = 'text'; card.dataset.seatScroll = String(oy); }
@@ -13601,8 +13617,9 @@ function mountSettledFrontVoice(item) {
   if (takenContextPending(item)) return;
   // a saved sentence whose load failed leaves the face printed; takenContext would only ask for that article again
   const saved = item.ctx ? D.passages.find((x) => x.id === item.ctx.p) : null;
-  if (saved?.tokens && takenContext(item)) return;
-  if ((S.srs[srsKey('word', item.id)]?.reps || 0) % 2 === 1 && (!exampleSearchSettled(item.id) || findExamples(item.id, 1).length)) return;
+  const matches = reviewTokenMatcher(item.id, savedAnswerFor(item));
+  if (saved?.tokens && takenContext(item, matches)) return;
+  if ((S.srs[srsKey('word', item.id)]?.reps || 0) % 2 === 1 && (!exampleSearchSettled(item.id) || findExamples(item.id, 1, null, matches).length)) return;
   // settled printed: the control stands now, and with it the ear may read the printed word, saying what the control says
   appendReviewFrontVoice(face, item, { printed: true, blanked: false });
 }
@@ -13996,8 +14013,10 @@ function renderReader(main) {
   dialsToggle.id = 'dials-toggle';
   dialsToggle.append(uiIcon('sliders'));
   dialsToggle.addEventListener('click', () => {
+    const keepFocus = dialsToggle.matches(':focus-visible');
     S.dialsOpen = !S.dialsOpen;
     render();
+    if (keepFocus) document.getElementById('dials-toggle')?.focus({ preventScroll: true });
   });
   // the listen door: one mark in one place (John, 2026-10-15): folded, its speaker mark ends the instrument line until
   // the learner opens it; none at all when this article has no recording
@@ -14042,6 +14061,7 @@ function renderReader(main) {
   }
   if (S.dialsOpen) {
     const dials = el('div', 'dials');
+    dials.append(readingSizeRow(true));
     dials.append(
       dialRow('漢字', 'kanji', 'kanji', [
         ['そのまま', 'as written'],
@@ -15180,6 +15200,7 @@ function updateRecordSyncSurface(container) {
   const slot = recordSyncSlot;
   const writable = recordWritable();
   const state = slot?.status.state || 'unavailable';
+  const retrySnapshot = state === 'error' && slot.status.code === 'snapshot-timeout';
   let message;
   if (!writable) message = tx('記録を保護しているため、同期を停止している。保存の警告を確認する。',
     'Sync is paused while this record is protected. Check the storage warning.');
@@ -15188,6 +15209,8 @@ function updateRecordSyncSurface(container) {
     'Syncing between devices isn’t available here. You can export your record below.');
   else if (state === 'connecting') message = tx('接続を確認している。アプリの案内に従ってください。', 'Connecting. Follow any confirmation shown by the app.');
   else if (state === 'syncing') message = tx('記録を同期している。', 'Syncing records…');
+  else if (retrySnapshot) message = tx('この端末の記録の読み込みに時間がかかっている。「今すぐ同期」でもう一度試してください。',
+    'The local record took too long to read. Choose Sync now to try again.');
   else if (state === 'error') message = tx('同期を完了できなかった。接続を確認して、もう一度試す。', 'Sync could not finish. Check the connection and try again.');
   else if (state === 'ready' && slot.status.result?.pendingCausal) message = tx('関連する変更を待っている記録がある。もう一度同期する。',
     'Some changes are waiting for related changes. Sync again.');
@@ -15206,8 +15229,8 @@ function updateRecordSyncSurface(container) {
   const idle = state === 'unavailable' && slot?.pending !== 'register';
   container.hidden = idle;
   for (const part of container.querySelectorAll('.record-sync-actions, .record-sync-scope')) part.hidden = idle;
-  connect.disabled = !writable || !slot || !!slot.pending || ['unavailable', 'ready', 'syncing', 'connecting'].includes(state);
-  sync.disabled = !writable || !slot?.registrationId || !!slot.pending || state !== 'ready';
+  connect.disabled = !writable || !slot || !!slot.pending || retrySnapshot || ['unavailable', 'ready', 'syncing', 'connecting'].includes(state);
+  sync.disabled = !writable || !slot?.registrationId || !!slot.pending || (state !== 'ready' && !retrySnapshot);
   // Disconnect remains usable during an in-flight cycle. Its newer generation
   // prevents the older completion from restoring a misleading ready state.
   disconnect.disabled = !writable || !slot?.registrationId || slot.pending === 'disconnect' ||
@@ -15828,6 +15851,16 @@ function renderTray(main) {
   main.append(hero);
   requestAnimationFrame(() => todayPlaceSky(hero));
   let lineDoor = null;
+  const legacyReview = !sharedStudyActive();
+  const deckDoor = (!legacyReview || !trayToday?.order.length) && window.__CORRIDOR_STANDALONE__ !== true
+    ? todayDeckDoor(loadDeckPlayer, () => roomTransition(() => {
+      keepNavigationReturn('dojo', document.getElementById('today-study-deck'));
+      S.view = 'dojo';
+      render();
+      const decks = document.querySelector('[data-learn-section="decks"]');
+      decks?.scrollIntoView({ block: 'start' });
+      decks?.querySelector('button')?.focus({ preventScroll: true });
+    })) : null;
   const record = renderTodayRecord();
   // Anki's deck screen first (operator, 2026-09-28): what is waiting, one Study, the decks
   if (S.taken.length && scheduler) {
@@ -15867,9 +15900,8 @@ function renderTray(main) {
       btn.append(pace);
     }
     if (due.length) btn.append(el('i', 'today-arrow'));
-    lineDoor = btn;
+    if (legacyReview) lineDoor = btn;
     const detail = renderTodayDetail(today);
-    main.append(renderTodayLine(today, lineDoor, readPick));
     record.append(detail.section);
     const fold = detail.body;
     fold.append(deckCounts(today));
@@ -15955,8 +15987,7 @@ function renderTray(main) {
       fold.append(qb, note);
     }
   }
-  // no cards yet (or no scheduler): the line still offers the reading and the word walk
-  if (!lineDoor && readPick) main.append(renderTodayLine(null, null, readPick));
+  if (lineDoor || readPick || deckDoor) head.after(renderTodayLine(lineDoor, readPick, deckDoor));
   renderSentencePracticeLibrary(main);
   // The stable global live region owns storage errors. This surface adds only
   // the quiet backup reminder when the record itself is healthy.
@@ -26348,8 +26379,10 @@ function srsReviewLogRow(key, before, after, rating, now, schedNow = now) {
 
 function advanceReviewSession(rv, item, next, entry) {
   if ((next.state === 1 || next.state === 3) && next.scheduled_days < 1) {
-    rv.queue.push(item);
-    entry.reinserted = true;
+    // A short step inside a timed block is another practice pass for this
+    // card. Keep the exact queue entry so Undo removes only this insertion.
+    entry.reinserted = S.focus ? { ...item, drillPass: true } : item;
+    rv.queue.push(entry.reinserted);
   }
   entry.item = item; entry.queueIndex = rv.ix;
   rv.history.push(entry);
@@ -27915,6 +27948,7 @@ function renderReview(main) {
   // at capture (この文 / 段落) outranks the corpus draw and shows every
   // time. No hand-made cards; the schedule is the same one card either way.
   let cloze = null;
+  let matches = null;
   // The question side's control stands only on a face known to stay as drawn (card audio, fix round 1): a face drawn with
   // the word printed while the sentence it is asked in is still on its way (the saved sentence's article; for a second
   // repetition, the example search) may be drawn again with the word blanked, and the hidden answer is never spoken.
@@ -27929,10 +27963,11 @@ function renderReview(main) {
         } else mountSettledFrontVoice(item);
       });
     }
-    cloze = takenContext(item);
+    matches = reviewTokenMatcher(item.id, presented?.answer || savedAnswerFor(item));
+    cloze = takenContext(item, matches);
     const inSentence = (S.srs[srsKey('word', item.id)]?.reps || 0) % 2 === 1;
     if (!cloze && inSentence) {
-      cloze = findExamples(item.id, 1)[0] || null;
+      cloze = findExamples(item.id, 1, null, matches)[0] || null;
     }
     faceSettled = !!cloze || (!takenContextPending(item) && (!inSentence || exampleSearchSettled(item.id)));
   }
@@ -27952,12 +27987,12 @@ function renderReview(main) {
     // the card's sentence carries the reader's full gesture grammar — every
     // word tap-circles, holds float its definition
     renderSentenceTokens(line, cloze.tokens, {
-      targetId: item.id,
+      targetId: item.id, matches,
       hideTarget: !rv.revealed,
       contextId: cloze.passage || 'bank',
       start: cloze.start,
     });
-    if (rv.revealed) line.append(sentenceDoor(cloze, item.id));
+    if (rv.revealed) line.append(sentenceDoor(cloze, item.id, cloze.targetOffset ?? cloze.tokens.findIndex(matches)));
     face.append(line);
     if (rv.revealed) {
       const front = el('div', 'review-front reveal r-0', item.label);
@@ -28041,7 +28076,7 @@ function renderReview(main) {
     let exs = [];
     if (item.t === 'word') {
       const clozeText = cloze ? cloze.tokens.map((t) => t.s).join('') : null;
-      exs = findExamples(item.id, 3)
+      exs = findExamples(item.id, 3, null, matches)
         .filter((ex) => ex.tokens.map((t) => t.s).join('') !== clozeText)
         .slice(0, 2);
     }
@@ -28065,8 +28100,8 @@ function renderReview(main) {
         const more = el('div', 'review-more');
         for (const ex of exs) {
           const line = el('p', 'review-example');
-          renderSentenceTokens(line, ex.tokens, { targetId: item.id, contextId: ex.passage || 'bank', start: ex.start });
-          line.append(sentenceDoor(ex, item.id));
+          renderSentenceTokens(line, ex.tokens, { targetId: item.id, matches, contextId: ex.passage || 'bank', start: ex.start });
+          line.append(sentenceDoor(ex, item.id, ex.tokens.findIndex(matches)));
           more.append(line);
         }
         for (const s of senses.slice(3)) more.append(el('div', 'review-sense review-sense-late', s));
@@ -28155,7 +28190,7 @@ function renderReview(main) {
   // exist, and must not burn one of the day's new-card slots. The same
   // rite covers the refill's second lap (POL-12): a card this block
   // already graded took its one honest schedule grade — a repeat pass
-  // (item.drillPass, stamped by refillFocusQueue) is practice, never a
+  // (a short step or a later lap, marked drillPass) is practice, never a
   // same-minute remutation of the long-term schedule. The drill still
   // behaves like a session — short ratings repeat in-session, the
   // judgment lands in the observation ledger as evidence (the drill room
@@ -28614,7 +28649,7 @@ function renderReviewUndo(main, rv) {
       rv.done[last.key] -= 1;
       // if this grade re-queued a learning step, remove that pending copy
       if (last.reinserted) {
-        const tail = rv.queue.lastIndexOf(prevItem);
+        const tail = rv.queue.lastIndexOf(last.reinserted);
         if (tail > previousIndex) rv.queue.splice(tail, 1);
       }
     }
@@ -29139,7 +29174,7 @@ function mockLengthsRow() {
 
 /** The study hall's doors, by id: the same seven rooms and the same entries as ever. */
 function studyHallDoors() {
-  const due = S.taken.length && scheduler ? todayQueue().order.length : 0;
+  const due = !sharedStudyActive() && S.taken.length && scheduler ? todayQueue().order.length : 0;
   const { tests: readyTests, sections: readySections, written: readyWritten } = learnTestCounts();
   // the reference library, named in the layout under test for what it holds
   const levelsName = placesLayout()
@@ -29210,7 +29245,13 @@ function learnDeckSummary(id) {
     .then((mod) => mod.summary(id))
     .then((got) => {
       deckSummaries[id] = got;
-      if (S.view === 'dojo') render();
+      if (S.view === 'dojo') {
+        // Refreshing counts replaces the picker. Keep the chosen deck under the
+        // keyboard cursor if a slower deck finishes loading while it has focus.
+        const focused = document.activeElement?.closest('.dojo-deck[data-deck]')?.dataset.deck;
+        render();
+        if (focused) document.querySelector(`.dojo-deck[data-deck="${CSS.escape(focused)}"]`)?.focus({ preventScroll: true });
+      }
     })
     .catch(() => {})
     .finally(() => deckSummaryPending.delete(id));
@@ -29226,7 +29267,8 @@ function learnStageFace(order) {
   const item = order.find((it) => it.t === 'word' || it.t === 'kanji');
   if (!item) return { item: null };
   if (item.t === 'word' && item.ctx) {
-    const cloze = takenContext(item);
+    const matches = reviewTokenMatcher(item.id, savedAnswerFor(item));
+    const cloze = takenContext(item, matches);
     if (!cloze) {
       const p = D.passages.find((x) => x.id === item.ctx.p);
       if (p && !p.tokens && learnStageAsked !== p.id) {
@@ -29239,7 +29281,7 @@ function learnStageFace(order) {
     let text = '';
     let seen = 0;
     for (const token of cloze.tokens) {
-      if (token.b === item.id) {
+      if (matches(token)) {
         parts.push({ text, at: seen });
         text = '';
         seen += 1;
@@ -29450,7 +29492,8 @@ let deckOpenRequest = null;
 function openDeck(id, { autoStart = false } = {}) {
   if (id === 'shared-grammar' && !sharedStudyActive()) return;
   if (!roomTransitionUpdating && (S.view !== 'deckplay' || S.deckPlay !== id)) return roomTransition(() => openDeck(id, { autoStart }));
-  keepScroll();
+  if (S.view === 'tray') keepNavigationReturn('deckplay', document.getElementById('today-study-deck'));
+  else keepScroll();
   deckPlayerError = false;
   deckOpenRequest = { id, autoStart };
   S.deckPlay = id;
@@ -29592,9 +29635,7 @@ function renderDeckPlay(main) {
       },
       onLeave() {
         delete deckSummaries[S.deckPlay];
-        S.view = 'dojo';
-        render();
-        window.scrollTo(0, 0);
+        back();
       },
     })
     .catch((err) => {
@@ -30380,7 +30421,7 @@ function renderSentenceTokens(container, tokens, opts = {}) {
       container.append(textNode);
       return;
     }
-    const isTarget = target && token.b === target;
+    const isTarget = opts.matches ? opts.matches(token) : target && token.b === target;
     if (isTarget && opts.hideTarget) {
       container.append(document.createTextNode('＿＿＿'));
       return;
@@ -37139,7 +37180,7 @@ function renderSettings(main) {
   }
   const language = el('section', 'foundation-section settings-rows settings-general');
   language.id = 'settings-general';
-  language.append(row('表示言語', 'Interface language', choices));
+  language.append(row('表示言語', 'Interface language', choices), readingSizeRow());
   // a door with its value: the name at the left, what it is now at the right
   const valued = (door, value) => {
     const text = el('span', 'settings-world-text');
@@ -38072,4 +38113,4 @@ function deckHost() {
   return deckHostAdapter;
 }
 
-export { $, barSavedVerb, savedInParts, savedPlace, voiceSettingsBlock, AI_DEFAULT_BASE_URL, AI_DEFAULT_MODEL, AI_DEVICE_STORE, AI_EVIDENCE_ROLES, AI_KEY_STORE, AI_MINE_MAX_ROWS, AI_READING_TIMEOUT_CAP_MS, AI_READING_TOKENS_PER_SECOND, AI_TIMEOUT_MS, ANNOTATION_DIGITS, BEYOND_JOYO, D, DEPTH_NAMES, DEPTH_OWNED_S, DEPTH_RECALLED_S, DEPTH_RECALL_R, DICTIONARY_INDEX_PATH, DICTIONARY_SHARD_PATH, DOJO_DECKS, DRAFT_KEY, DRIFT_THEME_BY_WORLD, EXAMPLE_DIR, FRAMES_CAP, FRAMES_STORE, GESTURE, GLOSS_LEAD, GLOSS_MESSY, GLUE_STROKE, GODAN_ROW, GODAN_TE, GRAMMAR, INK_DEPTH, INK_TEMPO, INK_WORLDS, ISO_DAY, JOYO_JUDGEABLE, JOYO_MARKS, KAGAMI_BAND_NAMES, KAGAMI_CLEAR, KAGAMI_CODE_BAND, KAGAMI_LEVELS, KAGAMI_MIN_SEEN, KAGAMI_MODEL_VERSION, KAGAMI_OOV, KANJI_QUEST_FAILED, KANJI_QUEST_STRUCTURAL, KATA_TO_HIRA_OFFSET, LEADING_DROP_DAYS, LEARN_STAGE_DECKS, LEMMA_NIDAN, LEMMA_ONBIN, LESSON_SIZE, LOOKUP_HELPER_POS, M4_COPY, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, MINI_INK, MONTHS_EN, NARRATION_VOICES, NEW_PER_DAY_DEFAULT, NODE_KIND, NOTE_TEXT, PARTICLES, PARTICLE_BY_SURFACE, PART_STROKES, PART_WRITTEN, PLACES_TABS, POS_FAMILY, POS_PLAIN, POS_SEGMENT_CODE, PRIMARY_TABS, READER_KANA, READER_KANJI, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, REL, REPORT_RELAY_STORE, REVIEWS_PER_DAY_DEFAULT, ROMAJI, ROOM_IDS, ROOM_NAMES, S, SAVE_PRESS_MS, SENSEI_OBS_CODES, SENSE_BY_ANCHOR, SENSE_CLASS, SENSE_GAVE_UP, SENSE_LATE, SENSE_MUST_END, SENSE_MUST_NOT, SENSE_NUMBER, SENSE_NUMBER_WORD, SENSE_TAG_EN, SENSE_TAG_JA, SENSE_WAIT_MS, SENSE_WEEKDAY, SHORT_EXAMPLE_CHARS, SLIP_NODE, SLIP_OWN_MEANING, SOUND_PLAIN, SOUND_VOICED, SPEAK_JA, SRS_KINDS, SRS_PREF_LADDERS, SRS_PRESETS, STROKE_SPEED_DEFAULT, STROKE_VIEWBOX, SVG_NS, TE_FORM_AUXILIARY, TE_FORM_NOTE, THEME_STORE, THEME_UI, THES_RELS, TODAY_JA_WORD, TODAY_SKY_CAP, TODAY_SKY_MISS_DAYS, TODAY_SKY_WORD, TOKEN_CONTEXT, TOPIC_BLOCKS, TOPIC_KICKERS, TOPIC_ORDER, TOUCH_READING_FADES, TOUCH_READING_GAP, TOUCH_READING_MOTION, TOUCH_READING_ROWS, TOUCH_ROW_PINS, TRAIL_KINDS, VOICE_LOCK, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, WW_CX, WW_CY, WW_KANJI_ANGLES, WW_REL, WW_RING2_ORDER, WW_RING2_SLOTS, WW_TRAIL_MAX, WW_WALK_KEY, YOMI_DAKUTEN, YOMI_HANDAKU, _KDX_NPTS, _compsCache, _kdxDist, _kdxNorm, _kdxResample, _kdxTemplates, activateWordLadder, afterPressLands, aiChatLog, aiConverse, aiLogAll, aiSheetNotes, aiSheetTurns, allAssessmentEvidence, anchorBox, animcjkApproved, animcjkShards, annotationKana, applyAssessmentV2, assertLearningSource, assessmentClockSession, back, bi, biLabel, boxLeadGloss, buildListenRow, buildTeacherChatLog, cacheDictionaryFormRows, cacheDictionaryRow, cancelExcerptPlayback, canonicalRecordJson, capturePending, captureScaleVisit, cardRecall, chipsFor, clearReaderReadings, clearReaderSummons, clearWordLadder, closeSealStrip, closeWorldPicker, commitCapture, commitStorePatch, confusablesFor, contrastOf, controlsUnder, copyRecordWith, currentAssessmentV2, currentJoyoKunNote, currentRecordNoteView, currentSentenceListeningCue, deckSummaries, deeperDepth, depthIndexMemo, depthNodeCache, depthRank, depthRetrievability, dictionaryQueryOpening, dictionaryReadingSummaries, dictionaryRowBySeq, dictionaryWorkerRequest, diveFromMini, diveFromSlip, el, encounterKey, enhanceJapaneseProse, ensureArchiveIndex, ensureArticle, ensureDictionaryIndex, ensureDictionaryShard, ensureReadingPositionModule, ensureSenseSidecar, ensureSentenceListeningCatalog, entryKanaIndex, explicitWordSnapshot, fetchData, fieldsDeckHome, findLookupOccurrence, finishPageTransition, finiteNumber, fitChromeKeep, flowText, focusKanjiItem, foundationDoor, frameFoot, gateFrame, glyphBox, go, guidedTaken, heldWordCardNode, heroSource, hideReaderToast, holdPageUnderDrawer, inkGroundFor, installProseWordRoving, installScaleBridge, interaction, invalidateRecordNoteViews, isLeech, jaGroupSegments, jlptRank, kagamiBandFor, kagamiLevel, kagamiLevelOf, kagamiMockBand, kanaReadingKey, kanjiAnswerAvailable, kanjiCourseApplyHelp, kanjiCourseRememberHelp, kanjiDisplayRecord, kanjiFamilyExposures, kanjiFamilyMounts, kanjiFamilyResolveExample, kanjiFamilyStamp, kanjiFamilyStampCurrent, kanjiFamilyTicket, kanjiFamilyTicketCurrent, kanjiFamilyViews, kanjiQuestFor, kanjiQuestLoading, kanjiQuestOwner, kanjiReadingsState, kanjiReferenceRows, kanjiStructureMounts, kanjiWorldEligible, kankenGradeLabel, kataToHira, keepNavigationReturn, laneMembers, layersMarkTop, learnDeckSummary, learnStageFace, loadReferenceExtra, logicalArchiveRows, lookupWordKey, meDeckIndex, meNum, meSealsPart, metReadable, mockFailed, motionEase, motionMs, narrationVoiceName, nonEmptyString, notYetReleased, noteEncounter, openAssessmentQuestionReview, openDeck, openGuidedRoom, openJapaneseLookup, openKanjiCourseUnit, openKanjiWorldEncounter, openPassage, openPersonalCollection, openPlainSaveMenu, openReferenceCollection, openSealStrip, openSentencePractice, openSpeakRoom, openStrokePage, openVocabularyListPopover, openWordWeb, optional, ownSentenceExample, owns, pageCutAllowed, paintKeptCount, paintMiniPath, passage, performAssessmentReconciliation, placeFloating, placeKinsoku, placesLayout, plainRecord, proseWordRovers, protectStore, queueAssessmentWork, quietUsageTags, readAloud, readFrameRows, readHelpPatch, readHelpReadable, readerReadingFits, readerSummaryFor, readerTokenLead, recordReady, recordWritable, refreshStrokeReadings, refreshWordSheet, relayServiceUrl, removeMini, render, renderFamilyExampleNode, renderKanjiCourseDoor, renderKanjiFamily, renderKanjiStructure, renderKdxGrid, renderReferenceConnections, renderReviewHall, renderSentenceTokens, renderSourceInboxEntries, renderSourceKanjiDoor, renderStudyFold, renderStudyHall, renderTeacherDoor, renderTextSourceContextSelection, renderWordWeb, resolveReaderChoice, resolveTeacherSource, retainedKanjiRecord, retireScaleReturn, returnToScaleBead, revalidateTutorRequests, revealFloatingFocus, roomName, roomTransition, rubyNode, safeJsonValue, sameItem, sameWordIdentity, saveWord, savedAnswerFor, scaleIn, scaleNavigationAllowed, scaleOut, scalePassage, scaleThreadPath, scaleTokenFingerprint, senseGlosses, senseLed, senseNumberBefore, sensePatch, senseWeekdayBracket, sentenceDraftBindings, sentenceDraftInputErrors, sentenceDraftWindowEdits, setGlossLine, setJaWords, setLayout, setLookupStop, setOwnRecordValue, setWordPref, shallowerDepth, sheetActionLine, sheetActionLineKeys, shelfDay, showMini, skipState, sourceInboxShelf, speakAvailable, srsDueItems, srsKey, srsParamsProblem, srsRoomBack, srsSchedulePolicy, stopPassageRead, stopSentenceListening, strokePathsFor, strokeReduced, strokeSpeed, studyHallDoors, suppressAssessmentCards, syncChromeKeep, syncStrokeNumbers, teacherDraftInputErrors, teacherDraftWindowEdits, teacherSourceProcessingUnavailable, teacherWindowDraftPrefix, todayQueue, todaySky, transcriptTime, trayItemPending, tx, uiIcon, updateReaderPlaceSave, updateReadingPlaces, validInstant, validNewPerDay, validPauseEvery, validPreset, validRetention, validReviewsPerDay, validStoreEnvelope, waitForLookupNameReadings, wireReaderWordMenu, withEn, wordBrush, wordCardIdentity, wordNodeIdentity, wordStudied, setReadHighlight, wordHighlight, wordVoice, wordWeb, writtenFormNote, wwP, wwPartMembers, wwReduced, wwShort, wwSpread, wwTokenIndex, wwTrail, yomiVariantCache };
+export { $, barSavedVerb, savedInParts, savedPlace, voiceSettingsBlock, AI_DEFAULT_BASE_URL, AI_DEFAULT_MODEL, AI_DEVICE_STORE, AI_EVIDENCE_ROLES, AI_KEY_STORE, AI_MINE_MAX_ROWS, AI_READING_TIMEOUT_CAP_MS, AI_READING_TOKENS_PER_SECOND, AI_TIMEOUT_MS, ANNOTATION_DIGITS, BEYOND_JOYO, D, DEPTH_NAMES, DEPTH_OWNED_S, DEPTH_RECALLED_S, DEPTH_RECALL_R, DICTIONARY_INDEX_PATH, DICTIONARY_SHARD_PATH, DOJO_DECKS, DRAFT_KEY, DRIFT_THEME_BY_WORLD, EXAMPLE_DIR, FRAMES_CAP, FRAMES_STORE, GESTURE, GLOSS_LEAD, GLOSS_MESSY, GLUE_STROKE, GODAN_ROW, GODAN_TE, GRAMMAR, INK_DEPTH, INK_TEMPO, INK_WORLDS, ISO_DAY, JOYO_JUDGEABLE, JOYO_MARKS, KAGAMI_BAND_NAMES, KAGAMI_CLEAR, KAGAMI_CODE_BAND, KAGAMI_LEVELS, KAGAMI_MIN_SEEN, KAGAMI_MODEL_VERSION, KAGAMI_OOV, KANJI_QUEST_FAILED, KANJI_QUEST_STRUCTURAL, KATA_TO_HIRA_OFFSET, LEADING_DROP_DAYS, LEARN_STAGE_DECKS, LEMMA_NIDAN, LEMMA_ONBIN, LESSON_SIZE, LOOKUP_HELPER_POS, M4_COPY, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, MINI_INK, MONTHS_EN, NARRATION_VOICES, NEW_PER_DAY_DEFAULT, NODE_KIND, NOTE_TEXT, PARTICLES, PARTICLE_BY_SURFACE, PART_STROKES, PART_WRITTEN, PLACES_TABS, POS_FAMILY, POS_PLAIN, POS_SEGMENT_CODE, PRIMARY_TABS, READER_KANA, READER_KANJI, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, REL, REPORT_RELAY_STORE, REVIEWS_PER_DAY_DEFAULT, ROMAJI, ROOM_IDS, ROOM_NAMES, S, SAVE_PRESS_MS, SENSEI_OBS_CODES, SENSE_BY_ANCHOR, SENSE_CLASS, SENSE_GAVE_UP, SENSE_LATE, SENSE_MUST_END, SENSE_MUST_NOT, SENSE_NUMBER, SENSE_NUMBER_WORD, SENSE_TAG_EN, SENSE_TAG_JA, SENSE_WAIT_MS, SENSE_WEEKDAY, SHORT_EXAMPLE_CHARS, SLIP_NODE, SLIP_OWN_MEANING, SOUND_PLAIN, SOUND_VOICED, SPEAK_JA, SRS_KINDS, SRS_PREF_LADDERS, SRS_PRESETS, STROKE_SPEED_DEFAULT, STROKE_VIEWBOX, SVG_NS, TE_FORM_AUXILIARY, TE_FORM_NOTE, THEME_STORE, THEME_UI, THES_RELS, TODAY_JA_WORD, TODAY_SKY_CAP, TODAY_SKY_MISS_DAYS, TODAY_SKY_WORD, TOKEN_CONTEXT, TOPIC_BLOCKS, TOPIC_KICKERS, TOPIC_ORDER, TOUCH_READING_FADES, TOUCH_READING_GAP, TOUCH_READING_MOTION, TOUCH_READING_ROWS, TOUCH_ROW_PINS, TRAIL_KINDS, VOICE_LOCK, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, WW_CX, WW_CY, WW_KANJI_ANGLES, WW_REL, WW_RING2_ORDER, WW_RING2_SLOTS, WW_TRAIL_MAX, WW_WALK_KEY, YOMI_DAKUTEN, YOMI_HANDAKU, _KDX_NPTS, _compsCache, _kdxDist, _kdxNorm, _kdxResample, _kdxTemplates, activateWordLadder, afterPressLands, aiChatLog, aiConverse, aiLogAll, aiSheetNotes, aiSheetTurns, allAssessmentEvidence, anchorBox, animcjkApproved, animcjkShards, annotationKana, applyAssessmentV2, assertLearningSource, assessmentClockSession, back, bi, biLabel, boxLeadGloss, buildListenRow, buildTeacherChatLog, cacheDictionaryFormRows, cacheDictionaryRow, cancelExcerptPlayback, canonicalRecordJson, capturePending, captureScaleVisit, cardRecall, chipsFor, clearReaderReadings, clearReaderSummons, clearWordLadder, closeSealStrip, closeWorldPicker, commitCapture, commitStorePatch, confusablesFor, contrastOf, controlsUnder, copyRecordWith, currentAssessmentV2, currentJoyoKunNote, currentRecordNoteView, currentSentenceListeningCue, deckSummaries, deeperDepth, depthIndexMemo, depthNodeCache, depthRank, depthRetrievability, dictionaryQueryOpening, dictionaryReadingSummaries, dictionaryRowBySeq, dictionaryWorkerRequest, diveFromMini, diveFromSlip, el, encounterKey, enhanceJapaneseProse, ensureArchiveIndex, ensureArticle, ensureDictionaryIndex, ensureDictionaryShard, ensureReadingPositionModule, ensureSenseSidecar, ensureSentenceListeningCatalog, entryKanaIndex, explicitWordSnapshot, fetchData, fieldsDeckHome, findLookupOccurrence, finishPageTransition, finiteNumber, fitChromeKeep, flowText, focusKanjiItem, foundationDoor, frameFoot, gateFrame, glyphBox, go, guidedTaken, heldWordCardNode, heroSource, hideReaderToast, holdPageUnderDrawer, inkGroundFor, installProseWordRoving, installScaleBridge, interaction, invalidateRecordNoteViews, isLeech, jaGroupSegments, jlptRank, kagamiBandFor, kagamiLevel, kagamiLevelOf, kagamiMockBand, kanaReadingKey, kanjiAnswerAvailable, kanjiCourseApplyHelp, kanjiCourseRememberHelp, kanjiDisplayRecord, kanjiFamilyExposures, kanjiFamilyMounts, kanjiFamilyResolveExample, kanjiFamilyStamp, kanjiFamilyStampCurrent, kanjiFamilyTicket, kanjiFamilyTicketCurrent, kanjiFamilyViews, kanjiQuestFor, kanjiQuestLoading, kanjiQuestOwner, kanjiReadingsState, kanjiReferenceRows, kanjiStructureMounts, kanjiWorldEligible, kankenGradeLabel, kataToHira, keepNavigationReturn, laneMembers, layersMarkTop, learnDeckSummary, learnStageFace, loadReferenceExtra, logicalArchiveRows, lookupWordKey, meDeckIndex, meNum, meSealsPart, metReadable, mockFailed, motionEase, motionMs, narrationVoiceName, nonEmptyString, notYetReleased, noteEncounter, openAssessmentQuestionReview, openDeck, openGuidedRoom, openJapaneseLookup, openKanjiCourseUnit, openKanjiWorldEncounter, openPassage, openPersonalCollection, openPlainSaveMenu, openReferenceCollection, openSealStrip, openSentencePractice, openSpeakRoom, openStrokePage, openVocabularyListPopover, openWordWeb, optional, ownSentenceExample, owns, pageCutAllowed, paintKeptCount, paintMiniPath, passage, performAssessmentReconciliation, placeFloating, placeKinsoku, placesLayout, plainRecord, proseWordRovers, protectStore, queueAssessmentWork, quietUsageTags, readAloud, readFrameRows, readHelpPatch, readHelpReadable, readerReadingFits, readerSummaryFor, readerTokenLead, recordReady, recordWritable, refreshStrokeReadings, refreshWordSheet, relayServiceUrl, removeMini, render, renderFamilyExampleNode, renderKanjiCourseDoor, renderKanjiFamily, renderKanjiStructure, renderKdxGrid, renderReferenceConnections, renderReviewHall, renderSentenceTokens, renderSourceInboxEntries, renderSourceKanjiDoor, renderStudyFold, renderStudyHall, renderTeacherDoor, renderTextSourceContextSelection, renderWordWeb, resolveReaderChoice, resolveTeacherSource, retainedKanjiRecord, retireScaleReturn, returnToScaleBead, revalidateTutorRequests, revealFloatingFocus, roomName, roomTransition, rubyNode, safeJsonValue, sameItem, sameWordIdentity, saveWord, savedAnswerFor, scaleIn, scaleNavigationAllowed, scaleOut, scalePassage, scaleThreadPath, scaleTokenFingerprint, senseGlosses, senseLed, senseNumberBefore, sensePatch, senseWeekdayBracket, sentenceDraftBindings, sentenceDraftInputErrors, sentenceDraftWindowEdits, setGlossLine, setJaWords, setLayout, setLookupStop, setOwnRecordValue, setWordPref, shallowerDepth, sheetActionLine, sheetActionLineKeys, shelfDay, showMini, skipState, sourceInboxShelf, speakAvailable, srsDueItems, srsKey, srsParamsProblem, srsRoomBack, srsSchedulePolicy, stopPassageRead, stopSentenceListening, strokePathsFor, strokeReduced, strokeSpeed, studyHallDoors, suppressAssessmentCards, syncChromeKeep, syncStrokeNumbers, teacherDraftInputErrors, teacherDraftWindowEdits, teacherSourceProcessingUnavailable, teacherWindowDraftPrefix, todayQueue, todaySky, transcriptTime, trayItemPending, tx, uiIcon, updateReaderPlaceSave, updateReadingPlaces, validInstant, validNewPerDay, validPauseEvery, validPreset, validRetention, validReviewsPerDay, validStoreEnvelope, waitForLookupNameReadings, wireReaderWordMenu, withEn, wordBrush, wordPref, wordCardIdentity, wordNodeIdentity, wordStudied, setReadHighlight, wordHighlight, wordVoice, wordWeb, writtenFormNote, wwP, wwPartMembers, wwReduced, wwShort, wwSpread, wwTokenIndex, wwTrail, yomiVariantCache };

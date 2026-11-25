@@ -1,4 +1,5 @@
 import { inputHashOf } from '@bunki/ai/hash';
+import { utf16String } from '@bunki/domain/wire-text';
 import { z } from 'zod';
 
 export type DeepReadonly<T> = T extends readonly (infer U)[]
@@ -127,10 +128,8 @@ export function parse<T>(schema: z.ZodType<T>, value: unknown): T {
 }
 
 export const textSchema = (max: number) =>
-  z
-    .string()
+  utf16String(max)
     .min(1)
-    .max(max)
     .refine(wellFormed)
     .refine((value) => value.trim().length > 0)
     .refine((value) =>

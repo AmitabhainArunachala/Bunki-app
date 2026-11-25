@@ -173,7 +173,7 @@ function fixture(overrides = {}, options = {}) {
     // D23: 学校, the reviewed word, is a core entry so its card has an answer to show and grade
     D: { exampleBank: new Map(), dict: { 学校: { r: 'がっこう', m: ['school'] } }, kanji: options.kanji || {} },
     lookup: (id) => ({ r: 'がっこう', m: [id], seq: 'synthetic-' + id }),
-    findExamples: () => [], takenContext: () => null, ensureBankExamples: async () => [],
+    reviewTokenMatcher: () => () => false, findExamples: () => [], takenContext: () => null, ensureBankExamples: async () => [],
     takenContextPending: () => false, exampleSearchSettled: () => true, mountSettledFrontVoice: () => {},
     reviewBack: () => ({ reading: '', senses: ['synthetic meaning'] }),
     isLeech: () => false, renderAiCoach: () => {},
@@ -230,6 +230,51 @@ async function check(name, action) {
 }
 const grade = (f, overrides = {}) => f.c.commitStandardGrade({ rv: f.S.review, item, key: 'good', skey: 'word:学校',
   rating: fsrsApi.Rating.Good, now: new Date('2026-09-10T10:00:00Z'), day: '2026-09-10', ...overrides });
+
+await check('saved-reading-selects-the-same-target-for-context-and-recall', async () => {
+  const f = fixture();
+  vm.runInContext(liftCorridor(source, [
+    'reviewTokenMatcher', 'takenContext', 'findExamples', 'exampleIdentity', 'exampleOwnRows', 'exampleKanji',
+    'kataToHira', 'KATA_TO_HIRA_OFFSET', 'READER_KANA', 'tokenReading', 'lemmaReading', 'lemmaTakesForm',
+    'GODAN_ROW', 'LEMMA_ONBIN', 'LEMMA_NIDAN', 'dictionaryReadingSupportsForm',
+  ]), f.c);
+  const token = (s, r, b = s) => ({ s, r, b, c: true });
+  const wrong = token('一日', 'ついたち'), right = token('一日', 'いちにち');
+  const stop = { s: '。', b: '。', c: false };
+  const p = { id: 'reading', tokens: [wrong, stop, right, right, stop] };
+  f.c.D.passages = [p];
+  f.c.D.dict['一日'] = { r: 'いちにち', m: ['one day'] };
+  f.c.learnerSourceLabel = article => article.id;
+  f.c.dictionaryRowBySeq = () => null;
+  f.c.dictionaryRowsForForm = () => [];
+  const daily = { t: 'word', id: '一日' };
+  const target = f.c.reviewTokenMatcher(daily.id, f.c.savedAnswerFor(daily));
+  assert.equal(target(wrong), false);
+  assert.equal(target(right), true);
+  for (const index of [0, 1, -1, 10_000]) {
+    assert.equal(f.c.takenContext({ ...daily, ctx: { p: p.id, i: index, scope: 'sent' } }, target), null);
+  }
+  // The tutor can quote a selected passage without any review card.
+  assert.equal(f.c.takenContext({ ctx: { p: p.id, i: 0, scope: 'sent' } }).tokens[0], wrong);
+  const saved = f.c.takenContext({ ...daily, ctx: { p: p.id, i: 3, scope: 'sent' } }, target);
+  assert.equal(saved.start + saved.targetOffset, 3);
+  assert.deepEqual(clone(f.c.findExamples(daily.id, 1, null, target)[0].tokens), [right, right, stop]);
+
+  const write = f.c.reviewTokenMatcher('書く', { status: 'available', reading: 'かく', head: '書く', seq: '7' });
+  assert.equal(write({ ...token('書い', 'かい', '書く'), p: '動詞' }), true);
+  assert.equal(write({ ...token('書く', 'かく'), seq: '99' }), false);
+
+  f.c.D.dict['どきどき'] = { r: 'どきどき', alt: 'ドキドキ', m: ['thumping'] };
+  const katakana = token('ドキドキ', 'ドキドキ');
+  f.c.D.exampleBank.set('どきどき', [{ tokens: [katakana, stop] }, { tokens: [wrong, stop] }]);
+  const beat = f.c.reviewTokenMatcher('どきどき', f.c.savedAnswerFor({ t: 'word', id: 'どきどき' }));
+  const bank = f.c.findExamples('どきどき', 2, null, beat);
+  assert.equal(bank.length, 1);
+  assert.equal(bank[0].tokens.findIndex(beat), 0, 'the variant that admitted this example is the word blanked');
+  assert.equal(f.queue.length, 0, 'resolving review material never requests a record write');
+  assert.deepEqual(f.durable().srs, {});
+  assert.deepEqual(f.durable().revlog, []);
+});
 
 await check('grade-rejection-keeps-schedule-log-stats-and-session-with-double-tap-guard', async () => {
   const f = fixture(); const before = f.durable(); const history = clone(f.S.review.history);
@@ -307,7 +352,7 @@ await check('undo-after-ungraded-skip-restores-the-actual-graded-item-and-remove
   rv.queue = [item, skipped, current]; rv.declared = 0;
   let promise = grade(f); f.ack(); assert.equal(await promise, true);
   assert.equal(rv.history[0].item, item); assert.equal(rv.history[0].queueIndex, 0);
-  assert.equal(rv.history[0].reinserted, true); assert.deepEqual(rv.queue, [item, skipped, current, item]);
+  assert.equal(rv.history[0].reinserted, item); assert.deepEqual(rv.queue, [item, skipped, current, item]);
   // Skip advances the cursor without minting a grade or a history entry.
   rv.ix = 2;
   promise = byClass(f.render('renderReviewUndo', rv), 'review-undo').fire();
@@ -317,6 +362,31 @@ await check('undo-after-ungraded-skip-restores-the-actual-graded-item-and-remove
   assert.equal(f.S.srs['word:学校'], undefined); assert.equal(f.S.revlog.length, 2);
   assert.deepEqual(f.S.revlog[1].slice(1), ['word:学校', 0, 0]);
   assert.equal(f.S.stats['2026-09-10'].n, 0); assert.equal(f.S.stats['2026-09-10'].nnew, 0);
+});
+await check('timed-practice-short-step-records-only-the-first-scheduled-grade', async () => {
+  const f = fixture({ focus: { mode: 'due' } });
+  const rv = f.S.review;
+  const undo = () => byClass(f.render('renderReviewUndo', rv), 'review-undo').fire();
+  let pending = grade(f, { key: 'again', rating: fsrsApi.Rating.Again });
+  f.ack(); assert.equal(await pending, true);
+  assert.equal(rv.queue.length, 2);
+  const scheduled = f.durable();
+  rv.revealed = true;
+  pending = byClass(f.render('renderReview'), 'g-easy').fire();
+  f.ack(); await pending;
+  assert.deepEqual(f.S.revlog, scheduled.revlog);
+  assert.deepEqual(f.S.srs, scheduled.srs);
+  assert.deepEqual(f.S.stats, scheduled.stats);
+  assert.equal(f.S.obslog.length, 1, 'the bound practice answer commits one observation');
+  assert.deepEqual(f.S.obslog[0].slice(1), ['dojo', 'word:学校', 4, 'due']);
+  pending = undo(); f.ack(); assert.equal(await pending, true);
+  assert.deepEqual(f.S.revlog, scheduled.revlog);
+  assert.deepEqual(f.S.obslog[1].slice(1), ['dojo', 'word:学校', 0]);
+  pending = undo(); f.ack(); assert.equal(await pending, true);
+  assert.deepEqual(rv.queue, [item]);
+  assert.equal(rv.ix, 0);
+  assert.deepEqual(f.S.srs, {});
+  assert.deepEqual(f.S.revlog[1].slice(1), ['word:学校', 0, 0]);
 });
 await check('dojo-evidence-waits-for-ack-and-never-creates-schedule-state', async () => {
   const f = fixture(); const before = f.durable();
@@ -1083,11 +1153,12 @@ async function browserChecks() {
       });
     } finally { db.close(); }
   }));
-  const boot = async (page, aiQuiz = null, entry = 'shelf') => {
+  const openToday = (page) => page.locator('#tray, #tab-today').click();
+  const boot = async (page, aiQuiz = null, entry = 'shelf', taken = null) => {
     await page.goto(origin + '/learning-setup');
-    await page.evaluate(async (initialQuiz) => {
+    await page.evaluate(async ({ initialQuiz, cards }) => {
       localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1,
-        taken: ['学校', '電話', '先生', '時間', '天気'].map((id) => ({ t: 'word', id, label: id, ts: 1700000000000, started: 1700000000000 })),
+        taken: cards || ['学校', '電話', '先生', '時間', '天気'].map((id) => ({ t: 'word', id, label: id, ts: 1700000000000, started: 1700000000000 })),
         aiQuiz: initialQuiz, srs: {}, revlog: [], obslog: [], stats: {}, suspended: {},
         srsPrefs: { newPerDay: 20, reviewLimit: 20 }, futureRoot: { keep: 'synthetic-learning-future' },
       }));
@@ -1099,7 +1170,7 @@ async function browserChecks() {
         };
         request.onsuccess = () => done(request.result); request.onerror = () => fail(request.error);
       }); db.close();
-    }, aiQuiz);
+    }, { initialQuiz: aiQuiz, cards: taken });
     await page.goto(origin + '/index.html?entry=' + entry + '&ui=bi');
     await page.waitForFunction(() => document.body.dataset.ready === '1');
     assert.equal(await page.locator('#store-alert').isVisible(), false, 'Synthetic legacy record migrated without warning');
@@ -1184,40 +1255,83 @@ async function browserChecks() {
             finally { await context.close(); }
           });
         };
+        await journey('stale-saved-context-preserves-the-card-and-only-an-explicit-grade-advances-it', async (page) => {
+          const saved = { t: 'word', id: '学校', label: '学校', ts: 1, started: 1,
+            ctx: { p: 'bunki-essay-n2-handwriting', i: 10_000, scope: 'sent' } };
+          await boot(page, null, 'shelf', [saved]);
+          await openToday(page);
+          await page.locator('#review-start').click();
+          await page.waitForFunction(async id => {
+            const { D } = await import('/corridor.js');
+            return D.passages.find(p => p.id === id)?.tokens?.length > 0;
+          }, saved.ctx.p);
+          await page.locator('#reveal').click();
+          assert.equal(await page.locator('.review-front').innerText(), '学校');
+          assert.equal(await page.locator('.review-cloze').count(), 0);
+          const revealed = await disk(page);
+          assert.deepEqual(revealed.srs, {});
+          assert.deepEqual(revealed.revlog, []);
+          await page.locator('.grade.g-good').click();
+          await pollDisk(page, state => state.revlog.length === 1);
+          await page.reload();
+          await page.waitForFunction(() => document.body.dataset.ready === '1');
+          const after = await disk(page);
+          assert.deepEqual(after.taken, [saved]);
+          assert.equal(after.srs['word:学校'].reps, 1);
+          assert.equal(after.revlog.length, 1);
+        });
+        await journey('return-to-the-saved-inflection-without-writing-a-review', async (page) => {
+          // 手で書くということ uses 書く three times in this paragraph. The
+          // learner kept the final 書き, not its earlier 書い or 書く.
+          const passage = 'bunki-essay-n2-handwriting', index = 119;
+          await boot(page, null, 'shelf', [{ t: 'word', id: '書く', label: '書く', ts: 1, started: 1,
+            from: { passage, index }, ctx: { p: passage, i: index, scope: 'para' } }]);
+          await openToday(page);
+          await page.locator('#review-start').click();
+          await page.locator('.review-cloze').waitFor();
+          const before = await disk(page);
+          assert.equal((await page.locator('.review-cloze').innerText()).split('＿＿＿').length - 1, 3);
+          await page.locator('#reveal').click();
+          await page.locator('.review-cloze .sent-door').click();
+          await page.locator('#sent-home').click();
+          await page.waitForFunction(index => document.activeElement?.dataset.index === String(index), index);
+          const after = await disk(page);
+          for (const root of ['taken', 'srs', 'revlog', 'stats']) assert.deepEqual(after[root], before[root]);
+        });
         await journey('quiz-answer-rejection-and-reload-preserve-the-unanswered-question', async (page) => {
-          await boot(page, quiz()); await page.locator('#tray').click(); await page.locator('#aiq-resume').click();
+          await boot(page, quiz()); await openToday(page); await page.locator('#aiq-resume').click();
           const before = await fault(page, 'aiQuiz');
           await page.locator('.lesson-option').first().evaluate((node) => { node.click(); node.click(); });
           await failed(page, before); assert.equal(await page.locator('.aiq-why').count(), 0); assert.equal(await page.locator('#aiq-next').count(), 0);
           await page.reload(); await page.waitForFunction(() => document.body.dataset.ready === '1');
-          await page.locator('#tray').click(); await page.locator('#aiq-resume').click(); assert.equal(await page.locator('.aiq-q').textContent(), questions[0].q);
+          await openToday(page); await page.locator('#aiq-resume').click(); assert.equal(await page.locator('.aiq-q').textContent(), questions[0].q);
           await page.locator('.lesson-option').first().click(); await page.locator('.aiq-why').waitFor();
           const after = await disk(page); assert.equal(after.aiQuiz.correct, 1); assert.equal(after.aiQuiz.picked, 0); assert.deepEqual(after.srs, before.srs);
         });
         await journey('quiz-next-and-close-reject-without-advancing-or-leaving', async (page) => {
-          await boot(page, { ...quiz(), picked: 0, correct: 1 }); await page.locator('#tray').click(); await page.locator('#aiq-resume').click();
+          await boot(page, { ...quiz(), picked: 0, correct: 1 }); await openToday(page); await page.locator('#aiq-resume').click();
           const before = await fault(page, 'aiQuiz'); await page.locator('#aiq-next').click(); await failed(page, before);
           assert.equal(await page.locator('.aiq-q').textContent(), questions[0].q); assert.equal(await page.locator('.aiq-why').count(), 1);
         });
         await journey('quiz-close-rejection-keeps-the-completed-run', async (page) => {
-          await boot(page, { ...quiz(), ix: 3, correct: 1 }); await page.locator('#tray').click(); await page.locator('#aiq-resume').click();
+          await boot(page, { ...quiz(), ix: 3, correct: 1 }); await openToday(page); await page.locator('#aiq-resume').click();
           const before = await fault(page, 'aiQuiz'); await page.locator('#aiq-close').click(); await failed(page, before);
           assert.equal(await page.locator('#aiq-close').count(), 1);
         });
         await journey('show-answer-opens-four-grades-without-a-write', async (page) => {
-          await boot(page); await page.locator('#tray').click(); await page.locator('#review-start').click();
+          await boot(page); await openToday(page); await page.locator('#review-start').click();
           const before = await pollDisk(page, () => true); await page.locator('#reveal').click(); await page.locator('.g-good').waitFor();
           assert.equal(await page.locator('.grade').count(), 4); const after = await pollDisk(page, () => true);
           assert.deepEqual(after.obslog, before.obslog);
         });
         await journey('review-grade-rejection-keeps-card-schedule-log-and-stats', async (page) => {
-          await boot(page); await page.locator('#tray').click(); await page.locator('#review-start').click(); await page.locator('#reveal').click();
+          await boot(page); await openToday(page); await page.locator('#review-start').click(); await page.locator('#reveal').click();
           await page.locator('.g-good').waitFor(); const label = await page.locator('.review-front').textContent(); const before = await fault(page, 'srs');
           await page.locator('.g-good').evaluate((node) => { node.click(); node.click(); }); await failed(page, before, { review: true });
           assert.equal(await page.locator('.review-front').textContent(), label); assert.equal(await page.locator('.g-good').count(), 1);
         });
         await journey('review-grade-and-undo-persist-one-schedule-with-an-append-only-revocation', async (page) => {
-          await boot(page); await page.locator('#tray').click(); await page.locator('#review-start').click(); await page.locator('#reveal').click();
+          await boot(page); await openToday(page); await page.locator('#review-start').click(); await page.locator('#reveal').click();
           await page.locator('.g-again').waitFor(); assert.equal(await page.locator('.g-good').count(), 1);
           await page.locator('.g-again').click(); const graded = await pollDisk(page, (state) => state.revlog.length === 1);
           assert.equal(graded.revlog[0][2], 1); const key = graded.revlog[0][1]; assert(graded.srs[key]);

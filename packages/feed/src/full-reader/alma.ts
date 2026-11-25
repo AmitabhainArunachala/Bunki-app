@@ -7,6 +7,7 @@ import {
   type ArticleCandidate,
   type ArticleCapabilityInput,
 } from '@bunki/reading';
+import { utf16String } from '@bunki/domain/wire-text';
 import { z } from 'zod';
 import { parseFeedEntry } from '../contracts.ts';
 import { feedEntryId } from '../identity.ts';
@@ -61,9 +62,9 @@ function attribution(url: string) {
 const sha = z.string().regex(/^[a-f0-9]{64}$/u);
 const docSchema = z.strictObject({
   parserVersion: z.literal(ALMA_READER_VERSION),
-  canonicalUrl: z.string().min(1).max(4096),
-  ogUrl: z.string().min(1).max(4096),
-  finalUrl: z.string().min(1).max(4096),
+  canonicalUrl: utf16String(4096).min(1),
+  ogUrl: utf16String(4096).min(1),
+  finalUrl: utf16String(4096).min(1),
   fetchedAt: instantSchema,
   responseSha256: sha,
   responseBytes: z.number().int().min(1).max(MAX_PUBLISHER_HTML_BYTES),
@@ -98,7 +99,7 @@ const docSchema = z.strictObject({
     .min(2)
     .max(2048),
   omittedElements: z.number().int().nonnegative().max(30_000),
-  articleVersionId: z.string().min(1).max(200),
+  articleVersionId: utf16String(200).min(1),
   contentSha256: sha,
 });
 export type AlmaSourceDocument = Readonly<z.infer<typeof docSchema>>;

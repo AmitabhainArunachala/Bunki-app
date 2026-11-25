@@ -140,6 +140,10 @@ function checkedSource(raw) {
   return actual;
 }
 
+class ArchiveReadDeadline extends RecordControllerError {
+  constructor() { super('archive-unavailable'); }
+}
+
 async function readArchive() {
   const db = await new Promise((done, fail) => {
     let settled = false; let request;
@@ -148,7 +152,7 @@ async function readArchive() {
       settled = true; clearTimeout(timer);
       if (error) fail(error); else done(opened);
     };
-    const timer = setTimeout(() => finish(new RecordControllerError('archive-unavailable')), 5000);
+    const timer = setTimeout(() => finish(new ArchiveReadDeadline()), 5000);
     try {
       // No version argument and no upgrade: the existing archive is read only.
       request = indexedDB.open(ARCHIVE_DB);
@@ -164,7 +168,7 @@ async function readArchive() {
     return await new Promise((done, fail) => {
       const tx = db.transaction(['turns', 'imports'], 'readonly', { durability: 'strict' });
       let error;
-      const timer = setTimeout(() => { error = new RecordControllerError('archive-unavailable'); try { tx.abort(); } catch { db.close(); fail(error); } }, 5000);
+      const timer = setTimeout(() => { error ??= new ArchiveReadDeadline(); try { tx.abort(); } catch { db.close(); fail(error); } }, 5000);
       tx.onabort = () => { clearTimeout(timer); fail(error || new RecordControllerError('archive-unavailable')); };
       try {
         const turns = tx.objectStore('turns'); const imports = tx.objectStore('imports');
@@ -187,7 +191,17 @@ async function scanLegacy(writer, captured, includeDrift = false, legacyStorage 
   assertWriter(writer, captured);
   const recordText = legacyStorage.getItem(LEGACY_KEY);
   const legacyDriftText = includeDrift ? legacyStorage.getItem(DRIFT_KEY) : undefined;
-  const archive = await readArchive();
+  // A busy renderer can deliver the archive deadline before an IndexedDB success.
+  // Retry only that read, with a new connection and transaction. Nothing is
+  // admitted until the complete snapshot and the original source text agree.
+  let archive;
+  try {
+    archive = await readArchive();
+  } catch (error) {
+    if (!(error instanceof ArchiveReadDeadline)) throw error;
+    assertWriter(writer, captured);
+    archive = await readArchive();
+  }
   assertWriter(writer, captured);
   insist(legacyStorage.getItem(LEGACY_KEY) === recordText, 'source-changed');
   insist(!includeDrift || legacyStorage.getItem(DRIFT_KEY) === legacyDriftText, 'source-changed');

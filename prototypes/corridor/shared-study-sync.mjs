@@ -23,6 +23,7 @@ export function createSharedStudySync(config = {}) {
     online = () => globalThis.navigator?.onLine!==false,
     visible = () => globalThis.document?.visibilityState!=='hidden',
     eventTarget = globalThis,
+    visibilityTarget = eventTarget?.document ?? eventTarget,
     now = Date.now,
     automatic = true,
     transportOptions = {},
@@ -46,6 +47,10 @@ export function createSharedStudySync(config = {}) {
   let state = 'idle';
   let lastError = null;
   let timer = null;
+  let maintenanceTimer = null;
+  let networkFailures = 0;
+  let departure = null;
+  let closeFlight = null;
   let internal = false;
   let changedDuringInternal = false;
   let unsubscribeStore = null;
@@ -91,13 +96,39 @@ export function createSharedStudySync(config = {}) {
     if (timer !== null) { clearTimeout(timer); timer = null; }
   };
 
+  const clearMaintenance = () => {
+    if (maintenanceTimer !== null) clearTimeout(maintenanceTimer);
+    maintenanceTimer = null;
+  };
+
+  // Match the canonical PWA's quiet foreground refresh cadence. A transient
+  // failure earns an earlier retry. Permanent protocol and storage errors do not.
+  function scheduleMaintenance(result) {
+    clearMaintenance();
+    if (!automatic || disposed || held() || departure || !isOnline() || !isVisible()) return;
+    let delay;
+    if (result.error === 'network-failed' || result.error === 'retry-later') {
+      const waitForServer = (result.retryAt ?? 0) - now();
+      delay = waitForServer > 0 ? Math.max(1000, waitForServer)
+        : Math.min(300000, 5000 * 2 ** Math.min(networkFailures++, 6));
+    } else if (result.state === 'up-to-date') {
+      networkFailures = 0;
+      delay = 15 * 60 * 1000;
+    } else return;
+    maintenanceTimer = setTimeout(() => {
+      maintenanceTimer = null;
+      schedule();
+    }, Math.min(delay, 2147483647));
+    maintenanceTimer?.unref?.();
+  }
+
   function schedule() {
-    if (!automatic || disposed || !attached || held() || !isOnline() || !isVisible() ||
+    if (!automatic || disposed || !attached || held() || departure || !isOnline() || !isVisible() ||
         timer !== null) return;
     if(flight){wakeAfterFlight=true;return;}
     timer = setTimeout(() => {
       timer = null;
-      if (disposed || !attached || held() || !isOnline() || !isVisible()) return;
+      if (disposed || !attached || held() || departure || !isOnline() || !isVisible()) return;
       if(flight){wakeAfterFlight=true;return;}
       synchronize().catch(error => publish('error', code(error)));
     }, 25);
@@ -111,16 +142,46 @@ export function createSharedStudySync(config = {}) {
     }
   };
 
+  // The canonical keepalive only attempts a current, bounded journal prefix.
+  // It does not acknowledge anything locally. Reopening always verifies it.
+  function attemptDeparture(cycle) {
+    if (departure !== cycle || cycle.dispatched || disposed || held() || !isOnline()) return Promise.resolve(false);
+    closeFlight = transport.flushOnClose(() => { cycle.dispatched = true; }).catch(error => {
+      if (code(error) === 'authentication-required') publish('paused-auth', code(error));
+      return false;
+    }).finally(() => { closeFlight = null; });
+    return closeFlight;
+  }
+
+  function flushBeforeClose(pagehide = true) {
+    clearWake();
+    clearMaintenance();
+    if (!automatic || disposed || !attached || held() || !isOnline()) return Promise.resolve(false);
+    const cycle = departure ??= { dispatched: false, hiding: null, final: null };
+    if (pagehide) {
+      // A grade can finish while the hidden check reads the prefix. On the
+      // final event, re-read it once if that check never dispatched.
+      return cycle.final ??= closeFlight ? closeFlight.then(() => attemptDeparture(cycle)) : attemptDeparture(cycle);
+    }
+    return cycle.final ?? (cycle.hiding ??= closeFlight ?? attemptDeparture(cycle));
+  }
+
   function watchEvents() {
-    if (!eventTarget || typeof eventTarget.addEventListener !== 'function') return;
-    const wake = () => schedule();
-    const offline = () => { if (!disposed && attached) publish('offline', null); };
-    for (const [type, handler] of [['online', wake], ['focus', wake],
-      ['visibilitychange', wake], ['offline', offline]]) {
-      try {
-        eventTarget.addEventListener(type, handler);
-        eventStops.push({stop: () => eventTarget.removeEventListener(type, handler)});
-      } catch { /* an absent event surface only disables background waking */ }
+    const wake = () => {
+      if (!isVisible()) return;
+      departure = null;
+      schedule();
+    };
+    const visibility = () => { if (isVisible()) wake(); else void flushBeforeClose(false); };
+    const offline = () => {
+      clearMaintenance();
+      if (!disposed && attached) publish('offline', null);
+    };
+    for (const [target, type, handler] of [[eventTarget, 'online', wake], [eventTarget, 'focus', wake],
+      [eventTarget, 'pageshow', wake], [visibilityTarget, 'visibilitychange', visibility], [eventTarget, 'offline', offline]]) {
+      if (!target?.addEventListener) continue;
+      target.addEventListener(type, handler);
+      eventStops.push({stop: () => target.removeEventListener(type, handler)});
     }
   }
 
@@ -134,6 +195,8 @@ export function createSharedStudySync(config = {}) {
     if (!attached || !transport) return snapshot('idle', 'shared-sync-not-attached');
     if (held()) { publish('paused', null); return snapshot('paused'); }
     if (!isOnline()) { publish('offline', null); return snapshot('offline'); }
+    clearWake();
+    clearMaintenance();
     publish('syncing', null);
     internal = true;
     changedDuringInternal = false;
@@ -151,6 +214,8 @@ export function createSharedStudySync(config = {}) {
     if (held() && result.state !== 'error') result = {...result, state: 'paused', error: null};
     else if (!isOnline() && result.state !== 'error') result = {...result, state: 'offline', error: null};
     publish(result.state, result.error ?? null);
+    scheduleMaintenance(result);
+    if (result.catchUp?.reason === 'new-head') schedule();
     const changed = changedDuringInternal;
     changedDuringInternal = false;
     if (changed && automatic && !result.error && !held() && isOnline() && isVisible()) {
@@ -237,7 +302,8 @@ export function createSharedStudySync(config = {}) {
         getCredential,
         fetch: request,
         now,
-        canContinue: () => !disposed && !held() && isOnline() && isVisible(),
+        canContinue: () => !disposed && !held() && !departure && isOnline() && isVisible(),
+        canFlushOnClose: () => automatic && !disposed && !held() && isOnline() && isPaired(),
       });
     } catch (error) {
       return Promise.reject(error);
@@ -246,6 +312,7 @@ export function createSharedStudySync(config = {}) {
     store = target.store;
     transport = Object.freeze({
       sync: () => next.sync(),
+      flushOnClose: notify => next.flushOnClose(notify),
       status: () => next.status(),
       resumeAfterPairing: () => next.resumeAfterPairing(),
       isPaired: async () => {
@@ -259,6 +326,7 @@ export function createSharedStudySync(config = {}) {
     if (typeof store.subscribe === 'function') {
       unsubscribeStore = store.subscribe(() => {
         if (internal) { changedDuringInternal = true; return; }
+        if (state === 'up-to-date') publish(isOnline() ? 'pending' : 'offline');
         schedule();
       });
     }
@@ -270,6 +338,7 @@ export function createSharedStudySync(config = {}) {
     if (typeof token !== 'string' || !SAFE_TOKEN.test(token)) throw Error('shared-sync-hold-token');
     if (disposed) return;
     holds.add(token);
+    clearMaintenance();
     publish('paused', null);
   }
 
@@ -279,7 +348,7 @@ export function createSharedStudySync(config = {}) {
   }
 
   async function drain() {
-    const settled = await Promise.allSettled([flight, reserveFlight]);
+    const settled = await Promise.allSettled([flight, reserveFlight, closeFlight, departure?.final]);
     const failure = settled.find(row => row.status === 'rejected');
     if (failure) throw failure.reason;
     return settled[0].value;
@@ -289,6 +358,7 @@ export function createSharedStudySync(config = {}) {
     if (disposed) return;
     disposed = true;
     clearWake();
+    clearMaintenance();
     stopEvents();
     holds.clear();
     if (unsubscribeStore) {
@@ -309,6 +379,7 @@ export function createSharedStudySync(config = {}) {
     attach,
     synchronize,
     reserveNewPermits,
+    flushBeforeClose,
     resumeAfterPairing() { if (!disposed) { transport?.resumeAfterPairing();publish('idle'); } },
     hold,
     release,
