@@ -801,7 +801,7 @@ async function corridorReview(browser, engine, { mutate = null } = {}) {
   const out = { shown: [], labels: [], earlyBeforeChoice: 0 };
   try {
     out.todayKeys = await page.evaluate(() => window.__KAIRO_SRS__.today().keys);
-    await page.locator('#tray').click();
+    await page.locator('#tray, #tab-today').click();
     await page.locator('#review-start').click();
     const grade = async () => {
       await page.waitForSelector('#reveal, .grade.g-good', { timeout: 15000 });
@@ -857,7 +857,7 @@ async function timedKanji(browser, engine) {
   const { context, page } = await corridorBoot(browser, seed);
   const out = {};
   try {
-    await page.locator('#chrome-dojo').click();
+    await page.locator('#chrome-dojo, #tab-learn').click();
     await page.locator('.focus-start').waitFor({ timeout: 15000 });
     await page.locator('.focus-mode').filter({ hasText: /kanji only/iu }).click();
     await page.locator('.focus-start').click();
