@@ -280,7 +280,7 @@ function loadState(storage, deck) {
   try {
     text = storage.getItem(stateKey(deck.id));
   } catch {
-    text = null;
+    return { state: normalizeState(null, deck), notice: SAVE_FAILED, source: undefined };
   }
   let raw = null;
   let unreadable = false;
@@ -295,13 +295,62 @@ function loadState(storage, deck) {
   const storedCards = raw && typeof raw === 'object' && raw.cards && typeof raw.cards === 'object' ? Object.keys(raw.cards).length : 0;
   if (text != null && !Object.keys(state.cards).length && (unreadable || storedCards)) {
     const kept = writeRaw(storage, quarantineKey(deck.id), text);
-    return { state, notice: kept ? QUARANTINED : '' };
+    return { state, notice: kept ? QUARANTINED : SAVE_FAILED, source: kept ? text : undefined };
   }
-  return { state, notice: '' };
+  return { state, notice: '', source: text };
+}
+
+const RECORD_CHANGED = 'ほかの画面で記録が更新されました。最新の記録から学習を続けられます。';
+
+/** Refresh a stale sitting, including its one-step undo snapshot. */
+function reopenDeck() {
+  ui.queue = [];
+  ui.undo = null;
+  ui.screen = 'home';
+  resetCard();
+  ui.toast = RECORD_CHANGED;
+  paint();
+}
+
+/** Hold a same-origin lock only while checking and committing one learner action.
+ * In-memory storage and older hosts retain synchronous dispatch and the revision check. */
+function ledgerAction(action) {
+  return (...args) => {
+    const owner = ctx;
+    const queue = ui.queue, pos = ui.pos, screen = ui.screen, revealed = ui.revealed;
+    const active = () => ctx === owner && owner.root.isConnected && ui.queue === queue &&
+      ui.pos === pos && ui.screen === screen && ui.revealed === revealed;
+    const apply = () => {
+      if (!active()) return;
+      if (owner.source === undefined) return saveFailed();
+      const key = stateKey(owner.deck.id);
+      let current;
+      try {
+        current = owner.storage.getItem(key);
+      } catch {
+        return saveFailed();
+      }
+      if (current !== owner.source) {
+        Object.assign(owner, loadState(owner.storage, owner.deck));
+        return reopenDeck();
+      }
+      action(...args);
+    };
+    if (typeof Storage === 'undefined' || !(owner.storage instanceof Storage) || !navigator.locks) return apply();
+    // The callback has no await. Durable bytes, the undo snapshot and the on-screen
+    // advance change together, before another tab can enter the same critical section.
+    return navigator.locks.request(stateKey(owner.deck.id), apply).catch((error) => {
+      if (error.name !== 'SecurityError') throw error;
+      if (active()) saveFailed();
+    });
+  };
 }
 /** write a candidate ledger; the caller adopts it only when this returns true */
 function save(state) {
-  return writeJson(ctx.storage, stateKey(ctx.deck.id), state);
+  const text = JSON.stringify(state);
+  if (!writeRaw(ctx.storage, stateKey(ctx.deck.id), text)) return false;
+  ctx.source = text;
+  return true;
 }
 /** adopt new settings only once they are stored */
 function savePrefs(prefs, { explicitLook = ctx.lookExplicit } = {}) {
@@ -322,6 +371,7 @@ function saveFailed() {
 
 /** UI chrome follows the host language; Japanese learning data is never translated. */
 const UI_EN = {
+  [RECORD_CHANGED]: "Your record changed in another window. Start again to continue from the latest review.",
   "前の記録を読み取れなかったので、別に保管しました。": "The previous record could not be read, so it was kept separately.",
   "保存できませんでした。設定のバックアップから記録をコピーして保管してください。": "Could not save. Copy and keep your record from Settings → Backup.",
   "前の文をすべて表示": "Show all preceding sentences",
@@ -938,7 +988,7 @@ function topicSettings() {
     box2.type = 'checkbox';
     box2.checked = !off.has(g.id);
     box2.dataset.group = g.id;
-    box2.addEventListener('change', () => {
+    box2.addEventListener('change', ledgerAction(() => {
       const set = new Set(ctx.state.groupsOff);
       if (box2.checked) set.delete(g.id);
       else set.add(g.id);
@@ -947,7 +997,7 @@ function topicSettings() {
       ctx.state = nextState;
       ui.toast = '';
       paintResponse({ hold: false });
-    });
+    }));
     const bar = el('span', 'kp-bar');
     bar.append(
       Object.assign(el('i', 'kp-c-known'), { style: `width:${share('known')}%` }),
@@ -1125,10 +1175,7 @@ function studyScreen() {
       for (const w of choicesFor(word)) {
         opts.append(
           btn('kp-choice', w.term, () => {
-            ui.picked = w.id;
-            ui.seen = !!ctx.state.cards[id];
-            ui.revealed = true;
-            commit(w.id === word.id ? RATINGS.good : RATINGS.again, { stay: true });
+            commit(w.id === word.id ? RATINGS.good : RATINGS.again, { stay: true, picked: w.id });
           }, { 'data-choice': w.id }),
         );
       }
@@ -1167,9 +1214,6 @@ function studyScreen() {
   } else if (mode === 'choice') {
     box.append(
       btn('kp-reveal', t("わからない"), () => {
-        ui.picked = null;
-        ui.seen = !!ctx.state.cards[id];
-        ui.revealed = true;
         commit(RATINGS.again, { stay: true });
       }, { id: 'kp-dunno' }),
     );
@@ -1808,7 +1852,7 @@ function lightWord(node) {
 }
 function tapped(unit, node, { card, where, depth }) {
   const frame = frameOf(unit);
-  logTap(card, where, frame, depth);
+  ledgerAction(logTap)(card, where, frame, depth);
   if (depth === 1) lightWord(node);
   if (ctx.host) openSheet(frame, node, depth);
   else openPop(frame, node);
@@ -2036,7 +2080,7 @@ function backParts(card, word) {
 function deleteButton() {
   return btn('kp-delete', t("削除"), (e) => {
     e.stopPropagation();
-    deleteCard();
+    ledgerAction(deleteCard)();
   }, { id: 'kp-delete', 'aria-label': t("このカードを削除（保留にする・あとで戻せる）") });
 }
 
@@ -2067,7 +2111,7 @@ function leechLadder(card, word) {
   const step = (name, label, sub, onClick) => {
     const b = btn(`kp-ladder-step`, [el('b', null, label), el('small', null, sub)], (e) => {
       e.stopPropagation();
-      onClick();
+      ledgerAction(onClick)();
     }, { id: `kp-ladder-${name}`, 'data-step': name });
     if (name === 'hint' && hint) b.dataset.uiContentValue = hint;
     if (!onClick) b.disabled = true;
@@ -2078,7 +2122,7 @@ function leechLadder(card, word) {
   step('suspend', t("保留"), t("このカードを休ませる"), () => ladderSuspend(card));
   box.append(steps, btn('kp-link kp-ladder-keep', t("このまま続ける"), (e) => {
     e.stopPropagation();
-    ladderKeep(card);
+    ledgerAction(ladderKeep)(card);
   }, { id: 'kp-ladder-keep' }));
   return box;
 }
@@ -2588,7 +2632,7 @@ function retireRule() {
   if (storePrefs(prefs)) ctx.prefs = prefs;
 }
 
-function commit(rating, { stay = false } = {}) {
+const commit = ledgerAction(function commitGrade(rating, { stay = false, picked = null } = {}) {
   const id = ui.queue[ui.pos];
   if (!id) return;
   const nextState = grade(fsrsApi, scheduler, ctx.state, id, rating, new Date());
@@ -2600,6 +2644,11 @@ function commit(rating, { stay = false } = {}) {
     }
     saveFailed();
     return;
+  }
+  if (stay) {
+    ui.picked = picked;
+    ui.seen = !!ctx.state.cards[id];
+    ui.revealed = true;
   }
   askToKeepStorage();
   if (cardMode() !== 'choice') retireRule();
@@ -2615,7 +2664,7 @@ function commit(rating, { stay = false } = {}) {
     return;
   }
   next(rating >= RATINGS.hard ? 'good' : 'again');
-}
+});
 
 /**
  * Ask the browser once, after the first saved grade, to keep this site's
@@ -2695,7 +2744,7 @@ function arrive(ghost, dir) {
   setTimeout(drop, 400);
 }
 
-function undo() {
+const undo = ledgerAction(function undoReview() {
   if (!ui.undo) return;
   // the words looked up since stay looked up: undo takes back answers and repairs, not lookups
   const restored = { ...ui.undo.state, lookups: ctx.state.lookups || [] };
@@ -2713,7 +2762,7 @@ function undo() {
   ui.seen = !!ctx.state.cards[ui.queue[ui.pos]];
   paint();
   if (ui.revealed) settleBack();
-}
+});
 
 /**
  * Swipe right = 正解 (Good), left = もう一度 (Again). Only the finger that started the
@@ -2968,14 +3017,14 @@ function suspendedField() {
   for (const id of ids) why[ctx.state.suspended[id].by] = (why[ctx.state.suspended[id].by] || 0) + 1;
   const count = el('p', 'kp-sub', ids.length ? t(`${fmtN(ids.length)}枚（${Object.entries(why).map(([k, n]) => `${SUSPEND_WHY[k] || k} ${n}`).join('・')}）`, `${nounEn(ids.length, 'card')} (${Object.entries(why).map(([k, n]) => `${t(SUSPEND_WHY[k] || k)} ${n}`).join(' · ')})`) : t("ありません"));
   count.id = 'kp-suspended';
-  const back = btn('', t("復元"), () => {
+  const back = btn('', t("復元"), ledgerAction(() => {
     const nextState = restoreSuspended(ctx.state, new Date(), ids);
     if (!save(nextState)) return saveFailed();
     ctx.state = nextState;
     ui.undo = null;
     ui.toast = '';
     paint();
-  }, { id: 'kp-unsuspend', 'aria-label': t(`保留中の${ids.length}枚をすべて戻す`, `Restore all ${ids.length} paused cards`) });
+  }), { id: 'kp-unsuspend', 'aria-label': t(`保留中の${ids.length}枚をすべて戻す`, `Restore all ${ids.length} paused cards`) });
   back.disabled = !ids.length;
   return el('div', 'kp-field', el('h2', 'kp-h2', t("保留中のカード")), el('p', 'kp-sub', t("削除したカードと、つまずきが続いて休ませたカード。記録は消えていません。")), count, el('div', 'kp-seg', back));
 }
@@ -3000,7 +3049,9 @@ const RESTORE_NO_ROOM = '保存領域がいっぱいで、置き換えられま�
 function restoreButton(ta, msg) {
   let staged = null;
   const b = btn('', t("復元"), () => {
-    if (staged && staged.text === ta.value) return replace();
+    if (staged && staged.text === ta.value) return ledgerAction(() => {
+      if (staged && staged.text === ta.value) replace();
+    })();
     disarm();
     let raw;
     try {
@@ -3110,7 +3161,8 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
   const start = pendingStart?.deckId === deckId ? pendingStart.autoStart : undefined;
   pendingStart = null;
   if (!root.isConnected) return;
-  const sameDeck = ctx?.deck?.id === deck.id;
+  const sameDeck = ctx?.deck?.id === deck.id && ctx.storage === storage;
+  const previousSource = ctx?.source;
   ctx = {
     root,
     english,
@@ -3136,7 +3188,14 @@ export async function render(main, { deckId, storage = window.localStorage, onLe
     lookExplicit: Object.hasOwn(readJson(storage, prefsKey(deck.id)) || {}, 'look'),
   };
   root.addEventListener('pointerdown', onDown, true);
-  ({ state: ctx.state, notice: ctx.notice } = loadState(storage, deck));
+  Object.assign(ctx, loadState(storage, deck));
+  if (sameDeck && previousSource !== ctx.source) {
+    ui.undo = null;
+    if (ui.screen === 'study') {
+      reopenDeck();
+      return;
+    }
+  }
   if (!sameDeck || start === false) {
     ui.screen = 'home';
     ui.queue = [];

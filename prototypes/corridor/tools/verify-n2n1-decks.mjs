@@ -7,6 +7,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { chromium } from 'playwright-core';
 import { startCorridorDev } from '../../../scripts/serve-corridor-dev.mjs';
+import { verifyConcurrentDeck } from './deck-ledger-concurrency.mjs';
 import { resolveCorridorEvidence } from '../../../scripts/resolve-corridor-site.mjs';
 import { cardTokens, defTokens, validateDeck } from '../decks/player/engine.js';
 
@@ -122,6 +123,7 @@ try {
       await context.close();
     }
   }
+  report.concurrentLedger = await verifyConcurrentDeck(browser, host.origin);
   assert.deepEqual(errors, []);
   report.status = 'passed';
   console.log(JSON.stringify(report, null, 2));
