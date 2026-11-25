@@ -1536,5 +1536,25 @@
     "policy": "002dc875d95d7d62d63eaed04ff00e3c74fed894c7b0b9d4615572cf2957a401",
     "startedAt": "2026-11-25T03:32:11Z",
     "reason": "Producer verification policy differs from trusted default branch"
+  },
+  "45535491261/2": {
+    "result": "observed",
+    "startedAt": "2026-11-25T11:10:44Z"
+  },
+  "45530503430/2": {
+    "result": "observed",
+    "startedAt": "2026-11-25T11:10:56Z"
+  },
+  "45531336262/2": {
+    "result": "observed",
+    "startedAt": "2026-11-25T11:10:53Z"
+  },
+  "45534044097/2": {
+    "result": "observed",
+    "startedAt": "2026-11-25T11:10:50Z"
+  },
+  "45536803674/2": {
+    "result": "observed",
+    "startedAt": "2026-11-25T11:10:43Z"
   }
 }
