@@ -6,13 +6,17 @@
 
 /* ---- type: eight steps (12 14 16 18 reading 24 29 38; a label and a control share 14); a figure and a ruby are not steps ---- */
 :root {
-  --type-label: 14px;
-  --type-control: 14px;
-  --type-seal: var(--type-reading);
-  --type-display: var(--type-title);
-  --type-headword: var(--type-hero);
+  --label-step: 14;
+  --control-step: 14;
+  --seal-step: var(--reading-step);
+  --display-step: 29;
+  --headword-step: 38;
 }
 :where(.kp, body[data-view='drift'], [class^='ww-'], [class*=' ww-'], .kw-encounter, .kw-dialog, .worldcraft-view, .wc-dialog, .passage-dialog) {
+  --label-step: 13;
+  --control-step: 15;
+  --seal-step: 22;
+  --headword-step: 42;
   --type-label: 13px;
   --type-control: 15px;
   --type-seal: 22px;

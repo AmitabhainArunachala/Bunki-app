@@ -863,7 +863,7 @@ html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen)
   html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:has(> .dials) > #reader.reader { border-top-color: transparent; background: none; box-shadow: none; }
 }
 @media (min-width: 900px) {
-  html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:has(> .dials) > #reader.reader .reader-prose { font-size: 21px; line-height: 42px; }
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:has(> .dials) > #reader.reader .reader-prose { --reading-step: 21; font-size: var(--type-reading); line-height: 2; }
 }
 
 /* ==== depth/kanji.css ==== */
@@ -1205,7 +1205,7 @@ html[data-live-depth='1'] body:not([data-view='drift']) #app .ww .ww-plate .ww-l
 /* on a wide screen the article is set like a book, not large print: 21 on 42 instead of 23 on 53.
    A tapped word still has room for its reading above and its meaning below (checked at 1728 wide). */
 @media (min-width: 900px) {
-  html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > #reader.reader .reader-prose { font-size: 21px; line-height: 42px; }
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > #reader.reader .reader-prose { --reading-step: 21; font-size: var(--type-reading); line-height: 2; }
 }
 /* on a wide screen the trail starts under Back, on the same left edge as the bar above it (it used to start at the window's edge) */
 @media (min-width: 900px) {

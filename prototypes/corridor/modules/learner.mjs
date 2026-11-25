@@ -1,5 +1,5 @@
 /** learner seam: split out of corridor.js (G3); now edited here directly. */
-import { $, voiceSettingsBlock, AI_EVIDENCE_ROLES, D, DRAFT_KEY, GRAMMAR, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, PLACES_TABS, PRIMARY_TABS, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, ROOM_IDS, ROOM_NAMES, S, SVG_NS, THEME_STORE, THEME_UI, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, bi, biLabel, contrastOf, el, fieldsDeckHome, finiteNumber, flowText, foundationDoor, logicalArchiveRows, meDeckIndex, meNum, meSealsPart, nonEmptyString, optional, owns, passage, paintKeptCount, placesLayout, plainRecord, render, roomTransition, safeJsonValue, savedAnswerFor, setLayout, setWordPref, srsKey, tx, validStoreEnvelope, wordBrush, setReadHighlight, wordHighlight, wordVoice } from '../corridor.js';
+import { $, voiceSettingsBlock, AI_EVIDENCE_ROLES, D, DRAFT_KEY, GRAMMAR, ME_DECKS, ME_FIELDS, ME_MONTHS_EN, ME_N1_SITTING, PLACES_TABS, PRIMARY_TABS, REGISTER_LINE_DOORS, REGISTER_ROOM_DOORS, ROOM_IDS, ROOM_NAMES, S, SVG_NS, THEME_STORE, THEME_UI, WORD_BRUSH, WORD_BRUSH_KEY, WORD_VOICE, WORD_VOICE_KEY, bi, biLabel, contrastOf, el, fieldsDeckHome, finiteNumber, flowText, foundationDoor, logicalArchiveRows, meDeckIndex, meNum, meSealsPart, nonEmptyString, optional, owns, passage, paintKeptCount, placesLayout, plainRecord, render, roomTransition, safeJsonValue, savedAnswerFor, setLayout, setWordPref, wordPref, srsKey, tx, validStoreEnvelope, wordBrush, setReadHighlight, wordHighlight, wordVoice } from '../corridor.js';
 import { dayKey, helpByMonth } from './drift.mjs';
 import { articleReadChars } from './library.mjs';
 import { VOICE_WORDS } from './voice-lines.mjs';
@@ -660,6 +660,41 @@ function renderLayoutChoice() {
   return section;
 }
 
+// Reading size belongs to the screen in hand, like voice and brush settings.
+const READING_SIZE_KEY = 'kairo-reading-size-v1';
+const READING_SIZES = ['100', '125', '150'];
+
+function applyReadingSize(value) {
+  const size = value === undefined
+    ? wordPref(READING_SIZE_KEY, 'readingSize', READING_SIZES)
+    : setWordPref(READING_SIZE_KEY, 'readingSize', READING_SIZES, value);
+  document.documentElement.dataset.readingSize = size;
+  return size;
+}
+
+function readingSizeRow(inReader = false) {
+  const row = el('div', inReader ? 'dial' : 'settings-writing-row');
+  const name = el('span', inReader ? 'dial-label' : 'settings-writing-name', tx('文字サイズ', 'Reading size'));
+  name.id = inReader ? 'reader-size-label' : 'settings-size-label';
+  const group = el('div', inReader ? 'seg' : 'lang-seg settings-layout-choice settings-writing-choice');
+  group.setAttribute('role', 'group');
+  group.setAttribute('aria-labelledby', name.id);
+  const size = applyReadingSize();
+  for (const value of READING_SIZES) {
+    const button = el('button', '', `${value}%`);
+    button.type = 'button';
+    button.dataset.readingSize = value;
+    button.setAttribute('aria-pressed', String(size === value));
+    button.addEventListener('click', () => {
+      applyReadingSize(value);
+      for (const other of group.children) other.setAttribute('aria-pressed', String(other === button));
+    });
+    group.append(button);
+  }
+  row.append(name, group);
+  return row;
+}
+
 function renderWritingChoice() {
   const section = el('section', 'foundation-section settings-writing');
   section.id = 'settings-writing';
@@ -687,6 +722,7 @@ function renderWritingChoice() {
     return line;
   };
   section.append(
+    readingSizeRow(),
     row('settings-brush', '筆 — 語が自分で書かれる', '筆 — a word writes itself',
       [['first', '初めての語', 'First meeting'], ['always', 'いつも', 'Always'], ['never', '書かない', 'Never']],
       wordBrush(), (value) => setWordPref(WORD_BRUSH_KEY, 'wordBrush', WORD_BRUSH, value)),
@@ -749,4 +785,4 @@ function maintenanceScreenName() {
   } catch { return ''; }
 }
 
-export { mergeGrammar, readRecordDrafts, portableRecord, meHelpLine, syncTrayCount, validArchiveTurn, validArchiveRows, storedArchiveRow, validStoredArchiveRows, validImportJournal, updateMeasurements, themeId, themeIx, primaryTabs, meN1Sitting, meDaysToSitting, meDeckLedger, meDeckWords, meDate, meRevoked, meDays, meReadUnaided, meHorizons, meCameHome, meCopiedLine, meSeam, meSection, meBreakable, meHorizonRow, meN1Plate, meHorizonsPart, meCameHomePart, meLinePart, renderMe, showRecordBackup, renderLayoutChoice, renderWritingChoice, stampRegister, maintenanceScreenName };
+export { applyReadingSize, readingSizeRow, mergeGrammar, readRecordDrafts, portableRecord, meHelpLine, syncTrayCount, validArchiveTurn, validArchiveRows, storedArchiveRow, validStoredArchiveRows, validImportJournal, updateMeasurements, themeId, themeIx, primaryTabs, meN1Sitting, meDaysToSitting, meDeckLedger, meDeckWords, meDate, meRevoked, meDays, meReadUnaided, meHorizons, meCameHome, meCopiedLine, meSeam, meSection, meBreakable, meHorizonRow, meN1Plate, meHorizonsPart, meCameHomePart, meLinePart, renderMe, showRecordBackup, renderLayoutChoice, renderWritingChoice, stampRegister, maintenanceScreenName };

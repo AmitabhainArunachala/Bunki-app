@@ -64,6 +64,7 @@ const record = (engine, name, passed, observations, error) => {
 /* ---------------------------------------------------------------- the sheets */
 const LADDER = { caption: 12, label: 13, chrome: 14, control: 15, body: 16, lead: 18, seal: 22, reading: 23, section: 24, title: 29, display: 34, hero: 38, headword: 42 };
 const PHONE_STEPS = { reading: 21, display: 29 };
+const TYPE_SCOPE = ':root, :where(#reader, .reader-prose, .mini-word, .mini-reading, .mini-gloss, .nsr-glyph, .nsr-read, .nsr-gloss, .tray-line .w, .sheet .headword, .sheet .reading, .sheet .gloss, .sheet .sense-list, .sheet .row-word, .sheet .row-reading, .sheet .example-ja, .sheet .example-en, .sheet .teacher-source-quote, .sheet .sent-reader, .sheet .sent-reader-en)';
 const LEADING = { tight: 1.25, ui: 1.35, body: 1.55, reading: 1.9 };
 /** Every literal size the artifact still sets, by file, selector and value: the ladder's own block and the declared
  * exceptions. A new literal anywhere, or one of these changed, is red. */
@@ -170,7 +171,7 @@ function allowedRtRule(rule) {
 }
 
 {
-  const bad = [], seenExceptions = new Set(), ladderBlocks = [], strayLadder = [], oldLadders = [], rubyRules = [], pseudoReadings = [], rtRules = [];
+  const bad = [], seenExceptions = new Set(), ladderBlocks = [], steps = [], strayLadder = [], oldLadders = [], rubyRules = [], pseudoReadings = [], rtRules = [];
   let driftSha = null;
   for (const file of cssFiles) {
     const rel = relative(site, file).split('\\').join('/');
@@ -180,8 +181,11 @@ function allowedRtRule(rule) {
     rtRules.push(...collectRtRules(rel, decls));
     for (const d of decls) {
       if (/^--type-/.test(d.prop)) {
-        if (rel === 'rooms/motion.css' && /^:root$/.test(d.selector)) ladderBlocks.push({ media: d.chain.length > 1 ? d.chain[0] : '', prop: d.prop, value: d.value });
+        if (rel === 'rooms/motion.css' && d.selector === TYPE_SCOPE && d.chain.length === 1) ladderBlocks.push({ media: d.chain.length > 1 ? d.chain[0] : '', prop: d.prop, value: d.value });
         else strayLadder.push(`${rel} ${d.selector} ${d.prop}: ${d.value}`);
+      }
+      if (rel === 'rooms/motion.css' && d.selector === ':root' && ['--reading-step', '--display-step'].includes(d.prop)) {
+        steps.push({ media: d.chain.length > 1 ? d.chain[0] : '', role: d.prop.slice(2, -5), value: d.value });
       }
       if (/^--(t-(body|label|chrome|read|section|display|hero)|reference-(small|body|title|headword)|seal-font)$/.test(d.prop)) oldLadders.push(`${rel} ${d.selector} ${d.prop}`);
       if (/^--leading-/.test(d.prop) && !(rel === 'rooms/motion.css' && d.selector === ':root')) strayLadder.push(`${rel} ${d.selector} ${d.prop}`);
@@ -197,12 +201,21 @@ function allowedRtRule(rule) {
     }
   }
   const ladder = Object.fromEntries(ladderBlocks.filter((b) => !b.media).map((b) => [b.prop.slice(7), b.value]));
-  const phone = Object.fromEntries(ladderBlocks.filter((b) => /max-width:\s*520px/.test(b.media)).map((b) => [b.prop.slice(7), b.value]));
+  const wide = Object.fromEntries(steps.filter((step) => !step.media).map((step) => [step.role, step.value]));
+  const phone = Object.fromEntries(steps.filter((step) => step.media === '@media (max-width: 520px)').map((step) => [step.role, step.value]));
   try {
     assert.deepEqual(bad, [], `literal sizes outside the ladder:\n${bad.join('\n')}`);
     assert.equal(seenExceptions.size, EXCEPTIONS.length, `a declared exception is gone or changed: ${EXCEPTIONS.filter((_, i) => !seenExceptions.has(i)).map((e) => e.join(' ')).join('; ')}`);
-    assert.deepEqual(ladder, Object.fromEntries(Object.entries(LADDER).map(([k, v]) => [k, `${v}px`])), `the ladder's one block: ${JSON.stringify(ladder)}`);
-    assert.deepEqual(phone, Object.fromEntries(Object.entries(PHONE_STEPS).map(([k, v]) => [k, `${v}px`])), `a phone's steps: ${JSON.stringify(phone)}`);
+    const expectedLadder = Object.fromEntries(Object.entries(LADDER).map(([role, size]) => {
+      let step = size;
+      if (role in PHONE_STEPS) step = `var(--${role}-step)`;
+      if (['label', 'control', 'seal', 'headword'].includes(role)) step = `var(--${role}-step, ${size})`;
+      return [role, `calc(${step} * var(--text-unit))`];
+    }));
+    assert.deepEqual(wide, { reading: String(LADDER.reading), display: String(LADDER.display) });
+    assert.equal(steps.length, 4);
+    assert.deepEqual(ladder, expectedLadder, `the ladder's one block: ${JSON.stringify(ladder)}`);
+    assert.deepEqual(phone, Object.fromEntries(Object.entries(PHONE_STEPS).map(([k, v]) => [k, String(v)])), `a phone's steps: ${JSON.stringify(phone)}`);
     assert.deepEqual(strayLadder, [], `a ladder step declared outside the one block: ${strayLadder.join('; ')}`);
     assert.deepEqual(oldLadders, [], `an old ladder survives: ${oldLadders.join('; ')}`);
     if (DRIFT_CSS_SHA256) assert.equal(driftSha, DRIFT_CSS_SHA256, 'the drift sky\'s sheet changed');
