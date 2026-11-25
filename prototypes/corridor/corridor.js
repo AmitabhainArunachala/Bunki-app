@@ -27,7 +27,7 @@ import { activeTeacherContext, aiAsk, aiChatTurns, aiCreateCards, aiKey, aiProvi
  * FSRS-6 (ts-fsrs 5.4.1) under packages/domain's pinned parameters.
  */
 // BEGIN GENERATED RELEASE IDENTITY — npm run release:sync
-const APP_RELEASE = Object.freeze({"version":"1.3.0-rc.3","channel":"rc","releasedOn":"2026-11-25","learnerDataEpoch":1});
+const APP_RELEASE = Object.freeze({"version":"1.3.0-rc.4","channel":"rc","releasedOn":"2026-11-25","learnerDataEpoch":1});
 // END GENERATED RELEASE IDENTITY
 const DATA = {
   safe: ['kanken', 'sem'],

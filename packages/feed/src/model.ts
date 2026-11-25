@@ -1,3 +1,4 @@
+import { utf16String } from '@bunki/domain/wire-text';
 import { z } from 'zod';
 import { feedEntryId } from './identity.ts';
 
@@ -24,10 +25,8 @@ const hasControl = (value: string) =>
     return (code < 32 && ![9, 10, 13].includes(code)) || code === 127;
   });
 const text = (max: number) =>
-  z
-    .string()
+  utf16String(max)
     .min(1)
-    .max(max)
     .refine((value) => !hasControl(value));
 export const sourceIdSchema = z.string().regex(/^[a-z][a-z0-9-]{1,63}$/u);
 export const instantSchema = z.string().datetime({ offset: true });

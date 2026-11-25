@@ -1,5 +1,6 @@
 import { sha256Hex } from '@bunki/ai/hash';
 import { DOMParser } from '@xmldom/xmldom';
+import { utf16String } from '@bunki/domain/wire-text';
 import { z } from 'zod';
 import { instantSchema } from '../model.ts';
 import {
@@ -103,9 +104,9 @@ export function parseAlmaDocument(html: string): Document {
 
 const sha = z.string().regex(/^[a-f0-9]{64}$/u);
 const responseSchema = z.strictObject({
-  html: z.string().max(MAX_PUBLISHER_HTML_BYTES),
-  finalUrl: z.string().min(1).max(4096),
-  contentType: z.string().min(1).max(300),
+  html: utf16String(MAX_PUBLISHER_HTML_BYTES),
+  finalUrl: utf16String(4096).min(1),
+  contentType: utf16String(300).min(1),
   fetchedAt: instantSchema,
   responseSha256: sha,
   responseBytes: z.number().int().min(1).max(MAX_PUBLISHER_HTML_BYTES),

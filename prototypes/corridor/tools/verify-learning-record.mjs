@@ -1108,6 +1108,7 @@ async function browserChecks() {
       });
     } finally { db.close(); }
   }));
+  const openToday = (page) => page.locator('#tray, #tab-today').click();
   const boot = async (page, aiQuiz = null, entry = 'shelf') => {
     await page.goto(origin + '/learning-setup');
     await page.evaluate(async (initialQuiz) => {
@@ -1210,39 +1211,39 @@ async function browserChecks() {
           });
         };
         await journey('quiz-answer-rejection-and-reload-preserve-the-unanswered-question', async (page) => {
-          await boot(page, quiz()); await page.locator('#tray').click(); await page.locator('#aiq-resume').click();
+          await boot(page, quiz()); await openToday(page); await page.locator('#aiq-resume').click();
           const before = await fault(page, 'aiQuiz');
           await page.locator('.lesson-option').first().evaluate((node) => { node.click(); node.click(); });
           await failed(page, before); assert.equal(await page.locator('.aiq-why').count(), 0); assert.equal(await page.locator('#aiq-next').count(), 0);
           await page.reload(); await page.waitForFunction(() => document.body.dataset.ready === '1');
-          await page.locator('#tray').click(); await page.locator('#aiq-resume').click(); assert.equal(await page.locator('.aiq-q').textContent(), questions[0].q);
+          await openToday(page); await page.locator('#aiq-resume').click(); assert.equal(await page.locator('.aiq-q').textContent(), questions[0].q);
           await page.locator('.lesson-option').first().click(); await page.locator('.aiq-why').waitFor();
           const after = await disk(page); assert.equal(after.aiQuiz.correct, 1); assert.equal(after.aiQuiz.picked, 0); assert.deepEqual(after.srs, before.srs);
         });
         await journey('quiz-next-and-close-reject-without-advancing-or-leaving', async (page) => {
-          await boot(page, { ...quiz(), picked: 0, correct: 1 }); await page.locator('#tray').click(); await page.locator('#aiq-resume').click();
+          await boot(page, { ...quiz(), picked: 0, correct: 1 }); await openToday(page); await page.locator('#aiq-resume').click();
           const before = await fault(page, 'aiQuiz'); await page.locator('#aiq-next').click(); await failed(page, before);
           assert.equal(await page.locator('.aiq-q').textContent(), questions[0].q); assert.equal(await page.locator('.aiq-why').count(), 1);
         });
         await journey('quiz-close-rejection-keeps-the-completed-run', async (page) => {
-          await boot(page, { ...quiz(), ix: 3, correct: 1 }); await page.locator('#tray').click(); await page.locator('#aiq-resume').click();
+          await boot(page, { ...quiz(), ix: 3, correct: 1 }); await openToday(page); await page.locator('#aiq-resume').click();
           const before = await fault(page, 'aiQuiz'); await page.locator('#aiq-close').click(); await failed(page, before);
           assert.equal(await page.locator('#aiq-close').count(), 1);
         });
         await journey('show-answer-opens-four-grades-without-a-write', async (page) => {
-          await boot(page); await page.locator('#tray').click(); await page.locator('#review-start').click();
+          await boot(page); await openToday(page); await page.locator('#review-start').click();
           const before = await pollDisk(page, () => true); await page.locator('#reveal').click(); await page.locator('.g-good').waitFor();
           assert.equal(await page.locator('.grade').count(), 4); const after = await pollDisk(page, () => true);
           assert.deepEqual(after.obslog, before.obslog);
         });
         await journey('review-grade-rejection-keeps-card-schedule-log-and-stats', async (page) => {
-          await boot(page); await page.locator('#tray').click(); await page.locator('#review-start').click(); await page.locator('#reveal').click();
+          await boot(page); await openToday(page); await page.locator('#review-start').click(); await page.locator('#reveal').click();
           await page.locator('.g-good').waitFor(); const label = await page.locator('.review-front').textContent(); const before = await fault(page, 'srs');
           await page.locator('.g-good').evaluate((node) => { node.click(); node.click(); }); await failed(page, before, { review: true });
           assert.equal(await page.locator('.review-front').textContent(), label); assert.equal(await page.locator('.g-good').count(), 1);
         });
         await journey('review-grade-and-undo-persist-one-schedule-with-an-append-only-revocation', async (page) => {
-          await boot(page); await page.locator('#tray').click(); await page.locator('#review-start').click(); await page.locator('#reveal').click();
+          await boot(page); await openToday(page); await page.locator('#review-start').click(); await page.locator('#reveal').click();
           await page.locator('.g-again').waitFor(); assert.equal(await page.locator('.g-good').count(), 1);
           await page.locator('.g-again').click(); const graded = await pollDisk(page, (state) => state.revlog.length === 1);
           assert.equal(graded.revlog[0][2], 1); const key = graded.revlog[0][1]; assert(graded.srs[key]);

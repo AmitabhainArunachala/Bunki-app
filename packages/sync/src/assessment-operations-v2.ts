@@ -1,5 +1,6 @@
 import { inputHashOf } from '@bunki/ai/hash';
 import { isoInstantSchema } from '@bunki/domain/events/shared';
+import { utf16String } from '@bunki/domain/wire-text';
 import { z } from 'zod';
 import {
   countSchema,
@@ -26,7 +27,7 @@ const responseSchema = z.discriminatedUnion('kind', [
   z.strictObject({ kind: z.literal('unanswered') }),
   z.strictObject({ kind: z.literal('selected'), optionId: idSchema }),
   z.strictObject({ kind: z.literal('ordered'), tokenIds: z.array(idSchema).min(2).max(32) }),
-  z.strictObject({ kind: z.literal('written'), text: z.string().max(16_000) }),
+  z.strictObject({ kind: z.literal('written'), text: utf16String(16_000) }),
 ]);
 const editorialSchema = z.strictObject({
   status: z.enum(['unreviewed', 'ai-reviewed-practice', 'ai-reviewed-full']),

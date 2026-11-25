@@ -1,3 +1,4 @@
+import { utf16String } from '@bunki/domain/wire-text';
 import { z } from 'zod';
 import {
   canonicalFeedLink,
@@ -28,10 +29,8 @@ export const FEED_FRESHNESS_VALUES = [
   'current',
 ] as const;
 const text = (maximum: number) =>
-  z
-    .string()
+  utf16String(maximum)
     .min(1)
-    .max(maximum)
     .refine(
       (value) =>
         !Array.from(value).some((char) => {

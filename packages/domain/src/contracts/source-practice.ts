@@ -7,6 +7,7 @@
  */
 import { z } from 'zod';
 import type { DomainContext } from '../context/index.ts';
+import { utf16String } from '../wire-text.ts';
 import { createDomainEvent } from '../events/factories.ts';
 import { parseEvent } from '../events/parse.ts';
 import { mintReviewGraded, mintProductionObserved } from '../evidence/mint.ts';
@@ -30,20 +31,18 @@ function wellFormed(text: string): boolean {
   }
   return true;
 }
-const prose = z
-  .string()
+const prose = utf16String(4000)
   .min(1)
-  .max(4000)
   .refine((text) => wellFormed(text) && text.trim().length > 0);
 const originFields = {
   contextRef: z.string().regex(/^teacher-context:[0-9a-f]{64}$/u),
-  sourceId: z.string().min(1).max(500),
+  sourceId: utf16String(500).min(1),
   sourceDigest: z.string().regex(/^[0-9a-f]{64}$/u),
   text: prose,
   start: z.number().int().min(0),
   end: z.number().int().min(1),
-  title: z.string().min(1).max(500),
-  attribution: z.string().max(1000),
+  title: utf16String(500).min(1),
+  attribution: utf16String(1000),
 };
 // Existing text-source events retain their exact shape. A bundled encounter
 // names token coordinates separately from character offsets inside its quote.
@@ -53,7 +52,7 @@ const tokenSpanSchema = z
     start: z.number().int().min(0),
     end: z.number().int().min(1),
     index: z.number().int().min(0),
-    surfaces: z.array(z.string().max(4000).refine(wellFormed)).min(1).max(4000),
+    surfaces: z.array(utf16String(4000).refine(wellFormed)).min(1).max(4000),
   })
   .refine(
     (span) =>
@@ -107,7 +106,7 @@ export type SourcePracticeOrigin = z.infer<typeof originSchema>;
 export type SourcePracticeMode = 'cloze' | 'production' | 'listening';
 const listeningCueFields = {
   version: z.literal(1),
-  path: z.string().min(1).max(700),
+  path: utf16String(700).min(1),
   sha256: z.string().regex(/^[0-9a-f]{64}$/u),
   bytes: z.number().int().min(1).max(10_000_000),
   sentenceIndex: z.number().int().min(0).max(100_000),
@@ -512,10 +511,8 @@ export interface SourceKanjiReadingPlan {
   readonly contracts: readonly [ContractCreatedEvent];
 }
 
-const readingTokenText = z
-  .string()
+const readingTokenText = utf16String(200)
   .min(1)
-  .max(200)
   .refine((text) => wellFormed(text) && text.trim().length > 0);
 const kanjiReadingCueSchema = z
   .strictObject({
@@ -530,10 +527,8 @@ const kanjiReadingCueSchema = z
         ),
       ),
     }),
-    rubySource: z
-      .string()
+    rubySource: utf16String(160)
       .min(1)
-      .max(160)
       .refine((text) => wellFormed(text) && text.trim().length > 0),
     reviewStatus: z.literal('unreviewed'),
   })

@@ -58,6 +58,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   API_KEY_ENV_VAR,
+  AiResponseValidationError,
   createAiRouteRing,
   createAiRuntime,
   createAnthropicProvider,
@@ -450,34 +451,17 @@ describe('T2 — schema-violating shapes are refused, not coerced', () => {
   });
 
   it('a prototype-pollution attempt neither pollutes nor survives validation', () => {
-    // `JSON.parse` creates a genuine own `__proto__` property, unlike an object
-    // literal — so a provider can put one on the wire and the usual "you cannot
-    // write `__proto__` from JSON" intuition does not apply. Two things must
-    // hold, and only the second of them is about zod: nothing may be written to
-    // `Object.prototype`, and the validated value the app then holds must carry
-    // only the fields the schema declares.
+    // The strict envelope rejects undeclared own keys before the caller receives a candidate.
     const polluted = JSON.parse(
       '{"candidateId":"c","payload":{"targetForm":"分岐","explanation":"分岐 x","__proto__":{"polluted":true}},"model":"m","provider":"p","promptVersion":"1","createdAt":"2026-07-27T09:00:00.000Z","checks":{"targetFormPresent":true,"isLabeled":true}}',
     ) as unknown;
 
-    const parsed = parseAiCandidateEnvelope(polluted);
+    expect(() => parseAiCandidateEnvelope(polluted)).toThrow(AiResponseValidationError);
 
     expect(
       ({} as Record<string, unknown>)['polluted'],
       'a hostile payload polluted Object.prototype',
     ).toBeUndefined();
-    expect(
-      (parsed.payload as unknown as Record<string, unknown>)['polluted'],
-      'the validated payload inherited an injected property',
-    ).toBeUndefined();
-    expect(
-      Object.keys(parsed.payload).sort(),
-      'the validated payload carried a field the schema does not declare',
-    ).toEqual(['explanation', 'targetForm']);
-    expect(
-      JSON.stringify(parsed.payload).includes('polluted'),
-      'the injected key survived into the serialised payload',
-    ).toBe(false);
   });
 });
 
