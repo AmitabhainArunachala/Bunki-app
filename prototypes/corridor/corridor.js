@@ -10925,6 +10925,15 @@ function noteBoxOpened(span, key) {
  * then the word's kanji, and in an article one named door into the word's sentence. Escape, or a tap
  * outside, puts it away. */
 let miniAnchor = null;
+let miniResizeFrame = 0;
+window.addEventListener('resize', () => {
+  if (!miniAnchor || miniResizeFrame) return;
+  miniResizeFrame = requestAnimationFrame(() => {
+    miniResizeFrame = 0;
+    const card = document.getElementById('mini');
+    if (card && miniAnchor?.isConnected) placeFloating(card, anchorBox(miniAnchor));
+  });
+}, { passive: true });
 const SAVE_PRESS_MS = 600;
 /* The slip (contract §1): one DOM for every word, kanji or particle the learner can touch, in every room.
  * The reader calls it with a token; every other surface comes through openSlip, which adds
@@ -11349,7 +11358,10 @@ function placeFloating(card, r) {
     const box = node.getBoundingClientRect();
     return box.height ? box[edge] : null;
   };
-  const height = window.innerHeight || Infinity;
+  // A popup with its previous landscape coordinates can extend the mobile
+  // scrollable area during rotation. Measure the new CSS layout viewport.
+  const width = document.documentElement.clientWidth || window.innerWidth;
+  const height = document.documentElement.clientHeight || window.innerHeight || Infinity;
   // A clipped card meets the chrome edge: a gutter here can expose half a title glyph. On a page the edge is the page's
   // own bar (G1: Back is never covered)
   const onPage = !!card.dataset.page;
@@ -11357,8 +11369,8 @@ function placeFloating(card, r) {
   // the deck's grade dock is a floor too: the slip never covers the four grades (it sits above a word in the lower third)
   // G5 · nor the 層 mark at the foot, where the card would stand over it (it sits beside 音, so on a phone it takes no
   // more room than 音 does)
-  const cardLeft = m.width >= window.innerWidth - 48 ? Math.max(0, (window.innerWidth - m.width) / 2)
-    : Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2));
+  const cardLeft = m.width >= width - 48 ? Math.max(0, (width - m.width) / 2)
+    : Math.max(8, Math.min(width - m.width - 8, r.left + r.width / 2 - m.width / 2));
   const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height,
     fixedEdge('.kp-grades', 'top') ?? height, layersMarkTop(cardLeft, m.width) ?? height) - 8;
   const roomAbove = r.top - 10 - ceiling, roomBelow = floor - (r.bottom + 10);
@@ -11366,7 +11378,7 @@ function placeFloating(card, r) {
   let seatHeight = m.height;
   // Reserve the real sentence view's space before the word popup appears. The inert
   // measuring copy is removed synchronously, so its layout never becomes a frame or a control.
-  if (window.innerWidth <= 520 && !sentence && card.querySelector('.mini-sentence-pane')) {
+  if (width <= 520 && !sentence && card.querySelector('.mini-sentence-pane')) {
     const measure = card.cloneNode(true);
     measure.classList.add('is-sentence');
     measure.inert = true;
@@ -11398,12 +11410,12 @@ function placeFloating(card, r) {
   // Keep the short word card's fixed seat, and restore that reading position on Back.
   // SAVE · P3-1: the pane's chooser never turns a floating pane into a page card (that moved the Save he pressed from
   // 180 to 387 and ran the pane under the bottom bar): with the chooser open the pane holds its seat and scrolls inside
-  const documentFlow = window.innerWidth <= 520 && sentence
+  const documentFlow = width <= 520 && sentence
     && (wasDocument || (!card.dataset.chooserPin && m.height > (pinHolds ? pinnedRoom : Math.max(roomAbove, roomBelow, 96))));
   if (documentFlow) {
     if (!wasDocument) card.dataset.flowScroll = String(window.scrollY);
     card.dataset.flow = 'document';
-    card.style.left = `${Math.max(0, (window.innerWidth - m.width) / 2)}px`;
+    card.style.left = `${Math.max(0, (width - m.width) / 2)}px`;
     card.style.top = `${r.bottom + 10 + window.scrollY}px`;
     delete card.dataset.floatingTop;
     card.dataset.side = 'below';
@@ -11512,9 +11524,9 @@ function placeFloating(card, r) {
   }
   // a card nearly as wide as the screen is centred, its two gutters equal (review round 2 #13);
   // a narrower card stays beside its word
-  const left = m.width >= window.innerWidth - 48
-    ? Math.max(0, (window.innerWidth - m.width) / 2)
-    : Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2));
+  const left = m.width >= width - 48
+    ? Math.max(0, (width - m.width) / 2)
+    : Math.max(8, Math.min(width - m.width - 8, r.left + r.width / 2 - m.width / 2));
   // the text's layer: the seat is the glass position once the text has finished moving (window.scrollY + shift)
   const ox = scroller === 'window' ? window.scrollX : 0, oy = scroller === 'window' ? startScroll + shift : 0;
   if (scroller === 'window') { card.dataset.flow = 'text'; card.dataset.seatScroll = String(oy); }

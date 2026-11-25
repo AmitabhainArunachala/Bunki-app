@@ -1706,6 +1706,21 @@ try {
         assert(!demonstration.tip && !demonstration.instructions, 'the permanent reader tip remains');
         assert.equal(demonstration.seen, '1', 'demonstration did not remember its device-only seen mark');
         assert.equal(demonstration.audio, 0, 'the demonstration played audio');
+        if (label === '390') {
+          for (const size of [{ width: 844, height: 390 }, PHONE]) {
+            await page.setViewportSize(size);
+            await page.waitForFunction(({ width, word }) => {
+              const card = document.querySelector('#mini[data-demo="true"]');
+              const headline = card?.querySelector('.mini-word');
+              if (!headline || headline.textContent.trim() !== word) return false;
+              const bounds = card.getBoundingClientRect();
+              const head = headline.getBoundingClientRect();
+              const hit = document.elementFromPoint(head.left + head.width / 2, head.top + head.height / 2);
+              return bounds.left >= 0 && bounds.right <= width + 1
+                && document.documentElement.scrollWidth <= width + 1 && headline.contains(hit);
+            }, { width: size.width, word: demonstration.word });
+          }
+        }
         await page.waitForTimeout(800);
         assert.deepEqual(learning(await readAppRecord(page)), before, 'the demonstration created learner history or review work');
         await page.keyboard.press('Escape');
