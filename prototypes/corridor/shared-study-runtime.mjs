@@ -37,7 +37,17 @@ export function sharedStudyRuntime() {
       // exact created adapter (including any sync lifecycle). Never create a
       // second adapter behind their back.
       if (typeof host.withAdapter==='function') {
-        const adapter=await host.withAdapter(async hostBinding=>prepare(await createBunkiStudyAdapter({...hostBinding,content})));
+        let prepared;
+        const adapter=await host.withAdapter(async hostBinding=>{
+          prepared=await prepare(await createBunkiStudyAdapter({...hostBinding,content}));
+          return prepared;
+        });
+        // A paired host guards write operations before publishing its adapter.
+        // Associate that facade only with the catalog and replica we prepared.
+        if (prepared && adapter!==prepared) {
+          if (adapter?.catalog!==prepared.catalog || adapter.store!==prepared.store) throw Error('shared-host-frame-binding-required');
+          presentationBindings.set(adapter,pins);
+        }
         if (typeof host.onReady==='function') await host.onReady(adapter);
         return adapter;
       }

@@ -403,6 +403,33 @@ describe('Bunki canonical shared study consumer', () => {
       expect(bound.result.identity).toBe(host.identity);
       expect(bound.queries).toEqual([]);
     }
+    // The paired host returns a distinct frozen facade around the adapter
+    // created in its callback. The frame receives that facade.
+    let guarded;
+    const paired = await mount({
+      host: {
+        async withAdapter(open) {
+          const prepared = await open({
+            identity: { learner: 'test-bound' },
+            presentation: 'phone',
+          });
+          guarded = Object.freeze({ ...prepared });
+          return guarded;
+        },
+      },
+    });
+    expect(paired.result).toBe(guarded);
+    for (const replacement of [{ store: {} }, { catalog: [] }]) {
+      await expect(
+        mount({
+          host: {
+            async withAdapter(open) {
+              return { ...(await open({ identity: { learner: 'test-bound' } })), ...replacement };
+            },
+          },
+        }),
+      ).rejects.toThrow('shared-host-frame-binding-required');
+    }
   }, 60_000);
   it('offers only held permits without an explicitly enabled bound reserve authority', async () => {
     const { adapter } = await fixture();
