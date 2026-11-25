@@ -54,9 +54,18 @@ async function checkStudyRotation() {
     const original = await page.evaluate(census);
     const passage = page.locator('#kp-card > .kp-sentence');
     await passage.hover();
-    const wheelLanded = passage.evaluate(p => new Promise(resolve => p.addEventListener('scrollend', resolve, { once: true })));
     await page.mouse.wheel(0, 230);
-    await wheelLanded;
+    await page.waitForFunction(initial => document.querySelector('#kp-card > .kp-sentence').scrollTop !== initial, original.inner);
+    // WebKit applies a wheel tick over several frames. Sample the chosen seat
+    // once the offset has stopped, including browsers without scrollend events.
+    await passage.evaluate(async p => {
+      let offset = p.scrollTop, stable = 0;
+      while (stable < 3) {
+        await new Promise(done => requestAnimationFrame(done));
+        stable = p.scrollTop === offset ? stable + 1 : 0;
+        offset = p.scrollTop;
+      }
+    });
     const reading = () => {
       const p = document.querySelector('#kp-card > .kp-sentence');
       const top = p.getBoundingClientRect().top;
