@@ -23,7 +23,7 @@ const RECORD_CODES = new Set([...STORE_CODES, 'writer-required', 'session-change
   'drift-root-conflict', 'noncanonical-drift-state', 'migration-conflict', 'target-occupied',
   'source-changed-before-prepare', 'reserved-migration-data']);
 const exact = (value, keys) => value !== null && typeof value === 'object' && !Array.isArray(value)
-  && Object.keys(value).sort().join(',') === [...keys].sort().join(',');
+  && Object.keys(value).length === keys.length && keys.every((key) => Object.hasOwn(value, key));
 const sameBinding = (a, b) => ['accountId', 'learnerId', 'sessionId'].every((key) => a?.[key] === b?.[key]);
 const failure = (code) => Object.assign(new Error('Record sync: ' + code), { code });
 const fixedCode = (error) => typeof error?.code === 'string' && /^[a-z][a-z0-9-]{0,63}$/u.test(error.code)
@@ -41,12 +41,15 @@ function matchesReceipt(method, request, receipt) {
   if (!exact(receipt, ['changeId', 'committedRevision', 'operations', 'outcome', 'runtimeLabel'])
       || !['browser', 'native', 'ci-substitute'].includes(receipt.runtimeLabel)
       || !['committed', 'duplicate'].includes(receipt.outcome)
-      || !Number.isSafeInteger(receipt.committedRevision) || receipt.committedRevision < 0
+      || !Number.isSafeInteger(receipt.committedRevision) || receipt.committedRevision < 1
       || !Array.isArray(receipt.operations)) return false;
   const acknowledge = method === 'acknowledgeOutbox';
   if (receipt.changeId !== (acknowledge ? request.acknowledgementId : request.deliveryId)) return false;
-  if (receipt.outcome === 'duplicate' ? receipt.committedRevision > request.expectedRevision
-    : receipt.committedRevision !== request.expectedRevision + 1) return false;
+  // A duplicate returns the original durable revision. Exact replay can
+  // return expectedRevision + 1; a later retry can return an older revision.
+  const nextRevision = request.expectedRevision + 1;
+  if (receipt.outcome === 'duplicate' ? receipt.committedRevision > nextRevision
+    : receipt.committedRevision !== nextRevision) return false;
   const expected = acknowledge ? request.operations : request.delivery.operations.map(operationReference);
   if (receipt.operations.length !== expected.length || !receipt.operations.every((row) =>
     exact(row, ['opId', 'sha256']) && typeof row.opId === 'string' && typeof row.sha256 === 'string')) return false;
@@ -165,6 +168,10 @@ function createRecordSyncHost({ window, owner, origin, configuration, canConnect
             !(exact(response.error, ['code']) || exact(response.error, ['code', 'targetCommitDurable'])) ||
             !RECORD_CODES.has(response.error.code) ||
             (Object.hasOwn(response.error, 'targetCommitDurable') && typeof response.error.targetCommitDurable !== 'boolean'))
+          throw failure('invalid-response');
+        // The adapter can report invalid-response if a completed controller
+        // call returned no receipt. Only a definite refusal clears uncertainty.
+        if (mutationUnconfirmed && response.error.code === 'invalid-response')
           throw failure('invalid-response');
         mutationUnconfirmed = false;
         if (response.error.targetCommitDurable === true || response.error.code === 'reopen-required') latchUncertain(slot);
