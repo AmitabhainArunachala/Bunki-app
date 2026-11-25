@@ -7,50 +7,6 @@
     "attemptedAt": "2026-11-24T19:22:54.274Z",
     "reason": "Command failed: gh api --paginate --slurp repos/AmitabhainArunachala/Bunki-app/actions/runs/42431546894/attempts/2/jobs?per_page=100"
   },
-  "42597380709/6": {
-    "result": "observed",
-    "startedAt": "2026-11-10T17:15:15Z"
-  },
-  "42780186199/2": {
-    "result": "observed",
-    "startedAt": "2026-11-10T17:15:03Z"
-  },
-  "42418249759/9": {
-    "result": "observed",
-    "startedAt": "2026-11-10T17:15:38Z"
-  },
-  "42489884950/7": {
-    "result": "observed",
-    "startedAt": "2026-11-10T17:15:27Z"
-  },
-  "42407075841/10": {
-    "result": "observed",
-    "startedAt": "2026-11-10T17:15:42Z"
-  },
-  "42593972611/5": {
-    "result": "observed",
-    "startedAt": "2026-11-10T17:15:16Z"
-  },
-  "42400327580/9": {
-    "result": "observed",
-    "startedAt": "2026-11-10T17:15:49Z"
-  },
-  "42431546894/9": {
-    "result": "observed",
-    "startedAt": "2026-11-10T17:15:29Z"
-  },
-  "42770473307/3": {
-    "result": "observed",
-    "startedAt": "2026-11-10T17:15:10Z"
-  },
-  "42406261624/10": {
-    "result": "observed",
-    "startedAt": "2026-11-10T17:15:43Z"
-  },
-  "42866195247/1": {
-    "result": "observed",
-    "startedAt": "2026-11-10T17:33:35Z"
-  },
   "42597380709/7": {
     "result": "observed",
     "startedAt": "2026-11-11T01:18:10Z"
@@ -1588,5 +1544,11 @@
   "45556583530/2": {
     "result": "observed",
     "startedAt": "2026-11-25T11:10:35Z"
+  },
+  "45530015627/2": {
+    "result": "rejected",
+    "policy": "002dc875d95d7d62d63eaed04ff00e3c74fed894c7b0b9d4615572cf2957a401",
+    "startedAt": "2026-11-25T11:10:57Z",
+    "reason": "Producer verification policy differs from trusted default branch"
   }
 }
