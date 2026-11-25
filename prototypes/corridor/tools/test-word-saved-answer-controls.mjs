@@ -63,7 +63,8 @@ const admit = (runRows, options = {}, control = C10, name = 'C10') =>
 
 /* Receipt children (verify-learning-record.mjs): each failing row keeps the exact text it wrote to
  * stderr. One synthetic diagnostic spans lines, as an assertion message may. */
-const LEARNING = ['a', 'word-review-render-fixture-starts-unbound', 'word-review-shows-and-binds-its-saved-answer',
+const LEARNING = ['a', 'word-review-render-fixture-starts-unbound', 'timed-practice-short-step-records-only-the-first-scheduled-grade',
+  'word-review-shows-and-binds-its-saved-answer',
   'word-review-changed-answer-refuses-both-producers-and-asks-for-a-fresh-look', 'word-review-unavailable-face-refuses-grades-and-writes-nothing'];
 const MESSAGE = {
   'word-review-shows-and-binds-its-saved-answer': "Cannot read properties of undefined (reading 'item')",

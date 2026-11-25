@@ -148,7 +148,7 @@ test('reviewed rosters retain source and browser coverage', () => {
   assert.equal(MISC_CASES.integrity.length, 25);
   assert.equal(MISC_CASES.binding.length, 14);
   assert.equal(MISC_CASES.storage.length, 36);
-  assert.equal(MISC_CASES.sync.length, 23);
+  assert.equal(MISC_CASES.sync.length, 24);
   assert.equal(MISC_CASES.writing.length, 51);
 });
 for (const name of Object.keys(miscReportContracts))
