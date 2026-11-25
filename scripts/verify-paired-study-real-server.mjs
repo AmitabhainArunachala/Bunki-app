@@ -12,6 +12,8 @@
  *   b. the study screen opens on the paired record: no "Trial copy", no "Sync is not set up";
  *   c. a grade made in the page reaches the server and a second device of the same learner (the engine's own store
  *      and sync client from Node, an `iphone-` device that sends no Origin), and a grade made there reaches the page;
+ *   handoff. a grade saved offline reaches the other client on pagehide while a foreground pull is interrupted;
+ *      creating a new page reconciles the original event exactly once;
  *   d. a new page of the same profile keeps the installation and the journal;
  *   f. the same token presented from the second listed origin is refused (401 `origin-mismatch`), and a page there
  *      that holds it shows the ended state;
@@ -452,6 +454,57 @@ async function runEngine(engine, launcher, { report, device, second, siteA, site
     });
     await shot(page, 'c-exchanged');
 
+    // Isolate the departure upload. The browser has a real unsent answer in
+    // IndexedDB; the reconnecting foreground GET is held before it reaches
+    // the server, so it cannot account for any accepted POST.
+    current = 'handoff';
+    await context.setOffline(true);
+    await page.waitForFunction(() => navigator.onLine === false);
+    const interrupted = await gradeInFrame(frame);
+    const locallyUnconfirmed = () =>
+      frame.evaluate(async (id) => {
+        const journal = await window.bunkiSharedStudy.store.readState({ requireCompatible: true });
+        return Object.values(journal.local).some(
+          (row) => row.event.id === id && row.ackedSeq === null,
+        );
+      }, interrupted.eventId);
+    assert.ok(await locallyUnconfirmed());
+    await shot(page, 'handoff-offline');
+
+    const isPull = (url) =>
+      url.origin === S && url.pathname === '/v1/events' && url.searchParams.has('after');
+    let heldPull;
+    await page.route(isPull, (route) => {
+      heldPull = route;
+    });
+    try {
+      await context.setOffline(false);
+      await until(() => !!heldPull, 'foreground reconnect reached the held pull');
+      await page.evaluate(() =>
+        window.dispatchEvent(new window.PageTransitionEvent('pagehide', { persisted: true })),
+      );
+      await until(
+        async () => {
+          await second.sync();
+          return second.reviews().some((review) => review.id === interrupted.eventId);
+        },
+        'the other client received the departure upload',
+        { timeout: 10000 },
+      );
+      assert.ok(await locallyUnconfirmed(), 'departure never acknowledges the local answer');
+    } finally {
+      await page.unroute(isPull);
+      await heldPull?.abort().catch(() => {});
+    }
+    done('handoff', {
+      grade: interrupted.eventId,
+      savedOffline: true,
+      foregroundPullHeld: true,
+      lifecycle: 'dispatched persisted pagehide',
+      confirmedBySecondClient: true,
+      stillPendingLocally: true,
+    });
+
     // d. a restart: a new page of the same profile
     current = 'd';
     await page.close();
@@ -461,9 +514,14 @@ async function runEngine(engine, launcher, { report, device, second, siteA, site
     state = await frameState(frame);
     assert.equal(state.installation, device.installation);
     assert.ok(state.reviews.includes(mine.eventId) && state.reviews.includes(theirs.eventId));
+    assert.equal(state.reviews.filter((id) => id === interrupted.eventId).length, 1);
+    assert.equal(state.pending, 0);
+    assert.equal(second.reviews().filter((review) => review.id === interrupted.eventId).length, 1);
     done('d', {
       installationKept: state.installation,
-      journalHolds: [mine.eventId, theirs.eventId],
+      journalHolds: [mine.eventId, theirs.eventId, interrupted.eventId],
+      recoveredOfflineAnswerCopies: 1,
+      pendingAfterReopen: state.pending,
       reviewsInJournal: state.reviews.length,
     });
     await shot(again, 'd-restart');
@@ -574,7 +632,7 @@ async function runEngine(engine, launcher, { report, device, second, siteA, site
     const ended = await studyBlock(again);
     assert.equal(ended.state, 'ended');
     assert.match(ended.status, /The server ended this device’s pairing/);
-    assert.match(ended.status, /1 answer saved on this device was never uploaded/);
+    assert.match(ended.status, /could not confirm that the server received 1 saved answer/);
     await shot(again, 'e-settings-ended');
     await again.goto(`${siteA.origin}/harness.html?deck=n2`, { waitUntil: 'load' });
     await again.locator('#old-player').waitFor();

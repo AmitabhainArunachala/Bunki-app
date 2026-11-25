@@ -1,5 +1,6 @@
 /* global process, URL, EventTarget, Response, Event */
 import assert from 'node:assert/strict';
+import { mock } from 'node:test';
 const { test } = await import(
   process.env.VITEST === 'true' && !process.env.NODE_TEST_CONTEXT ? 'vitest' : 'node:test'
 );
@@ -35,6 +36,8 @@ async function setup(config = {}) {
     visible = true,
     sequence = 0,
     failBeforeAccept = 0,
+    retryAfter = null,
+    interruptedClose = false,
     invalidAck = false,
     auth = false;
   const scope = {
@@ -53,6 +56,9 @@ async function setup(config = {}) {
     if (auth) {
       status = 401;
       reply = { scope };
+    } else if (retryAfter !== null && init.method === 'POST') {
+      status = 429;
+      reply = { scope };
     } else if (init.method === 'POST') {
       bodies.push(init.body);
       if (failBeforeAccept-- > 0) throw Error('synthetic-network-error');
@@ -60,6 +66,7 @@ async function setup(config = {}) {
       for (const row of body.events)
         if (!rows.some((r) => r.event.id === row.event.id))
           rows.push({ ...row, seq: rows.length + 1, rt: Date.now(), authority: 'device' });
+      if (init.keepalive && interruptedClose) throw Error('connection-lost-after-server-commit');
       reply = {
         scope,
         head: rows.length,
@@ -75,7 +82,10 @@ async function setup(config = {}) {
         head: rows.length,
         events: rows.filter((r) => r.seq > Number(new URL(url).searchParams.get('after'))),
       };
-    const response = new Response(JSON.stringify(reply), { status });
+    const response = new Response(JSON.stringify(reply), {
+      status,
+      headers: retryAfter ? { 'Retry-After': retryAfter } : {},
+    });
     Object.defineProperty(response, 'url', { value: url });
     return response;
   };
@@ -106,13 +116,16 @@ async function setup(config = {}) {
     target,
     requests,
     bodies,
+    rows,
+    setRetryAfter: (seconds) => (retryAfter = seconds),
+    interruptClose: () => (interruptedClose = true),
     setOnline: (v) => (online = v),
     setVisible: (v) => (visible = v),
     failPosts: (n) => (failBeforeAccept = n),
     invalidAck: (v) => (invalidAck = v),
     auth: (v) => (auth = v),
-    async local() {
-      const command = adapter.backend.command('settings', { key: 'newPerDayTotal', value: 15 });
+    async local(value = 15) {
+      const command = adapter.backend.command('settings', { key: 'newPerDayTotal', value });
       assert.equal((await adapter.backend.submitCommand(command)).kind, 'durable');
     },
     dispose() {
@@ -207,5 +220,138 @@ test('authentication pause requires explicit resume; reconnect drains local work
     assert.equal(d.requests.length, settled);
   } finally {
     d.dispose();
+  }
+});
+
+test('document hide and page departure share one unacknowledged upload; returning verifies a lost response', async () => {
+  const doc = new EventTarget();
+  const d = await setup({ automatic: true, visibilityTarget: doc });
+  try {
+    await d.local();
+    const original = await d.adapter.store.outbox();
+    assert.equal(original.length, 1);
+    assert.equal(d.sync.getSyncState(), 'pending');
+    d.interruptClose();
+    d.setVisible(false);
+    doc.dispatchEvent(new Event('visibilitychange'));
+    await d.sync.flushBeforeClose();
+    await d.sync.flushBeforeClose();
+    assert.equal(d.bodies.length, 1);
+    assert.equal(d.rows.length, 1);
+    assert.deepEqual(await d.adapter.store.outbox(), original);
+    assert.equal(d.sync.getSyncState(), 'pending');
+
+    d.setVisible(true);
+    doc.dispatchEvent(new Event('visibilitychange'));
+    for (let pass = 0; pass < 60 && d.sync.getSyncState() !== 'up-to-date'; pass++) await delay(10);
+    assert.equal(d.sync.getSyncState(), 'up-to-date');
+    assert.deepEqual(await d.adapter.store.outbox(), []);
+    assert.equal(d.rows.length, 1);
+    assert.equal(d.rows[0].event.id, original[0].event.id);
+  } finally {
+    d.dispose();
+  }
+});
+
+test('pagehide rechecks a prefix changed during the document hide credential read', async () => {
+  let gate;
+  let checking;
+  const entering = new Promise((resolve) => {
+    checking = resolve;
+  });
+  const d = await setup({
+    automatic: true,
+    getCredential: async () => {
+      if (gate) {
+        checking();
+        await gate;
+      }
+      return 'synthetic-only';
+    },
+  });
+  try {
+    await d.local(15);
+    let release;
+    gate = new Promise((resolve) => {
+      release = resolve;
+    });
+    d.setVisible(false);
+    d.target.dispatchEvent(new Event('visibilitychange'));
+    await entering;
+    await d.local(12);
+    const closing = d.sync.flushBeforeClose();
+    assert.equal(closing, d.sync.flushBeforeClose());
+    release();
+    assert.equal(await closing, true);
+    assert.equal(d.bodies.length, 1);
+    assert.equal(d.rows.length, 2);
+    assert.equal((await d.adapter.store.outbox()).length, 2);
+    await d.sync.flushBeforeClose();
+    assert.equal(d.bodies.length, 1);
+  } finally {
+    d.dispose();
+  }
+});
+
+test('held, unpaired, offline and disposed hosts never send a departure request', async () => {
+  let paired = true;
+  const d = await setup({
+    automatic: true,
+    permits: { isPaired: () => paired, reserve: async () => {} },
+  });
+  try {
+    await d.local();
+    d.sync.hold('release');
+    await d.sync.flushBeforeClose();
+    paired = false;
+    d.sync.release('release');
+    await d.sync.flushBeforeClose();
+    paired = true;
+    d.setOnline(false);
+    await d.sync.flushBeforeClose();
+    d.sync.dispose();
+    d.setOnline(true);
+    await d.sync.flushBeforeClose();
+    d.target.dispatchEvent(new Event('pageshow'));
+    await delay(40);
+    assert.equal(d.bodies.length, 0);
+    assert.equal((await d.adapter.store.outbox()).length, 1);
+  } finally {
+    d.dispose();
+  }
+});
+
+test('a quiet foreground page retries at the server deadline, refreshes on cadence and stops after disposal', async () => {
+  mock.timers.enable({ apis: ['Date', 'setTimeout'], now: Date.now() });
+  let d;
+  try {
+    d = await setup({ automatic: true });
+    d.setRetryAfter('8');
+    await d.local();
+    assert.equal((await d.sync.synchronize()).state, 'backoff');
+    d.setRetryAfter(null);
+    const heldRequests = d.requests.length;
+    mock.timers.tick(7999);
+    await d.sync.drain();
+    assert.equal(d.requests.length, heldRequests);
+    assert.equal((await d.adapter.store.outbox()).length, 1);
+    mock.timers.tick(1);
+    mock.timers.tick(25);
+    await d.sync.drain();
+    assert.equal(d.sync.getSyncState(), 'up-to-date');
+    assert.equal((await d.adapter.store.outbox()).length, 0);
+    assert.equal(d.rows.length, 1);
+
+    const count = d.requests.length;
+    mock.timers.tick(15 * 60 * 1000);
+    mock.timers.tick(25);
+    await d.sync.drain();
+    assert.equal(d.requests.length, count + 1);
+    d.sync.dispose();
+    mock.timers.tick(30 * 60 * 1000);
+    assert.equal(d.requests.length, count + 1);
+  } finally {
+    d?.dispose();
+    mock.timers.reset();
   }
 });

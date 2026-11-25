@@ -543,13 +543,14 @@ const LINES = Object.freeze({
   paired: ['接続済み。この端末は Nihongo Study の記録で学習しています。', 'Connected. This device studies on your Nihongo Study record.'],
   reopen: ['接続済み。Bunki を開き直すと、Nihongo Study の記録での学習が始まります。', 'Connected. Reopen Bunki and study starts on your Nihongo Study record.'],
   reopenNow: ['Bunki を開き直す', 'Reopen Bunki'],
-  ended: ['サーバーがこの端末のペアリングを終了しました。同期は止まっています。この端末に残っている記録は送信されません。接続を解除してから、Nihongo Study からもう一度接続してください。',
-    'The server ended this device’s pairing. Sync has stopped, and what is still on this device is not sent. Disconnect, then connect again from Nihongo Study.'],
-  unsent: (count) => [`この端末で保存された答えのうち ${count} 件は、サーバーに送信されませんでした。その答えはこの端末に残っています。`,
-    count === 1 ? '1 answer saved on this device was never uploaded. It is still on this device.' : `${count} answers saved on this device were never uploaded. They are still on this device.`],
-  unsentNone: ['送信されなかった答えはありません。', 'No answer was left unsent.'],
+  ended: ['サーバーがこの端末のペアリングを終了しました。同期は止まっています。これまでに保存した学習記録はこの端末に残っています。接続を解除してから、Nihongo Study からもう一度接続してください。',
+    'The server ended this device’s pairing. Sync has stopped. Your saved study record is still on this device. Disconnect, then connect again from Nihongo Study.'],
+  unsent: (count) => [`この端末に保存した回答のうち、${count} 件はサーバーが受信したか確認できていません。`,
+    `This device could not confirm that the server received ${count === 1 ? '1 saved answer' : `${count} saved answers`}.`],
+  unsentNone: ['未確認の回答はありません。', 'All saved answers were confirmed.'],
   failed: ['このブラウザーの保存領域を読めませんでした。ページを読み込み直してください。', 'This browser’s storage could not be read. Reload the page.'],
   notSynced: ['まだ同期していません。', 'Not synced yet.'],
+  retrySync: ['同期を再試行', 'Retry sync'],
   forget: ['接続を解除', 'Disconnect'],
   forgetSure: ['本当に解除する（同期が止まります）', 'Really disconnect (sync stops)'],
   forgetWhat: ['接続を解除すると同期が止まります。この端末にある学習記録の写しは消えずに残りますが、使われません。まだ送信されていない記録は送信されません。',
@@ -563,7 +564,11 @@ const LINES = Object.freeze({
     offline: ['オフラインです。記録はこの端末に保存され、つながると送信されます。', 'Offline. Grades are kept on this device and sent when it is back online.'],
     'update-required': ['Bunki の更新が必要です。更新するまで同期は止まります。記録はこの端末に残っています。',
       'Bunki needs an update. Sync waits until then, and your grades stay on this device.'],
-    unreachable: ['学習サーバーにつながりません。記録はこの端末に残り、あとで送信されます。', 'The study server cannot be reached. Grades stay on this device and are sent later.'],
+    backoff: ['学習サーバーが混み合っています。この画面を開いたままにすると、自動で同期を再試行します。', 'The study server asked Bunki to wait. Sync will retry while this page is open and online.'],
+    blocked: ['学習記録の一部を読み込めないため、同期を中断しました。保存済みの回答はこの端末に残っています。', 'Sync stopped because Bunki could not read part of the study record. Your saved answers remain on this device.'],
+    storage: ['この端末の学習記録を読み書きできませんでした。同期を再試行してください。', 'Bunki could not read or update the study record on this device. Retry sync.'],
+    unreachable: ['学習サーバーにつながりません。回答はこの端末に保存されています。接続を確認してください。', 'The study server could not be reached. Your saved answers are on this device. Check your connection.'],
+    unconfirmed: ['同期を確認できませんでした。保存済みの回答はこの端末に残っています。', 'Bunki could not verify the sync. Your saved answers remain on this device.'],
   }),
   errors: Object.freeze({
     'invalid-link': ['この接続リンクは正しくありません。Nihongo Study からもう一度開いてください。', 'This connect link is not complete. Open it again from Nihongo Study.'],
@@ -591,8 +596,12 @@ const LINES = Object.freeze({
 export const studyPairingLine = (code) => [...(Object.hasOwn(LINES.errors, code) ? LINES.errors[code] : LINES.errorOther)];
 const syncLine = (state, error) => {
   if (error === 'update-required' || state === 'update-required') return LINES.sync['update-required'];
+  if (state === 'offline') return LINES.sync.offline;
+  if (error === 'retry-later') return LINES.sync.backoff;
+  if (error === 'store-failed') return LINES.sync.storage;
+  if (error === 'network-failed') return LINES.sync.unreachable;
   if (Object.hasOwn(LINES.sync, state) && !error) return LINES.sync[state];
-  return state === 'idle' || state === 'paused' || state === 'disposed' ? null : LINES.sync.unreachable;
+  return state === 'idle' || state === 'paused' || state === 'disposed' ? null : LINES.sync.unconfirmed;
 };
 /** When the record was last brought up to date, in words: "Synced 2 minutes ago.", or after a line that says what is
  * wrong now, "Last synced 2 minutes ago." */
@@ -616,10 +625,11 @@ export function fillStudyPairingBlock(block, { tx, el, env = globalThis, pairing
   const state = el('p', 'teacher-note'); state.id = 'study-pair-status'; state.setAttribute('role', 'status');
   const sync = el('p', 'teacher-note'); sync.id = 'study-pair-sync';
   const note = el('p', 'teacher-note'); note.id = 'study-pair-note'; note.setAttribute('role', 'status');
+  const retry = el('button', 'chip', words(LINES.retrySync)); retry.type = 'button'; retry.id = 'study-pair-retry';
   const reopen = el('button', 'chip', words(LINES.reopenNow)); reopen.type = 'button'; reopen.id = 'study-pair-reopen';
   const forgetWhat = el('p', 'teacher-note', words(LINES.forgetWhat)); forgetWhat.id = 'study-unpair-what';
   const forget = el('button', 'btn-tertiary', words(LINES.forget)); forget.type = 'button'; forget.id = 'study-unpair';
-  let busy = false, leaving = false, sure = false, current = null, reading = false;
+  let busy = false, leaving = false, sure = false, current = null, reading = false, retrying = false;
   const paint = () => {
     if (!current) return;
     const { paired, failed } = current;
@@ -644,6 +654,8 @@ export function fillStudyPairingBlock(block, { tx, el, env = globalThis, pairing
     const shown = paired && !ended && !failed && !leaving;
     sync.textContent = shown ? [problem, at ? studySyncedLine(at, now(), !!problem) : problem ? null : LINES.notSynced].filter(Boolean).map(words).join(' ') : '';
     sync.hidden = !shown; block.dataset.sync = live?.started ? live.state : ''; block.dataset.synced = at && shown ? String(at) : '';
+    retry.hidden = !(shown && bound && live?.started && live.state === 'error' && typeof host.synchronize === 'function');
+    retry.disabled = retrying || busy;
     reopen.hidden = !(paired && !ended && !bound) || leaving;
     forget.hidden = !paired || leaving;
     // what Disconnect does is said when it is asked for, beside the second press
@@ -661,6 +673,11 @@ export function fillStudyPairingBlock(block, { tx, el, env = globalThis, pairing
     leaving = true; note.textContent = words(line); block.append(note); paint();
     env.setTimeout(() => reload(), reloadDelayMs);
   };
+  retry.addEventListener('click', async () => {
+    if (retry.hidden || retrying || busy || leaving) return;
+    retrying = true; paint();
+    try { await host.synchronize(); } finally { retrying = false; paint(); }
+  });
   reopen.addEventListener('click', () => { if (!leaving) { leaving = true; reload(); } });
   forget.addEventListener('click', async () => {
     if (busy || leaving) return;
@@ -675,7 +692,7 @@ export function fillStudyPairingBlock(block, { tx, el, env = globalThis, pairing
       leave(LINES.forgotten);
     } else { note.textContent = words(studyPairingLine(answer.code)); block.append(note); paint(); }
   });
-  block.replaceChildren(name, state, sync, reopen, forgetWhat, forget);
+  block.replaceChildren(name, state, sync, retry, reopen, forgetWhat, forget);
   block.dataset.state = 'loading';
   // this page's host changing, and the pairing changing in another tab, both redraw the block from the device's truth
   const stopHost = host?.subscribe?.(() => { if (!block.isConnected) { stopHost?.(); return; } paint(); if (host.status().closed) void refresh(); });

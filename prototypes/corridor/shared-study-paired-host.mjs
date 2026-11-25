@@ -346,6 +346,7 @@ export async function openPairedStudyHost(options = {}) {
       const result = session ? await session.synchronize() : { state: 'idle', error: 'study-host-not-started', retryAt: null };
       return closed ? stopped : result;
     },
+    flushBeforeClose: () => session?.flushBeforeClose() ?? Promise.resolve(false),
     /** Stop syncing and let go of the store. The paired copy of the record stays on the device. */
     async dispose() {
       if (disposed) return;

@@ -560,7 +560,7 @@ test(
       const ended = await studyBlock(again);
       assert.equal(ended.state, 'ended');
       assert.match(ended.status, /The server ended this device’s pairing/);
-      assert.match(ended.status, /1 answer saved on this device was never uploaded/);
+      assert.match(ended.status, /could not confirm that the server received 1 saved answer/);
       assert.equal(ended.unpairShown, true);
       assert.equal(ended.fields, 0);
       await shoot(again, 'settings-ended');
