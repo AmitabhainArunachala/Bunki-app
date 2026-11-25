@@ -256,22 +256,34 @@ export class SyncCoordinator {
       )
       .slice(0, this.#pushLimit);
     if (!pending.length) return null;
-    let selected: SyncPushRequest | null = null;
+    const refs: OperationRef[] = [];
+    const operations: SyncOperation[] = [];
+    const requestId = () => identity('push', { capture, refs, maxBytes: this.#maxBytes });
+    const envelope = {
+      requestId: requestId(),
+      binding: capture.binding,
+      channelId: capture.channelId,
+      operations,
+      maxBytes: this.#maxBytes,
+    };
+    // SHA-256 gives every request ID the same wire length. Filling the empty
+    // JSON array adds each canonical operation and one comma between entries.
+    let bytes = size(envelope);
     for (const operation of pending) {
-      const operations: SyncOperation[] = [...(selected?.operations ?? []), operation];
-      const refs = operations.map(operationReference);
-      const request: SyncPushRequest = {
-        requestId: identity('push', { capture, refs, maxBytes: this.#maxBytes }),
-        binding: capture.binding,
-        channelId: capture.channelId,
-        operations,
-        maxBytes: this.#maxBytes,
-      };
-      if (size(request) > this.#maxBytes) break;
-      selected = Object.freeze({ ...request, operations: Object.freeze(operations) });
+      bytes += size(operation) + (operations.length ? 1 : 0);
+      if (bytes > this.#maxBytes) break;
+      operations.push(operation);
+      refs.push(operationReference(operation));
     }
-    if (!selected) throw new SyncCoordinatorError('batch-too-large');
-    return selected;
+    if (!operations.length) throw new SyncCoordinatorError('batch-too-large');
+    const request = Object.freeze({
+      ...envelope,
+      operations: Object.freeze(operations),
+      requestId: requestId(),
+    });
+    // Retain the whole-message canonical JSON depth, node and size checks.
+    insist(size(request) <= this.#maxBytes, 'batch-too-large');
+    return request;
   }
 
   #accepted(raw: unknown, request: SyncPushRequest): readonly OperationRef[] {

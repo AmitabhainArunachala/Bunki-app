@@ -301,13 +301,14 @@ function loadState(storage, deck) {
   try {
     text = storage.getItem(stateKey(deck.id));
   } catch {
-    text = null;
+    return { state: normalizeState(null, deck), notice: SAVE_FAILED, text: undefined };
   }
   let raw = null;
   let unreadable = false;
   if (text != null) {
     try {
       raw = JSON.parse(text);
+      unreadable = raw?.format !== STATE_FORMAT || raw?.version !== VERSION || raw?.deckId !== deck.id;
     } catch {
       unreadable = true;
     }
@@ -316,7 +317,7 @@ function loadState(storage, deck) {
   const storedCards = raw && typeof raw === 'object' && raw.cards && typeof raw.cards === 'object' ? Object.keys(raw.cards).length : 0;
   if (text != null && !Object.keys(state.cards).length && (unreadable || storedCards)) {
     const kept = writeRaw(storage, quarantineKey(deck.id), text);
-    return { state, notice: kept ? QUARANTINED : '', text };
+    return { state, notice: kept ? QUARANTINED : SAVE_FAILED, text: kept ? text : undefined };
   }
   return { state, notice: '', text };
 }
@@ -355,14 +356,16 @@ function writeLedger(change) {
   try {
     text = ctx.storage.getItem(stateKey(ctx.deck.id));
   } catch {
-    text = ctx.ledgerText;
+    return { failed: true };
   }
-  if (text !== ctx.ledgerText && text != null) {
+  if (text !== ctx.ledgerText) {
+    // A removed or unreadable revision cannot be merged. Keep the durable
+    // bytes and the open card, so the learner can recover before retrying.
+    if (text == null) return { failed: true };
     const read = readLedger(text, ctx.deck);
-    if (read) {
-      ctx.state = read;
-      ctx.ledgerText = text;
-    }
+    if (!read) return { failed: true };
+    ctx.state = read;
+    ctx.ledgerText = text;
   }
   const before = ctx.state;
   const next = change(before);
@@ -854,6 +857,7 @@ const reflowWatch = typeof ResizeObserver === 'function'
     for (const { target } of entries) {
       if (!target.isConnected) { reflowWatch.unobserve(target); continue; }
       for (const tok of target.querySelectorAll('.kp-tok')) tok.classList.toggle('kp-split', tok.getClientRects().length > 1);
+      if (ctx?.focusRoom && ui.revealed && target.matches('#kp-card > .kp-sentence')) fitStudyLayout(target);
     }
   })
   : null;
@@ -2576,7 +2580,14 @@ function windowPassage(from, page = from) {
   const passage = face?.querySelector('.kp-sentence');
   const def = face?.querySelector('.kp-answer > .kp-def');
   const bar = ctx.root.querySelector('.kp-grades');
-  if (!passage || !def || !bar || ui.screen !== 'study' || getComputedStyle(bar).position !== 'fixed') return;
+  if (!passage || !def || !bar || ui.screen !== 'study') return;
+  if (getComputedStyle(bar).position !== 'fixed') {
+    // A window fitted in portrait no longer constrains a tablet or desktop card.
+    passage.classList.remove('kp-window');
+    passage.style.removeProperty('--kp-window-h');
+    placeWindowControls(face, passage, false);
+    return;
+  }
   passage.classList.remove('kp-window');
   passage.style.removeProperty('--kp-window-h');
   window.scrollTo({ top: 0, behavior: 'instant' });
@@ -2633,6 +2644,50 @@ function windowPassage(from, page = from) {
   // Put a long reading window at the top of the reading area. Its clipped
   // earlier lines then stay behind the chrome, rather than under card controls.
   if (seat > 0) window.scrollTo({ top: window.scrollY + seat, behavior: 'instant' });
+}
+
+// Keep the sentence at the learner's reading position when the columns reflow.
+// These seats belong to DOM passages and disappear with the card.
+const studySeats = new WeakMap();
+function fitStudyLayout(passage) {
+  const face = passage.parentElement;
+  const split = getComputedStyle(face).getPropertyValue('--kp-split').trim() === '1';
+  if (split) {
+    watchWindowEdges(passage, face);
+    watchWindowEdges(face.querySelector('.kp-answer'), face);
+  }
+  let seat = studySeats.get(passage);
+  if (!seat) {
+    seat = { width: innerWidth, split, sentence: null, fraction: 0 };
+    studySeats.set(passage, seat);
+    passage.addEventListener('scroll', () => {
+      // Resizing may clamp the old offset before the observer runs.
+      if (innerWidth !== seat.width || passage.scrollTop === seat.restoredTo || passage.scrollHeight <= passage.clientHeight) return;
+      seat.restoredTo = null;
+      const top = passage.getBoundingClientRect().top;
+      for (const sentence of passage.querySelectorAll('.kp-s')) {
+        const row = sentence.getBoundingClientRect();
+        if (!row.height || row.bottom <= top) continue;
+        seat.sentence = sentence;
+        seat.fraction = Math.max(0, (top - row.top) / row.height);
+        break;
+      }
+    }, { passive: true });
+    return;
+  }
+  if (seat.width === innerWidth && seat.split === split) return;
+  seat.width = innerWidth;
+  seat.split = split;
+  if (externalSheet() || ctx.host?.slipOpen?.() || ui.pop) return;
+  fitBar();
+  fitClamps(face);
+  windowPassage(passage.scrollTop, window.scrollY);
+  settleBack();
+  if (seat.sentence && (split || passage.classList.contains('kp-window'))) {
+    const row = seat.sentence.getBoundingClientRect();
+    passage.scrollTop += row.top - passage.getBoundingClientRect().top + seat.fraction * row.height;
+  }
+  seat.restoredTo = passage.scrollTop;
 }
 
 /** Initial window fitting must leave a whole first row's 44px reach inside the
@@ -2697,6 +2752,16 @@ function settleBack() {
   const folds = face.querySelector('.kp-folds');
   // Recalculate the extra seating gap after a viewport, font or fold change.
   folds?.style.removeProperty('margin-top');
+  if (getComputedStyle(face).getPropertyValue('--kp-split').trim() === '1') {
+    const passage = face.querySelector('.kp-sentence');
+    const mark = passage?.querySelector('.kp-target, .kp-blank');
+    if (mark) {
+      const view = passage.getBoundingClientRect();
+      const word = mark.getBoundingClientRect();
+      if (word.top < view.top || word.bottom > view.bottom) passage.scrollTop += word.top - view.top - (view.height - word.height) / 2;
+    }
+    return;
+  }
   const bar = ctx.root.querySelector('.kp-grades');
   const barTop = bar ? Math.min(innerHeight, bar.getBoundingClientRect().top) : innerHeight;
   const bottomLimit = barTop - SETTLE_GAP;
@@ -3458,7 +3523,8 @@ function restoreButton(ta, msg) {
     try {
       current = ctx.storage.getItem(key);
     } catch {
-      current = null;
+      msg.textContent = t(SAVE_FAILED);
+      return;
     }
     if (!writeRaw(ctx.storage, beforeRestoreKey(ctx.deck.id), current ?? JSON.stringify(ctx.state))) {
       msg.textContent = t(RESTORE_NO_ROOM);
@@ -3483,7 +3549,10 @@ function onKey(e) {
   if (e.defaultPrevented || !ctx?.root?.isConnected || ui.screen !== 'study'
     || ctx.root.closest('[inert], [aria-hidden="true"], [hidden]')
     || (ctx.host && document.querySelector('#sheet, #stroke-page'))
-    || e.target.closest?.('input, textarea')) return;
+    || document.querySelector('dialog[open]')) return;
+  if (e.repeat || e.isComposing || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+  const target = e.target;
+  if (target.isContentEditable || target.closest?.('input, textarea, select')) return;
   // an open slip (the host's) or popover takes the keys: Escape closes it, and nothing grades behind it
   const slip = !!ctx.host && safely(() => !!ctx.host.slipOpen?.(), false);
   if (slip || ui.pop) {
@@ -3494,14 +3563,16 @@ function onKey(e) {
     }
     return;
   }
+  const activation = e.key === ' ' || e.key === 'Enter';
+  if (activation && target.closest?.('button, a[href], summary, [role="button"]')) return;
   const mode = cardMode();
-  if (!ui.revealed && (e.key === ' ' || e.key === 'Enter')) {
+  if (!ui.revealed && activation) {
     e.preventDefault();
     if (mode !== 'choice') reveal();
   } else if (ui.revealed && mode !== 'choice' && ['1', '2', '3', '4'].includes(e.key)) {
     e.preventDefault();
     commit(Number(e.key));
-  } else if (ui.revealed && mode === 'choice' && (e.key === ' ' || e.key === 'Enter')) {
+  } else if (ui.revealed && mode === 'choice' && activation) {
     e.preventDefault();
     next();
   } else if (e.key === 'u' && ui.undo) undo();

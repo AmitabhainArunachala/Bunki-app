@@ -126,7 +126,7 @@ export async function openPairedStudyHost(options = {}) {
 
   let disposed = false, binding = null, active = null, activeStorage = null, session = null, stopSession = null;
   /** Why this host has stopped, or null while it is the pairing's host; and what was still unsent when it ended. */
-  let closed = null, unsent = null;
+  let closed = null, unsent = null, ending = null;
   /** When a sync of this page last left the record up to date, and when that was last written to the pairing's row
    * (at most once a minute: Settings on a page that has not opened study reads it from there). */
   let syncedAt = null, keptSyncedAt = 0;
@@ -147,9 +147,13 @@ export async function openPairedStudyHost(options = {}) {
 
   /** The server refused the credential. The pairing has ended: this page knows at once, the mark page start reads
    * is written at once, and the row is written with what was still unsent, tried again if the write fails. */
-  async function endPairing() {
+  function endPairing(adapter = active) {
+    ending ??= finishEnding(adapter);
+    return ending;
+  }
+
+  async function finishEnding(adapter) {
     if (closed) return;
-    const adapter = active;
     // a refusal that comes back after this pairing was replaced on the device ends nothing: the row and the marks
     // are another pairing's by then, and this host just stops
     let current;
@@ -159,7 +163,14 @@ export async function openPairedStudyHost(options = {}) {
     endedMark.set(ref.installation, 'server');
     shut('study-pairing-ended');
     // what was still waiting to be sent: the answers among it (the copy also queues records that are not answers)
-    try { unsent = adapter ? (await adapter.store.outbox(500)).filter((record) => record?.event?.type === 'review').length : 0; } catch { unsent = null; }
+    // The transport exposes one upload window. The retained journal also has
+    // later answers and records already acknowledged by the server.
+    if (adapter) {
+      try {
+        const journal = await adapter.store.readState({ requireCompatible: true });
+        unsent = Object.values(journal.local).filter((row) => row.ackedSeq === null && row.event.type === 'review').length;
+      } catch { unsent = null; }
+    }
     notify();
     announce();
     for (const pause of [0, ...endRetryMs]) {
@@ -207,7 +218,7 @@ export async function openPairedStudyHost(options = {}) {
     return body;
   }
 
-  function openSession() {
+  function openSession(currentAdapter) {
     const next = createSharedStudySync({
       ...syncOptions,
       origin: bridge.origin,
@@ -218,7 +229,7 @@ export async function openPairedStudyHost(options = {}) {
       permits: { isPaired: () => closed === null, reserve: reservePermits },
     });
     const stop = next.subscribeSyncState(() => {
-      if (next.getSyncError() === 'authentication-required' && closed === null) void endPairing();
+      if (next.getSyncError() === 'authentication-required' && closed === null) void endPairing(currentAdapter());
       if (next.getSyncState() === 'up-to-date' && !next.getSyncError() && closed === null) noteSynced();
       notify();
     });
@@ -229,6 +240,9 @@ export async function openPairedStudyHost(options = {}) {
     try { sync?.dispose(); await sync?.drain(); } catch { /* the failure that brought us here is the one reported */ }
     try { disposeSharedStudyAudioPreparation(adapter); } catch { /* cleanup cannot replace the failure */ }
     try { await adapter?.disposeAudioPacks?.(); } catch { /* same */ }
+    // A denial on startup can precede publication of the adapter. Keep its
+    // store open until the diagnostic on that exact replica has settled.
+    if (ending) await ending.catch(() => {});
     try { await adapter?.backend?.dispose(); } catch { /* same */ }
     try { await storage?.close?.(); } catch { /* same */ }
   }
@@ -253,10 +267,10 @@ export async function openPairedStudyHost(options = {}) {
     try { current = (await store.read()).device; } catch { throw hostError('study-storage-failed'); }
     if (!current || current.scope.installation !== ref.installation || current.generation !== ref.generation) { shut('study-pairing-changed'); throw hostError(closed); }
     const storage = await storageFactory({ databaseName: pairedReplicaName(scope.installation) });
-    const { next: sync, stop } = openSession();
+    let adapter = null;
+    const { next: sync, stop } = openSession(() => adapter);
     const open = (mode) => callback(Object.freeze({ storage, now, presentation, transport: sync, ...sync.hooks,
       identity: Object.freeze({ learner: scope.learner, environment: scope.environment, installation: scope.installation, mode }) }));
-    let adapter = null;
     try {
       if (current.phase === 'ready') {
         try { adapter = await open('open'); }
@@ -278,7 +292,7 @@ export async function openPairedStudyHost(options = {}) {
         for (let round = 0; round < 40 && !result?.error && result?.state === 'pending'; round++) result = await sync.synchronize();
         // the server refused the credential before the record arrived (revoked, a token from another origin, a ledger
         // restored without its origin): the pairing has ended, which no new try online can change, and says so
-        if (!closed && result?.error === 'authentication-required') await endPairing();
+        if (!closed && result?.error === 'authentication-required') await endPairing(adapter);
         if (closed) throw hostError(closed);
         if (result?.state !== 'up-to-date') {
           const cause = result?.error || result?.state || 'unknown';

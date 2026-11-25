@@ -16,7 +16,7 @@ import {
 } from 'node:fs';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { homedir } from 'node:os';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { buildCorridorModules } from './build-reading-module.mjs';
 import { assetFilesUnder, corridorAssetFiles } from './corridor-assets.mjs';
 import { verifyRelease } from './release/version.mjs';
@@ -188,6 +188,17 @@ try {
     else copyFileSync(join(source, file.path), destination);
     if (digest(readFileSync(destination)) !== file.sha256) {
       throw new Error(`Source changed during assembly: ${file.path}`);
+    }
+  }
+  // A complete hash manifest can still describe bundles that fail during module initialization.
+  for (const { path } of modules) {
+    try {
+      await import(pathToFileURL(join(staging, path)).href);
+    } catch (cause) {
+      throw new Error(
+        `Generated module ${path} failed to initialize: ${cause.message}. Check the workspace installation with npm ci.`,
+        { cause },
+      );
     }
   }
   // The cache identity follows the complete unstamped asset set. This avoids

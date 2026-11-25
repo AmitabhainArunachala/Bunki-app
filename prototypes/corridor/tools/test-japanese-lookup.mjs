@@ -130,7 +130,7 @@ function app({ withIndex = true, withKanji = false } = {}) {
   const body = new Element('body'), opened = [], chosen = [], menus = [];
   const D = { dict, words, kanji: withKanji ? copy(kanjiTable) : {}, dictionaryIndex: withIndex ? index : null,
     dictionaryByForm: new Map(), dictionaryCompleteForms: new Set(), dictionaryBySeq: new Map() };
-  const document = { body, querySelectorAll: selector => body.querySelectorAll(selector),
+  const document = { documentElement: { clientWidth: 400, clientHeight: 800 }, body, querySelectorAll: selector => body.querySelectorAll(selector),
     createRange: () => ({ selectNodeContents() {}, getClientRects: () => [] }),
     getElementById: id => body.querySelector(`#${id}`),
     createTextNode: text, createDocumentFragment: () => new Element('#fragment'), createElement: tag => new Element(tag),

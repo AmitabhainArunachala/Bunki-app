@@ -138,7 +138,6 @@ export async function render(main,{deckId,english=true,onLeave,autoStart}={}) {
   if(adapter.identity.environment==='test-bunki-shared-preview')root.append(element('p',english?'Trial copy. Your real study record stays as it is.':'試しの写し。実際の学習記録はそのままです。'));
   const frame=element('iframe');frame.title=english?'Shared study':'共通の学習';frame.dataset.sharedStudyFrame='';
   frame.allow='autoplay';
-  frame.style.cssText='display:block;width:100%;height:calc(100dvh - 7rem);min-height:28rem;border:0;background:transparent';
   const url=new URL('./shared-frame.html',import.meta.url);url.searchParams.set('deck',deckId);url.searchParams.set('ui',english?'en':'ja');if(autoStart)url.searchParams.set('start','1');
   // The child receives the already bound backend, never credentials or a new
   // independent learner identity. This port is same-origin and frame-specific.
@@ -156,6 +155,7 @@ export async function render(main,{deckId,english=true,onLeave,autoStart}={}) {
   const onCardStart=()=>{
     if(request!==serial||!root.isConnected||!frame.isConnected||frame.parentNode!==root)return;
     const chromeBottom=Math.max(0,document.querySelector('.chrome')?.getBoundingClientRect().bottom??0);
+    frame.style.setProperty('--shared-study-chrome-height', `${chromeBottom}px`);
     const target=window.scrollY+frame.getBoundingClientRect().top-chromeBottom;
     window.scrollTo({top:Math.max(0,target),behavior:'instant'});
   };

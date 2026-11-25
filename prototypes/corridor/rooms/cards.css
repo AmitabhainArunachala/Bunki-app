@@ -30,6 +30,123 @@ html[data-room='deckplay'] #app > main > .kp { margin-top: 0; }
    the reveal no longer scrolling the page (decks/player windowPassage) it never moves. ---- */
 html[data-room='deckplay'] body:not(.zen) #app > .chrome { background: var(--color-glass-solid, var(--color-page)); -webkit-backdrop-filter: none; backdrop-filter: none; }
 
+/* Reserve the study bar's end for the prototype, colour and report buttons.
+   The report rail follows the centred 672px bar on wide screens. */
+html[data-room='deckplay'] body:has(#app .kp-study) {
+  --deck-report-inset: calc(4px + env(safe-area-inset-right, 0px));
+  --deck-controls-top: env(safe-area-inset-top, 0px);
+}
+@media (min-width: 521px) {
+  html[data-room='deckplay'] body:has(#app .kp-study) {
+    --deck-report-inset: max(14px, calc((100vw - 672px) / 2 + 4px));
+  }
+}
+@media (min-width: 40em) and (orientation: landscape) {
+  html[data-room='deckplay'] body:has(#app .kp-study) {
+    /* The split stage is 72rem plus its two 1rem gutters. */
+    --deck-report-inset: max(calc(4px + env(safe-area-inset-right, 0px)), calc((100vw - 74rem) / 2 + 4px));
+    --deck-controls-top: max(.5rem, env(safe-area-inset-top, 0px));
+  }
+}
+html[data-room='deckplay'] body:has(#app .kp-study):not(:has(#sheet, dialog[open])) #bunki-reports-root .br-rail {
+  top: var(--deck-controls-top);
+  right: var(--deck-report-inset);
+}
+html[data-room='deckplay'] body:has(#app .kp-study) #app .kp-top-study[data-bar='deck'] {
+  padding-right: calc(152px + env(safe-area-inset-right, 0px));
+}
+html[data-room='deckplay'] body:has(#app .kp-study):not(:has(#sheet, dialog[open])) #bunki-look-seal {
+  inset: var(--deck-controls-top) calc(var(--deck-report-inset) + 44px) auto auto;
+  top: var(--deck-controls-top) !important;
+}
+html[data-room='deckplay'] body:has(#app .kp-study):not(:has(#sheet, dialog[open])) > #bunki-prototype-root .pl-rail {
+  inset: var(--deck-controls-top) calc(var(--deck-report-inset) + 88px) auto auto;
+}
+html[data-room='deckplay'] body:has(#app .kp-study):not(:has(#sheet, dialog[open])) > #bunki-prototype-root .pl-intro {
+  display: none;
+}
+
+/* In a wide sitting the passage and its reference sheet scroll independently.
+   The four grades take their own row, including when the first-session hints wrap. */
+@media (min-width: 40em) and (orientation: landscape) {
+  html[data-room='deckplay'] body[data-view='deckplay']:not(.zen) #app > main:has(.kp-study) {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+  #app .kp:has(> .kp-study) {
+    margin: 0;
+    padding: max(.5rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(.5rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+    min-height: 100dvh;
+  }
+  #app .kp > .kp-study { max-width: 72rem; }
+  #app .kp-study > .kp-card:not(:has(> .kp-answer)) {
+    width: min(100%, 40rem);
+    margin-inline: auto;
+  }
+  #app .kp-study.has-bar {
+    height: calc(100dvh - max(.5rem, env(safe-area-inset-top)) - max(.5rem, env(safe-area-inset-bottom)));
+    min-height: 21rem;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    padding: 0;
+    gap: .5rem;
+  }
+  #app .kp-study.has-bar > .kp-card {
+    --kp-split: 1;
+    min-height: 0;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    column-gap: clamp(1rem, 3vw, 2.5rem);
+    align-items: start;
+  }
+  #app .kp-study.has-bar .kp-chips { grid-area: 1 / 1; }
+  #app .kp-study.has-bar .kp-sentence {
+    grid-area: 2 / 1;
+    max-height: 100%;
+    overflow: auto;
+    overscroll-behavior: contain;
+    padding-block: .6em 0;
+    margin-block: 0;
+    mask-image: none;
+    scrollbar-width: thin;
+  }
+  #app .kp-study.has-bar .kp-answer {
+    grid-area: 1 / 2 / 3;
+    max-height: 100%;
+    overflow: auto;
+    overflow-wrap: anywhere;
+    line-break: strict;
+    overscroll-behavior: contain;
+    padding: 0 0 0 clamp(1rem, 2vw, 2rem);
+    border-top: 0;
+    border-inline-start: 1px solid var(--kp-line);
+  }
+  #app .kp-study.has-bar .kp-folds > .kp-f-gloss { padding-inline: 14px; }
+  #app .kp-study.has-bar :is(.kp-sentence, .kp-answer)[data-edge='above'] {
+    mask-image: linear-gradient(to bottom, transparent, black .65rem);
+  }
+  #app .kp-study.has-bar :is(.kp-sentence, .kp-answer)[data-edge='below'] {
+    mask-image: linear-gradient(to top, transparent, black .65rem);
+  }
+  #app .kp-study.has-bar :is(.kp-sentence, .kp-answer)[data-edge='both'] {
+    mask-image: linear-gradient(to bottom, transparent, black .65rem, black calc(100% - .65rem), transparent);
+  }
+  #app .kp-study .kp-grades {
+    position: static;
+    width: min(100%, 40rem);
+    margin-inline: auto;
+    padding-block: .25rem 0;
+    background: var(--kp-dock);
+  }
+}
+
+@media (min-width: 40em) and (orientation: landscape) and (max-height: 32em) {
+  #app .kp-study.has-bar > .kp-card { padding: .65rem 1rem .8rem; row-gap: .25rem; }
+  #app .kp-study .kp-grades:has(.kp-rule) > .kp-swipehint { grid-column: 1 / 3; align-self: center; }
+  #app .kp-study .kp-swipehint + .kp-rule { grid-column: 3 / 5; }
+}
+
 /* ---- Embedded Nihongo Study (ENGINE-ONE.2 / Slice 2): seamless single-chrome surface harmonized
    with all 11 Bunki looks. Scoped strictly to #app > main:has(> [data-shared-study]) so ordinary
    legacy deck routes keep their exact gutters and frame. ---- */
@@ -95,10 +212,23 @@ html[data-room='deckplay'] body:not(.zen):not([data-view='entry']):not([data-vie
   flex: 1 0 100%;
   display: block;
   width: 100%;
-  height: calc(100dvh - 7rem);
-  min-height: 28rem;
+  height: calc(100dvh - var(--shared-study-chrome-height, 3.5rem) - var(--nav-clearance, 0px));
   border: 0;
   background: transparent;
+}
+/* The iframe owns the reading surface and the four grades. The host's
+   prototype and look controls fit in the empty left side of its own toolbar. */
+html[data-room='deckplay'] body:has([data-shared-study='ready']) > #bunki-prototype-root .pl-rail {
+  inset: env(safe-area-inset-top, 0px) auto auto max(4px, env(safe-area-inset-left, 0px));
+}
+html[data-room='deckplay'] body:has([data-shared-study='ready']) > #bunki-prototype-root .pl-intro {
+  display: none;
+}
+html[data-room='deckplay'] body:has([data-shared-study='ready']) #bunki-look-seal {
+  inset: env(safe-area-inset-top, 0px) auto auto calc(48px + env(safe-area-inset-left, 0px));
+  /* The seal's inline top clears buttons in its usual right-hand corner.
+     The shared frame instead reserves this left slot in the host toolbar. */
+  top: env(safe-area-inset-top, 0px) !important;
 }
 /* Avoid duplicate outer chrome ear mark while embedded Nihongo Study owns its own working ear inside the frame. */
 html[data-room='deckplay'] body:has(#app > main > [data-shared-study='ready']) #app > .chrome > .ear-spot {

@@ -26,6 +26,8 @@ const owned = new Set([
   'shared-study-presentation.mjs',
   'decks/player/shared-frame.mjs',
   'decks/player/shared-mount.mjs',
+  'decks/player/shared-frame.html',
+  'rooms/cards.css',
 ]);
 const qaOnly = new Set([
   'study-engine-adapter.mjs',
@@ -394,6 +396,66 @@ test(
           await frame.waitForFunction(
             () => bunkiSharedStudy.app.read().current.revealed && !bunkiSharedStudy.app.read().busy,
           );
+          if (viewport.width === 375 && rating === 1) {
+            for (const size of [
+              { width: 844, height: 390 },
+              { width: 667, height: 375 },
+              viewport,
+            ]) {
+              await page.setViewportSize(size);
+              await frame.evaluate(
+                () =>
+                  new Promise((done) =>
+                    window.requestAnimationFrame(() => window.requestAnimationFrame(done)),
+                  ),
+              );
+              const back = await frame.evaluate(() => ({
+                task: bunkiSharedStudy.app.read().current.entry.taskKey,
+                count: bunkiSharedStudy.backend.readProjection().reviews.length,
+                points: [...document.querySelectorAll('[data-grade]')].map((button) => {
+                  const b = button.getBoundingClientRect(),
+                    x = b.left + b.width / 2,
+                    y = b.top + b.height / 2;
+                  return { x, y, hit: button.contains(document.elementFromPoint(x, y)) };
+                }),
+                split:
+                  document
+                    .querySelector('[data-vocabulary-back] > [data-passage]')
+                    .getBoundingClientRect().right <=
+                  document.querySelector('[data-vocabulary-entry]').getBoundingClientRect().left,
+              }));
+              const reachable = await page.evaluate((points) => {
+                const child = document.querySelector('[data-shared-study-frame]'),
+                  r = child.getBoundingClientRect();
+                return points.every(
+                  (p) => p.hit && document.elementFromPoint(r.left + p.x, r.top + p.y) === child,
+                );
+              }, back.points);
+              const sealClearsFrame = await page.evaluate(() => {
+                const seal = document.querySelector('#bunki-look-seal')?.getBoundingClientRect();
+                const chrome = document.querySelector('.chrome').getBoundingClientRect();
+                return !seal?.height || seal.bottom <= chrome.bottom + 1;
+              });
+              assert.ok(sealClearsFrame, 'Bunki theme control clears the embedded study toolbar');
+              assert.equal(back.task, before.taskKey);
+              assert.equal(back.count, before.count);
+              assert.equal(back.points.length, 4);
+              assert.equal(back.split, size.width > size.height);
+              assert.ok(
+                reachable,
+                `All grades must receive input through parent chrome at ${size.width}×${size.height}`,
+              );
+              row.actions.push({
+                label: 'rotate-revealed-card',
+                size,
+                reachable,
+                taskKey: back.task,
+              });
+              await page.screenshot({
+                path: join(output, `rotation-${size.width}x${size.height}.png`),
+              });
+            }
+          }
           await page.evaluate(() =>
             scrollTo(0, Math.min(369, document.documentElement.scrollHeight - innerHeight)),
           );

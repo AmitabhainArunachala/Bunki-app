@@ -1703,6 +1703,55 @@ test('after the pairing has ended an answer is refused in plain words, nothing i
   await bunki.host.dispose();
 });
 
+test('a server refusal on reopen counts the offline answer from the existing replica', async () => {
+  const world = createWorld();
+  const first = await world.paired();
+  await first.adapter.platform.requestNewCards();
+  world.state.online = false;
+  await grade(first.adapter.backend, catalog[0].taskKey, 3);
+  await first.host.dispose();
+
+  world.server.revoke(first.installation);
+  world.state.online = true;
+  const reopened = await world.openHost();
+  await assert.rejects(world.bind(reopened), /study-pairing-ended/);
+  await until(() => world.store.peek().ended, 'the reopened installation was ended');
+  assert.equal(world.store.peek().ended.unsent, 1);
+  assert.equal((await (await replicaOf(world, first.installation)).status()).pendingUpload, 1);
+  await reopened.dispose();
+});
+
+test('the ended-pairing count covers unacknowledged answers beyond one upload page', async () => {
+  const world = createWorld();
+  const minted = world.server.code();
+  await world.pairing.pair(pairLine(minted));
+  const host = await world.openHost();
+  let refused = false;
+  // Diagnostic fixture with two reviews beyond the 500-row wire window and
+  // one acknowledged review. Sync still uses the canonical store until refusal.
+  const rows = Array.from({ length: 503 }, (_, index) => ({
+    event: { type: index < 500 ? 'settings' : 'review' },
+    ackedSeq: index === 502 ? 7 : null,
+  }));
+  await host.withAdapter(async (binding) => {
+    const adapter = await createBunkiStudyAdapter({ ...binding, content });
+    return {
+      ...adapter,
+      store: {
+        ...adapter.store,
+        outbox: (...args) => (refused ? rows.slice(0, args[0]) : adapter.store.outbox(...args)),
+        readState: (...args) => (refused ? { local: rows } : adapter.store.readState(...args)),
+      },
+    };
+  });
+  world.server.revoke(minted.installation);
+  refused = true;
+  await host.synchronize();
+  await until(() => world.store.peek().ended, 'the installation was ended');
+  assert.equal(world.store.peek().ended.unsent, 2);
+  await host.dispose();
+});
+
 test('forgetting is made durable first: a page that closes midway leaves a pairing that is ended, never one that comes back', async () => {
   // the order, when nothing fails: the mark, the row ended, the row removed, the flag cleared
   const world = createWorld();

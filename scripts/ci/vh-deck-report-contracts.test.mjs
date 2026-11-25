@@ -479,8 +479,7 @@ test('producer-specific engine scopes are enforced', () => {
 });
 test('independent published obligation counts cover all variants', () => {
   assert.equal(LANGUAGE_ROOMS.length, 115);
-  // INT-VH (2026-10-19): +1 Hfix-1B places row (switch back · Settings offers no Layout again)
-  assert.equal(PLACES_CASES.length, 93);
+  assert.equal(PLACES_CASES.length, 101);
   assert.equal(EXPERIENCE_CASES.length, 42);
   // INT-VH (2026-10-19): +2 Hfix-1B deck rows (K161, K162)
   assert.equal(KOTOBA_SITES.length, 154);

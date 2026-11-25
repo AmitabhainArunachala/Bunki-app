@@ -27,7 +27,7 @@ import { activeTeacherContext, aiAsk, aiChatTurns, aiCreateCards, aiKey, aiProvi
  * FSRS-6 (ts-fsrs 5.4.1) under packages/domain's pinned parameters.
  */
 // BEGIN GENERATED RELEASE IDENTITY — npm run release:sync
-const APP_RELEASE = Object.freeze({"version":"1.3.0-rc.2","channel":"rc","releasedOn":"2026-11-09","learnerDataEpoch":1});
+const APP_RELEASE = Object.freeze({"version":"1.3.0-rc.3","channel":"rc","releasedOn":"2026-11-25","learnerDataEpoch":1});
 // END GENERATED RELEASE IDENTITY
 const DATA = {
   safe: ['kanken', 'sem'],
@@ -2183,7 +2183,7 @@ async function runRecordSyncAction(method) {
       recordFailure(status.code, true);
       return;
     }
-    if (method === 'sync') {
+    if (method === 'sync' && status.code !== 'snapshot-timeout') {
       const refreshed = await refreshRecordSyncSnapshot(slot);
       if (!slot.current() || slot.generation !== generation) return;
       if (refreshed.status !== 'active') recordFailure(refreshed.reason, true);
@@ -4368,28 +4368,24 @@ async function boot() {
   }
   S.variantsBar = anyVariantParam;
   if (['bi', 'ja'].includes(params.get('ui'))) S.lang = params.get('ui');
-  try { await ensureReadingModule(); }
-  catch { protectStore('読み物の機能を読み込めない。保存を止めて記録を保護している。接続してから再読み込みする。',
-    'The reading component could not load. Saving is paused to protect article versions. Reconnect and reload the app.'); }
-  try { await ensureTeacherContextModule(); }
-  catch { protectStore('先生との学習記録を読み込めない。再読み込みして続ける。',
-    'Saved teaching contexts could not load. Reconnect and reload to protect your record.'); }
-  try { await ensureTeacherDraftModule(); }
-  catch { protectStore('質問の下書きを読み込めない。再読み込みして続ける。',
-    'Saved questions could not load. Reconnect and reload to protect your record.'); }
-  try { await ensureSentenceDraftModule(); }
-  catch { protectStore('練習の下書きを読み込めない。再読み込みして続ける。',
-    'Saved practice drafts could not load. Reconnect and reload to protect your record.'); }
-  // If there are existing source records, their validator will protect them
-  // when this module is unavailable. Older records can still open normally.
-  try { await ensureFeedModule(); } catch { /* The source shelf offers retry. */ }
-  try { await ensurePublisherModule(); } catch { /* Existing originals fail closed; the source shelf offers retry. */ }
-  try { await ensureSourceInboxModule(); } catch { /* Existing captures fail closed; the inbox offers retry. */ }
-  try { sentencePracticeModule = await import(window.__KAIRO_SENTENCE_PRACTICE_URL__ || './sentence-practice.mjs'); }
-  catch { /* Existing source practice fails closed; neutral captures remain available. */ }
-  try { sourceProcessingModule = await import(window.__KAIRO_SOURCE_PROCESSING_URL__ || './source-processing.mjs'); }
-  catch { /* Local reading remains available; sending an excerpt requires this module. */ }
-  try { await ensureAssessmentModule(); } catch { /* Existing typed attempts fail closed in loadStore. */ }
+  // Fetch independent validators together. Every import settles before record
+  // ownership or validation begins; apply protection in the original order.
+  const [reading, contexts, questions, drafts] = await Promise.allSettled([
+    ensureReadingModule(), ensureTeacherContextModule(), ensureTeacherDraftModule(), ensureSentenceDraftModule(),
+    ensureFeedModule(), ensurePublisherModule(), ensureSourceInboxModule(), ensureAssessmentModule(),
+    import(window.__KAIRO_SENTENCE_PRACTICE_URL__ || './sentence-practice.mjs').then(module => { sentencePracticeModule = module; }),
+    import(window.__KAIRO_SOURCE_PROCESSING_URL__ || './source-processing.mjs').then(module => { sourceProcessingModule = module; }),
+  ]);
+  if (reading.status === 'rejected') protectStore('読み物の機能を読み込めない。保存を止めて記録を保護している。接続してから再読み込みする。',
+    'The reading component could not load. Saving is paused to protect article versions. Reconnect and reload the app.');
+  if (contexts.status === 'rejected') protectStore('先生との学習記録を読み込めない。再読み込みして続ける。',
+    'Saved teaching contexts could not load. Reconnect and reload to protect your record.');
+  if (questions.status === 'rejected') protectStore('質問の下書きを読み込めない。再読み込みして続ける。',
+    'Saved questions could not load. Reconnect and reload to protect your record.');
+  if (drafts.status === 'rejected') protectStore('練習の下書きを読み込めない。再読み込みして続ける。',
+    'Saved practice drafts could not load. Reconnect and reload to protect your record.');
+  // Optional validators remain unavailable on failure. Existing records are
+  // checked at load, and the source shelf can retry its own providers.
   if (await acquireRecordOwnership()) await openAppRecord();
   await resumeSavedPractice();
   await resumeAssessmentV2();
@@ -4579,16 +4575,19 @@ async function boot() {
       const chars = rec.k && rec.k.length ? rec.k : [...w].filter(isKanji);
       for (const c of chars) add(c, w);
     }
-    const rank = (w) => {
-      const g = D.words[w];
-      const graded = g && g.jlpt ? 0 : 1;
-      const jl = g && g.jlpt ? 5 - g.jlpt : 9;
-      return graded * 100 + jl * 10 + Math.min([...w].length, 9);
-    };
-    for (const c of Object.keys(buckets)) {
-      D.kanjiWords[c] = [...buckets[c]].sort(
-        (a, b) => rank(a) - rank(b) || [...a].length - [...b].length || (a < b ? -1 : 1),
-      );
+    // Compute Unicode length and JLPT rank once per entry in the bucket.
+    // Comparisons run repeatedly while building a large compound index.
+    for (const [kanji, words] of Object.entries(buckets)) {
+      const ranked = Array.from(words, word => {
+        const level = D.words[word]?.jlpt;
+        const length = [...word].length;
+        const graded = level ? 0 : 1;
+        const jl = level ? 5 - level : 9;
+        const rank = graded * 100 + jl * 10 + Math.min(length, 9);
+        return { word, length, rank };
+      });
+      ranked.sort((a, b) => a.rank - b.rank || a.length - b.length || (a.word < b.word ? -1 : 1));
+      D.kanjiWords[kanji] = ranked.map(entry => entry.word);
     }
   }
   D.wordCap = manifest.caps.kanjiWordCap;
@@ -10926,6 +10925,15 @@ function noteBoxOpened(span, key) {
  * then the word's kanji, and in an article one named door into the word's sentence. Escape, or a tap
  * outside, puts it away. */
 let miniAnchor = null;
+let miniResizeFrame = 0;
+window.addEventListener('resize', () => {
+  if (!miniAnchor || miniResizeFrame) return;
+  miniResizeFrame = requestAnimationFrame(() => {
+    miniResizeFrame = 0;
+    const card = document.getElementById('mini');
+    if (card && miniAnchor?.isConnected) placeFloating(card, anchorBox(miniAnchor));
+  });
+}, { passive: true });
 const SAVE_PRESS_MS = 600;
 /* The slip (contract §1): one DOM for every word, kanji or particle the learner can touch, in every room.
  * The reader calls it with a token; every other surface comes through openSlip, which adds
@@ -11350,7 +11358,10 @@ function placeFloating(card, r) {
     const box = node.getBoundingClientRect();
     return box.height ? box[edge] : null;
   };
-  const height = window.innerHeight || Infinity;
+  // A popup with its previous landscape coordinates can extend the mobile
+  // scrollable area during rotation. Measure the new CSS layout viewport.
+  const width = document.documentElement.clientWidth || window.innerWidth;
+  const height = document.documentElement.clientHeight || window.innerHeight || Infinity;
   // A clipped card meets the chrome edge: a gutter here can expose half a title glyph. On a page the edge is the page's
   // own bar (G1: Back is never covered)
   const onPage = !!card.dataset.page;
@@ -11358,8 +11369,8 @@ function placeFloating(card, r) {
   // the deck's grade dock is a floor too: the slip never covers the four grades (it sits above a word in the lower third)
   // G5 · nor the 層 mark at the foot, where the card would stand over it (it sits beside 音, so on a phone it takes no
   // more room than 音 does)
-  const cardLeft = m.width >= window.innerWidth - 48 ? Math.max(0, (window.innerWidth - m.width) / 2)
-    : Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2));
+  const cardLeft = m.width >= width - 48 ? Math.max(0, (width - m.width) / 2)
+    : Math.max(8, Math.min(width - m.width - 8, r.left + r.width / 2 - m.width / 2));
   const floor = Math.min(height, fixedEdge('.listen-row', 'top') ?? height, fixedEdge('#primary-tabs', 'top') ?? height,
     fixedEdge('.kp-grades', 'top') ?? height, layersMarkTop(cardLeft, m.width) ?? height) - 8;
   const roomAbove = r.top - 10 - ceiling, roomBelow = floor - (r.bottom + 10);
@@ -11367,7 +11378,7 @@ function placeFloating(card, r) {
   let seatHeight = m.height;
   // Reserve the real sentence view's space before the word popup appears. The inert
   // measuring copy is removed synchronously, so its layout never becomes a frame or a control.
-  if (window.innerWidth <= 520 && !sentence && card.querySelector('.mini-sentence-pane')) {
+  if (width <= 520 && !sentence && card.querySelector('.mini-sentence-pane')) {
     const measure = card.cloneNode(true);
     measure.classList.add('is-sentence');
     measure.inert = true;
@@ -11399,12 +11410,12 @@ function placeFloating(card, r) {
   // Keep the short word card's fixed seat, and restore that reading position on Back.
   // SAVE · P3-1: the pane's chooser never turns a floating pane into a page card (that moved the Save he pressed from
   // 180 to 387 and ran the pane under the bottom bar): with the chooser open the pane holds its seat and scrolls inside
-  const documentFlow = window.innerWidth <= 520 && sentence
+  const documentFlow = width <= 520 && sentence
     && (wasDocument || (!card.dataset.chooserPin && m.height > (pinHolds ? pinnedRoom : Math.max(roomAbove, roomBelow, 96))));
   if (documentFlow) {
     if (!wasDocument) card.dataset.flowScroll = String(window.scrollY);
     card.dataset.flow = 'document';
-    card.style.left = `${Math.max(0, (window.innerWidth - m.width) / 2)}px`;
+    card.style.left = `${Math.max(0, (width - m.width) / 2)}px`;
     card.style.top = `${r.bottom + 10 + window.scrollY}px`;
     delete card.dataset.floatingTop;
     card.dataset.side = 'below';
@@ -11513,9 +11524,9 @@ function placeFloating(card, r) {
   }
   // a card nearly as wide as the screen is centred, its two gutters equal (review round 2 #13);
   // a narrower card stays beside its word
-  const left = m.width >= window.innerWidth - 48
-    ? Math.max(0, (window.innerWidth - m.width) / 2)
-    : Math.max(8, Math.min(window.innerWidth - m.width - 8, r.left + r.width / 2 - m.width / 2));
+  const left = m.width >= width - 48
+    ? Math.max(0, (width - m.width) / 2)
+    : Math.max(8, Math.min(width - m.width - 8, r.left + r.width / 2 - m.width / 2));
   // the text's layer: the seat is the glass position once the text has finished moving (window.scrollY + shift)
   const ox = scroller === 'window' ? window.scrollX : 0, oy = scroller === 'window' ? startScroll + shift : 0;
   if (scroller === 'window') { card.dataset.flow = 'text'; card.dataset.seatScroll = String(oy); }
@@ -15180,6 +15191,7 @@ function updateRecordSyncSurface(container) {
   const slot = recordSyncSlot;
   const writable = recordWritable();
   const state = slot?.status.state || 'unavailable';
+  const retrySnapshot = state === 'error' && slot.status.code === 'snapshot-timeout';
   let message;
   if (!writable) message = tx('記録を保護しているため、同期を停止している。保存の警告を確認する。',
     'Sync is paused while this record is protected. Check the storage warning.');
@@ -15188,6 +15200,8 @@ function updateRecordSyncSurface(container) {
     'Syncing between devices isn’t available here. You can export your record below.');
   else if (state === 'connecting') message = tx('接続を確認している。アプリの案内に従ってください。', 'Connecting. Follow any confirmation shown by the app.');
   else if (state === 'syncing') message = tx('記録を同期している。', 'Syncing records…');
+  else if (retrySnapshot) message = tx('この端末の記録の読み込みに時間がかかっている。「今すぐ同期」でもう一度試してください。',
+    'The local record took too long to read. Choose Sync now to try again.');
   else if (state === 'error') message = tx('同期を完了できなかった。接続を確認して、もう一度試す。', 'Sync could not finish. Check the connection and try again.');
   else if (state === 'ready' && slot.status.result?.pendingCausal) message = tx('関連する変更を待っている記録がある。もう一度同期する。',
     'Some changes are waiting for related changes. Sync again.');
@@ -15206,8 +15220,8 @@ function updateRecordSyncSurface(container) {
   const idle = state === 'unavailable' && slot?.pending !== 'register';
   container.hidden = idle;
   for (const part of container.querySelectorAll('.record-sync-actions, .record-sync-scope')) part.hidden = idle;
-  connect.disabled = !writable || !slot || !!slot.pending || ['unavailable', 'ready', 'syncing', 'connecting'].includes(state);
-  sync.disabled = !writable || !slot?.registrationId || !!slot.pending || state !== 'ready';
+  connect.disabled = !writable || !slot || !!slot.pending || retrySnapshot || ['unavailable', 'ready', 'syncing', 'connecting'].includes(state);
+  sync.disabled = !writable || !slot?.registrationId || !!slot.pending || (state !== 'ready' && !retrySnapshot);
   // Disconnect remains usable during an in-flight cycle. Its newer generation
   // prevents the older completion from restoring a misleading ready state.
   disconnect.disabled = !writable || !slot?.registrationId || slot.pending === 'disconnect' ||
@@ -26348,8 +26362,10 @@ function srsReviewLogRow(key, before, after, rating, now, schedNow = now) {
 
 function advanceReviewSession(rv, item, next, entry) {
   if ((next.state === 1 || next.state === 3) && next.scheduled_days < 1) {
-    rv.queue.push(item);
-    entry.reinserted = true;
+    // A short step inside a timed block is another practice pass for this
+    // card. Keep the exact queue entry so Undo removes only this insertion.
+    entry.reinserted = S.focus ? { ...item, drillPass: true } : item;
+    rv.queue.push(entry.reinserted);
   }
   entry.item = item; entry.queueIndex = rv.ix;
   rv.history.push(entry);
@@ -28155,7 +28171,7 @@ function renderReview(main) {
   // exist, and must not burn one of the day's new-card slots. The same
   // rite covers the refill's second lap (POL-12): a card this block
   // already graded took its one honest schedule grade — a repeat pass
-  // (item.drillPass, stamped by refillFocusQueue) is practice, never a
+  // (a short step or a later lap, marked drillPass) is practice, never a
   // same-minute remutation of the long-term schedule. The drill still
   // behaves like a session — short ratings repeat in-session, the
   // judgment lands in the observation ledger as evidence (the drill room
@@ -28614,7 +28630,7 @@ function renderReviewUndo(main, rv) {
       rv.done[last.key] -= 1;
       // if this grade re-queued a learning step, remove that pending copy
       if (last.reinserted) {
-        const tail = rv.queue.lastIndexOf(prevItem);
+        const tail = rv.queue.lastIndexOf(last.reinserted);
         if (tail > previousIndex) rv.queue.splice(tail, 1);
       }
     }

@@ -290,6 +290,22 @@ try {
     assert.equal(await page.evaluate(() => recordSyncSlot.status.state), 'disconnected');
     assert.equal(await page.evaluate(() => fixture.refreshes), 0);
   });
+  await check('a local snapshot timeout offers an immediate retry on the connected session', async () => {
+    await page.evaluate(() => window.setupSync());
+    await page.locator('#record-sync-connect').click();
+    await page.locator('#record-sync-now').click();
+    await page.evaluate(() => fixture.finishSync({ state: 'error', code: 'snapshot-timeout' }));
+    await page.waitForFunction(() => recordSyncSlot.status.code === 'snapshot-timeout');
+    assert.match(await page.locator('.record-sync-status').textContent(), /local record/i);
+    assert.equal(await page.locator('#record-sync-now').isEnabled(), true);
+    assert.equal(await page.locator('#record-sync-connect').isEnabled(), false);
+    assert.equal(await page.evaluate(() => fixture.refreshes), 0);
+    await page.locator('#record-sync-now').click();
+    await page.evaluate(() => fixture.finishSync({ state: 'ready', result: { pendingOutbox: 0, pendingCausal: 0, hasMore: false } }));
+    await page.waitForFunction(() => recordSyncSlot.status.state === 'ready');
+    assert.deepEqual(await page.evaluate(() => fixture.calls), ['connect', 'sync', 'sync']);
+    assert.equal(await page.evaluate(() => fixture.refreshes), 1);
+  });
   await check('completed cycle refreshes record and reports remaining work honestly', async () => {
     await page.evaluate(() => window.setupSync()); await page.locator('#record-sync-connect').click();
     await page.waitForFunction(() => !document.getElementById('record-sync-now').disabled);

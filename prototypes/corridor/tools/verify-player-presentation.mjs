@@ -32,6 +32,20 @@ const census = () => {
   const header = document.querySelector('.chrome');
   return { card: face?.dataset.card, zoom: face?.dataset.zoom, windowed: p?.classList.contains('kp-window'), inner: p?.scrollTop, height: p?.clientHeight, page: scrollY, anchor: rect(p), toggle: rect(face?.querySelector('.kp-zoom')), target: rect(face?.querySelector('.kp-target')), def: rect(face?.querySelector('.kp-answer>.kp-def')), bar: rect(document.querySelector('.kp-grades')), header: rect(header), folds: [...face.querySelectorAll('.kp-fold')].map(n => [n.className, n.open]), context: [...p.querySelectorAll('.kp-ctx')].map(n => [n.dataset.side, n.dataset.open || '']), overflow: document.documentElement.scrollWidth - innerWidth, ledger: localStorage.getItem('bunki-cloze:n1'), ruby: [...p.querySelectorAll('ruby')].filter(n => n.firstChild.textContent === '小村').map(n => n.querySelector('rt')?.textContent) };
 };
+const studyToolbar = () => {
+  const bar = document.querySelector('.kp-top-study').getBoundingClientRect();
+  const count = document.querySelector('.kp-count').getBoundingClientRect();
+  return ['#kp-quit', '.pl-open', '#bunki-look-seal', '#bunki-report-bug'].map(selector => {
+    const button = document.querySelector(selector);
+    const r = button.getBoundingClientRect();
+    return {
+      selector,
+      hit: button.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)),
+      fits: r.width >= 44 && r.height >= 44 && r.top >= bar.top && r.bottom <= bar.bottom,
+      clearsCount: r.right <= count.left || r.left >= count.right,
+    };
+  });
+};
 const seated = (s, context) => s.windowed === true && s.inner > 0 && (!context || s.context.some(([, open]) => open === '1'));
 const fits = s => s.toggle.top >= s.header.bottom && s.target.top >= Math.max(s.header.bottom, s.windowed ? s.anchor.top : s.header.bottom) && s.target.bottom <= Math.min(s.bar.top, s.windowed ? s.anchor.bottom : s.bar.top) && s.def.bottom <= s.bar.top && s.toggle.bottom <= s.bar.top && s.overflow === 0;
 async function labels(page, cdp, lang) {
@@ -53,7 +67,75 @@ async function labels(page, cdp, lang) {
   // the house voice (one hand, slice E): 不具合を知らせる · Report a problem
   check('actual accessibility tree report entry ' + lang, actual.button.some(n => n.role === 'button' && n.name === expected[0]) && actual.container.some(n => n.name === expected[1]) && actual.title === expected[0], actual);
 }
+async function checkStudyRotation() {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce', serviceWorkers: 'block' });
+  try {
+    const page = await context.newPage();
+    await page.goto(host.origin + '/index.html?deck=n1&ui=bi');
+    await page.locator('#kp-start').click();
+    await page.locator('#kp-reveal').click();
+    await resting(page);
+    const original = await page.evaluate(census);
+    const passage = page.locator('#kp-card > .kp-sentence');
+    await passage.hover();
+    await page.mouse.wheel(0, 230);
+    await page.waitForFunction(initial => document.querySelector('#kp-card > .kp-sentence').scrollTop !== initial, original.inner);
+    // WebKit applies a wheel tick over several frames. Sample the chosen seat
+    // once the offset has stopped, including browsers without scrollend events.
+    await passage.evaluate(async p => {
+      let offset = p.scrollTop, stable = 0;
+      while (stable < 3) {
+        await new Promise(done => requestAnimationFrame(done));
+        stable = p.scrollTop === offset ? stable + 1 : 0;
+        offset = p.scrollTop;
+      }
+    });
+    const reading = () => {
+      const p = document.querySelector('#kp-card > .kp-sentence');
+      const top = p.getBoundingClientRect().top;
+      const spans = [...p.querySelectorAll('.kp-s')];
+      return spans.findIndex(s => s.getBoundingClientRect().bottom > top + 1);
+    };
+    const sourceSentence = await page.evaluate(reading);
+    const sourcePose = await page.evaluate(census);
+    for (const [width, height] of [[667, 375], [844, 390], [768, 1024], [1024, 768], [1440, 900], [390, 844]]) {
+      await page.setViewportSize({ width, height });
+      await resting(page);
+      const pose = await page.evaluate(census);
+      const layout = await page.evaluate(() => {
+        const rect = selector => document.querySelector(selector).getBoundingClientRect();
+        const p = rect('#kp-card > .kp-sentence'), a = rect('.kp-answer'), w = rect('.kp-word'), g = rect('.kp-grades');
+        const pads = [...document.querySelectorAll('.kp-grade')];
+        return { split: p.right <= a.left, wordVisible: w.top >= 0 && w.bottom <= g.top,
+          reachable: pads.length === 4 && pads.every(pad => {
+            const r = pad.getBoundingClientRect();
+            return r.height >= 44 && pad.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2));
+          }) };
+      });
+      check(`rotation ${width}×${height} keeps revealed card, useful reading area and reachable grade controls`,
+        pose.card === original.card && pose.ledger === original.ledger && pose.overflow === 0 &&
+        layout.split === (width > height) && layout.wordVisible && layout.reachable, { layout, pose });
+      const toolbar = await page.evaluate(studyToolbar);
+      check(`rotation ${width}×${height} preserves separate toolbar targets and card count`,
+        toolbar.every(b => b.hit && b.fits && b.clearsCount), toolbar);
+      await page.screenshot({ path: OUT + `/study-rotation-${width}x${height}.png` });
+      // At the intermediate desktop size the entire passage can fit, so the
+      // scroll offset naturally becomes zero there. The compact return should
+      // restore the learner's sentence.
+      if (width === 390) {
+        const returned = await page.evaluate(reading);
+        check('portrait returns to the chosen sentence and scroll offset', returned === sourceSentence &&
+          Math.abs(pose.inner - sourcePose.inner) <= 1 && Math.abs(pose.page - sourcePose.page) <= 1, { sourceSentence, returned, sourcePose, pose });
+      }
+    }
+    await page.locator('#kp-grade-good').click();
+    await resting(page);
+    const history = await page.evaluate(() => JSON.parse(localStorage.getItem('bunki-cloze:n1')).log);
+    check('one grade after rotating records exactly one review', history.length === 1, history);
+  } finally { await context.close(); }
+}
 try {
+  await checkStudyRotation();
   for (const width of [320, 390]) for (const zoom of ['full', 'focus']) {
     const context = await browser.newContext({ viewport: { width, height: 844 }, reducedMotion: 'reduce', serviceWorkers: 'block' });
     try {
@@ -66,11 +148,18 @@ try {
       await page.waitForFunction(() => document.body.dataset.ready === '1');
       await page.locator('#kp-start').waitFor();
       await page.locator('#bunki-report-bug').waitFor();
-      // the report entry's accessible names, in both languages, on the deck home (the card screen has none)
-      for (const lang of ['ja', 'bi']) { await page.locator(`#lang [data-lang=${lang}]`).click(); await labels(page, cdp, lang); }
+      // The single language button displays the active language and names the language it will select.
+      for (const [name, lang] of [['EN — switch to 日本語', 'ja'], ['日本語 — English に切り替える', 'bi']]) {
+        await page.getByRole('button', { name, exact: true }).click();
+        await page.locator(`#lang button[data-lang="${lang}"]`).waitFor();
+        await labels(page, cdp, lang);
+      }
       await page.locator('#kp-start').click();
       check(`${width}/${zoom} bare original front`, await page.locator('#kp-card rt, #kp-card .kp-tok, #kp-card .kp-zoom').count() === 0 && await page.locator('#kp-card').getAttribute('data-card') === card.id, await page.locator('#kp-card').textContent());
       await page.locator('#kp-reveal').click(); await resting(page);
+      const toolbar = await page.evaluate(studyToolbar);
+      check(`${width}/${zoom} exit, prototype, colour and report receive their own toolbar taps and clear the card count`,
+        toolbar.every(b => b.hit && b.fits && b.clearsCount), toolbar);
       for (const choice of [zoom === 'full' ? 'focus' : 'full', zoom]) {
         await page.locator(`#kp-zoom-${choice}`).click(); await resting(page);
         const switched = await page.evaluate(census);
@@ -107,7 +196,7 @@ try {
           report: !!glyph && !!bar && glyph.left >= bar.left && glyph.right <= bar.right && glyph.top >= bar.top && glyph.bottom <= bar.bottom,
           readings: document.getElementById('kp-readings')?.getAttribute('aria-pressed') };
       });
-      check(`${width}/${zoom} the card screen has no top bar (no language or world switch), keeps the one report door in its study bar's end slot, and offers its Readings switch, on`, !chrome.lang && !chrome.world && chrome.report && chrome.readings === 'true', chrome);
+      check(`${width}/${zoom} the card screen has no outer language or theme bar, keeps the one report door in its study bar's end slot, and offers its Readings switch, on`, !chrome.lang && !chrome.world && chrome.report && chrome.readings === 'true', chrome);
       const same = (a, b) => a.card === b.card && a.zoom === b.zoom && a.windowed === b.windowed && a.inner === b.inner && a.anchor.top === b.anchor.top && a.height === b.height && a.page === b.page && a.ledger === b.ledger && JSON.stringify(a.context) === JSON.stringify(b.context) && JSON.stringify(a.folds) === JSON.stringify(b.folds) && JSON.stringify(a.target) === JSON.stringify(b.target);
       // Deliberately off-window: trusted inner wheel chooses an earlier paragraph; where the window is tall
       // enough to keep the marked word inside, a trusted outer scroll then carries it above the screen.

@@ -128,6 +128,75 @@ test('an uncertain durable acknowledgement is never retried or treated as succes
   assert.deepEqual(await f.service.connect(f.registration), { state: 'error', code: 'reopen-required' });
 });
 
+test('a delayed snapshot reply leaves the active connection available for a fresh read', async (t) => {
+  let late;
+  const f = await scenario(t, { storeTimeoutMs: 35, storeReply: (request) => {
+    if (!late && request.method === 'snapshot') {
+      late = request;
+      return 'drop';
+    }
+  } });
+  // The production timer is unreferenced so it cannot keep the app alive after exit.
+  const keepAlive = setTimeout(() => {}, 2000);
+  t.after(() => clearTimeout(keepAlive));
+  await f.service.connect(f.registration);
+  const before = await f.store.snapshot();
+  assert.deepEqual(await f.service.sync(f.registration), { state: 'error', code: 'snapshot-timeout' });
+  assert.deepEqual(await f.store.snapshot(), before);
+  f.service.receiveStoreReply({ registrationId: late.registrationId, requestId: late.requestId,
+    response: { ok: false, error: { code: 'reopen-required' } } });
+  assert.equal((await f.service.sync(f.registration)).state, 'ready');
+  assert.equal(f.started(), 1);
+  assert.equal((await f.store.snapshot()).outbox.length, 0);
+});
+
+for (const method of ['acknowledgeOutbox', 'commitReceive']) {
+  for (const fault of ['lost reply', 'invalid reply', 'unreadable receipt', 'wrong receipt', 'changed digest', 'future commit', 'missing operations']) {
+    test(`${method} with ${fault} after durable commit requires a fresh document`, async (t) => {
+      const f = await scenario(t, { storeTimeoutMs: 35, storeReply: async (request, store) => {
+        if (request.method !== method) return;
+        const receipt = await store[method](request.request);
+        if (fault === 'lost reply') return 'drop';
+        if (fault === 'invalid reply') return { ok: true };
+        if (fault === 'unreadable receipt') return { ok: false, error: { code: 'invalid-response' } };
+        if (fault === 'changed digest') return { ok: true, value: { ...receipt,
+          operations: receipt.operations.map((row) => ({ ...row, sha256: '0'.repeat(64) })) } };
+        if (fault === 'future commit') return { ok: true, value: { ...receipt, committedRevision: receipt.committedRevision + 1 } };
+        if (fault === 'wrong receipt') return { ok: true, value: { ...receipt, changeId: 'prior-change' } };
+        return { ok: true, value: { ...receipt, operations: [] } };
+      } });
+      const keepAlive = setTimeout(() => {}, 2000);
+      t.after(() => clearTimeout(keepAlive));
+      await f.service.connect(f.registration);
+      const uncertain = { state: 'error', code: 'reopen-required' };
+      assert.deepEqual(await f.service.sync(f.registration), uncertain);
+      assert.deepEqual(f.service.status(f.registration), uncertain);
+      assert.deepEqual(await f.service.connect(f.registration), uncertain);
+      assert.deepEqual(await f.service.sync(f.registration), uncertain);
+      assert.equal(f.requests.filter((request) => request.method === method).length, 1);
+      const snapshot = await f.store.snapshot();
+      assert.equal(snapshot.outbox.length, 0);
+      assert.equal(snapshot.replica.operations.length, method === 'commitReceive' ? 2 : 1);
+    });
+  }
+}
+
+test('an exact replay confirms the original SQLite receipt across both mutating RPCs', async (t) => {
+  const f = await scenario(t, { storeReply: async (request, store) => {
+    if (request.method === 'snapshot') return;
+    const first = await store[request.method](request.request);
+    const duplicate = await store[request.method](request.request);
+    assert.equal(duplicate.outcome, 'duplicate');
+    assert.equal(duplicate.committedRevision, first.committedRevision);
+    return { ok: true, value: duplicate };
+  } });
+  await f.service.connect(f.registration);
+  assert.equal((await f.service.sync(f.registration)).state, 'ready');
+  const snapshot = await f.store.snapshot();
+  assert.equal(snapshot.outbox.length, 0);
+  assert.equal(snapshot.replica.operations.length, 2);
+});
+
 test('a foreign renderer snapshot cannot be transmitted under the paired native scope', async (t) => {
   const f = await scenario(t, { storeReply: async (request, store) => request.method === 'snapshot'
     ? { ok: true, value: { ...await store.snapshot(), documents: [], policy: { ...fixtures.POLICY,

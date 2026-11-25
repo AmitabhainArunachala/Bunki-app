@@ -307,7 +307,7 @@ await check('undo-after-ungraded-skip-restores-the-actual-graded-item-and-remove
   rv.queue = [item, skipped, current]; rv.declared = 0;
   let promise = grade(f); f.ack(); assert.equal(await promise, true);
   assert.equal(rv.history[0].item, item); assert.equal(rv.history[0].queueIndex, 0);
-  assert.equal(rv.history[0].reinserted, true); assert.deepEqual(rv.queue, [item, skipped, current, item]);
+  assert.equal(rv.history[0].reinserted, item); assert.deepEqual(rv.queue, [item, skipped, current, item]);
   // Skip advances the cursor without minting a grade or a history entry.
   rv.ix = 2;
   promise = byClass(f.render('renderReviewUndo', rv), 'review-undo').fire();
@@ -317,6 +317,31 @@ await check('undo-after-ungraded-skip-restores-the-actual-graded-item-and-remove
   assert.equal(f.S.srs['word:学校'], undefined); assert.equal(f.S.revlog.length, 2);
   assert.deepEqual(f.S.revlog[1].slice(1), ['word:学校', 0, 0]);
   assert.equal(f.S.stats['2026-09-10'].n, 0); assert.equal(f.S.stats['2026-09-10'].nnew, 0);
+});
+await check('timed-practice-short-step-records-only-the-first-scheduled-grade', async () => {
+  const f = fixture({ focus: { mode: 'due' } });
+  const rv = f.S.review;
+  const undo = () => byClass(f.render('renderReviewUndo', rv), 'review-undo').fire();
+  let pending = grade(f, { key: 'again', rating: fsrsApi.Rating.Again });
+  f.ack(); assert.equal(await pending, true);
+  assert.equal(rv.queue.length, 2);
+  const scheduled = f.durable();
+  rv.revealed = true;
+  pending = byClass(f.render('renderReview'), 'g-easy').fire();
+  f.ack(); await pending;
+  assert.deepEqual(f.S.revlog, scheduled.revlog);
+  assert.deepEqual(f.S.srs, scheduled.srs);
+  assert.deepEqual(f.S.stats, scheduled.stats);
+  assert.equal(f.S.obslog.length, 1, 'the bound practice answer commits one observation');
+  assert.deepEqual(f.S.obslog[0].slice(1), ['dojo', 'word:学校', 4, 'due']);
+  pending = undo(); f.ack(); assert.equal(await pending, true);
+  assert.deepEqual(f.S.revlog, scheduled.revlog);
+  assert.deepEqual(f.S.obslog[1].slice(1), ['dojo', 'word:学校', 0]);
+  pending = undo(); f.ack(); assert.equal(await pending, true);
+  assert.deepEqual(rv.queue, [item]);
+  assert.equal(rv.ix, 0);
+  assert.deepEqual(f.S.srs, {});
+  assert.deepEqual(f.S.revlog[1].slice(1), ['word:学校', 0, 0]);
 });
 await check('dojo-evidence-waits-for-ack-and-never-creates-schedule-state', async () => {
   const f = fixture(); const before = f.durable();

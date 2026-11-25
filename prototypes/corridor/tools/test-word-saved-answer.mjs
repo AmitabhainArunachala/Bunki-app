@@ -24,7 +24,7 @@
  *     latest record only; the render-time S is not republished.
  *   - The actual mini (showMini) and its registered click handler run against a small fake DOM:
  *     FakeElement, document.querySelectorAll → [], document.body.append no-op, fixed
- *     getBoundingClientRect, window.innerWidth 400. removeMini is a no-op; syncReaderTakeSeal only
+ *     getBoundingClientRect, a 400 × 800 layout viewport. removeMini is a no-op; syncReaderTakeSeal only
  *     counts, so a test sees the handler reach its end.
  *   - The suppression host runs the host's 'remove' transition on the actual modules, staged by the
  *     repository's own builder (as verify-assessment-learning.mjs stages them): the command through
@@ -326,7 +326,7 @@ function defineRows() {
       biLabel: (tag, cls, ja, en) => Object.assign(new FakeElement(tag, cls, en), { labelJa: ja }),
       // the list chooser's peripheral doors (typed-name draft, context picker) are not under test here
       dialogs: [], attachRecordDraft: () => {}, rememberRecordDraft: () => true, renderContextPicker: () => {},
-      document: { querySelectorAll: () => [], body: { append: (node) => { context.dialogs.push(node); } }, getElementById: () => null,
+      document: { documentElement: { clientWidth: 400, clientHeight: 800 }, querySelectorAll: () => [], body: { append: (node) => { context.dialogs.push(node); } }, getElementById: () => null,
         createTextNode: (text) => new FakeElement('#text', '', text) },
       window: { innerWidth: 400 }, removeMini: () => {}, activeTokenAlternatives: null,
       // G1's frame sampler and the page built at idle are the browser's (frames, idle callbacks), not the slip's logic

@@ -1120,6 +1120,7 @@ const RECORD_GATE_CASES = {
     'undo-does-not-overwrite-a-later-card-change',
     'acknowledged-grade-disposes-question-view-and-clears-transient-response-state',
     'undo-after-ungraded-skip-restores-the-actual-graded-item-and-removes-only-its-reinsertion',
+    'timed-practice-short-step-records-only-the-first-scheduled-grade',
     'dojo-evidence-waits-for-ack-and-never-creates-schedule-state',
     'show-answer-turns-the-card-without-a-write-and-ignores-a-second-press',
     'quiz-answer-next-and-close-use-only-acknowledged-run-and-ignore-stale-buttons',
