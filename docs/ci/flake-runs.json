@@ -3,9 +3,9 @@
     "result": "retry",
     "policy": "002dc875d95d7d62d63eaed04ff00e3c74fed894c7b0b9d4615572cf2957a401",
     "startedAt": "2026-11-20T10:49:07Z",
-    "failures": 21,
-    "attemptedAt": "2026-11-24T19:22:54.274Z",
-    "reason": "Command failed: gh api --paginate --slurp repos/AmitabhainArunachala/Bunki-app/actions/runs/42431546894/attempts/2/jobs?per_page=100"
+    "failures": 22,
+    "attemptedAt": "2026-11-25T19:23:13.878Z",
+    "reason": "Observation artifact not yet available: bunki-plan-42431546894-2"
   },
   "42597380709/7": {
     "result": "observed",
