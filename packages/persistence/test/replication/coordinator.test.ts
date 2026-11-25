@@ -253,6 +253,76 @@ describe('sync coordinator — two real file-backed node:sqlite stores (ci-subst
     expect(projection(await open('phone').store.snapshot())).toEqual(projection(two));
   });
 
+  it('retains concurrent offline reviews of the same schedule revision after reconnection and reopen', async () => {
+    const mac = open('mac').store;
+    const phone = open('phone').store;
+    const relay = new SyntheticRelay();
+    relay.offline = true;
+    const a = coordinator(mac, relay).sync;
+    const b = coordinator(phone, relay, PHONE).sync;
+    for (const [store, device, reportedGrade] of [
+      [mac, 'mac', 'again'],
+      [phone, 'phone', 'good'],
+    ] as const) {
+      const { policy, revision } = await store.snapshot();
+      await store.commitLocal({
+        changeId: device + '-answer',
+        expectedRevision: revision,
+        binding: policy.binding,
+        occurredAt: WHEN,
+        mutations: [],
+        operations: [
+          {
+            dependencies: [],
+            payload: {
+              kind: 'review.attempt',
+              attemptId: device + '-attempt',
+              cardId: '川',
+              scheduleRevisionId: 'shared-revision',
+              generation: null,
+              observedAt: WHEN,
+              response: { kind: 'text', text: 'かわ' },
+              reportedGrade,
+              hintsUsed: 0,
+              answerRevealed: false,
+              admission: 'accepted',
+              admissionPolicyVersion: 'fixture/1',
+              schedulerParametersVersion: 'fsrs-pin/1',
+              domainEventRefs: [],
+            },
+          },
+        ],
+      });
+    }
+    for (const sync of [a, b])
+      await expect(sync.syncOnce()).rejects.toMatchObject({ code: 'transport-failed' });
+    expect((await mac.snapshot()).outbox).toHaveLength(1);
+    expect((await phone.snapshot()).outbox).toHaveLength(1);
+    relay.offline = false;
+    for (const sync of [a, b, a, b]) await sync.syncOnce();
+    await mac.close();
+    await phone.close();
+    const one = await open('mac').store.snapshot();
+    const two = await open('phone').store.snapshot();
+    expect(one.outbox).toEqual([]);
+    expect(two.outbox).toEqual([]);
+    expect(projection(one)).toEqual(projection(two));
+    expect(
+      one.replica.operations
+        .map((op) => op.payload.kind === 'review.attempt' && op.payload.reportedGrade)
+        .sort(),
+    ).toEqual(['again', 'good']);
+    expect(one.replica.projection.reviewReconciliations).toEqual([
+      {
+        cardId: '川',
+        scheduleRevisionId: 'shared-revision',
+        reason: 'concurrent-schedule-revision',
+        attempts: expect.arrayContaining(one.replica.operations.map(operationReference)),
+      },
+    ]);
+    expect(one.replica.projection.scheduling).toBe('not-computed');
+  });
+
   it('makes one bounded push and pull per call and leaves remaining work explicit', async () => {
     const a = open('mac').store;
     const b = open('phone').store;
@@ -646,6 +716,29 @@ describe('sync coordinator — two real file-backed node:sqlite stores (ci-subst
     expect(
       new TextEncoder().encode(JSON.stringify(relay.pushes[0])).byteLength,
     ).toBeLessThanOrEqual(2600);
+  });
+
+  it('fits a UTF-8 batch exactly and defers the last operation for a one-byte deficit', async () => {
+    const store = open('mac').store;
+    const relay = new SyntheticRelay();
+    relay.acceptCount = 0;
+    for (const id of ['one', 'two']) await append(store, id, '「雨」🌧️'.repeat(16));
+    await coordinator(store, relay, POLICY, { maxBytes: 9000 }).sync.syncOnce();
+    const serialized = JSON.stringify(relay.pushes[0]);
+    const exact = new TextEncoder().encode(serialized).byteLength;
+    expect(exact).toBeGreaterThan(1024);
+    expect(exact).toBeLessThan(9000); // Wire budget stays four decimal digits in all three requests.
+    for (const [maxBytes, count] of [
+      [exact, 2],
+      [exact - 1, 1],
+    ] as const) {
+      const cycle = await coordinator(store, relay, POLICY, { maxBytes }).sync.syncOnce();
+      expect(cycle.offered).toHaveLength(count);
+      expect(cycle.pendingOutbox).toBe(2);
+      expect(
+        new TextEncoder().encode(JSON.stringify(relay.pushes.at(-1))).byteLength,
+      ).toBeLessThanOrEqual(maxBytes);
+    }
   });
 
   it('does not send a checkpoint request larger than its wire budget', async () => {
