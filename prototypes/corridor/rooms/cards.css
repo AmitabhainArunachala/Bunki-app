@@ -30,6 +30,42 @@ html[data-room='deckplay'] #app > main > .kp { margin-top: 0; }
    the reveal no longer scrolling the page (decks/player windowPassage) it never moves. ---- */
 html[data-room='deckplay'] body:not(.zen) #app > .chrome { background: var(--color-glass-solid, var(--color-page)); -webkit-backdrop-filter: none; backdrop-filter: none; }
 
+/* Reserve the study bar's end for the prototype, colour and report buttons.
+   The report rail follows the centred 672px bar on wide screens. */
+html[data-room='deckplay'] body:has(#app .kp-study) {
+  --deck-report-inset: calc(4px + env(safe-area-inset-right, 0px));
+  --deck-controls-top: env(safe-area-inset-top, 0px);
+}
+@media (min-width: 521px) {
+  html[data-room='deckplay'] body:has(#app .kp-study) {
+    --deck-report-inset: max(14px, calc((100vw - 672px) / 2 + 4px));
+  }
+}
+@media (min-width: 40em) and (orientation: landscape) {
+  html[data-room='deckplay'] body:has(#app .kp-study) {
+    /* The split stage is 72rem plus its two 1rem gutters. */
+    --deck-report-inset: max(calc(4px + env(safe-area-inset-right, 0px)), calc((100vw - 74rem) / 2 + 4px));
+    --deck-controls-top: max(.5rem, env(safe-area-inset-top, 0px));
+  }
+}
+html[data-room='deckplay'] body:has(#app .kp-study):not(:has(#sheet, dialog[open])) #bunki-reports-root .br-rail {
+  top: var(--deck-controls-top);
+  right: var(--deck-report-inset);
+}
+html[data-room='deckplay'] body:has(#app .kp-study) #app .kp-top-study[data-bar='deck'] {
+  padding-right: calc(152px + env(safe-area-inset-right, 0px));
+}
+html[data-room='deckplay'] body:has(#app .kp-study):not(:has(#sheet, dialog[open])) #bunki-look-seal {
+  inset: var(--deck-controls-top) calc(var(--deck-report-inset) + 44px) auto auto;
+  top: var(--deck-controls-top) !important;
+}
+html[data-room='deckplay'] body:has(#app .kp-study):not(:has(#sheet, dialog[open])) > #bunki-prototype-root .pl-rail {
+  inset: var(--deck-controls-top) calc(var(--deck-report-inset) + 88px) auto auto;
+}
+html[data-room='deckplay'] body:has(#app .kp-study):not(:has(#sheet, dialog[open])) > #bunki-prototype-root .pl-intro {
+  display: none;
+}
+
 /* In a wide sitting the passage and its reference sheet scroll independently.
    The four grades take their own row, including when the first-session hints wrap. */
 @media (min-width: 40em) and (orientation: landscape) {
