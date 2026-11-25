@@ -352,10 +352,22 @@ async function answer(page, grade = 'good', deck = 'n2') {
   const stepNote = await shownText(page.locator('.kp-stepnote'));
   const shownAt = await nowIn(page);
   await page.locator(`#kp-grade-${grade}`).click();
-  await page.waitForFunction(([key, card, n]) => (JSON.parse(localStorage.getItem(key) || '{}').log || []).filter((r) => r[0] === card).length > n, [`bunki-cloze:${deck}`, card, (before?.reps ?? 0)], { timeout: 10000 }).catch(() => {});
+  // Retained rows can start after a card's first review, or reach their retention cap.
+  // Observe the requested grade in this card's next revision and its matching log row.
+  const stored = await page.waitForFunction(([key, id, reps, rating]) => {
+    const ledger = JSON.parse(localStorage.getItem(key) || '{}');
+    const updated = ledger.cards?.[id];
+    const row = ledger.log?.at(-1);
+    return updated?.reps === reps && row?.[0] === id && row[1] === rating && row[2] === updated.last_review;
+  }, [`bunki-cloze:${deck}`, card, (before?.reps ?? 0) + 1, player.RATINGS[grade]], { timeout: 10000 })
+    .then(() => true).catch(error => {
+      // A control which serves a card early can lead to a real refusal.
+      if (error.name === 'TimeoutError') return false;
+      throw error;
+    });
   const ledger = await ledgerOf(page, deck);
   const after = ledger?.cards?.[card] ?? null;
-  const row = [...(ledger?.log || [])].reverse().find((r) => r[0] === card);
+  const row = stored ? [...(ledger?.log || [])].reverse().find((r) => r[0] === card) : null;
   const promised = row && after ? playerWait(Date.parse(after.due) - Date.parse(row[2])) : null;
   return { card, before, after, label, promised, chips, stepNote, shownAt, early: isEarly(chips) };
 }
