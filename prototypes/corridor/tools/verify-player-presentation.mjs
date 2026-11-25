@@ -54,8 +54,9 @@ async function checkStudyRotation() {
     const original = await page.evaluate(census);
     const passage = page.locator('#kp-card > .kp-sentence');
     await passage.hover();
+    const wheelLanded = passage.evaluate(p => new Promise(resolve => p.addEventListener('scrollend', resolve, { once: true })));
     await page.mouse.wheel(0, 230);
-    await page.waitForFunction(initial => document.querySelector('#kp-card > .kp-sentence').scrollTop !== initial, original.inner);
+    await wheelLanded;
     const reading = () => {
       const p = document.querySelector('#kp-card > .kp-sentence');
       const top = p.getBoundingClientRect().top;
