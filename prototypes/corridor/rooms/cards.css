@@ -176,10 +176,20 @@ html[data-room='deckplay'] body:not(.zen):not([data-view='entry']):not([data-vie
   flex: 1 0 100%;
   display: block;
   width: 100%;
-  height: calc(100dvh - 7rem);
-  min-height: 28rem;
+  height: calc(100dvh - var(--shared-study-chrome-height, 3.5rem) - var(--nav-clearance, 0px));
   border: 0;
   background: transparent;
+}
+/* The iframe owns the reading surface and the four grades. The host's
+   prototype and look controls fit in the empty left side of its own toolbar. */
+html[data-room='deckplay'] body:has([data-shared-study='ready']) > #bunki-prototype-root .pl-rail {
+  inset: env(safe-area-inset-top, 0px) auto auto max(4px, env(safe-area-inset-left, 0px));
+}
+html[data-room='deckplay'] body:has([data-shared-study='ready']) > #bunki-prototype-root .pl-intro {
+  display: none;
+}
+html[data-room='deckplay'] body:has([data-shared-study='ready']) #bunki-look-seal {
+  inset: env(safe-area-inset-top, 0px) auto auto calc(48px + env(safe-area-inset-left, 0px));
 }
 /* Avoid duplicate outer chrome ear mark while embedded Nihongo Study owns its own working ear inside the frame. */
 html[data-room='deckplay'] body:has(#app > main > [data-shared-study='ready']) #app > .chrome > .ear-spot {

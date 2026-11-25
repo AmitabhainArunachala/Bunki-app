@@ -141,6 +141,15 @@ try {
   applyHostAppearance(initialAppearance);
   const disposeAppearance=typeof port.subscribeAppearance==='function'?port.subscribeAppearance(next=>applyHostAppearance(next,{syncLanguage:true})):()=>{};
   const disposeViewport=bindSharedStudyViewport({app,root,onCardStart:port.onCardStart});
+  // Rotating changes the parent header and the trial copy's line wrapping. Seat
+  // the same card below the new header without remounting its reading surface.
+  let frameWidth = window.innerWidth;
+  const onResize = () => {
+    if (window.innerWidth === frameWidth) return;
+    frameWidth = window.innerWidth;
+    if (app.read().screen === 'study') port.onCardStart?.();
+  };
+  window.addEventListener('resize', onResize);
   if(params.get('start')==='1')root.querySelector('[data-start]')?.click();
   window.bunkiSharedStudy=Object.freeze({app,backend:adapter.backend,store:adapter.store,catalog,dictionary});
   function onPagehide(event) {
@@ -148,6 +157,7 @@ try {
     window.removeEventListener('pagehide', onPagehide);
     disposeAppearance();
     voicePort?.abortAll?.();
+    window.removeEventListener('resize', onResize);
     disposeViewport();
     app.dispose();
   }
