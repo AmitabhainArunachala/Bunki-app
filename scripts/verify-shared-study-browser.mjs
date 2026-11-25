@@ -165,6 +165,13 @@ try {
     narrowPage.on('pageerror', (error) => receipt.errors.push(error.message));
     for (const width of [320, 375]) {
       await narrowPage.setViewportSize({ width, height: 852 });
+      if (width === 320) {
+        await narrowPage.route(
+          '**/data/shared-study/BUILD.json',
+          (route) => route.fulfill({ contentType: 'application/json', body: '{}' }),
+          { times: 1 },
+        );
+      }
       await narrowPage.goto(`${host.origin}/?deck=n2&sharedStudy=preview&ui=en`, {
         waitUntil: 'domcontentloaded',
       });
@@ -172,6 +179,14 @@ try {
       let narrowFrame = await (
         await narrowPage.locator('[data-shared-study-frame]').elementHandle()
       ).contentFrame();
+      if (width === 320) {
+        await narrowFrame.getByRole('alert').waitFor();
+        assert.equal(await narrowFrame.locator('[data-grade]').count(), 0);
+        const reason = await narrowFrame.locator('details').textContent();
+        assert.match(reason, /shared-ui-content-hash/);
+        await narrowFrame.getByRole('button', { name: /Try opening again|もう一度開く/ }).click();
+        receipt.checks.push('tampered-materials-block-and-retry-in-the-same-bound-frame');
+      }
       await narrowFrame.waitForFunction(() => !!window.bunkiSharedStudy, null, {
         timeout: 60000,
       });
@@ -322,6 +337,29 @@ try {
       await narrowFrame.locator('[data-reveal]').tap();
       await narrowFrame.locator('[data-study=back]').waitFor();
       assert.equal(await narrowFrame.locator('[data-grade]').count(), 4);
+      const passage = narrowFrame.locator('[data-passage=passage]').first();
+      const glyphSize = (node) => parseFloat(window.getComputedStyle(node).fontSize);
+      const baseSize = await passage.evaluate(glyphSize);
+      const currentTask = await narrowFrame.evaluate(
+        () => bunkiSharedStudy.app.read().current.entry.taskKey,
+      );
+      await narrowPage.evaluate(() => {
+        document.documentElement.dataset.readingSize = '150';
+      });
+      await narrowFrame.waitForFunction(
+        () =>
+          window
+            .getComputedStyle(document.documentElement)
+            .getPropertyValue('--reading-multiplier')
+            .trim() === '1.5',
+      );
+      assert.equal(await passage.evaluate(glyphSize), baseSize * 1.5);
+      assert.equal(
+        await narrowFrame.evaluate(() => bunkiSharedStudy.app.read().current.entry.taskKey),
+        currentTask,
+      );
+      assert.equal(await narrowFrame.locator('[data-study=back] [data-grade]:enabled').count(), 4);
+
       await assertWidth();
       assert.equal(
         await narrowPage.evaluate(() => window.__KAIRO_RECORD_SAFETY__.state().notSaving),
