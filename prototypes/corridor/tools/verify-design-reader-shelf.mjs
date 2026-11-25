@@ -1372,6 +1372,22 @@ try {
           return { tokens: sentence.length, lastBottom: Math.round(last.bottom), viewport: innerHeight, misses: misses.slice(0, 4), missCount: misses.length };
         });
         assert.equal(probe.missCount, 0, `first sentence not wholly on the first screen: ${JSON.stringify(probe.misses)}`);
+        if (label === '390') {
+          // A phone rotation keeps the open article and puts its first word
+          // between the fixed navigation bars on short landscape displays.
+          const first = page.locator('#reader .tok.content').first();
+          const firstText = await first.innerText();
+          for (const size of [{ width: 568, height: 320 }, { width: 844, height: 390 }]) {
+            await page.setViewportSize(size);
+            assert.equal(await first.innerText(), firstText);
+            const reachable = await first.evaluate(node => {
+              const box = node.getClientRects()[0];
+              return node.contains(document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2)) &&
+                document.documentElement.scrollWidth <= innerWidth;
+            });
+            assert(reachable, `opening word clipped or covered at ${size.width}×${size.height}`);
+          }
+        }
         return probe;
       });
     }

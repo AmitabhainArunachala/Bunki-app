@@ -1043,6 +1043,32 @@ html[data-live-depth='1'][data-room='reader'] body:not([data-view='drift']):not(
   html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > #reader.reader::before { content: none; }
 }
 
+/* In the landscape reading column the cover occupies the left margin.
+   Keep the title on its image and let long titles extend below the print. */
+@media (orientation: landscape) and (min-width: 521px) and (max-height: 540px) {
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader']:not(.zen) #app > main:not(:has(> .dials)) {
+    --rd-pad: var(--s2, 16px);
+    margin-top: 0;
+    padding: var(--s1, 8px) var(--rd-pad) 96px;
+  }
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero {
+    height: clamp(96px, 32svh, 144px);
+    margin: 0;
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
+  }
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero + .reader-card {
+    --cover-lap: 40px;
+    margin: calc(-1 * var(--cover-lap)) 0 8px;
+    padding: 10px var(--s1, 8px) 8px;
+    border-radius: 0 0 var(--radius-card) var(--radius-card);
+  }
+  html[data-live-depth='1'][data-room='reader'] body[data-view='reader'] #app > main:not(:has(> .dials)) > .reader-hero + .reader-card > h1.view-title {
+    font-size: var(--type-reading);
+    line-height: 1.5;
+  }
+}
+
+
 /* =====================================================================================
    3 · Learn opens on a desk at night: one deck under a lamp (lead, 2026-11-10 21:25)
    The room you study in is dark with one lit card. Its doorway is the same: the deck lies under a pool of

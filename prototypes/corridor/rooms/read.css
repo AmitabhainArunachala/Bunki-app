@@ -1666,6 +1666,52 @@ html[data-room='reader'] body:not([data-view='drift']) main #reader.reader {
   html[data-room='reader'] body[data-view='reader'] #app > main > .reader-card > .view-title-en { font-size: var(--type-chrome); line-height: 1.4; }
 }
 
+/* Short landscape readers keep the text beside its illustration and reading
+   controls. The document still scrolls as one surface for saved positions. */
+@media (orientation: landscape) and (min-width: 521px) and (max-height: 540px) {
+  :root[data-room='reader'] body[data-view='reader']:not(.zen) #app > main {
+    display: grid;
+    grid-template:
+      "return return" auto
+      "print  text" auto
+      "title  text" auto
+      "audio  text" auto
+      ".      text" 1fr
+      "places places" auto
+      "footer footer" auto / minmax(0, 31%) minmax(0, 1fr);
+    align-items: start;
+    column-gap: var(--s2, 16px);
+    width: 100%;
+    max-width: 1060px;
+    margin-top: 0;
+    padding-top: var(--s1, 8px);
+    padding-inline: var(--s2, 16px);
+  }
+  html[data-room='reader'] #app > main > :is(#reader-source-back, #source-entry-return) { grid-area: return; }
+  html[data-room='reader'] body[data-view='reader']:not(.zen) #app > main > .reader-hero {
+    grid-area: print;
+    margin: 0;
+    padding: 6px;
+  }
+  html[data-room='reader'] body[data-view='reader']:not(.zen) #app > main > .reader-hero .reader-picture-img {
+    height: clamp(76px, 23svh, 120px);
+  }
+  html[data-room='reader'] body[data-view='reader']:not(.zen) #app > main > .reader-card {
+    grid-area: title; margin: 6px 0; padding: 8px 12px 4px;
+  }
+  html[data-room='reader'] body[data-view='reader']:not(.zen) #app > main > .reader-card > h1.view-title { font-size: var(--type-reading); }
+  :root[data-room='reader'] body[data-view='reader']:not(.zen) #app > main:has(> .dials) { display: block; }
+  html[data-room='reader'] #app > main > .listen-row { grid-area: audio; flex-wrap: wrap; }
+  html[data-room='reader'] #app > main > #record-reading-places { grid-area: places; }
+  html[data-room='reader'] #app > main > .article-footer { grid-area: footer; }
+  html[data-room='reader'] #app > main > #reader.reader {
+    grid-area: text;
+    min-width: 0;
+    /* The floating paragraph control has a 44px target at the screen edge. */
+    padding-inline-end: calc(44px + var(--s1, 8px));
+  }
+}
+
 /* =====================================================================================
    ROUND 4, the shelf's lead (the common thread: separation instead of one beige). The lead story is
    the reader's own composition in miniature: the woodblock, and in front of it a raised card holding
