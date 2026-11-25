@@ -7,38 +7,6 @@
     "attemptedAt": "2026-11-24T19:22:54.274Z",
     "reason": "Command failed: gh api --paginate --slurp repos/AmitabhainArunachala/Bunki-app/actions/runs/42431546894/attempts/2/jobs?per_page=100"
   },
-  "42597380709/4": {
-    "result": "observed",
-    "startedAt": "2026-11-10T01:08:59Z"
-  },
-  "42489884950/5": {
-    "result": "observed",
-    "startedAt": "2026-11-10T01:09:10Z"
-  },
-  "42593972611/3": {
-    "result": "observed",
-    "startedAt": "2026-11-10T01:09:01Z"
-  },
-  "42418249759/7": {
-    "result": "observed",
-    "startedAt": "2026-11-10T01:09:21Z"
-  },
-  "42407075841/8": {
-    "result": "observed",
-    "startedAt": "2026-11-10T01:09:26Z"
-  },
-  "42400327580/7": {
-    "result": "observed",
-    "startedAt": "2026-11-10T01:09:32Z"
-  },
-  "42431546894/7": {
-    "result": "observed",
-    "startedAt": "2026-11-10T01:09:11Z"
-  },
-  "42406261624/8": {
-    "result": "observed",
-    "startedAt": "2026-11-10T01:09:27Z"
-  },
   "42766585487/1": {
     "result": "observed",
     "startedAt": "2026-11-10T06:09:13Z"
@@ -1574,5 +1542,13 @@
   "45449862978/1": {
     "result": "observed",
     "startedAt": "2026-11-24T17:33:18Z"
+  },
+  "45529876391/1": {
+    "result": "observed",
+    "startedAt": "2026-11-25T02:00:50Z"
+  },
+  "45530015627/1": {
+    "result": "observed",
+    "startedAt": "2026-11-25T02:01:55Z"
   }
 }
