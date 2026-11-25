@@ -28,6 +28,20 @@ async function dailyStudy(browser, engine, origin, out) {
     await openToday();
     const study = page.locator('.today-deck-door');
     assert.match(await study.innerText(), /Choose a study deck/);
+    const leaveToday = async () => {
+      await study.focus();
+      const y = await page.evaluate(() => { window.scrollTo(0, 48); return window.scrollY; });
+      await study.press('Enter');
+      return y;
+    };
+    const expectReturn = async previousY => {
+      await page.waitForFunction(() => document.activeElement?.id === 'today-study-deck');
+      assert(Math.abs(await page.evaluate(() => window.scrollY) - previousY) <= 1);
+    };
+    const chooserScroll = await leaveToday();
+    await page.locator('button[data-deck="n1"]').waitFor();
+    await page.locator('#back').click();
+    await expectReturn(chooserScroll);
     await study.click();
     await page.locator('button[data-deck="n1"]').click();
     await page.locator('#kp-start').click();
@@ -54,12 +68,16 @@ async function dailyStudy(browser, engine, origin, out) {
       positions.push({ width, height, button: box });
     }
 
-    await study.click();
+    const deckScroll = await leaveToday();
     const followingCard = await page.locator('#kp-card').getAttribute('data-card');
     assert.notEqual(followingCard, first);
     assert(await page.locator('#kp-reveal').isVisible());
     assert.equal(await record(), saved, 'Resuming cannot grade or alter the ledger');
-    await openToday();
+    // The player's End command takes you to that deck's home. Its Back returns
+    // through the originating host navigation frame.
+    await page.locator('#kp-quit').click();
+    await page.locator('.kp-home .kp-top .kp-icon, .kp-top .kp-icon').first().click();
+    await expectReturn(deckScroll);
     await page.locator('#tab-learn').click();
     await page.locator('.learn-go-deck[data-stage-deck="n1"]').waitFor();
     assert.match(await page.locator('.learn-go-deck').innerText(), /Continue/);
