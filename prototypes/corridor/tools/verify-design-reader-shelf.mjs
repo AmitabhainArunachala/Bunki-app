@@ -1688,6 +1688,8 @@ try {
       await run(`P1-fresh-word-demo-${label}`, viewport, async (page) => {
         page.__verifierPhase = 'fresh shelf';
         await open(page);
+        const intro = page.locator('.pl-intro-ok');
+        if (await intro.isVisible()) await intro.click();
         const learning = (record) => Object.fromEntries(['taken', 'srs', 'obslog', 'revlog', 'lists', 'teacherContexts']
           .map((key) => [key, record[key] ?? null]));
         const before = learning(await readAppRecord(page));
