@@ -627,7 +627,13 @@ async function main() {
     await page.waitForTimeout(280);
     await page.screenshot({ path: resolve(SHOTS_DIR, '02-named-entry-dialog.png') });
     await page.keyboard.press('Escape');
-    await page.waitForTimeout(120);
+    // Focus restoration runs after the reader is repainted. Wait for the
+    // actual invoking token, including its index, rather than a wall-clock sleep.
+    await page.waitForFunction((index) => !document.querySelector('#sheet') &&
+      document.activeElement?.matches(`#reader .tok.content[data-index="${index}"]`),
+    invokerIndex, { timeout: 3000 }).catch((error) => {
+      if (error.name !== 'TimeoutError') throw error;
+    });
     const returnProbe = await page.evaluate(`({
       closed: !document.querySelector('#sheet'),
       returned: document.activeElement?.matches('#reader .tok.content[data-index="${invokerIndex}"]') ?? false,
