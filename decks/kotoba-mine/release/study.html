@@ -4479,29 +4479,43 @@ body.has-primary-tabs .kp .kp-study > .kp-reveal { bottom: calc(var(--nav-cleara
    reading is half its word (the ruby rule below). The floors (MASTER_SPEC D5): a reading 10 CSS px or
    more, a gloss 13 or more. The old ladders (corridor.css --t-*, register.css, editorial.css's own and
    its bridge, reference-ui.css --reference-*) are gone. ── */
+/* Only learning text rebinds these same steps to the reader's device preference.
+   Outer UI keeps its original scale. rem also honors the browser's base text size. */
 :root {
-  --type-caption: 12px;
-  --type-label: 13px;
-  --type-chrome: 14px;
-  --type-control: 15px;
-  --type-body: 16px;
-  --type-lead: 18px;
-  --type-seal: 22px;
-  --type-reading: 23px;
-  --type-section: 24px;
-  --type-title: 29px;
-  --type-display: 34px;
-  --type-hero: 38px;
-  --type-headword: 42px;
+  --text-unit: 1px;
+  --reading-step: 23;
+  --display-step: 34;
   --leading-tight: 1.25;
   --leading-ui: 1.35;
   --leading-body: 1.55;
   --leading-reading: 1.9;
 }
-/* a phone sets reading and display a step smaller: 21 is the smallest Japanese that carries a 10 px
-   reading. (Until F this compact pair applied only with the contrast variant off; type is not contrast.) */
+:root[data-reading-size='125'] { --reading-multiplier: 1.25; }
+:root[data-reading-size='150'] { --reading-multiplier: 1.5; }
+body { --text-unit: calc(0.0625rem * var(--reading-multiplier, 1)); }
+:root,
+:where(#reader, .reader-prose, .mini-word, .mini-reading, .mini-gloss,
+  .nsr-glyph, .nsr-read, .nsr-gloss, .tray-line .w,
+  .sheet .headword, .sheet .reading, .sheet .gloss, .sheet .sense-list,
+  .sheet .row-word, .sheet .row-reading, .sheet .example-ja, .sheet .example-en,
+  .sheet .teacher-source-quote, .sheet .sent-reader, .sheet .sent-reader-en) {
+  --type-caption: calc(12 * var(--text-unit));
+  --type-label: calc(var(--label-step, 13) * var(--text-unit));
+  --type-chrome: calc(14 * var(--text-unit));
+  --type-control: calc(var(--control-step, 15) * var(--text-unit));
+  --type-body: calc(16 * var(--text-unit));
+  --type-lead: calc(18 * var(--text-unit));
+  --type-seal: calc(var(--seal-step, 22) * var(--text-unit));
+  --type-reading: calc(var(--reading-step) * var(--text-unit));
+  --type-section: calc(24 * var(--text-unit));
+  --type-title: calc(29 * var(--text-unit));
+  --type-display: calc(var(--display-step) * var(--text-unit));
+  --type-hero: calc(38 * var(--text-unit));
+  --type-headword: calc(var(--headword-step, 42) * var(--text-unit));
+}
+/* A phone's 21px Japanese carries a 10.5px reading at the default size. */
 @media (max-width: 520px) {
-  :root { --type-reading: 21px; --type-display: 29px; }
+  :root { --reading-step: 21; --display-step: 29; }
 }
 /* ── One ruby: every reading in the house is a native <rt>, set by this one rule. Half its word (so 10 CSS
    px or more over Japanese set at the reading step or larger, D5), over it, one line high, in the
@@ -11413,11 +11427,15 @@ async function nextNewWord(deckIds, storage = window.localStorage) {
 async function summary(deckId, storage = window.localStorage) {
   if (isSharedStudyMode() && (isSharedDeck(deckId) || deckId === 'shared-grammar')) return (await sharedPlayer()).summary(deckId);
   if (isSharedStudyMode()) return {due:0,fresh:0,total:0,words:0,authority:'unmapped'};
-  const { deck } = await loadDeck(deckId);
-  const { state } = loadState(storage, deck);
+  const { deck, index } = await loadDeck(deckId);
+  const state = normalizeState(readJson(storage, stateKey(deck.id)), deck);
+  let lastReviewedAt = 0;
+  for (const [id, record] of Object.entries(state.cards)) {
+    if (index.cards.has(id)) lastReviewedAt = Math.max(lastReviewedAt, Date.parse(record.last_review) || 0);
+  }
   const prefs = prefsFor(storage, deck);
   const q = buildQueue(deck, state, new Date(), prefs.newPerDay, { skip: skipFor(prefs.mode), buried: buriedToday(storage, deck.id, new Date()) });
-  return { due: q.due.length, fresh: q.fresh.length, total: q.queue.length, words: deck.words.length, titleJa: deck.titleJa, titleEn: deck.titleEn };
+  return { lastReviewedAt, due: q.due.length, fresh: q.fresh.length, total: q.queue.length, words: deck.words.length, titleJa: deck.titleJa, titleEn: deck.titleEn };
 }
 
 if (isSharedStudyMode()) {
