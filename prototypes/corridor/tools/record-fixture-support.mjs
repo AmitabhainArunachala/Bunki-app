@@ -63,7 +63,7 @@ export async function restoreAppFixture(page, value, { archive, journal } = {}) 
   const marker = randomUUID();
   await page.evaluate((marker) => { window.__fixtureImportDocument = marker; }, marker);
   await page.locator('#import-file').setInputFiles({ name: 'synthetic-fixture-backup.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(backup)) });
-  await page.waitForFunction((marker) => window.__fixtureImportDocument !== marker && document.body.dataset.ready === '1', marker, { timeout: 20000 });
+  await page.waitForFunction((marker) => window.__fixtureImportDocument !== marker && document.body?.dataset.ready === '1', marker, { timeout: 20000 });
   const after = await readAppRecordSnapshot(page);
   assert.deepEqual(after.record, record, 'The actual importer must commit the supplied synthetic record');
   assert.deepEqual(after.archive, portableArchive);
