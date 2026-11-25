@@ -1,6 +1,6 @@
 # Integrated study and continuity
 
-This is the implementation record for the branch based on `next` at `cbb7a0343` (PR #154, 1.3.0-rc.2). The candidate is 1.3.0-rc.3. The separate production 1.2.3 baseline at `62abd3542` uses different routing and storage. Its 1.2.4 work is available on `improve/study-continuity`. Do not apply its localStorage writer over the integrated engine.
+The current candidate is **1.3.0-rc.5**, at the end of a single integration line based on `next` at `cbb7a0343` (PR #154, 1.3.0-rc.2). The opening sections record rc.3. The final section covers the changes since rc.4, measurements, and outstanding acceptance work. [Current candidate](#daily-study-and-reading-on-130-rc5) The separate production 1.2.3 baseline at `62abd3542` uses different routing and storage. Its 1.2.4 work is available on `improve/study-continuity`. Do not apply its localStorage writer over the integrated engine.
 
 ## What owns a review
 
@@ -106,6 +106,8 @@ Both rc.4 and the first rc.5 build occasionally protected the record while savin
 ### Measurements and assessment
 
 Two Chromium comparisons used the real shared N2 route, the full catalog and a persistent profile for each cold/reopen pair. Service workers were blocked for the timing experiment. First-card times in seconds were 30/78 and 53/39 on rc.4, and 127/62 and 69/51 on the isolated startup patch. Host contention varied. The dictionary request began 4.30–9.27 seconds after grammar on rc.4 and 0.10–1.19 seconds after grammar on the candidate. The redundant binding came from browser cache in the baseline. Every measured cold start of the experiment was slower. The revised candidate restores sequential preparation of the large assets and retains the removal of the redundant parse.
+
+The reviewed rc.5 package came from clean commit `c2b4b9c20`, with artifact SHA-256 `724fe8631434aec65c1b0cbfe8b53a472bf6bae75f977acc323430c105fbd32d`. One quiet Linux Chromium run reached a usable full-corpus N2 prompt in **21.05 seconds cold and 15.54 seconds on reopen**. This is still a long wait. The portable ZIP was extracted and run on loopback. A separate HTTPS test of the same build passed all 97 assertions for offline reopen, interrupted updates, cache isolation and recovery from an older service worker. Upgrade and rollback, two offline learners and the older IndexedDB archive were exercised separately. Signed Apple hardware, VoiceOver and a real CloudKit account remain open.
 
 The scores below are judgments on the exercised routes. The counts, timings and dimensions are observations. Earlier columns above remain the evidence trail for the prior candidate.
 
