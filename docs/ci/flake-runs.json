@@ -7,80 +7,6 @@
     "attemptedAt": "2026-11-24T19:22:54.274Z",
     "reason": "Command failed: gh api --paginate --slurp repos/AmitabhainArunachala/Bunki-app/actions/runs/42431546894/attempts/2/jobs?per_page=100"
   },
-  "42770473307/1": {
-    "result": "observed",
-    "startedAt": "2026-11-10T06:43:53Z"
-  },
-  "42772917642/1": {
-    "result": "observed",
-    "startedAt": "2026-11-10T07:05:56Z"
-  },
-  "42773527668/1": {
-    "result": "rejected",
-    "policy": "002dc875d95d7d62d63eaed04ff00e3c74fed894c7b0b9d4615572cf2957a401",
-    "startedAt": "2026-11-10T07:11:14Z",
-    "reason": "Producer verification policy differs from trusted default branch"
-  },
-  "42776971134/1": {
-    "result": "rejected",
-    "policy": "002dc875d95d7d62d63eaed04ff00e3c74fed894c7b0b9d4615572cf2957a401",
-    "startedAt": "2026-11-10T07:40:49Z",
-    "reason": "Producer verification policy differs from trusted default branch"
-  },
-  "42776971134/2": {
-    "result": "observed",
-    "startedAt": "2026-11-10T09:12:01Z"
-  },
-  "42772917642/2": {
-    "result": "observed",
-    "startedAt": "2026-11-10T09:12:07Z"
-  },
-  "42773527668/2": {
-    "result": "observed",
-    "startedAt": "2026-11-10T09:12:05Z"
-  },
-  "42780186199/1": {
-    "result": "rejected",
-    "policy": "002dc875d95d7d62d63eaed04ff00e3c74fed894c7b0b9d4615572cf2957a401",
-    "startedAt": "2026-11-10T08:07:30Z",
-    "reason": "Producer verification policy differs from trusted default branch"
-  },
-  "42418249759/8": {
-    "result": "observed",
-    "startedAt": "2026-11-10T09:12:34Z"
-  },
-  "42597380709/5": {
-    "result": "observed",
-    "startedAt": "2026-11-10T09:12:13Z"
-  },
-  "42489884950/6": {
-    "result": "observed",
-    "startedAt": "2026-11-10T09:12:25Z"
-  },
-  "42593972611/4": {
-    "result": "observed",
-    "startedAt": "2026-11-10T09:12:15Z"
-  },
-  "42407075841/9": {
-    "result": "observed",
-    "startedAt": "2026-11-10T09:12:39Z"
-  },
-  "42770473307/2": {
-    "result": "observed",
-    "startedAt": "2026-11-10T09:12:09Z"
-  },
-  "42400327580/8": {
-    "result": "observed",
-    "startedAt": "2026-11-10T09:12:45Z"
-  },
-  "42431546894/8": {
-    "result": "observed",
-    "startedAt": "2026-11-10T09:12:27Z"
-  },
-  "42406261624/9": {
-    "result": "observed",
-    "startedAt": "2026-11-10T09:12:40Z"
-  },
   "42597380709/6": {
     "result": "observed",
     "startedAt": "2026-11-10T17:15:15Z"
@@ -1598,5 +1524,11 @@
   "45556583530/1": {
     "result": "observed",
     "startedAt": "2026-11-25T05:52:37Z"
+  },
+  "45536024187/1": {
+    "result": "rejected",
+    "policy": "002dc875d95d7d62d63eaed04ff00e3c74fed894c7b0b9d4615572cf2957a401",
+    "startedAt": "2026-11-25T02:52:32Z",
+    "reason": "Producer verification policy differs from trusted default branch"
   }
 }
