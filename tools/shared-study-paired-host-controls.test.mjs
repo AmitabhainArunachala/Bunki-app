@@ -496,7 +496,7 @@ const FAULTS = [
   [
     'a first open the server refuses ends the pairing and says so',
     HOST,
-    "if (!closed && result?.error === 'authentication-required') await endPairing();",
+    "if (!closed && result?.error === 'authentication-required') await endPairing(adapter);",
     '',
     T.firstRefused,
   ],
