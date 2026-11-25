@@ -1584,5 +1584,9 @@
     "policy": "002dc875d95d7d62d63eaed04ff00e3c74fed894c7b0b9d4615572cf2957a401",
     "startedAt": "2026-11-25T06:31:56Z",
     "reason": "Producer verification policy differs from trusted default branch"
+  },
+  "45556583530/2": {
+    "result": "observed",
+    "startedAt": "2026-11-25T11:10:35Z"
   }
 }
