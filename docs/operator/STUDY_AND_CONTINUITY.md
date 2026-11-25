@@ -37,6 +37,10 @@ The synthetic 75 ms RTT boot probe on the production-based slice measured the te
 - The Chromium paired-browser walk exercised pairing, two-way grade transfer, reopening and revocation through the Worker. The separately tested native desktop journal has a different transport and narrower record coverage.
 - The private canonical renderer was tested independently. The same four seconds of recall plus sixty seconds in menus changed from a recorded 64 seconds to 4 seconds on the upstream branch. The selected grade and reducer digest were preserved. This upstream change enters Bunki through a later released-engine import.
 
+- WebKit paired, exchanged grades in both directions and twice exceeded the 150-second readiness budget when reopening the profile on this Linux host. The shipped dictionary expands to 163,451,315 bytes before indexing. This gate remains open.
+- Starting the generated modules exposed an incomplete local workspace installation. Bundles had consistent hashes but selected an incompatible schema dependency and the app correctly protected its record. Assembly now initializes every generated core module before sealing the build.
+- The rc.3 lockfile retains the rc.2 dependency resolution. The November 25 production-dependency audit reported 14 advisories (6 moderate, 7 high and 1 critical). The critical shell-quote advisory is in the Expo/React Native development-tools chain. The release review still needs to establish shipped reachability and qualify any dependency updates.
+
 ## Evaluation
 
 Judgments on the inspected paths use five-point increments on a 0–100 scale. The columns record discovery, integrity fixes, adaptive layouts and the combined candidate. A reproducible loss or unreachable primary action rates below 60. Scores near 75 require repeatable behavior across the exercised paths. Scores above 90 require sustained use on real devices. Where an iteration supplied no new evidence the score stays fixed.
