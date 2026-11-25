@@ -14,6 +14,13 @@ This is the implementation record for the branch based on `next` at `cbb7a0343` 
 
 The public distribution remains pinned to the 354-file Nihongo Study release at `5f2f45fb021d6e328ea91c7890fcadf70da9a37b`. The importer, content binding and release verifier own this boundary. The grade clock lives upstream. A separately reviewed upstream correction excludes time spent in a menu, help or report surface from active recall time. Its adoption requires a new admitted distribution. [Shared study contract](../srs/SHARED_STUDY_ENGINE.md) · [Release identity](../../scripts/shared-study-release.json)
 
+## Design decisions
+
+- The Read and Cards rooms use the existing semantic roles for color, type, spacing, elevation and motion. Keep Japanese passages in the editorial text face and the controls in the interface face. The shared frame inherits its own canonical type and theme contract.
+- Keep the prompt dominant in portrait. On a revealed wide card, keep the passage and its explanation side by side. In both layouts reserve space for the four grade controls and allow the text to scroll. Measure what receives a tap in addition to its bounding box.
+- Use native ruby and strict Japanese line breaking. Give a term, its reading and the adjoining punctuation enough room to reflow together. Keep disclosure, reading-mode changes and rotation on the same card without recording a review.
+- Anchor a word lookup to the selected Japanese token. Rotation should move the existing surface, retain the selected word and keep its actions inside the new viewport. Test before and after onboarding notices are dismissed.
+
 ## Iterations and evidence
 
 | Cycle             | Baseline observation                                                                                                                                                           | Candidate check                                                                                                                                                                                                                                                                                                   |
@@ -40,6 +47,10 @@ The synthetic 75 ms RTT boot probe on the production-based slice measured the te
 - WebKit paired, exchanged grades in both directions and twice exceeded the 150-second readiness budget when reopening the profile on this Linux host. The shipped dictionary expands to 163,451,315 bytes before indexing. This gate remains open.
 - Starting the generated modules exposed an incomplete local workspace installation. Bundles had consistent hashes but selected an incompatible schema dependency and the app correctly protected its record. Assembly now initializes every generated core module before sealing the build.
 - The rc.3 lockfile retains the rc.2 dependency resolution. The November 25 production-dependency audit reported 14 advisories (6 moderate, 7 high and 1 critical). The critical shell-quote advisory is in the Expo/React Native development-tools chain. The release review still needs to establish shipped reachability and qualify any dependency updates.
+
+On the clean rc.3 artifact `b3fdefd32de4` from `f0db6a4cd`, the same revealed N2 headword moved from y1121 to y132 at 844 × 390. Both versions had the introductory notice dismissed. All four grade controls became reachable at both tested phone landscape widths. The separate authenticated host fixture passed all three viewport groups, including Undo and a refused write. The Chromium private-collection walk also restored a complete backup into a second browser context and committed a review on a cold offline route.
+
+In the first-screen article comparison, the number of fully visible Japanese tokens grew from zero to 20 at 568 pixels, 51 at 844 and 94 at 932. Portrait at 390 pixels retained its original 89. The learner opened 新聞 from the article, kept the same entry across rotation, changed furigana and returned to bookmarked token 13. Testing the first-use dictionary popup also exposed a stale screen coordinate on rotation. The follow-up repositions the existing popup against the new viewport and tests the live word in six rotations.
 
 ## Evaluation
 
@@ -68,7 +79,8 @@ Judgments on the inspected paths use five-point increments on a 0–100 scale. T
 1. Install dependencies with `npm ci --ignore-scripts` and start `npm run bunki:web:dev`. The server builds a fresh immutable artifact. Use the reported origin with `?deck=n2&sharedStudy=preview` for the shared renderer, `?deck=n1` for ordinary study and `?deck=personal&ui=ja` for a private collection.
 2. Run `npm run verify:shared-study:release` and `node scripts/verify-shared-study.mjs`. Run the shared browser verifier against the assembled site with `KAIRO_SITE_DIR` and an external `KAIRO_EVIDENCE_DIR`. The presentation, SRS-conformance, reader/bookmark, storage and sync verifiers exercise their respective owners.
 3. Bind two disposable devices, introduce an eligible card, go offline, review independently and reconnect. Inspect the outbox, retrieved events, review head and conflicts on each installation. Test revocation with an unsent review. Use synthetic scopes and retain the original backups.
-4. Run the signed builds on physical iPhone and Mac. Validate foreground/background transitions, device rotation with an IME or VoiceOver active, real-account revocation, incremental transport and restoration from an older backup.
-5. Profile long sessions with thousands of cards and years of retained events on a mid-range phone. Distinguish transfer, parse, render, storage acknowledgement and wire confirmation. No claim about long-term learning efficacy follows from these software checks.
+4. Qualify WebKit reopen first. Measure the full time from navigation to a gradeable card with a persistent profile and verify the pinned corpus. The canonical engine's dictionary preparation is being optimized upstream and requires a reviewed release import.
+5. Run the signed builds on physical iPhone and Mac. Validate foreground/background transitions, device rotation with an IME or VoiceOver active, real-account revocation, incremental transport and restoration from an older backup.
+6. Profile long sessions with thousands of cards and years of retained events on a mid-range phone. Distinguish transfer, parse, render, storage acknowledgement and wire confirmation. No claim about long-term learning efficacy follows from these software checks.
 
 Screenshots and execution receipts belong outside the checkout. The evidence bundle supplied with the work pairs images from matching routes and screen dimensions. The build identity in a receipt identifies the artifact actually exercised.
