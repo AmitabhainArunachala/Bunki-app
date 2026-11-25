@@ -276,10 +276,10 @@ try {
     await page.locator('#me-settings').click();
     await wait(800);
     await page.locator('.srs-preset[data-preset="gentle"]').click();
-    await wait(900);
+    await page.locator('#srs-preset-now').filter({ hasText: 'Gentle' }).waitFor();
     check('settings · the pace stands open and applies', /Gentle/.test((await page.locator('#srs-preset-now').textContent()) || ''));
     await page.locator('.srs-preset[data-preset="standard"]').click();
-    await wait(900);
+    await page.locator('#srs-preset-now').filter({ hasText: 'Standard' }).waitFor();
     check('settings · language, colour theme, layout, sync, export, import and the builder note are here',
       await page.evaluate(() => ['.settings-language', '#settings-world', '#settings-layout', '#record-sync', '#export-store', '#import-store', '#note-input'].every((s) => document.querySelector(s))));
 
@@ -431,6 +431,7 @@ try {
     await page.keyboard.press('Alt+3');
     check('keyboard · a modified number keeps the revealed card and its ledger', (await bare()).revealed && await ledger() === beforeGrade);
     await page.keyboard.press('3');
+    await page.waitForFunction(() => JSON.parse(localStorage.getItem('bunki-cloze:n2'))?.log.length === 1);
     check('keyboard · one plain number records exactly one review', JSON.parse(await ledger()).log.length === 1 && !(await bare()).revealed);
     const afterGrade = await ledger();
     await page.keyboard.press('Control+u');
