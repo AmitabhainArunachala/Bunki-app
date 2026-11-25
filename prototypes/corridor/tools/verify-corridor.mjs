@@ -4205,6 +4205,11 @@ async function main() {
     await page.evaluate(`document.querySelector('.grade.g-good')?.click()`);
     await page.waitForTimeout(300);
   }
+  // The countdown spans the toolbar. Its transparent area must pass touches
+  // through to Undo and More while its End button remains directly operable.
+  for (const selector of ['.review-undo', '#zen-more', '.focus-hud-end']) {
+    await page.locator(selector).tap({ trial: true, timeout: 5000 });
+  }
   const lap1After = await evaluateAppRecord(page, `(() => {
     const e = record;
     return {
