@@ -5582,10 +5582,9 @@ function back({ instant = false } = {}) {
     return;
   }
   if (S.view === 'deckplay' || S.view === 'contextdeck') {
-    S.view = S.view === 'deckplay' ? deckReturnView : 'dojo';
+    S.view = 'dojo';
     render();
     window.scrollTo(0, 0);
-    if (S.view === 'tray') document.querySelector('.today-deck-door')?.focus({ preventScroll: true });
     return;
   }
   if (S.view === 'dojo' || S.view === 'tests') {
@@ -15849,6 +15848,7 @@ function renderTray(main) {
   const legacyReview = !sharedStudyActive();
   const deckDoor = (!legacyReview || !trayToday?.order.length) && window.__CORRIDOR_STANDALONE__ !== true
     ? todayDeckDoor(loadDeckPlayer, () => roomTransition(() => {
+      keepNavigationReturn('dojo', document.getElementById('today-study-deck'));
       S.view = 'dojo';
       render();
       const decks = document.querySelector('[data-learn-section="decks"]');
@@ -29483,13 +29483,12 @@ function loadDeckPlayer() {
 }
 
 let deckOpenRequest = null;
-let deckReturnView = 'dojo';
 function openDeck(id, { autoStart = false } = {}) {
   if (id === 'shared-grammar' && !sharedStudyActive()) return;
   if (!roomTransitionUpdating && (S.view !== 'deckplay' || S.deckPlay !== id)) return roomTransition(() => openDeck(id, { autoStart }));
-  keepScroll();
+  if (S.view === 'tray') keepNavigationReturn('deckplay', document.getElementById('today-study-deck'));
+  else keepScroll();
   deckPlayerError = false;
-  if (S.view !== 'deckplay') deckReturnView = S.view === 'tray' ? 'tray' : 'dojo';
   deckOpenRequest = { id, autoStart };
   S.deckPlay = id;
   S.view = 'deckplay';

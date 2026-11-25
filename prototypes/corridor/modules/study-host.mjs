@@ -706,6 +706,7 @@ function nextDeckSitting(rows) {
 
 function todayDeckDoor(loadPlayer, choose) {
   const button = el('button', 'today-deck-door');
+  button.id = 'today-study-deck';
   button.type = 'button';
   const label = el('span', 'today-deck-label', tx('デッキを選ぶ', 'Choose a study deck'));
   button.append(label, el('i', 'today-arrow'));
