@@ -190,6 +190,9 @@ html[data-room='deckplay'] body:has([data-shared-study='ready']) > #bunki-protot
 }
 html[data-room='deckplay'] body:has([data-shared-study='ready']) #bunki-look-seal {
   inset: env(safe-area-inset-top, 0px) auto auto calc(48px + env(safe-area-inset-left, 0px));
+  /* The seal's inline top clears buttons in its usual right-hand corner.
+     The shared frame instead reserves this left slot in the host toolbar. */
+  top: env(safe-area-inset-top, 0px) !important;
 }
 /* Avoid duplicate outer chrome ear mark while embedded Nihongo Study owns its own working ear inside the frame. */
 html[data-room='deckplay'] body:has(#app > main > [data-shared-study='ready']) #app > .chrome > .ear-spot {

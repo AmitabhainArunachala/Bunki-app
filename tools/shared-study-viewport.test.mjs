@@ -431,6 +431,12 @@ test(
                   (p) => p.hit && document.elementFromPoint(r.left + p.x, r.top + p.y) === child,
                 );
               }, back.points);
+              const sealClearsFrame = await page.evaluate(() => {
+                const seal = document.querySelector('#bunki-look-seal')?.getBoundingClientRect();
+                const chrome = document.querySelector('.chrome').getBoundingClientRect();
+                return !seal?.height || seal.bottom <= chrome.bottom + 1;
+              });
+              assert.ok(sealClearsFrame, 'Bunki theme control clears the embedded study toolbar');
               assert.equal(back.task, before.taskKey);
               assert.equal(back.count, before.count);
               assert.equal(back.points.length, 4);
