@@ -26350,8 +26350,10 @@ function srsReviewLogRow(key, before, after, rating, now, schedNow = now) {
 
 function advanceReviewSession(rv, item, next, entry) {
   if ((next.state === 1 || next.state === 3) && next.scheduled_days < 1) {
-    rv.queue.push(item);
-    entry.reinserted = true;
+    // A short step inside a timed block is another practice pass for this
+    // card. Keep the exact queue entry so Undo removes only this insertion.
+    entry.reinserted = S.focus ? { ...item, drillPass: true } : item;
+    rv.queue.push(entry.reinserted);
   }
   entry.item = item; entry.queueIndex = rv.ix;
   rv.history.push(entry);
@@ -28157,7 +28159,7 @@ function renderReview(main) {
   // exist, and must not burn one of the day's new-card slots. The same
   // rite covers the refill's second lap (POL-12): a card this block
   // already graded took its one honest schedule grade — a repeat pass
-  // (item.drillPass, stamped by refillFocusQueue) is practice, never a
+  // (a short step or a later lap, marked drillPass) is practice, never a
   // same-minute remutation of the long-term schedule. The drill still
   // behaves like a session — short ratings repeat in-session, the
   // judgment lands in the observation ledger as evidence (the drill room
@@ -28616,7 +28618,7 @@ function renderReviewUndo(main, rv) {
       rv.done[last.key] -= 1;
       // if this grade re-queued a learning step, remove that pending copy
       if (last.reinserted) {
-        const tail = rv.queue.lastIndexOf(prevItem);
+        const tail = rv.queue.lastIndexOf(last.reinserted);
         if (tail > previousIndex) rv.queue.splice(tail, 1);
       }
     }

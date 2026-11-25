@@ -6045,6 +6045,8 @@ body.zen .grade-row {
 }
 /* the dojo's clock becomes a whisper: time and one small door, nothing more */
 body.zen .focus-hud {
+  /* Let taps through the transparent clock strip reach More and Undo. */
+  pointer-events: none;
   /* one quiet top line, not a pill floating mid-air: the clock holds the
    * centre and the way out stands in the right corner — the same corner
    * as plain review's ×, so the hand already knows it (operator's real
@@ -6073,6 +6075,7 @@ body.zen .focus-hud-left {
   align-items: center;
 }
 body.zen .focus-hud-end {
+  pointer-events: auto;
   position: absolute;
   right: 6px;
   top: 50%;

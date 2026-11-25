@@ -5124,6 +5124,11 @@ async function main() {
     await page.waitForTimeout(300);
   }
   await waitForAppRecord(page, (r) => (r.revlog || []).length === 2, { timeout: 8000 }).catch(() => {});
+  // The countdown spans the toolbar. Its transparent area must pass touches
+  // through to Undo and More while its End button remains directly operable.
+  for (const selector of ['.review-undo', '#zen-more', '.focus-hud-end']) {
+    await page.locator(selector).tap({ trial: true, timeout: 5000 });
+  }
   const lap1After = await evaluateAppRecord(page, `(() => {
     const e = record;
     return {
