@@ -1,6 +1,6 @@
 /** Host the exact canonical study UI in a same-origin frame. No second player,
  * admission policy, or legacy-ledger writer is implemented in this module. */
-import {sharedStudyRuntime} from '../../shared-study-runtime.mjs';
+import {sharedStudyRuntime,sharedPresentationBinding} from '../../shared-study-runtime.mjs';
 import {openBunkiStudyVoice} from '../../modules/shared-study-voice.mjs';
 let serial=0;
 const element=(tag,text)=>{const node=document.createElement(tag);if(text)node.textContent=text;return node;};
@@ -165,7 +165,7 @@ export async function render(main,{deckId,english=true,onLeave,autoStart}={}) {
     disposers.add(stop);
     return ()=>{disposers.delete(stop);stop();};
   };
-  frame.bunkiStudyPort=Object.freeze({adapter,onCardStart,readAppearance,subscribeAppearance,...(audio?{audio}:{}),...(voice?{voice}:{})});
+  frame.bunkiStudyPort=Object.freeze({adapter,binding:sharedPresentationBinding(adapter),onCardStart,readAppearance,subscribeAppearance,...(audio?{audio}:{}),...(voice?{voice}:{})});
   frame.src=url.href;root.append(frame);
   // the pairing ending under an open screen closes the screen: nothing more is answered into a copy that cannot be sent
   const unhear=paired?.onClosed?.(notice=>{unhear?.();if(request!==serial||!root.isConnected)return;cleanup();renderClosed(root,notice,{english,onLeave});});

@@ -234,6 +234,7 @@ function productModule(path, imports, dependencies) {
   new vm.Script(compiled.outputText, { filename: path }).runInNewContext({
     ...dependencies,
     URLSearchParams,
+    structuredClone,
     exports,
     require: (specifier) => {
       if (!Object.hasOwn(imports, specifier))
@@ -362,7 +363,16 @@ describe('Bunki canonical shared study consumer', () => {
       expect(created).toHaveLength(1);
       expect(attach).toHaveBeenCalledTimes(1);
       expect(attach.mock.calls[0][0].adapter).toBe(created[0]);
-      expect(attach.mock.calls[0][0].binding).toBe(loaded.binding);
+      const { source, grammarAssets, dictionary, counts } = loaded.binding;
+      const pins = { source, grammarAssets, dictionary, counts };
+      expect(attach.mock.calls[0][0].binding).toEqual(pins);
+      const framePins = context.sharedPresentationBinding(result);
+      expect(framePins).toEqual(pins);
+      framePins.counts.tasks = 0;
+      expect(context.sharedPresentationBinding(result).counts.tasks).toBe(counts.tasks);
+      expect(() => context.sharedPresentationBinding({})).toThrow(
+        'shared-host-frame-binding-required',
+      );
       expect(result).not.toBe(created[0]);
       expect(result.store).toBe(store);
       expect(result.backend).toBe(backend);

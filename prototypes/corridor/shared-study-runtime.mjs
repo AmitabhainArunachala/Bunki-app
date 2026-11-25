@@ -5,6 +5,13 @@ import {createSharedStudyStorage} from './shared-study-storage.mjs';
 import {dayBounds,payloadHash} from './vendor/shared-study-engine/client/engine.mjs';
 
 let runtime=null;
+const presentationBindings=new WeakMap();
+/** Only expose the content pins used to build this particular adapter. */
+export function sharedPresentationBinding(adapter) {
+  const binding=presentationBindings.get(adapter);
+  if (!binding) throw Error('shared-host-frame-binding-required');
+  return structuredClone(binding);
+}
 /** The product shell supplies an authenticated identity/storage/transport binding.
  * Existing Bunki schedules cannot be guessed into that binding. */
 export function sharedStudyRuntime() {
@@ -14,11 +21,16 @@ export function sharedStudyRuntime() {
   if (!host && !preview) return Promise.reject(Error('shared-profile-not-bound'));
   runtime=(async()=>{
     const {content,binding}=await loadSharedContent();
+    const {source,grammarAssets,dictionary,counts}=binding;
+    const pins={source,grammarAssets,dictionary,counts};
     const prepare=async adapter=>{
-      const prepared=attachSharedStudyAudioPreparation({adapter,binding});
-      if (!host?.audioPackConfiguration) return prepared;
-      const {attachSharedStudyAudioPacks}=await import('./shared-study-audio-packs.mjs');
-      return attachSharedStudyAudioPacks({adapter:prepared,binding,configuration:host.audioPackConfiguration});
+      let prepared=attachSharedStudyAudioPreparation({adapter,binding:pins});
+      if (host?.audioPackConfiguration) {
+        const {attachSharedStudyAudioPacks}=await import('./shared-study-audio-packs.mjs');
+        prepared=attachSharedStudyAudioPacks({adapter:prepared,binding:pins,configuration:host.audioPackConfiguration});
+      }
+      presentationBindings.set(prepared,pins);
+      return prepared;
     };
     if (host) {
       // Isolated QA hosts own profile create/open serialization and bind the

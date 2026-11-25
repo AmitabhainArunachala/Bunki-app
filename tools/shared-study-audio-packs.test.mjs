@@ -634,16 +634,16 @@ test('complete frame returns child-realm source assignments and preserves exact 
       }),
     }),
   });
-  const data = {
-    'shared-study-content.json': {
-      dictionary: { buildSha256: digest },
-      grammarAssets: {
-        'registry.json': digest,
-        'grammar.json': digest,
-        'grammar-reviews.json': digest,
-      },
-      counts: { vocabulary: 1, grammar: 0 },
+  const frameBinding = {
+    dictionary: { buildSha256: digest },
+    grammarAssets: {
+      'registry.json': digest,
+      'grammar.json': digest,
+      'grammar-reviews.json': digest,
     },
+    counts: { vocabulary: 1, grammar: 0 },
+  };
+  const data = {
     'registry.json': {},
     'grammar.json': {},
     'grammar-reviews.json': {},
@@ -688,7 +688,7 @@ test('complete frame returns child-realm source assignments and preserves exact 
     'globalThis.structuredClone=value=>JSON.parse(JSON.stringify(value));globalThis.window=globalThis;globalThis.addEventListener=()=>{};globalThis.removeEventListener=()=>{};',
     ctx,
   );
-  ctx.frameElement = { bunkiStudyPort: { adapter: g.attached } };
+  ctx.frameElement = { bunkiStudyPort: { binding: frameBinding, adapter: g.attached } };
   const imports = {
     '../../vendor/shared-study-engine/client/app/app.mjs': {
       mountStudyApp(_root, options) {
