@@ -1735,10 +1735,14 @@ test('the ended-pairing count covers unacknowledged answers beyond one upload pa
   }));
   await host.withAdapter(async (binding) => {
     const adapter = await createBunkiStudyAdapter({ ...binding, content });
-    return { ...adapter, store: { ...adapter.store,
-      outbox: (...args) => refused ? rows.slice(0, args[0]) : adapter.store.outbox(...args),
-      readState: (...args) => refused ? { local: rows } : adapter.store.readState(...args),
-    } };
+    return {
+      ...adapter,
+      store: {
+        ...adapter.store,
+        outbox: (...args) => (refused ? rows.slice(0, args[0]) : adapter.store.outbox(...args)),
+        readState: (...args) => (refused ? { local: rows } : adapter.store.readState(...args)),
+      },
+    };
   });
   world.server.revoke(minted.installation);
   refused = true;
