@@ -1,7 +1,7 @@
 import { createDeviceVoice, REASONS as DEVICE_VOICE_REASONS } from './device-voice.mjs';
 import { listsByRecency, moveLists, placeOf, savedBetween, validSaveMemory, withBoxOpened, withListDropped, withListRenamed, withListUsed } from './modules/save-places.mjs';
 import { VOICE_NOTES, VOICE_WORDS, voiceLineOf, voiceShortOf } from './modules/voice-lines.mjs';
-import { activeDictionaryQuery, appendJapaneseLookup, joyoDialChanges, conjugations, dictionaryAnsweredForm, dictionaryDetailsFor, dictionaryGlossSummary, dictionaryLoneDoor, dictionaryQueryError, dictionaryQueryKey, dictionaryReadingSupportsForm, dictionaryRowsForForm, dictionarySearchContext, dictionaryShardNumber, displayPairs, ensureDictionaryRowsForForm, ensureSense, exampleFnv, exampleOrder, fetchExampleJson, findExamples, glossaryCrossRefPlan, hasEmbeddedDictionaryIndex, inlineTokenGloss, inlineWordGloss, inlineWordReading, japaneseLookupEntryRecord, japaneseLookupHelpId, japaneseLookupRecord, kanjiReadingsInWord, loadDictionaryJson, lookup, lookupBlockWords, lookupItemBlocks, lookupOccurrence, nameReaderToken, normalizeGloss, phoneticAnnotationCandidates, phoneticAnnotationIndices, phoneticAnnotationRanges, posLine, readerDoorGloss, readerDoorLead, readerGlossLine, readerGlossMissText, readerHelp, readerLayerParagraph, readerLayerReading, readerLookupAnswer, readerRenderedTokens, readerTokenAt, readerTokenAtIndex, readerTokenNode, readerWordNote, readingAsksIndex, readingExpected, readingForm, readingPlaceFailure, readingTargets, readingToken, readingTokenEntry, readyTokenReading, renderConjugation, renderDictionaryDetails, renderDictionaryHomographs, renderThesaurus, requestDictionaryDetails, senseChoice, senseFillInPlace, senseMoreElement, senseMoreLine, senseNeighbours, senseRefine, senseWithin, tapLadderHint, tokenReading, validDictionaryRow, yomiReadingType } from './modules/dictionary.mjs';
+import { activeDictionaryQuery, appendJapaneseLookup, joyoDialChanges, conjugations, dictionaryAnsweredForm, dictionaryDetailsFor, dictionaryGlossSummary, dictionaryLoneDoor, dictionaryQueryError, dictionaryQueryKey, dictionaryReadingSupportsForm, dictionaryRowsForForm, dictionarySearchContext, dictionaryShardNumber, displayPairs, ensureDictionaryRowsForForm, ensureSense, exampleFnv, exampleOrder, fetchExampleJson, findExamples, glossaryCrossRefPlan, hasEmbeddedDictionaryIndex, inlineTokenGloss, inlineWordGloss, inlineWordReading, japaneseLookupEntryRecord, japaneseLookupHelpId, japaneseLookupRecord, kanjiReadingsInWord, loadDictionaryJson, lookup, lookupBlockWords, lookupItemBlocks, lookupOccurrence, nameReaderToken, normalizeGloss, phoneticAnnotationCandidates, phoneticAnnotationIndices, phoneticAnnotationRanges, posLine, readerDoorGloss, readerDoorLead, readerGlossLine, readerGlossMissText, readerHelp, readerLayerParagraph, readerLayerReading, readerLookupAnswer, readerRenderedTokens, readerTokenAt, readerTokenAtIndex, readerTokenNode, readerWordNote, readingAsksIndex, readingExpected, readingForm, readingPlaceFailure, readingTargets, readingToken, readingTokenEntry, readyTokenReading, renderConjugation, renderDictionaryDetails, renderDictionaryHomographs, renderThesaurus, requestDictionaryDetails, reviewTokenMatcher, senseChoice, senseFillInPlace, senseMoreElement, senseMoreLine, senseNeighbours, senseRefine, senseWithin, tapLadderHint, tokenReading, validDictionaryRow, yomiReadingType } from './modules/dictionary.mjs';
 import { blankSlip, keepMenuInCard, drawSheetActionLine, entryCueReading, findSheetDoor, flySeal, foldEntryForms, holdRing, keepFloatingBeside, keptState, keptWordProjection, listToMarkdown, listeningField, markStripMore, miniKanjiWeb, note, noteSlipDepth, openSlip, openWordWebLadder, paintWordSave, placeSaveMenu, rememberSheet, renderWordCaptureNote, reopenSaveMenu, saveAiDeviceConfig, saveOne, saveReaderPosition, saveReportRelay, saveReportRelayLink, savedNodeRecord, savedRecordNoteDraft, sealHostedWord, setSaveDrawerPush, sheetActionVisitHolds, sheetTakeLabel, slipAllowed, slipHeadword, slipScroller, standingSlip, takenContext, toggleTaken, travelSlip, unsaveEverywhere, wordCaptureBasis, wordCaptureHeldText, wordCaptureOpenLabel, wordCaptureState, wordDepth, wordPresentationKey, wordRow, wordSaveFacts } from './modules/word-entry.mjs';
 import { clearTouchReadingSeat, encounterIdentity, encounterPatch, fileIntakeFailure, filePageLabel, finishTouchReadingFade, holdReaderCapture, readerCaptureReasonText, readerTakeCurrent, readerTakeNode, reconcileSourceInboxEntries, rememberFileDraft, renderEncounterTrail, seatInlineGloss, seatTouchReading, setTouchReadingShown, sourceInboxEntries, sourceLadderAction, sourceProcessingScope, stopTouchReadingFade, syncReaderTakeSeal, touchReading } from './modules/capture.mjs';
 import { cardDepth, cardInk, deckCounts, deckWordsBegun, focusPool, focusProseWord, focusReturnMarkOnce, focusSentencePracticeTarget, gradeTag, guidedCardStatus, guidedDoorInJlptRoom, learnHead, learnerModel, learnerSourceLabel, learningContextRef, learningEnrollHeldText, learningItemNode, lessonChoices, lessonMissedLast, lessonPlan, lessonPreviousRuns, markCardMore, mockSubjectKey, practiceIdentity, presentReviewAnswer, renderFocus, renderSrsStats, reviewAnswerAvailable, reviewBack, reviewCardBack, reviewCounts, sharedStudyActive, sharedStudyFence, srsCardKind, srsDecks, srsForecast, srsLearnerPolicy, srsPrefStep, srsPrefValue, srsPresetState, srsWhen } from './modules/study-host.mjs';
@@ -13612,8 +13612,9 @@ function mountSettledFrontVoice(item) {
   if (takenContextPending(item)) return;
   // a saved sentence whose load failed leaves the face printed; takenContext would only ask for that article again
   const saved = item.ctx ? D.passages.find((x) => x.id === item.ctx.p) : null;
-  if (saved?.tokens && takenContext(item)) return;
-  if ((S.srs[srsKey('word', item.id)]?.reps || 0) % 2 === 1 && (!exampleSearchSettled(item.id) || findExamples(item.id, 1).length)) return;
+  const matches = reviewTokenMatcher(item.id, savedAnswerFor(item));
+  if (saved?.tokens && takenContext(item, matches)) return;
+  if ((S.srs[srsKey('word', item.id)]?.reps || 0) % 2 === 1 && (!exampleSearchSettled(item.id) || findExamples(item.id, 1, null, matches).length)) return;
   // settled printed: the control stands now, and with it the ear may read the printed word, saying what the control says
   appendReviewFrontVoice(face, item, { printed: true, blanked: false });
 }
@@ -27931,6 +27932,7 @@ function renderReview(main) {
   // at capture (この文 / 段落) outranks the corpus draw and shows every
   // time. No hand-made cards; the schedule is the same one card either way.
   let cloze = null;
+  let matches = null;
   // The question side's control stands only on a face known to stay as drawn (card audio, fix round 1): a face drawn with
   // the word printed while the sentence it is asked in is still on its way (the saved sentence's article; for a second
   // repetition, the example search) may be drawn again with the word blanked, and the hidden answer is never spoken.
@@ -27945,10 +27947,11 @@ function renderReview(main) {
         } else mountSettledFrontVoice(item);
       });
     }
-    cloze = takenContext(item);
+    matches = reviewTokenMatcher(item.id, presented?.answer || savedAnswerFor(item));
+    cloze = takenContext(item, matches);
     const inSentence = (S.srs[srsKey('word', item.id)]?.reps || 0) % 2 === 1;
     if (!cloze && inSentence) {
-      cloze = findExamples(item.id, 1)[0] || null;
+      cloze = findExamples(item.id, 1, null, matches)[0] || null;
     }
     faceSettled = !!cloze || (!takenContextPending(item) && (!inSentence || exampleSearchSettled(item.id)));
   }
@@ -27968,12 +27971,12 @@ function renderReview(main) {
     // the card's sentence carries the reader's full gesture grammar — every
     // word tap-circles, holds float its definition
     renderSentenceTokens(line, cloze.tokens, {
-      targetId: item.id,
+      targetId: item.id, matches,
       hideTarget: !rv.revealed,
       contextId: cloze.passage || 'bank',
       start: cloze.start,
     });
-    if (rv.revealed) line.append(sentenceDoor(cloze, item.id));
+    if (rv.revealed) line.append(sentenceDoor(cloze, item.id, cloze.targetOffset ?? cloze.tokens.findIndex(matches)));
     face.append(line);
     if (rv.revealed) {
       const front = el('div', 'review-front reveal r-0', item.label);
@@ -28057,7 +28060,7 @@ function renderReview(main) {
     let exs = [];
     if (item.t === 'word') {
       const clozeText = cloze ? cloze.tokens.map((t) => t.s).join('') : null;
-      exs = findExamples(item.id, 3)
+      exs = findExamples(item.id, 3, null, matches)
         .filter((ex) => ex.tokens.map((t) => t.s).join('') !== clozeText)
         .slice(0, 2);
     }
@@ -28081,8 +28084,8 @@ function renderReview(main) {
         const more = el('div', 'review-more');
         for (const ex of exs) {
           const line = el('p', 'review-example');
-          renderSentenceTokens(line, ex.tokens, { targetId: item.id, contextId: ex.passage || 'bank', start: ex.start });
-          line.append(sentenceDoor(ex, item.id));
+          renderSentenceTokens(line, ex.tokens, { targetId: item.id, matches, contextId: ex.passage || 'bank', start: ex.start });
+          line.append(sentenceDoor(ex, item.id, ex.tokens.findIndex(matches)));
           more.append(line);
         }
         for (const s of senses.slice(3)) more.append(el('div', 'review-sense review-sense-late', s));
@@ -29242,7 +29245,8 @@ function learnStageFace(order) {
   const item = order.find((it) => it.t === 'word' || it.t === 'kanji');
   if (!item) return { item: null };
   if (item.t === 'word' && item.ctx) {
-    const cloze = takenContext(item);
+    const matches = reviewTokenMatcher(item.id, savedAnswerFor(item));
+    const cloze = takenContext(item, matches);
     if (!cloze) {
       const p = D.passages.find((x) => x.id === item.ctx.p);
       if (p && !p.tokens && learnStageAsked !== p.id) {
@@ -29255,7 +29259,7 @@ function learnStageFace(order) {
     let text = '';
     let seen = 0;
     for (const token of cloze.tokens) {
-      if (token.b === item.id) {
+      if (matches(token)) {
         parts.push({ text, at: seen });
         text = '';
         seen += 1;
@@ -30396,7 +30400,7 @@ function renderSentenceTokens(container, tokens, opts = {}) {
       container.append(textNode);
       return;
     }
-    const isTarget = target && token.b === target;
+    const isTarget = opts.matches ? opts.matches(token) : target && token.b === target;
     if (isTarget && opts.hideTarget) {
       container.append(document.createTextNode('＿＿＿'));
       return;

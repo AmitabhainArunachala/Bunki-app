@@ -173,7 +173,7 @@ function fixture(overrides = {}, options = {}) {
     // D23: 学校, the reviewed word, is a core entry so its card has an answer to show and grade
     D: { exampleBank: new Map(), dict: { 学校: { r: 'がっこう', m: ['school'] } }, kanji: options.kanji || {} },
     lookup: (id) => ({ r: 'がっこう', m: [id], seq: 'synthetic-' + id }),
-    findExamples: () => [], takenContext: () => null, ensureBankExamples: async () => [],
+    reviewTokenMatcher: () => () => false, findExamples: () => [], takenContext: () => null, ensureBankExamples: async () => [],
     takenContextPending: () => false, exampleSearchSettled: () => true, mountSettledFrontVoice: () => {},
     reviewBack: () => ({ reading: '', senses: ['synthetic meaning'] }),
     isLeech: () => false, renderAiCoach: () => {},
@@ -230,6 +230,51 @@ async function check(name, action) {
 }
 const grade = (f, overrides = {}) => f.c.commitStandardGrade({ rv: f.S.review, item, key: 'good', skey: 'word:学校',
   rating: fsrsApi.Rating.Good, now: new Date('2026-09-10T10:00:00Z'), day: '2026-09-10', ...overrides });
+
+await check('saved-reading-selects-the-same-target-for-context-and-recall', async () => {
+  const f = fixture();
+  vm.runInContext(liftCorridor(source, [
+    'reviewTokenMatcher', 'takenContext', 'findExamples', 'exampleIdentity', 'exampleOwnRows', 'exampleKanji',
+    'kataToHira', 'KATA_TO_HIRA_OFFSET', 'READER_KANA', 'tokenReading', 'lemmaReading', 'lemmaTakesForm',
+    'GODAN_ROW', 'LEMMA_ONBIN', 'LEMMA_NIDAN', 'dictionaryReadingSupportsForm',
+  ]), f.c);
+  const token = (s, r, b = s) => ({ s, r, b, c: true });
+  const wrong = token('一日', 'ついたち'), right = token('一日', 'いちにち');
+  const stop = { s: '。', b: '。', c: false };
+  const p = { id: 'reading', tokens: [wrong, stop, right, right, stop] };
+  f.c.D.passages = [p];
+  f.c.D.dict['一日'] = { r: 'いちにち', m: ['one day'] };
+  f.c.learnerSourceLabel = article => article.id;
+  f.c.dictionaryRowBySeq = () => null;
+  f.c.dictionaryRowsForForm = () => [];
+  const daily = { t: 'word', id: '一日' };
+  const target = f.c.reviewTokenMatcher(daily.id, f.c.savedAnswerFor(daily));
+  assert.equal(target(wrong), false);
+  assert.equal(target(right), true);
+  for (const index of [0, 1, -1, 10_000]) {
+    assert.equal(f.c.takenContext({ ...daily, ctx: { p: p.id, i: index, scope: 'sent' } }, target), null);
+  }
+  // The tutor can quote a selected passage without any review card.
+  assert.equal(f.c.takenContext({ ctx: { p: p.id, i: 0, scope: 'sent' } }).tokens[0], wrong);
+  const saved = f.c.takenContext({ ...daily, ctx: { p: p.id, i: 3, scope: 'sent' } }, target);
+  assert.equal(saved.start + saved.targetOffset, 3);
+  assert.deepEqual(clone(f.c.findExamples(daily.id, 1, null, target)[0].tokens), [right, right, stop]);
+
+  const write = f.c.reviewTokenMatcher('書く', { status: 'available', reading: 'かく', head: '書く', seq: '7' });
+  assert.equal(write({ ...token('書い', 'かい', '書く'), p: '動詞' }), true);
+  assert.equal(write({ ...token('書く', 'かく'), seq: '99' }), false);
+
+  f.c.D.dict['どきどき'] = { r: 'どきどき', alt: 'ドキドキ', m: ['thumping'] };
+  const katakana = token('ドキドキ', 'ドキドキ');
+  f.c.D.exampleBank.set('どきどき', [{ tokens: [katakana, stop] }, { tokens: [wrong, stop] }]);
+  const beat = f.c.reviewTokenMatcher('どきどき', f.c.savedAnswerFor({ t: 'word', id: 'どきどき' }));
+  const bank = f.c.findExamples('どきどき', 2, null, beat);
+  assert.equal(bank.length, 1);
+  assert.equal(bank[0].tokens.findIndex(beat), 0, 'the variant that admitted this example is the word blanked');
+  assert.equal(f.queue.length, 0, 'resolving review material never requests a record write');
+  assert.deepEqual(f.durable().srs, {});
+  assert.deepEqual(f.durable().revlog, []);
+});
 
 await check('grade-rejection-keeps-schedule-log-stats-and-session-with-double-tap-guard', async () => {
   const f = fixture(); const before = f.durable(); const history = clone(f.S.review.history);
@@ -1109,11 +1154,11 @@ async function browserChecks() {
     } finally { db.close(); }
   }));
   const openToday = (page) => page.locator('#tray, #tab-today').click();
-  const boot = async (page, aiQuiz = null, entry = 'shelf') => {
+  const boot = async (page, aiQuiz = null, entry = 'shelf', taken = null) => {
     await page.goto(origin + '/learning-setup');
-    await page.evaluate(async (initialQuiz) => {
+    await page.evaluate(async ({ initialQuiz, cards }) => {
       localStorage.setItem('kairo-corridor-v1', JSON.stringify({ v: 1,
-        taken: ['学校', '電話', '先生', '時間', '天気'].map((id) => ({ t: 'word', id, label: id, ts: 1700000000000, started: 1700000000000 })),
+        taken: cards || ['学校', '電話', '先生', '時間', '天気'].map((id) => ({ t: 'word', id, label: id, ts: 1700000000000, started: 1700000000000 })),
         aiQuiz: initialQuiz, srs: {}, revlog: [], obslog: [], stats: {}, suspended: {},
         srsPrefs: { newPerDay: 20, reviewLimit: 20 }, futureRoot: { keep: 'synthetic-learning-future' },
       }));
@@ -1125,7 +1170,7 @@ async function browserChecks() {
         };
         request.onsuccess = () => done(request.result); request.onerror = () => fail(request.error);
       }); db.close();
-    }, aiQuiz);
+    }, { initialQuiz: aiQuiz, cards: taken });
     await page.goto(origin + '/index.html?entry=' + entry + '&ui=bi');
     await page.waitForFunction(() => document.body.dataset.ready === '1');
     assert.equal(await page.locator('#store-alert').isVisible(), false, 'Synthetic legacy record migrated without warning');
@@ -1210,6 +1255,49 @@ async function browserChecks() {
             finally { await context.close(); }
           });
         };
+        await journey('stale-saved-context-preserves-the-card-and-only-an-explicit-grade-advances-it', async (page) => {
+          const saved = { t: 'word', id: '学校', label: '学校', ts: 1, started: 1,
+            ctx: { p: 'bunki-essay-n2-handwriting', i: 10_000, scope: 'sent' } };
+          await boot(page, null, 'shelf', [saved]);
+          await openToday(page);
+          await page.locator('#review-start').click();
+          await page.waitForFunction(async id => {
+            const { D } = await import('/corridor.js');
+            return D.passages.find(p => p.id === id)?.tokens?.length > 0;
+          }, saved.ctx.p);
+          await page.locator('#reveal').click();
+          assert.equal(await page.locator('.review-front').innerText(), '学校');
+          assert.equal(await page.locator('.review-cloze').count(), 0);
+          const revealed = await disk(page);
+          assert.deepEqual(revealed.srs, {});
+          assert.deepEqual(revealed.revlog, []);
+          await page.locator('.grade.g-good').click();
+          await pollDisk(page, state => state.revlog.length === 1);
+          await page.reload();
+          await page.waitForFunction(() => document.body.dataset.ready === '1');
+          const after = await disk(page);
+          assert.deepEqual(after.taken, [saved]);
+          assert.equal(after.srs['word:学校'].reps, 1);
+          assert.equal(after.revlog.length, 1);
+        });
+        await journey('return-to-the-saved-inflection-without-writing-a-review', async (page) => {
+          // 手で書くということ uses 書く three times in this paragraph. The
+          // learner kept the final 書き, not its earlier 書い or 書く.
+          const passage = 'bunki-essay-n2-handwriting', index = 119;
+          await boot(page, null, 'shelf', [{ t: 'word', id: '書く', label: '書く', ts: 1, started: 1,
+            from: { passage, index }, ctx: { p: passage, i: index, scope: 'para' } }]);
+          await openToday(page);
+          await page.locator('#review-start').click();
+          await page.locator('.review-cloze').waitFor();
+          const before = await disk(page);
+          assert.equal((await page.locator('.review-cloze').innerText()).split('＿＿＿').length - 1, 3);
+          await page.locator('#reveal').click();
+          await page.locator('.review-cloze .sent-door').click();
+          await page.locator('#sent-home').click();
+          await page.waitForFunction(index => document.activeElement?.dataset.index === String(index), index);
+          const after = await disk(page);
+          for (const root of ['taken', 'srs', 'revlog', 'stats']) assert.deepEqual(after[root], before[root]);
+        });
         await journey('quiz-answer-rejection-and-reload-preserve-the-unanswered-question', async (page) => {
           await boot(page, quiz()); await openToday(page); await page.locator('#aiq-resume').click();
           const before = await fault(page, 'aiQuiz');

@@ -1604,6 +1604,7 @@ function renderSentenceNode(sheet, node) {
   // its mark but joins the ladder like every neighbour
   renderSentenceTokens(line, node.tokens, {
     targetId: node.target || null,
+    ...(Number.isInteger(node.targetOffset) ? { matches: token => token === node.tokens[node.targetOffset] } : {}),
     targetLive: true,
     contextId: node.passage || 'bank',
     start: node.start,
@@ -1640,7 +1641,7 @@ function renderSentenceNode(sheet, node) {
   sheet.append(el('p', 'sent-hint', tx('語をタップ：読み、意味、項目の順。長押しで保存。', 'Tap a word: reading, meaning, entry. Hold to save.')));
 }
 
-function sentenceDoor(ex, target) {
+function sentenceDoor(ex, target, targetOffset = null) {
   const door = el('button', 'sent-door', '▷');
   door.type = 'button';
   door.setAttribute('aria-label', tx('この文だけをひらく', 'open this sentence on its own page'));
@@ -1655,6 +1656,7 @@ function sentenceDoor(ex, target) {
       passage: ex.passage || null,
       start: ex.start,
       target: target || null,
+      ...(Number.isInteger(targetOffset) && targetOffset >= 0 ? { targetOffset } : {}),
     });
   });
   return door;
