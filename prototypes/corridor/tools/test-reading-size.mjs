@@ -80,10 +80,10 @@ try {
               const ruby = n.querySelector('ruby'), reading = ruby.querySelector('rt');
               const rect = reading.getBoundingClientRect();
               return { base: parseFloat(getComputedStyle(ruby).fontSize), ruby: parseFloat(getComputedStyle(reading).fontSize),
-                width: rect.width, shown: getComputedStyle(reading).display !== 'none' };
+                rubyWidth: rect.width, shown: getComputedStyle(reading).display !== 'none' };
             });
             assert.deepEqual([sizes.base, sizes.ruby], width === 844 ? [34.5, 17.25] : [31.5, 15.75]);
-            assert(sizes.shown && sizes.width > 0 && await fits(), `ruby and layout at ${width}px`);
+            assert(sizes.shown && sizes.rubyWidth > 0 && await fits(), `ruby and layout at ${width}px`);
             prose.push({ width, height, ...sizes });
             await shot(`article-${width}`);
           }
