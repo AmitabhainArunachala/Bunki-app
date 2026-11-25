@@ -139,7 +139,7 @@ function createRecordSyncHost({ window, owner, origin, configuration, canConnect
         // revision race. The existing controller must recover before reuse.
         slot.pending.delete(requestId);
         if (method === 'snapshot') {
-          reject(failure('storage-failure'));
+          reject(failure('snapshot-timeout'));
         } else {
           latchUncertain(slot);
           reject(new ReplicationStoreError('reopen-required'));

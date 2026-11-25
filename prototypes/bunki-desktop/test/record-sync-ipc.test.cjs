@@ -141,7 +141,7 @@ test('a delayed snapshot reply leaves the active connection available for a fres
   t.after(() => clearTimeout(keepAlive));
   await f.service.connect(f.registration);
   const before = await f.store.snapshot();
-  assert.deepEqual(await f.service.sync(f.registration), { state: 'error', code: 'storage-failure' });
+  assert.deepEqual(await f.service.sync(f.registration), { state: 'error', code: 'snapshot-timeout' });
   assert.deepEqual(await f.store.snapshot(), before);
   f.service.receiveStoreReply({ registrationId: late.registrationId, requestId: late.requestId,
     response: { ok: false, error: { code: 'reopen-required' } } });
