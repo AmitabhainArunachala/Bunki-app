@@ -7,46 +7,6 @@
     "attemptedAt": "2026-11-26T19:23:19.886Z",
     "reason": "Observation artifact not yet available: bunki-plan-42431546894-2"
   },
-  "42780186199/6": {
-    "result": "observed",
-    "startedAt": "2026-11-12T01:28:00Z"
-  },
-  "42418249759/13": {
-    "result": "observed",
-    "startedAt": "2026-11-12T01:28:35Z"
-  },
-  "42407075841/14": {
-    "result": "observed",
-    "startedAt": "2026-11-12T01:28:40Z"
-  },
-  "42489884950/11": {
-    "result": "observed",
-    "startedAt": "2026-11-12T01:28:23Z"
-  },
-  "42597380709/10": {
-    "result": "observed",
-    "startedAt": "2026-11-12T01:28:12Z"
-  },
-  "42400327580/13": {
-    "result": "observed",
-    "startedAt": "2026-11-12T01:28:46Z"
-  },
-  "42593972611/9": {
-    "result": "observed",
-    "startedAt": "2026-11-12T01:28:13Z"
-  },
-  "42770473307/7": {
-    "result": "observed",
-    "startedAt": "2026-11-12T01:28:08Z"
-  },
-  "42431546894/13": {
-    "result": "observed",
-    "startedAt": "2026-11-12T01:28:24Z"
-  },
-  "42406261624/14": {
-    "result": "observed",
-    "startedAt": "2026-11-12T01:28:41Z"
-  },
   "42780186199/7": {
     "result": "observed",
     "startedAt": "2026-11-12T09:31:05Z"
@@ -1538,5 +1498,13 @@
   "45534312507/7": {
     "result": "observed",
     "startedAt": "2026-11-26T20:21:15Z"
+  },
+  "45561291448/6": {
+    "result": "observed",
+    "startedAt": "2026-11-27T04:24:04Z"
+  },
+  "45530015627/7": {
+    "result": "observed",
+    "startedAt": "2026-11-27T04:24:27Z"
   }
 }
